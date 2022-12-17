@@ -18,6 +18,7 @@ module.exports = {
     alias: {
       configuration: path.join(__dirname, 'config', stage),
     },
+    fallback:  { "events": require.resolve("events/") }
   },
   module: {
     rules: [
