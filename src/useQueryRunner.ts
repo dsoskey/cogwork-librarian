@@ -1,8 +1,11 @@
 import React, { useCallback, useRef, useState } from "react"
 import * as Scry from "scryfall-sdk"
-import { SearchOptions } from "scryfall-sdk/out/api/Cards"
+import { SearchOptions, Sort } from "scryfall-sdk/out/api/Cards"
 import cloneDeep from 'lodash/cloneDeep'
 
+export enum Status {
+    NotStarted, Loading, Success, Error
+}
 export interface EnrichedCard {
     weight: number
     data: Scry.Card
@@ -16,6 +19,7 @@ interface QueryRunner {
     options: SearchOptions
     setOptions: React.Dispatch<React.SetStateAction<SearchOptions>>
     result: Array<EnrichedCard>
+    status: Status
 }
 
 export const weightAlgorithms = {
@@ -26,18 +30,24 @@ export const weightAlgorithms = {
 export const useQueryRunner = (
     getWeight: (index: number) => number = weightAlgorithms.uniform,
     initialQueries: string[] | (() => string[]) = [
-        'o:/sacrifice a.*:/', 
         'o:/sacrifice a.*:/ t:artifact',
-        'o:/sacrifice a.*:/ t:creature'
-    ]
+        'o:/sacrifice a.*:/ t:creature',
+        'o:/add {.}\\./'
+    ],
+    initialOptions: SearchOptions | (() => SearchOptions) = {
+        order: 'cmc',
+        dir: 'auto',
+    }
 ): QueryRunner => {
+    const [status, setStatus] = useState(Status.NotStarted)
     const [result, setResult] = useState<Array<EnrichedCard>>([])
-    const [options, setOptions] = useState<SearchOptions>({})
+    const [options, setOptions] = useState<SearchOptions>(initialOptions)
     const [queries, setQueries] = useState<string[]>(initialQueries)
     
     const _cache = useRef<{ [query: string]: Array<EnrichedCard> }>({}) 
     const rawData = useRef<{ [query: string]: Array<EnrichedCard> }>({})
     const execute = useCallback(() => {
+        setStatus(Status.Loading)
         rawData.current = {}
         // call scryfall
         Promise.allSettled(queries
@@ -47,7 +57,7 @@ export const useQueryRunner = (
                 rawData.current[query] = []
                 if (_cache.current[query] === undefined) {
                     _cache.current[query] = []
-                    Scry.Cards.search(query).on("data", data => {
+                    Scry.Cards.search(query, options).on("data", data => {
                         rawData.current[query].push({ data, weight, matchedQueries: [query] })
                         _cache.current[query].push({ data, weight, matchedQueries: [query] })
                     }).on("done", () => {
@@ -78,9 +88,11 @@ export const useQueryRunner = (
             })
 
             const sorted: Array<EnrichedCard> = Object.values(orgo).sort((a, b) => b.weight - a.weight)
+            const throwErr = promiseResults.filter(it => it.status === 'rejected').length
+            setStatus(throwErr ? Status.Error : Status.Success)
             setResult(sorted)
         })
-    }, [queries, getWeight])
+    }, [queries, options, getWeight])
 
     return {
         execute,
@@ -89,5 +101,6 @@ export const useQueryRunner = (
         setOptions,
         options,
         result,
+        status,
     }
 }

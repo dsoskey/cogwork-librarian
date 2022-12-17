@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { EnrichedCard } from './useQueryRunner';
+import { EnrichedCard, Status } from './useQueryRunner';
 
 interface CardViewProps {
     card: EnrichedCard
@@ -25,19 +25,22 @@ export const CardView = ({ card, revealed }: CardViewProps) => {
 }
 
 interface ResultsProps {
+    status: Status
     result: Array<EnrichedCard>
 }
 
-export const Results = React.memo(({ result }: ResultsProps) => {
+export const Results = React.memo(({ result, status }: ResultsProps) => {
     const [revealed, setRevealed] = useState(false)
 
-    if (result.length === 0) {
+    if (status == Status.NotStarted) {
         return null
     }
     
     return <div className='results'>
         <div className="result-controls">
-            <h2>{result.length} results</h2>
+            <h2>
+                {status === Status.Loading ? "running queries. please be patient..." : `${result.length} results`}
+            </h2>
             <div>
                 <input id="show-details" type='checkbox'
                     value={revealed? 1:0}
@@ -46,8 +49,10 @@ export const Results = React.memo(({ result }: ResultsProps) => {
                 <label htmlFor="show-details">show details</label>
             </div>
         </div>
-        <div className="result-container">
-            {result.slice(0, 100).map(card => <CardView key={card.data.id} card={card} revealed={revealed} />)}
-        </div>
+        {status !== Status.Loading && (
+            <div className="result-container">
+                {result.slice(0, 100).map(card => <CardView key={card.data.id} card={card} revealed={revealed} />)}
+            </div>
+        )}
     </div>
 });
