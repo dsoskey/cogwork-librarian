@@ -3,9 +3,10 @@ import { Sort, SortDirection, UniqueStrategy } from 'scryfall-sdk'
 import { DnDInput } from './dndInput'
 import { Results } from './results'
 import { QueryTextEditor } from './textAreaInput'
-import { useQueryRunner, weightAlgorithms } from './useQueryRunner'
+import { Status, useQueryRunner, weightAlgorithms } from './useQueryRunner'
 import cloneDeep from 'lodash/cloneDeep'
 import { Expander } from './expander'
+import { Loader } from './loader'
 
 export const App = () => {
     const [cardList, setCardList] = useState<string[]>([])
@@ -15,7 +16,8 @@ export const App = () => {
         queries, setQueries,
         options, setOptions,
         status, result,
-    } = useQueryRunner(weightAlgorithms.zipf)
+        report,
+    } = useQueryRunner({ getWeight: weightAlgorithms.zipf })
 
     return (
         <div className="root">
@@ -78,7 +80,7 @@ export const App = () => {
                 </>}
             </div>
 
-            <Results result={result} status={status} addCard={addCard} />
+            <Results report={report} result={result} status={status} addCard={addCard} />
         </div>
     )
 }

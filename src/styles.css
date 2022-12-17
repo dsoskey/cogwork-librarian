@@ -6,6 +6,7 @@
     --gray-68-shadow: rgba(68, 68, 68, 50%);
     --gray-42: rgb(128, 128, 128);
     --blue: hsl(180, 100%, 69%);
+    --green:  hsl(96, 100%, 69%);
     --card-radius: 12px;
     background-color: var(--light-color);
     color: var(--dark-color);
@@ -62,6 +63,15 @@ textarea {
     height: 100%;
     padding: 8px;
 }
+
+.results * {
+    background-color: inherit;
+}
+
+.expander {
+    background-color: inherit;
+}
+
 .expander-action {
     background-color: var(--light-color);
     color: var(--dark-color);
@@ -87,15 +97,17 @@ textarea {
     border-bottom: solid 1px var(--gray-68);
     box-shadow: 0px 2px 2px 0px var(--gray-68-shadow);
     z-index: 2;
-    position: sticky;
+    position: relative;
+    top: 0;
 }
 
 .result-container {
     padding-top: 8px;
     background-color: var(--darker-color);
-    width: 100%;
+
+    /* TODO: FIX HEIGHT ISSUES */
     height: 84vh;
-    overflow: scroll;
+    overflow-y: scroll;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -125,3 +137,17 @@ textarea {
 .card-view .detail {
     margin-top: 4px;
 }
+.loader-holder {
+    width: 500px;
+}
+
+.loader .background {
+    fill: var(--light-color);
+
+}
+
+.loader .foreground {
+    fill: var(--green);
+}
+
+
