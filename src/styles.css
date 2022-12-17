@@ -1,0 +1,16 @@
+textarea {
+    width: 500px;
+    color: hsla(180, 100%, 50%, 0.76);
+    background-color: rgb(68, 68, 68);
+}
+
+.card-view {
+    width: 240px;
+}
+
+.result-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
