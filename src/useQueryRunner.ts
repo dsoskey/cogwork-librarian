@@ -37,7 +37,8 @@ export const useQueryRunner = (
     initialOptions: SearchOptions | (() => SearchOptions) = {
         order: 'cmc',
         dir: 'auto',
-    }
+    },
+    injectPrefix: (query: string) => string = (q) => `-name:/^A-/ (${q})`,
 ): QueryRunner => {
     const [status, setStatus] = useState(Status.NotStarted)
     const [result, setResult] = useState<Array<EnrichedCard>>([])
@@ -54,12 +55,13 @@ export const useQueryRunner = (
             .filter(q => q.length > 0)
             .map((query, index) => new Promise((resolve, reject) => {
                 const weight = getWeight(index)
+                const _cacheKey = `${query}:${JSON.stringify(options)}`
                 rawData.current[query] = []
-                if (_cache.current[query] === undefined) {
-                    _cache.current[query] = []
-                    Scry.Cards.search(query, options).on("data", data => {
+                if (_cache.current[_cacheKey] === undefined) {
+                    _cache.current[_cacheKey] = []
+                    Scry.Cards.search(injectPrefix(query), options).on("data", data => {
                         rawData.current[query].push({ data, weight, matchedQueries: [query] })
-                        _cache.current[query].push({ data, weight, matchedQueries: [query] })
+                        _cache.current[_cacheKey].push({ data, weight, matchedQueries: [query] })
                     }).on("done", () => {
                         console.log("Done")
                         resolve(query)
@@ -68,7 +70,7 @@ export const useQueryRunner = (
                         reject(e)
                     })
                 } else {
-                    rawData.current[query] = cloneDeep(_cache.current[query])
+                    rawData.current[query] = cloneDeep(_cache.current[_cacheKey])
                     resolve(query)
                 }
             })    

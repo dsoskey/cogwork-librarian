@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Sort, SortDirection, UniqueStrategy } from 'scryfall-sdk'
 import { DnDInput } from './dndInput'
 import { Results } from './results'
@@ -8,6 +8,8 @@ import cloneDeep from 'lodash/cloneDeep'
 import { Expander } from './expander'
 
 export const App = () => {
+    const [cardList, setCardList] = useState<string[]>([])
+    const addCard = useCallback((next) => setCardList(prev => [...prev.filter(it => it.length > 0), next]), [setCardList])
     const [inputIsTextArea, setInputIsTextArea] = useState(true)
     const { execute,
         queries, setQueries,
@@ -68,9 +70,15 @@ export const App = () => {
                 <div>
                     <button onClick={execute}>scour the library</button>
                 </div>
+
+                {cardList.length > 0 && <>
+                    <h2>saved cards</h2>
+
+                    <QueryTextEditor queries={cardList} setQueries={setCardList} />
+                </>}
             </div>
 
-            <Results result={result} status={status} />
+            <Results result={result} status={status} addCard={addCard} />
         </div>
     )
 }

@@ -62,6 +62,11 @@ textarea {
     height: 100%;
     padding: 8px;
 }
+.expander-action {
+    background-color: var(--light-color);
+    color: var(--dark-color);
+    border-color: var(--light-color);
+}
 
 .results {
     flex: 4;
@@ -73,16 +78,6 @@ textarea {
     border-bottom-color: var(--dark-color);
     border-right-color: var(--dark-color);
     color: var(--light-color)
-}
-
-.card-view {
-    width: 24%;
-    padding-bottom: 4px;
-}
-
-img {
-    clip-path: inset(0 0 0 0 round var(--card-radius));
-    box-shadow: 4px var(--gray-68);
 }
 
 .result-controls {
@@ -107,8 +102,26 @@ img {
     justify-content: space-around;
 }
 
-.expander-action {
-    background-color: var(--light-color);
-    color: var(--dark-color);
-    border-color: var(--light-color);
+.result-container > :last-child {
+    margin-bottom: 24px;
+}
+
+.card-view {
+    width: 24%;
+    padding-bottom: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-view img {
+    clip-path: inset(0 0 0 0 round var(--card-radius));
+    box-shadow: 4px var(--gray-68);
+}
+
+.card-view .add-button {
+    align-self: center;
+}
+
+.card-view .detail {
+    margin-top: 4px;
 }
