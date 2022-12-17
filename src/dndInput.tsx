@@ -9,7 +9,7 @@ export interface QueryInputProps {
 export const DnDInput = ({ setQueries, queries }: QueryInputProps) => {
     return <div>
         {queries.map((query, index) => <div key={index}>
-            <input value={query} onChange={(event) => setQueries((prev) => {
+            <input className='query-input' value={query} onChange={(event) => setQueries((prev) => {
                 const newQ = cloneDeep(prev)
                 newQ[index] = event.target.value
                 return newQ

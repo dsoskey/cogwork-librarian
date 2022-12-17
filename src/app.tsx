@@ -10,23 +10,25 @@ export const App = () => {
     const { execute, setQueries, queries, result } = useQueryRunner(weightAlgorithms.zipf)
 
     return (
-        <div>
-            <h1>cogwork librarian</h1>
+        <div className="root">
+            <div className="editor">
+                <h1>cogwork librarian</h1>
 
-            <label>enter your queries</label>
+                <label>enter one scryfall query per row</label>
 
-            <div className='result-container'>
                 {inputIsTextArea ? 
                     <QueryTextEditor queries={queries} setQueries={setQueries} /> : 
                     <DnDInput queries={queries} setQueries={setQueries} />
                 }
-            </div>
-            
-            <button onClick={execute}>run</button>
-            <button onClick={() => setInputIsTextArea((prev) => !prev)}>
-                switch to {inputIsTextArea ? "drag and drop" : "query editor"}
-            </button>
 
+                <div>
+                    <button onClick={execute}>run</button>
+                    <button onClick={() => setInputIsTextArea((prev) => !prev)}>
+                        switch to {inputIsTextArea ? "drag and drop" : "query editor"}
+                    </button>
+                </div>
+                
+            </div>
             <Results result={result} />            
         </div>
     )
