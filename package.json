@@ -6,7 +6,6 @@
   "scripts": {
     "test": "npm run lint-ts && npm run lint-css && npm run test-ts",
     "test-ts": "npx jest",
-    "postinstall": "cp -R ./prism/ ./dist",
     "start-dev": "webpack-dev-server --config ./webpack.dev.js",
     "build-dev": "webpack --config ./webpack.dev.js",
     "build-prod": "webpack --config ./webpack.prod.js",
