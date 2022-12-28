@@ -1,4 +1,4 @@
-# cogwork-librarian
+# [cogwork-librarian](https://coglib.sosk.watch/)
 
 ## prereqs
 
