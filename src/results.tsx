@@ -32,7 +32,7 @@ export const CardView = ({ onAdd, card, revealed, visibleDetails }: CardViewProp
             {visibleDetails.has(WEIGHT) && <div>weight: {card.weight.toPrecision(4)}</div>}
             {visibleDetails.has(QUERIES) && <>
                 <div>matched queries:</div>
-                <code>{card.matchedQueries.join(',\n')}</code>
+                <code className="language-regex">{card.matchedQueries.join(',\n')}</code>
             </>}
         </div>}
     </div>)
@@ -86,7 +86,7 @@ export const Results = React.memo(({ addCard, result, status, report }: ResultsP
                         <div>
                             <input id="show-weight" type='checkbox'
                                 checked={visibleDetails.has(WEIGHT)}
-                                onChange={event => {
+                                onChange={_ => {
                                     setVisibleDetails((prev) => {
                                         const next = cloneDeep(prev)
                                         if (next.has(WEIGHT)) {
@@ -120,7 +120,7 @@ export const Results = React.memo(({ addCard, result, status, report }: ResultsP
             </div>
         </div>
 
-        {status !== Status.Loading && (
+        {result.length > 0 && (
             <div className="result-container">
                 {result.slice(0, cardCount).map(card => <CardView
                     onAdd={() => addCard(card.data.name)}

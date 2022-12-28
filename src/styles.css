@@ -5,7 +5,8 @@
     --gray-68: rgb(68, 68, 68);
     --gray-68-shadow: rgba(68, 68, 68, 50%);
     --gray-42: rgb(128, 128, 128);
-    --blue: hsl(180, 100%, 69%);
+    --blue: hsla(180, 100%, 69%, 100%);
+    --blue-low-alpha: hsla(180, 100%, 69%, 50%);
     --green:  hsl(96, 100%, 69%);
     --card-radius: 12px;
     background-color: var(--light-color);
@@ -21,7 +22,6 @@
     flex-wrap: wrap;
 }
 
-
 button {
     background-color: var(--dark-color);
     border-top-color: var(--gray-42);
@@ -31,7 +31,7 @@ button {
     color: var(--light-color);
 }
 
-textarea, input {
+input {
     color: var(--blue);
     background-color: var(--gray-68);
     border-top-color: var(--gray-42);
@@ -41,9 +41,51 @@ textarea, input {
     font-family: monospace;
 }
 
-textarea {
-    width: 500px;
+.query-editor {
+    width: 100%;
+    height: max-content;
+
 }
+.query-editor .controller {
+    /* copies prism theme */
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 1em;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+    padding: 1em;
+    margin: .5em 0;
+    overflow: auto;
+    border: none;
+
+    caret-color: var(--blue);
+    color: transparent;
+    width: 500px;
+    background-color: transparent;
+    resize: none;
+    position: fixed;
+    z-index: 3;
+    box-sizing: border-box;
+
+}
+
+*:focus-visible {
+    outline: 2px inset var(--blue);
+}
+
+.query-editor .controller::selection {
+    background-color: var(--blue-low-alpha);
+}
+.query-editor .display {
+    width: 500px;
+    z-index: 2;
+    box-sizing: border-box;
+    display: inline-block;
+}
+
 .query-input {
     width: 350px;
 }

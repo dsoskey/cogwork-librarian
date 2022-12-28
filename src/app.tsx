@@ -64,20 +64,18 @@ export const App = () => {
                         </select>
                     </div>
 
-                    <button onClick={() => setInputIsTextArea((prev) => !prev)}>
+                    {/* <button onClick={() => setInputIsTextArea((prev) => !prev)}>
                         switch to {inputIsTextArea ? "drag and drop" : "query editor"}
-                    </button>
+                    </button> */}
                 </Expander>
                     
                 <div>
                     <button onClick={execute}>scour the library</button>
                 </div>
 
-                {cardList.length > 0 && <>
-                    <h2>saved cards</h2>
+                <h2>saved cards</h2>
 
-                    <QueryTextEditor queries={cardList} setQueries={setCardList} />
-                </>}
+                <QueryTextEditor queries={cardList} setQueries={setCardList} />
             </div>
 
             <Results report={report} result={result} status={status} addCard={addCard} />
