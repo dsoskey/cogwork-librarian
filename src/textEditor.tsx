@@ -1,8 +1,21 @@
 import Prism from 'prismjs'
 import React, { useRef } from 'react'
-import { QueryInputProps } from "./dndInput"
-const MIN_TEXTAREA_HEIGHT = 32;
-export const QueryTextEditor = ({ queries, setQueries }: QueryInputProps) => {
+
+const MIN_TEXTAREA_HEIGHT = 32
+
+export interface QueryInputProps {
+    setQueries: React.Dispatch<React.SetStateAction<string[]>>
+    queries: string[]
+    placeholder?: string | undefined
+    language?: 'regex'
+}
+
+export const TextEditor = ({ 
+    queries, 
+    setQueries, 
+    placeholder, 
+    language,
+}: QueryInputProps) => {
     const value = queries.join("\n")
     const controller = useRef<HTMLTextAreaElement>()
     const faker = useRef<HTMLPreElement>()
@@ -31,11 +44,15 @@ export const QueryTextEditor = ({ queries, setQueries }: QueryInputProps) => {
             ref={controller}
             className="controller"
             value={value}
+            placeholder={placeholder}
             onChange={(event) => {
                 setQueries(event.target.value.split("\n"))
             }} 
         />
-        <pre ref={faker} tabIndex={-1} className="language-regex display"><code className="match-braces">
+
+        <pre ref={faker} tabIndex={-1}
+            className={`language-${language ?? 'none'} display`}
+        ><code className="match-braces">
             {value}
         </code></pre>
     </div>

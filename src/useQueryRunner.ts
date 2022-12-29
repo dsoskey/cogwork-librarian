@@ -1,14 +1,12 @@
 import React, { useCallback, useRef, useState } from "react"
 import * as Scry from "scryfall-sdk"
-import Cards, { Card, SearchOptions, Sort } from "scryfall-sdk/out/api/Cards"
+import { Card, SearchOptions } from "scryfall-sdk/out/api/Cards"
 import cloneDeep from 'lodash/cloneDeep'
 import { QueryReport, useReporter } from "./useReporter"
 import MagicEmitter from "scryfall-sdk/out/util/MagicEmitter"
 import MagicQuerier, { List, SearchError } from "scryfall-sdk/out/util/MagicQuerier"
+import { TaskStatus } from "./types"
 
-export enum Status {
-    NotStarted, Loading, Success, Error
-}
 export interface EnrichedCard {
     weight: number
     data: Scry.Card
@@ -43,7 +41,7 @@ interface QueryRunner {
     options: SearchOptions
     setOptions: React.Dispatch<React.SetStateAction<SearchOptions>>
     result: Array<EnrichedCard>
-    status: Status,
+    status: TaskStatus,
     report: QueryReport,
 }
 
@@ -70,7 +68,7 @@ export const useQueryRunner = ({
         dir: 'auto',
     },
 }: QueryRunnerProps): QueryRunner => {
-    const [status, setStatus] = useState(Status.NotStarted)
+    const [status, setStatus] = useState<TaskStatus>('unstarted')
     const [result, setResult] = useState<Array<EnrichedCard>>([])
     const [options, setOptions] = useState<SearchOptions>(initialOptions)
     const [queries, setQueries] = useState<string[]>(initialQueries)
@@ -79,7 +77,7 @@ export const useQueryRunner = ({
     const _cache = useRef<{ [query: string]: Array<EnrichedCard> }>({}) 
     const rawData = useRef<{ [query: string]: Array<EnrichedCard> }>({})
     const execute = useCallback(() => {
-        setStatus(Status.Loading)
+        setStatus('loading')
         const filteredQueries = queries.filter(q => q.length > 0)
         report.reset(filteredQueries.length)
         rawData.current = {}
@@ -130,7 +128,7 @@ export const useQueryRunner = ({
 
             const sorted: Array<EnrichedCard> = Object.values(orgo).sort((a, b) => b.weight - a.weight)
             const throwErr = promiseResults.filter(it => it.status === 'rejected').length
-            setStatus(throwErr ? Status.Error : Status.Success)
+            setStatus(throwErr ? 'error' : 'success')
             setResult(sorted)
         })
     }, [queries, options, getWeight])

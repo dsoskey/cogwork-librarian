@@ -13,6 +13,10 @@
     color: var(--dark-color);
 }
 
+*:focus-visible {
+    outline: 2px inset var(--blue);
+}
+
 .root {
     height: 100vh;
     overflow: hidden;
@@ -41,11 +45,25 @@ input {
     font-family: monospace;
 }
 
+.input-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+
+    max-width: 50%;
+    height: 100%;
+    padding: 8px;
+}
+
+.input-column .execute {
+    padding-bottom: .25em;
+}
+
 .query-editor {
     width: 100%;
     height: max-content;
-
 }
+
 .query-editor .controller {
     /* copies prism theme */
     font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -69,41 +87,21 @@ input {
     position: fixed;
     z-index: 3;
     box-sizing: border-box;
-
-}
-
-*:focus-visible {
-    outline: 2px inset var(--blue);
 }
 
 .query-editor .controller::selection {
     background-color: var(--blue-low-alpha);
 }
+
+.query-editor .controller::placeholder {
+    color: var(--blue);
+}
+
 .query-editor .display {
     width: 500px;
     z-index: 2;
     box-sizing: border-box;
     display: inline-block;
-}
-
-.query-input {
-    width: 350px;
-}
-
-.root {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-.editor {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-
-    max-width: 50%;
-    height: 100%;
-    padding: 8px;
 }
 
 .results * {
@@ -146,8 +144,6 @@ input {
 .result-container {
     padding-top: 8px;
     background-color: var(--darker-color);
-
-    /* TODO: FIX HEIGHT ISSUES */
     height: 84vh;
     overflow-y: scroll;
     display: flex;
@@ -179,13 +175,13 @@ input {
 .card-view .detail {
     margin-top: 4px;
 }
+
 .loader-holder {
     width: 500px;
 }
 
 .loader .background {
     fill: var(--light-color);
-
 }
 
 .loader .foreground {

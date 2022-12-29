@@ -6,6 +6,9 @@ export interface QueryInputProps {
     queries: string[]
 }
 
+/**
+ * @deprecated for now. Will revive upon demand and once i better understand what i want it to look like
+ */
 export const DnDInput = ({ setQueries, queries }: QueryInputProps) => {
     return <div>
         {queries.map((query, index) => <div key={index}>

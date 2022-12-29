@@ -2,7 +2,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import React, { useState } from 'react'
 import { Expander } from './expander';
 import { Loader } from './loader';
-import { EnrichedCard, Status } from './useQueryRunner';
+import { TaskStatus } from './types';
+import { EnrichedCard } from './useQueryRunner';
 import { QueryReport } from './useReporter';
 
 interface CardViewProps {
@@ -10,7 +11,6 @@ interface CardViewProps {
     revealed: boolean
     visibleDetails: Set<string>
     onAdd: () => void
-
 }
 
 export const CardView = ({ onAdd, card, revealed, visibleDetails }: CardViewProps) => {
@@ -39,7 +39,7 @@ export const CardView = ({ onAdd, card, revealed, visibleDetails }: CardViewProp
 }
 
 interface ResultsProps {
-    status: Status
+    status: TaskStatus
     result: Array<EnrichedCard>
     report: QueryReport
     addCard: (name: string) => void
@@ -52,17 +52,17 @@ export const Results = React.memo(({ addCard, result, status, report }: ResultsP
     const [visibleDetails, setVisibleDetails] = useState(new Set(['weight', 'queries']))
     const [cardCount, setCardCount] = useState(100)
 
-    if (status == Status.NotStarted) {
+    if (status == 'unstarted') {
         return null
     }
     
     return <div className='results'>
         <div className="result-controls">
             <h2>
-                {status === Status.Loading ? "running queries. please be patient..." : `displaying ${cardCount} of ${result.length} results`}
+                {status === 'loading' ? "running queries. please be patient..." : `displaying ${cardCount} of ${result.length} results`}
             </h2>
             <div>
-                {status === Status.Loading && <div className="loader-holder">
+                {status === 'loading' && <div className="loader-holder">
                     {report.totalQueries > 0 && <Loader
                         label="queries curated"
                         width={500}
@@ -76,7 +76,7 @@ export const Results = React.memo(({ addCard, result, status, report }: ResultsP
                         total={report.totalCards}
                     />}
                 </div>}
-                {status !== Status.Loading && <>
+                {status !== 'loading' && <>
                     <input id="show-details" type='checkbox'
                         checked={revealed}
                         onChange={() => setRevealed((prev) => !prev)}
