@@ -3,17 +3,20 @@ import React from 'react'
 import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
 import { Expander } from './expander'
 import { TextEditor } from './textEditor'
+import { DataSource, DATA_SOURCE, Setter } from './types'
 
 export interface QueryFormProps {
     execute: () => void
     queries: string[]
-    setQueries: React.Dispatch<React.SetStateAction<string[]>>
+    setQueries: Setter<string[]>
     options: SearchOptions
-    setOptions: React.Dispatch<React.SetStateAction<SearchOptions>>
+    setOptions: Setter<SearchOptions>
+    source: DataSource
+    setSource: Setter<DataSource>
 }
 
 export const QueryForm = ({
-    execute, queries, setQueries, options, setOptions
+    execute, queries, setQueries, options, setOptions, source, setSource,
 }: QueryFormProps) => {
     
     return <>
@@ -30,6 +33,16 @@ export const QueryForm = ({
         </div>
 
         <Expander title="search options">
+            <div>
+                <label htmlFor="source">data source: </label>
+                <select id="source" value={source} onChange={event => {
+                    setSource(event.target.value as DataSource)
+                }}>
+                    {Object.keys(DATA_SOURCE)
+                    .map((it => <option key={it} value={it}>{it}</option>))}
+                </select>
+            </div>
+
             <div>
                 <label htmlFor="sort">sort by: </label>
                 <select id="sort" value={options.order} onChange={event => {

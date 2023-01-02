@@ -2,8 +2,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import React, { useState } from 'react'
 import { Expander } from './expander';
 import { Loader } from './loader';
+import { EnrichedCard } from './queryRunnerCommon';
 import { TaskStatus } from './types';
-import { EnrichedCard } from './useQueryRunner';
 import { QueryReport } from './useReporter';
 
 interface CardViewProps {
@@ -63,6 +63,7 @@ export const Results = React.memo(({ addCard, result, status, report }: ResultsP
             </h2>
             <div>
                 {status === 'loading' && <div className="loader-holder">
+                    {report.start && `Time elapsed: ${(Date.now() - report.start) / 1000}s`}
                     {report.totalQueries > 0 && <Loader
                         label="queries curated"
                         width={500}
@@ -77,6 +78,7 @@ export const Results = React.memo(({ addCard, result, status, report }: ResultsP
                     />}
                 </div>}
                 {status !== 'loading' && <>
+                    {report.start && report.end && `query ran in ${(report.end - report.start) / 1000}s`}
                     <input id="show-details" type='checkbox'
                         checked={revealed}
                         onChange={() => setRevealed((prev) => !prev)}

@@ -1,19 +1,31 @@
 import React, { useCallback, useState } from 'react'
 import { Results } from './results'
 import { TextEditor } from './textEditor'
-import { useQueryRunner, weightAlgorithms } from './useQueryRunner'
+import { useQueryRunner } from './local/useQueryRunner'
 import { useCogDB } from './local/useCogDB'
 import { QueryForm } from './queryForm'
+import { useScryfallQueryRunner } from './scryfall/useQueryRunner'
+import { DataSource } from './types'
+import { useQueryForm } from './useQueryForm'
+import { weightAlgorithms } from './queryRunnerCommon'
 
 export const App = () => {
+    const [source, setSource] = useState<DataSource>("scryfall")
     const [cardList, setCardList] = useState<string[]>([])
     const addCard = useCallback((next) => setCardList(prev => [...prev.filter(it => it.length > 0), next]), [setCardList])
-    const { execute, report,
+    const localQueryRunner = useQueryRunner({ getWeight: weightAlgorithms.zipf })
+    const scryQueryRunner = useScryfallQueryRunner({ getWeight: weightAlgorithms.zipf })
+    const { status: dbStatus } = useCogDB()
+    const {
         queries, setQueries,
         options, setOptions,
+    } = useQueryForm({})
+    const { execute, report,
         status, result,
-    } = useQueryRunner({ getWeight: weightAlgorithms.zipf })
-    const { status: dbStatus } = useCogDB()
+    } = {
+        local: localQueryRunner,
+        scryfall: scryQueryRunner,
+    }[source]
 
     return (
         <div className="root">
@@ -22,9 +34,10 @@ export const App = () => {
 
                 {dbStatus === 'loading' && 'Indexing local database...'}
 
-                {dbStatus === 'success' && <QueryForm execute={execute}
+                {dbStatus === 'success' && <QueryForm execute={() => execute(queries, options)}
                     queries={queries} setQueries={setQueries}
                     options={options} setOptions={setOptions}
+                    source={source} setSource={setSource}
                 />}
 
                 <h2>saved cards</h2>

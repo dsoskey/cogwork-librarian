@@ -1,17 +1,12 @@
-import React, { useCallback, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import * as Scry from "scryfall-sdk"
-import { Card, SearchOptions } from "scryfall-sdk/out/api/Cards"
+import { Card, SearchOptions } from "scryfall-sdk"
 import cloneDeep from 'lodash/cloneDeep'
-import { QueryReport, useReporter } from "./useReporter"
+import { useReporter } from "../useReporter"
 import MagicEmitter from "scryfall-sdk/out/util/MagicEmitter"
 import MagicQuerier, { List, SearchError } from "scryfall-sdk/out/util/MagicQuerier"
-import { TaskStatus } from "./types"
-
-export interface EnrichedCard {
-    weight: number
-    data: Scry.Card
-    matchedQueries: string[]
-}
+import { TaskStatus } from "../types"
+import { EnrichedCard, injectors, QueryRunner, QueryRunnerProps, weightAlgorithms } from "../queryRunnerCommon"
 
 class MyCards extends MagicQuerier {
     public searchCount(query: string, options?: SearchOptions | number) {
@@ -27,56 +22,19 @@ class MyCards extends MagicQuerier {
 }
 const MYCARDS = new MyCards()
 
-interface QueryRunnerProps {
-    getWeight?: (index: number) => number
-    injectPrefix?: (query: string) => string,
-    initialQueries?: string[] | (() => string[]),
-    initialOptions?: SearchOptions | (() => SearchOptions),
-}
-
-interface QueryRunner {
-    execute: () => void
-    queries: string[]
-    setQueries: React.Dispatch<React.SetStateAction<string[]>>
-    options: SearchOptions
-    setOptions: React.Dispatch<React.SetStateAction<SearchOptions>>
-    result: Array<EnrichedCard>
-    status: TaskStatus,
-    report: QueryReport,
-}
-
-export const weightAlgorithms = {
-    zipf: (index: number) => 1 / (index + 2),
-    uniform: (_: number) => 1,
-}
-
-export const injectors = {
-    noDigital: (query: string) => `-is:digital (${query})`,
-}
-
-
-export const useQueryRunner = ({
+export const useScryfallQueryRunner = ({
     getWeight = weightAlgorithms.uniform,
     injectPrefix = injectors.noDigital,
-    initialQueries = [
-        'o:/sacrifice a.*:/ t:artifact',
-        'o:/sacrifice a.*:/ t:creature',
-        'o:/add {.}\\./'
-    ],
-    initialOptions = {
-        order: 'cmc',
-        dir: 'auto',
-    },
 }: QueryRunnerProps): QueryRunner => {
     const [status, setStatus] = useState<TaskStatus>('unstarted')
     const [result, setResult] = useState<Array<EnrichedCard>>([])
-    const [options, setOptions] = useState<SearchOptions>(initialOptions)
-    const [queries, setQueries] = useState<string[]>(initialQueries)
     const report = useReporter()
     
-    const _cache = useRef<{ [query: string]: Array<EnrichedCard> }>({}) 
+    // should this be 
+    const _cache = useRef<{ [query: string]: Array<EnrichedCard> }>({})
     const rawData = useRef<{ [query: string]: Array<EnrichedCard> }>({})
-    const execute = useCallback(() => {
+
+    const execute = useCallback((queries: string[], options: SearchOptions) => {
         setStatus('loading')
         const filteredQueries = queries.filter(q => q.length > 0)
         report.reset(filteredQueries.length)
@@ -129,16 +87,13 @@ export const useQueryRunner = ({
             const sorted: Array<EnrichedCard> = Object.values(orgo).sort((a, b) => b.weight - a.weight)
             const throwErr = promiseResults.filter(it => it.status === 'rejected').length
             setStatus(throwErr ? 'error' : 'success')
+            report.markTimepoint('end')
             setResult(sorted)
         })
-    }, [queries, options, getWeight])
+    }, [getWeight])
 
     return {
         execute,
-        setQueries,
-        queries,
-        setOptions,
-        options,
         result,
         status,
         report

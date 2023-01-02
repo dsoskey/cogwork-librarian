@@ -5,17 +5,19 @@ import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 type ManifestKeys = 'id' | 'uri' | 'type' | 'updated_at'
 export type Manifest = Pick<BulkDataDefinition, ManifestKeys>
 
-type CardKeys =
+export type CardKeys =
  'id' |
  'oracle_id' | 
  'cmc' |
  'color_identity' |
  'colors' |
  'name' |
- 'oracle_text'
+ 'oracle_text' |
+ 'power' |
+ 'toughness'
 export type CardTable = Pick<Card, CardKeys>
 
-class TypedDexie extends Dexie {
+export class TypedDexie extends Dexie {
     manifest!: Table<Manifest>
 
     card!: Table<CardTable>
@@ -82,7 +84,7 @@ class TypedDexie extends Dexie {
             toughness 	String 	Nullable 	This card’s toughness, if any. Note that some cards have toughnesses that are not numeric, such as *.
             type_line 	String 		The type line of this card. 
             */
-            card: 'id, oracle_id',
+            card: 'id, oracle_id, cmc, color_identity, colors, name, oracle_text, power, toughness',
         })
     }
 }
