@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { SearchOptions } from "scryfall-sdk";
-import { useLocalStorage } from "./local/useLocalStorage";
-import { Setter } from "./types";
+import { useLocalStorage } from "../../api/local/useLocalStorage";
+import { Setter } from "../../types";
 
 interface QueryFormProps {
     initialQueries?: string[] | (() => string[]),
@@ -26,8 +25,8 @@ export const useQueryForm = ({
         dir: 'auto',
     },
 }: QueryFormProps): QueryFormState => {
-    const [options, setOptions] = useLocalStorage<SearchOptions>("search-options.coglib.sosk.watch", initialOptions)
-    const [queries, setQueries] = useLocalStorage<string[]>("queries.coglib.sosk.watch", initialQueries)
+    const [options, setOptions] = useLocalStorage<SearchOptions>("search-options", initialOptions)
+    const [queries, setQueries] = useLocalStorage<string[]>("queries", initialQueries)
     
     return { options, setOptions, queries, setQueries }
 }

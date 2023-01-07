@@ -1,14 +1,14 @@
 import React, { useCallback, useState } from 'react'
-import { Results } from './results'
-import { TextEditor } from './textEditor'
-import { useQueryRunner } from './local/useQueryRunner'
-import { useCogDB } from './local/useCogDB'
-import { QueryForm } from './queryForm'
-import { useScryfallQueryRunner } from './scryfall/useQueryRunner'
+import { BrowserView } from './ui/cardBrowser/browserView'
+import { TextEditor } from './ui/textEditor'
+import { useQueryRunner } from './api/local/useQueryRunner'
+import { useCogDB } from './api/local/useCogDB'
+import { QueryForm } from './ui/queryForm/queryForm'
+import { useScryfallQueryRunner } from './api/scryfall/useQueryRunner'
 import { DataSource } from './types'
-import { useQueryForm } from './useQueryForm'
-import { weightAlgorithms } from './queryRunnerCommon'
-import { useLocalStorage } from './local/useLocalStorage'
+import { useQueryForm } from './ui/queryForm/useQueryForm'
+import { weightAlgorithms } from './api/queryRunnerCommon'
+import { useLocalStorage } from './api/local/useLocalStorage'
 
 export const App = () => {
     const [source, setSource] = useLocalStorage<DataSource>("source.coglib.sosk.watch","scryfall")
@@ -22,7 +22,7 @@ export const App = () => {
         options, setOptions,
     } = useQueryForm({ initialQueries: [
         `o:"whenever ~ deals"`,
-        `o=combat`
+        `o=extra`
     ]})
     const { execute, report,
         status, result,
@@ -38,7 +38,8 @@ export const App = () => {
 
                 {dbStatus === 'loading' && 'Indexing local database...'}
 
-                {dbStatus === 'success' && <QueryForm execute={() => execute(queries, options)}
+                {dbStatus === 'success' && <QueryForm
+                    status={status} execute={() => execute(queries, options)}
                     queries={queries} setQueries={setQueries}
                     options={options} setOptions={setOptions}
                     source={source} setSource={setSource}
@@ -53,7 +54,7 @@ export const App = () => {
                 />
             </div>
 
-            <Results report={report} result={result} status={status} addCard={addCard} />
+            <BrowserView report={report} result={result} status={status} addCard={addCard} />
         </div>
     )
 }

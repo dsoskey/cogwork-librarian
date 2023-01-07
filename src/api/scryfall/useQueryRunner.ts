@@ -5,7 +5,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import { useReporter } from "../useReporter"
 import MagicEmitter from "scryfall-sdk/out/util/MagicEmitter"
 import MagicQuerier, { List, SearchError } from "scryfall-sdk/out/util/MagicQuerier"
-import { TaskStatus } from "../types"
+import { TaskStatus } from "../../types"
 import { EnrichedCard, injectors, QueryRunner, QueryRunnerProps, weightAlgorithms } from "../queryRunnerCommon"
 
 class MyCards extends MagicQuerier {

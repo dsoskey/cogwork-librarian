@@ -1,66 +1,30 @@
 import cloneDeep from 'lodash/cloneDeep';
 import React, { useState } from 'react'
-import { Card, ImageUris } from 'scryfall-sdk';
-import { Expander } from './expander';
-import { Loader } from './loader';
-import { EnrichedCard } from './queryRunnerCommon';
-import { TaskStatus } from './types';
-import { QueryReport } from './useReporter';
+import { CardView } from './cardView';
+import { PAGE_SIZE, WEIGHT, QUERIES } from './constants';
+import { Expander } from '../expander';
+import { Loader } from '../loader';
+import { useLocalStorage } from '../../api/local/useLocalStorage';
+import { EnrichedCard } from '../../api/queryRunnerCommon';
+import { TaskStatus } from '../../types';
+import { QueryReport } from '../../api/useReporter';
+import { PageControl } from './pageControl';
 
-interface CardViewProps {
-    card: EnrichedCard
-    revealed: boolean
-    visibleDetails: Set<string>
-    onAdd: () => void
-}
-
-const getBackImageURI = (card: Card, version: keyof ImageUris) => {
-    return card.card_faces.length === 1
-        ? ""
-        : card.card_faces[1].image_uris[version] ?? ""
-}
-
-export const CardView = ({ onAdd, card, revealed, visibleDetails }: CardViewProps) => {
-    const [flipped, setFlipped] = useState(false)
-    const _card = card.data
-    const imageSource = flipped ? getBackImageURI(_card,'normal') : _card.getFrontImageURI('normal')
-
-    return (<div className='card-view'>
-        <a href={card.data.scryfall_uri.replace(/\?.*$/, '')} target="_blank" rel="noopener">
-            <img width="100%"
-                src={imageSource} 
-                alt={card.data.name}
-                title={card.data.name}
-            />
-        </a>
-        <div className='add-button'>
-            {card.data.card_faces.length > 1 && <button onClick={() => setFlipped(prev => !prev)}>flip</button>}
-            <button onClick={onAdd}>add to list</button>
-        </div>
-        {revealed && <div className='detail'>
-            <div>{card.data.name}</div>
-            {visibleDetails.has(WEIGHT) && <div>weight: {card.weight.toPrecision(4)}</div>}
-            {visibleDetails.has(QUERIES) && <>
-                <div>matched queries:</div>
-                <code className="language-regex">{card.matchedQueries.join(',\n')}</code>
-            </>}
-        </div>}
-    </div>)
-}
-
-interface ResultsProps {
+interface BrowserViewProps {
     status: TaskStatus
     result: Array<EnrichedCard>
     report: QueryReport
     addCard: (name: string) => void
 }
 
-const WEIGHT = 'weight'
-const QUERIES = 'queries'
-export const Results = React.memo(({ addCard, result, status, report }: ResultsProps) => {
-    const [revealed, setRevealed] = useState(false)
-    const [visibleDetails, setVisibleDetails] = useState(new Set(['weight', 'queries']))
-    const [cardCount, setCardCount] = useState(100)
+export const BrowserView = React.memo(({ addCard, result, status, report }: BrowserViewProps) => {
+    const [revealDetails, setRevealDetails] = useLocalStorage("reveal-details", false)
+    const [visibleDetails, setVisibleDetails] = useLocalStorage("visible-details", new Set(['weight', 'queries']))
+    // TODO make configurable
+    const [pageSize] = useLocalStorage("page-size", PAGE_SIZE)
+    const [page, setPage] = useState(0)
+    const lowerBound = (page) * pageSize + 1
+    const upperBound = (page + 1) * pageSize
 
     if (status == 'unstarted') {
         return null
@@ -68,9 +32,22 @@ export const Results = React.memo(({ addCard, result, status, report }: ResultsP
     
     return <div className='results'>
         <div className="result-controls">
-            <h2>
-                {status === 'loading' ? "running queries. please be patient..." : `displaying ${cardCount} of ${result.length} results`}
-            </h2>
+            {status === "loading" && <h2>running queries. please be patient...</h2>}
+
+            <div>
+                {result.length > 0 && `${lowerBound} – ${Math.min(upperBound, result.length)} of ${result.length} cards`}
+                {result.length === 0 && status !== "loading" && "0 cards found. We'll have more details on that soon :)"}
+            </div>
+           
+            
+            <PageControl
+                page={page}
+                setPage={setPage}
+                pageSize={pageSize}
+                upperBound={upperBound}
+                cardCount={result.length}
+            />
+            
             <div>
                 {status === 'loading' && <div className="loader-holder">
                     {report.start && `Time elapsed: ${(Date.now() - report.start) / 1000}s`}
@@ -90,8 +67,8 @@ export const Results = React.memo(({ addCard, result, status, report }: ResultsP
                 {status !== 'loading' && <>
                     {report.start && report.end && `query ran in ${(report.end - report.start) / 1000}s`}
                     <input id="show-details" type='checkbox'
-                        checked={revealed}
-                        onChange={() => setRevealed((prev) => !prev)}
+                        checked={revealDetails}
+                        onChange={() => setRevealDetails((prev) => !prev)}
                     />
                     <label htmlFor="show-details">show details</label>
                     <Expander title='manage details'>
@@ -134,14 +111,13 @@ export const Results = React.memo(({ addCard, result, status, report }: ResultsP
 
         {result.length > 0 && (
             <div className="result-container">
-                {result.slice(0, cardCount).map(card => <CardView
+                {result.slice(lowerBound - 1, upperBound).map(card => <CardView
                     onAdd={() => addCard(card.data.name)}
                     key={card.data.id}
                     card={card}
-                    revealed={revealed}
+                    revealDetails={revealDetails}
                     visibleDetails={visibleDetails}
                 />)}
-                {cardCount < result.length && <button onClick={() => setCardCount(prev => prev + 100)}>load more</button>}
             </div>
         )}
     </div>

@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import React, { useEffect, useState } from 'react'
-import { TaskStatus } from '../types'
+import { useEffect, useState } from 'react'
+import { TaskStatus } from '../../types'
 import { cogDB, Manifest } from './db'
 import { populateDB } from './populate'
 

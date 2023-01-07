@@ -1,9 +1,9 @@
 import { cloneDeep } from 'lodash'
 import React from 'react'
 import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
-import { Expander } from './expander'
-import { TextEditor } from './textEditor'
-import { DataSource, DATA_SOURCE, Setter } from './types'
+import { Expander } from '../expander'
+import { TextEditor } from '../textEditor'
+import { DataSource, DATA_SOURCE, Setter, TaskStatus } from '../../types'
 
 const description: Record<DataSource, String> = {
     scryfall: 'fetches from scryfall using its API. the current recommended experience',
@@ -11,6 +11,7 @@ const description: Record<DataSource, String> = {
 }
 
 export interface QueryFormProps {
+    status: TaskStatus
     execute: () => void
     queries: string[]
     setQueries: Setter<string[]>
@@ -21,9 +22,12 @@ export interface QueryFormProps {
 }
 
 export const QueryForm = ({
-    execute, queries, setQueries, options, setOptions, source, setSource,
+    status, execute,
+    queries, setQueries,
+    options, setOptions,
+    source, setSource,
 }: QueryFormProps) => {
-    
+
     return <>
         <label>enter one scryfall query per row</label>
 
@@ -34,7 +38,9 @@ export const QueryForm = ({
         />
 
         <div className='execute'>
-            <button onClick={execute}>scour the library</button>
+            <button disabled={status==="loading"} onClick={execute}>
+                scour{status === "loading" && "ing"} the library
+            </button>
         </div>
 
         <Expander title="search options">

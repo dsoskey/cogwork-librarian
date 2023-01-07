@@ -1,6 +1,6 @@
 import Scry, { SearchOptions } from 'scryfall-sdk'
 import { TaskStatus } from 'src/types';
-import { QueryReport } from 'src/useReporter';
+import { QueryReport } from 'src/api/useReporter';
 
 export interface EnrichedCard {
     weight: number

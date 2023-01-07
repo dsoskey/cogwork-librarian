@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react"
 import { Card, SearchOptions } from "scryfall-sdk/out/api/Cards"
 import cloneDeep from 'lodash/cloneDeep'
 import { useReporter } from "../useReporter"
-import { TaskStatus } from "../types"
+import { TaskStatus } from "../../types"
 import { queryParser } from './parser'
 import { CardCollection } from "./filter"
 import { EnrichedCard, injectors, QueryRunner, QueryRunnerProps, weightAlgorithms } from "../queryRunnerCommon"
