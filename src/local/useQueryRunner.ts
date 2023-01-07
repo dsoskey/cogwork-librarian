@@ -35,6 +35,7 @@ export const useQueryRunner = ({
                     try {
                         const parser = queryParser()
                         parser.feed(query)
+                        console.log(`parsed ${parser.results}`)
                         // if (parser.results.length  1) {
                         const cards = (await (parser.results[0] as CardCollection)
                             .sortBy(options.order))

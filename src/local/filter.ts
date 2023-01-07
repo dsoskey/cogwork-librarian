@@ -14,7 +14,7 @@ export class FilterWrapper {
         this.db = db
     }
 
-    root = () => this.db.card.filter(() => true)
+    root = () => this.db.card.toCollection()
 
     where = (field: string) => this.db.card.where(field)
 
@@ -23,9 +23,7 @@ export class FilterWrapper {
     // TODO: HOF-ify
     defaultOperation = (field: CardKeys, operator: Operator, value: any): CardCollection => {    
         switch (operator) {
-            // These are different for testing
             case ":":
-                return this.root().and((card: Card) => card[field] === value)
             case "=":
                 return this.root().and((card: Card) => card[field] === value)
             case "!=":
@@ -43,16 +41,20 @@ export class FilterWrapper {
     }
 
     subbed = (text: string, value: string): string => {
-        return text.replace(/~/g, value)
+        return text.replace(/~/g, value).toLowerCase()
     }
 
     oracleText = (value: string): CardCollection => {
-        return this.root().filter(card => card.oracle_text?.includes(
-            this.subbed(value, card.name)))
+        return this.root().filter(card => {
+            return card.oracle_text?.toLowerCase()
+                .includes(this.subbed(value, card.name))
+        })
     }
 
     oracleRegex = (value: string): CardCollection => {
-        return this.root().filter(card => new RegExp(this.subbed(value, card.name)).test(card.oracle_text))
+        return this.root().filter(card => new RegExp(this.subbed(value, card.name))
+            .test(card.oracle_text.toLowerCase())
+        )
     }
 }
 

@@ -5,6 +5,11 @@ import { Expander } from './expander'
 import { TextEditor } from './textEditor'
 import { DataSource, DATA_SOURCE, Setter } from './types'
 
+const description: Record<DataSource, String> = {
+    scryfall: 'fetches from scryfall using its API. the current recommended experience',
+    local: 'WARNING: ALPHA! Syntax is under active development! processes queries against a local database of oracle cards'
+}
+
 export interface QueryFormProps {
     execute: () => void
     queries: string[]
@@ -33,15 +38,20 @@ export const QueryForm = ({
         </div>
 
         <Expander title="search options">
-            <div>
-                <label htmlFor="source">data source: </label>
-                <select id="source" value={source} onChange={event => {
-                    setSource(event.target.value as DataSource)
-                }}>
-                    {Object.keys(DATA_SOURCE)
-                    .map((it => <option key={it} value={it}>{it}</option>))}
-                </select>
-            </div>
+            <fieldset>
+                <legend>data source: </legend>
+                {Object.keys(DATA_SOURCE)
+                    .map(((it: DataSource) => <div>
+                        <input key={it}
+                            id={`source-${it}`}
+                            type='radio'
+                            value={it}
+                            checked={it === source}
+                            onClick={() => setSource(it)}
+                        />
+                        <label htmlFor={`source-${it}`}>{it} - {description[it]}</label>
+                    </div>))}
+            </fieldset>
 
             <div>
                 <label htmlFor="sort">sort by: </label>

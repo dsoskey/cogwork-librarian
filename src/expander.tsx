@@ -10,6 +10,6 @@ export const Expander = ({ title, children }: ExpanderProps) => {
 
     return <div className='expander'>
         <button className='expander-action' onClick={() => setOpen(prev => !prev)}>{title} {open ? "V" : ">"}</button>
-        {open && children}
+        {open && <div className='expander-child'>{children}</div>}
     </div>
 }

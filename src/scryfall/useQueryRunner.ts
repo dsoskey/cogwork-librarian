@@ -29,8 +29,7 @@ export const useScryfallQueryRunner = ({
     const [status, setStatus] = useState<TaskStatus>('unstarted')
     const [result, setResult] = useState<Array<EnrichedCard>>([])
     const report = useReporter()
-    
-    // should this be 
+
     const _cache = useRef<{ [query: string]: Array<EnrichedCard> }>({})
     const rawData = useRef<{ [query: string]: Array<EnrichedCard> }>({})
 

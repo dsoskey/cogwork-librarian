@@ -19,7 +19,10 @@ export const App = () => {
     const {
         queries, setQueries,
         options, setOptions,
-    } = useQueryForm({})
+    } = useQueryForm({ initialQueries: [
+        `o:"whenever ~ deals"`,
+        `o=combat`
+    ]})
     const { execute, report,
         status, result,
     } = {

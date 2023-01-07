@@ -1,5 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 import React, { useState } from 'react'
+import { Card, ImageUris } from 'scryfall-sdk';
 import { Expander } from './expander';
 import { Loader } from './loader';
 import { EnrichedCard } from './queryRunnerCommon';
@@ -13,12 +14,21 @@ interface CardViewProps {
     onAdd: () => void
 }
 
+const getBackImageURI = (card: Card, version: keyof ImageUris) => {
+    return card.card_faces.length === 1
+        ? ""
+        : card.card_faces[1].image_uris[version] ?? ""
+}
+
 export const CardView = ({ onAdd, card, revealed, visibleDetails }: CardViewProps) => {
     const [flipped, setFlipped] = useState(false)
+    const _card = card.data
+    const imageSource = flipped ? getBackImageURI(_card,'normal') : _card.getFrontImageURI('normal')
+
     return (<div className='card-view'>
         <a href={card.data.scryfall_uri.replace(/\?.*$/, '')} target="_blank" rel="noopener">
             <img width="100%"
-                src={flipped ? card.data.getBackImageURI('normal') : card.data.getFrontImageURI('normal')} 
+                src={imageSource} 
                 alt={card.data.name}
                 title={card.data.name}
             />

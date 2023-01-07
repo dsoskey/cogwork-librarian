@@ -45,6 +45,13 @@ input {
     font-family: monospace;
 }
 
+fieldset {
+    margin-left: 0px;
+    padding-left: unset;
+    margin-top: 4px;
+    border: none;
+}
+
 .input-column {
     flex: 2;
     display: flex;
@@ -116,6 +123,10 @@ input {
     background-color: var(--light-color);
     color: var(--dark-color);
     border-color: var(--light-color);
+}
+
+.expander-child {
+    margin: 4px;
 }
 
 .results {
