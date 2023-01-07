@@ -8,9 +8,10 @@ import { useScryfallQueryRunner } from './scryfall/useQueryRunner'
 import { DataSource } from './types'
 import { useQueryForm } from './useQueryForm'
 import { weightAlgorithms } from './queryRunnerCommon'
+import { useLocalStorage } from './local/useLocalStorage'
 
 export const App = () => {
-    const [source, setSource] = useState<DataSource>("scryfall")
+    const [source, setSource] = useLocalStorage<DataSource>("source.coglib.sosk.watch","scryfall")
     const [cardList, setCardList] = useState<string[]>([])
     const addCard = useCallback((next) => setCardList(prev => [...prev.filter(it => it.length > 0), next]), [setCardList])
     const localQueryRunner = useQueryRunner({ getWeight: weightAlgorithms.zipf })

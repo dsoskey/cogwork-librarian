@@ -41,9 +41,8 @@ export const QueryForm = ({
             <fieldset>
                 <legend>data source: </legend>
                 {Object.keys(DATA_SOURCE)
-                    .map(((it: DataSource) => <div>
-                        <input key={it}
-                            id={`source-${it}`}
+                    .map(((it: DataSource) => <div key={it}>
+                        <input id={`source-${it}`}
                             type='radio'
                             value={it}
                             checked={it === source}
