@@ -11,8 +11,6 @@ export interface EnrichedCard {
 export interface QueryRunnerProps {
     getWeight?: (index: number) => number
     injectPrefix?: (query: string) => string,
-    initialQueries?: string[] | (() => string[]),
-    initialOptions?: SearchOptions | (() => SearchOptions),
 }
 
 export interface QueryRunner {

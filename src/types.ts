@@ -1,5 +1,4 @@
 import React from 'react'
-import { SearchOptions } from 'scryfall-sdk'
 
 type ObjectValues<T> = T[keyof T]
 

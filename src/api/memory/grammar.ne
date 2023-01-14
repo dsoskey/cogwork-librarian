@@ -12,7 +12,7 @@ main -> filterStart {% id %}
 filterStart ->
       _ {% () => Filters.identity() %}
     | _ filter _ {% ([, filter]) => {
-        console.log(filter)
+        console.debug(filter)
         return filter
     } %}
 
@@ -38,24 +38,64 @@ connector ->
 
 condition -> (
     cmcCondition |
+    colorCondition |
+    colorIdentityCondition |
+    nameCondition |
+    nameRegexCondition |
     oracleCondition |
     oracleRegexCondition |
+    typeCondition |
+    typeRegexCondition |
     powerCondition |
-    toughCondition
+    toughCondition |
+    loyaltyCondition |
+    layoutCondition
 ) {% ([[condition]]) => condition %}
 
 # TODO: Why does anyOperator get wrapped in an array?
-cmcCondition -> ("mv"i | "cmc"i) anyOperator integerValue {% ([_, [operator], value]) => Filters.defaultOperation('cmc', operator, value) %}
+cmcCondition -> ("mv"i | "cmc"i) anyOperator integerValue
+    {% ([_, [operator], value]) => Filters.defaultOperation('cmc', operator, value) %}
 
-oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue {% ([_, [operator], value]) => Filters.oracleText(value) %}
+# TODO: Investigate name search with no field prefix
+nameCondition -> ("name"i) (":" | "=") stringValue
+    {% ([_, [operator], value]) => Filters.textMatch('name', value) %}
 
-oracleRegexCondition -> ("oracle"i | "o"i | "text"i) ":" regexString {% ([_, [operator], value]) => Filters.oracleRegex(value) %}
+nameRegexCondition -> ("name"i) (":" | "=") regexString
+    {% ([_, [operator], value]) => Filters.regexMatch('name', value) %}
 
+colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
+    {% ([_, [operator], value]) => Filters.colorMatch(operator, new Set(value)) %}
+
+colorIdentityCondition -> ("ci"i | "id"i | "identity"i) anyOperator colorCombinationValue
+    {% ([_, [operator], value]) => Filters.colorIdentityMatch(operator, new Set(value)) %}
+
+oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue
+    {% ([_, [operator], value]) => Filters.textMatch('oracle_text', value) %}
+
+oracleRegexCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") regexString
+    {% ([_, [operator], value]) => Filters.regexMatch('oracle_text', value) %}
+
+typeCondition -> ("t"i | "type"i) (":" | "=") stringValue
+    {% ([_, [operator], value]) => Filters.textMatch('type_line', value) %}
+
+typeRegexCondition -> ("t"i | "type"i) (":" | "=") regexString
+    {% ([_, [operator], value]) => Filters.regexMatch('type_line', value) %}
+
+powerCondition -> ("pow"i | "power"i) anyOperator integerValue
+    {% ([_, [operator], value]) => Filters.powTouOperation('power', operator, value.toString()) %}
+
+toughCondition -> ("tou"i | "toughness"i) anyOperator integerValue
+    {% ([_, [operator], value]) => Filters.powTouOperation('toughness', operator, value.toString()) %}
+
+loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
+    {% ([_, [operator], value]) => Filters.powTouOperation('loyalty', operator, value) %}
+
+layoutCondition -> ("layout"i) equalityOperator stringValue
+    {% ([_, [operator], value]) => Filters.defaultOperation('layout', operator, value) %}
+
+
+# Values
 stringValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value.toLowerCase() %}
-
-powerCondition -> ("pow"i | "power"i) anyOperator integerValue {% ([_, [operator], value]) => Filters.powTouOperation('power', operator, value.toString()) %}
-
-toughCondition -> ("tou"i | "tough"i | "toughness"i) anyOperator integerValue {% ([_, [operator], value]) => Filters.powTouOperation('toughness', operator, value.toString()) %}
 
 regexString -> "/" [^/]:* "/"  {% function(d) {return d[1].join(""); } %}
 
@@ -75,4 +115,63 @@ noQuoteStringValue ->
     | "o"i [^rR \t\n"'\\=<>:]
     | "or"i [^ \t\n"'\\=<>:]
     ) [^ \t\n"'\\=<>:]:* {% ([startChars, chars]) => startChars.concat(chars).join('').toLowerCase() %}
-# "
+
+# https://github.com/dekkerglen/CubeCobra/blob/dfbe1bdea3020cf4c619d6c6b360efe8e78f100f/nearley/values.ne#L85
+comb1[A] -> null {% () => [] %}
+  | $A {% ([comb]) => comb %}
+
+comb2[A, B] -> null {% () => [] %}
+  | ( $A comb1[$B]
+    | $B comb1[$A]
+    ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
+
+comb3[A, B, C] -> null {% () => [] %}
+  | ( $A comb2[$B, $C]
+    | $B comb2[$A, $C]
+    | $C comb2[$A, $B]
+    ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
+
+comb4[A, B, C, D] -> null {% () => [] %}
+  | ( $A comb3[$B, $C, $D]
+    | $B comb3[$A, $C, $D]
+    | $C comb3[$A, $B, $D]
+    | $D comb3[$A, $B, $C]
+    ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
+
+comb5NonEmpty[A, B, C, D, E] -> (
+    $A comb4[$B, $C, $D, $E]
+  | $B comb4[$A, $C, $D, $E]
+  | $C comb4[$A, $B, $D, $E]
+  | $D comb4[$A, $B, $C, $E]
+  | $E comb4[$A, $B, $C, $D]
+) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
+
+colorCombinationValue ->
+    ("c"i | "brown"i | "colorless"i) {% () => [] %}
+  | "white"i {% () => ['w'] %}
+  | "blue"i {% () => ['u'] %}
+  | "black"i {% () => ['b'] %}
+  | "red"i {% () => ['r'] %}
+  | "green"i {% () => ['g'] %}
+  | ("azorius"i) {% () => ['w', 'u'] %}
+  | ("dimir"i) {% () => ['u', 'b'] %}
+  | ("rakdos"i) {% () => ['b', 'r'] %}
+  | ("gruul"i) {% () => ['r', 'g'] %}
+  | ("selesnya"i) {% () => ['g', 'w'] %}
+  | ("silverquill"i | "orzhov"i) {% () => ['w', 'b'] %}
+  | ("prismari"i | "izzet"i) {% () => ['u', 'r'] %}
+  | ("witherbloom" | golgari) {% () => ['b', 'g'] %}
+  | ("lorehold"i | "boros"i) {% () => ['w', 'r'] %}
+  | ("quandrix"i | "simic"i) {% () => ['u', 'g'] %}
+  | ("brokers"i | "bant"i) {% () => ['w', 'u', 'g'] %}
+  | ("obscura"i | "esper"i) {% () => ['w', 'u', 'b'] %}
+  | ("maestros"i | "grixis"i) {% () => ['u', 'b', 'r'] %}
+  | ("riveteers"i | "jund"i) {% () => ['b', 'r', 'g'] %}
+  | ("cabaretti"i | "naya"i) {% () => ['w', 'r', 'g'] %}
+  | ("savai"i | "mardu"i) {% () => ['w', 'b', 'r'] %}
+  | ("ketria"i | "temur"i) {% () => ['u', 'r', 'g'] %}
+  | ("indatha"i | "abzan"i) {% () => ['w', 'b', 'g'] %}
+  | ("raugrin"i | "jeskai"i) {% () => ['w', 'u', 'r'] %}
+  | ("zagoth"i | "sultai"i) {% () => ['u', 'b', 'g'] %}
+  | ("rainbow"i | "fivecolor"i) {% () => ['w', 'u', 'b', 'r', 'g'] %}
+  | comb5NonEmpty["w"i, "u"i, "b"i, "r"i, "g"i] {% ([comb]) => comb.map((c) => c.toLowerCase()) %}

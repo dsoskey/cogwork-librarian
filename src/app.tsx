@@ -19,8 +19,13 @@ export const App = () => {
     const memoryDB = useMemo(() => (_memoryDB ?? []).map(Card.construct), [_memoryDB])
     const [cardList, setCardList] = useState<string[]>([])
     const addCard = useCallback((next) => setCardList(prev => [...prev.filter(it => it.length > 0), next]), [setCardList])
-    const localQueryRunner = useMemoryQueryRunner({ getWeight: weightAlgorithms.zipf, corpus: memoryDB })
-    const scryQueryRunner = useScryfallQueryRunner({ getWeight: weightAlgorithms.zipf })
+    const localQueryRunner = useMemoryQueryRunner({
+        getWeight: weightAlgorithms.zipf,
+        corpus: memoryDB,
+    })
+    const scryQueryRunner = useScryfallQueryRunner({
+        getWeight: weightAlgorithms.zipf,
+    })
     const { status: dbStatus } = useCogDB()
     const {
         queries, setQueries,

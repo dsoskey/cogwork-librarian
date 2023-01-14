@@ -27,6 +27,7 @@ export class MemoryFilterWrapper {
 
     defaultOperation = (field: CardKeys, operator: Operator, value: any): Filter<Card> => (card: Card) => {
         const cardValue = card[field]
+        if (cardValue === undefined) return false
         switch (operator) {
             case ":":
             case "=":
@@ -72,17 +73,62 @@ export class MemoryFilterWrapper {
         return text.replace(/~/g, value).toLowerCase()
     }
 
-    oracleText = (value: string): Filter<Card> => {
-        console.log(value)
-        return (card => card.oracle_text?.toLowerCase()
+    textMatch = (field: CardKeys, value: string): Filter<Card> => card =>
+        card[field]?.toString()
+            .toLowerCase()
             .includes(this.subbed(value, card.name))
-        )
+
+    regexMatch = (field: CardKeys, value: string): Filter<Card> => card =>
+        new RegExp(this.subbed(value, card.name))
+            .test((card[field] ?? "").toLowerCase())
+
+    colorMatch = (operator: Operator, value: Set<string>): Filter<Card> => (card: Card) => {
+        if (card.colors === undefined) return false
+        const colors = card.colors.map(it => it.toLowerCase())
+        const matchedColors = colors.filter(color => value.has(color))
+        const notMatchedColors = colors.filter(color => !value.has(color))
+        switch (operator) {
+            case "=":
+                return matchedColors.length === value.size && notMatchedColors.length === 0
+            case "!=":
+                return matchedColors.length === 0
+            case "<":
+                return notMatchedColors.length === 0 && matchedColors.length < value.size
+            case "<=":
+                return notMatchedColors.length === 0 && matchedColors.length <= value.size
+            case ">":
+                return notMatchedColors.length > 0 && matchedColors.length === value.size
+            // Scryfall adapts ":" to the context. in this context it acts as >=
+            case ":":
+            case ">=":
+                return matchedColors.length === value.size
+            case "<>":
+                throw "throw something better please!"
+        }
     }
 
-    oracleRegex = (value: string): Filter<Card> => {
-        return (card: Card) => {
-            return new RegExp(this.subbed(value, card.name))
-                .test((card.oracle_text ?? "").toLowerCase())
+    colorIdentityMatch = (operator: Operator, value: Set<string>): Filter<Card> => (card: Card) => {
+        if (card.colors === undefined) return false
+        const colors = card.colors.map(it => it.toLowerCase())
+        const matchedColors = colors.filter(color => value.has(color))
+        const notMatchedColors = colors.filter(color => !value.has(color))
+        switch (operator) {
+            case "=":
+                return matchedColors.length === value.size && notMatchedColors.length === 0
+            case "!=":
+                return matchedColors.length === 0
+            case "<":
+                return notMatchedColors.length === 0 && matchedColors.length < value.size
+            // Scryfall adapts ":" to the context. in this context it acts as <=
+            case ":":
+            case "<=":
+                return notMatchedColors.length === 0 && matchedColors.length <= value.size
+            case ">":
+                return notMatchedColors.length > 0 && matchedColors.length === value.size
+            case ">=":
+                return matchedColors.length === value.size
+            case "<>":
+                throw "throw something better please!"
         }
     }
 }
