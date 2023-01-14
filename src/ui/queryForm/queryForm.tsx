@@ -29,7 +29,13 @@ export const QueryForm = ({
 }: QueryFormProps) => {
 
     return <>
-        <label>enter one scryfall query per row</label>
+        <div><label>
+            enter one
+            {" "}
+            <a href="https://scryfall.com/docs/syntax" rel="noreferrer" target="_blank">scryfall query</a>
+            {" "}
+            per row
+        </label></div>
 
         <TextEditor
             queries={queries}

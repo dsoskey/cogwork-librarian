@@ -4,17 +4,21 @@ import cloneDeep from 'lodash/cloneDeep'
 import { useReporter } from "../useReporter"
 import { TaskStatus } from "../../types"
 import { queryParser } from './parser'
-import { CardCollection } from "./filter"
 import { EnrichedCard, injectors, QueryRunner, QueryRunnerProps, weightAlgorithms } from "../queryRunnerCommon"
 
-export const useQueryRunner = ({
+interface MemoryQueryRunnerProps extends QueryRunnerProps {
+    corpus: Card[]
+}
+export const useMemoryQueryRunner = ({
     getWeight = weightAlgorithms.uniform,
     injectPrefix = injectors.noDigital,
-}: QueryRunnerProps): QueryRunner => {
+    corpus
+}: MemoryQueryRunnerProps): QueryRunner => {
     const [status, setStatus] = useState<TaskStatus>('unstarted')
     const [result, setResult] = useState<Array<EnrichedCard>>([])
     const report = useReporter()
-    
+
+    // TODO: evaluate removing memory cache?
     const _cache = useRef<{ [query: string]: Array<EnrichedCard> }>({}) 
     const rawData = useRef<{ [query: string]: Array<EnrichedCard> }>({})
     const execute = useCallback((queries: string[], options: SearchOptions) => {
@@ -22,7 +26,6 @@ export const useQueryRunner = ({
         const filteredQueries = queries.filter(q => q.length > 0)
         report.reset(filteredQueries.length)
         rawData.current = {}
-        // call scryfall
         Promise.allSettled(filteredQueries
             .map(async (query, index) => {
                 const weight = getWeight(index)
@@ -37,10 +40,10 @@ export const useQueryRunner = ({
                         parser.feed(query)
                         console.debug(`parsed ${parser.results}`)
                         // if (parser.results.length  1) {
-                        const cards = (await (parser.results[0] as CardCollection)
-                            .sortBy(options.order))
+                        const cards = corpus.filter(parser.results[0])
+                            // TODO: Handle sorting
                             .map((card: Card) => ({
-                                data: Card.construct(card),
+                                data: card,
                                 weight,
                                 matchedQueries: [query]
                             }))
@@ -51,6 +54,7 @@ export const useQueryRunner = ({
                         // }
                         return query
                     } catch (error) {
+                        console.log(error)
                         report.addError()
                         throw error
                     }
@@ -82,7 +86,7 @@ export const useQueryRunner = ({
             report.markTimepoint('end')
             setResult(sorted)
         })
-    }, [getWeight])
+    }, [getWeight, corpus])
 
     return {
         execute,
