@@ -1,17 +1,21 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useEffect, useState } from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import { TaskStatus } from '../../types'
 import { cogDB, Manifest } from './db'
 import { populateDB } from './populate'
+import {Card} from "scryfall-sdk";
 
 export interface CogDB {
-    status: TaskStatus
+    dbStatus: TaskStatus
+    memoryStatus: TaskStatus
+    memory: Card[]
     manifest: Manifest
 }
 
 export const useCogDB = (): CogDB => {
-    const [status, setStatus] = useState<TaskStatus>('unstarted')
-    
+    const [dbStatus, setDbStatus] = useState<TaskStatus>('unstarted')
+    const [memoryStatus, setMemoryStatus] = useState<TaskStatus>('unstarted')
+
     const manifest = useLiveQuery(async () => {
         const results = await cogDB.manifest
             .where('type')
@@ -22,12 +26,23 @@ export const useCogDB = (): CogDB => {
 
     useEffect(() => {
         if (manifest !== undefined) {
-            setStatus('loading')
+            setDbStatus('loading')
             populateDB(manifest)
-            .then(() => setStatus('success'))
-            .catch(() => setStatus('error'))
+            .then(() => setDbStatus('success'))
+            .catch(() => setDbStatus('error'))
         }
     }, [manifest])
 
-    return { status, manifest }
+    const _memoryDB = useLiveQuery(async () => {
+        if (dbStatus === 'success') {
+            setMemoryStatus('loading')
+            const res = await cogDB.card.toArray()
+            setMemoryStatus('success')
+            return res
+        }
+        return []
+    }, [dbStatus])
+    const memory = useMemo(() => (_memoryDB ?? []).map(Card.construct), [_memoryDB])
+
+    return { dbStatus, memoryStatus, manifest, memory }
 }

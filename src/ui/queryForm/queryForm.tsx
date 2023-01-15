@@ -10,6 +10,22 @@ const description: Record<DataSource, String> = {
     local: 'WARNING: ALPHA! Syntax is under active development! processes queries against a local database of oracle cards'
 }
 
+const sortOptions: Array<keyof typeof Sort> = [
+    'name',
+    // 'set',
+    // 'released',
+    // 'rarity',
+    // 'color', TODO: handle color sort
+    // 'usd',
+    // 'tix',
+    // 'eur',
+    'cmc',
+    'power',
+    'toughness',
+    'edhrec',
+    // 'artist',
+]
+
 export interface QueryFormProps {
     status: TaskStatus
     execute: () => void
@@ -27,7 +43,7 @@ export const QueryForm = ({
     options, setOptions,
     source, setSource,
 }: QueryFormProps) => {
-
+    console.log('rendering query form')
     return <>
         <div><label>
             enter one
@@ -58,7 +74,7 @@ export const QueryForm = ({
                             type='radio'
                             value={it}
                             checked={it === source}
-                            onClick={() => setSource(it)}
+                            onChange={() => setSource(it)}
                         />
                         <label htmlFor={`source-${it}`}>{it} - {description[it]}</label>
                     </div>))}
@@ -73,10 +89,7 @@ export const QueryForm = ({
                         return newVal 
                     })
                 }}>
-                    <option value={null} />
-                    {Object.keys(Sort)
-                    .filter(it => Number.isNaN(Number.parseInt(it)))
-                    .map((it => <option key={it} value={it}>{it}</option>))}
+                    {sortOptions.map((it => <option key={it} value={it}>{it}</option>))}
                 </select>
             </div>
 
@@ -89,7 +102,6 @@ export const QueryForm = ({
                         return newVal 
                     })
                 }}>
-                    <option value={null} />
                     {Object.keys(SortDirection)
                     .filter(it => Number.isNaN(Number.parseInt(it)))
                     .map((it => <option key={it} value={it}>{it}</option>))}

@@ -46,26 +46,26 @@ export class MemoryFilterWrapper {
         }
     }
 
-    powTouOperation = (field: CardKeys, operator: Operator, value: any): Filter<Card> => (card: Card) => {
+    powTouOperation = (field: CardKeys, operator: Operator, targetValue: number): Filter<Card> => (card: Card) => {
         const cardValue = card[field]
         if (cardValue === undefined) return false
 
-        const parsed = Number.parseInt(cardValue.toString(), 10)
+        const valueToTest = Number.parseInt(cardValue.toString().replace("*", "0"), 10)
         switch (operator) {
             case ":":
             case "=":
-                return parsed === value
+                return valueToTest === targetValue
             case "!=":
             case "<>":
-                return parsed !== value
+                return valueToTest !== targetValue
             case "<":
-                return parsed < value
+                return valueToTest < targetValue
             case "<=":
-                return parsed <= value
+                return valueToTest <= targetValue
             case ">":
-                return parsed > value
+                return valueToTest > targetValue
             case ">=":
-                return parsed >= value
+                return valueToTest >= targetValue
         }
     }
 

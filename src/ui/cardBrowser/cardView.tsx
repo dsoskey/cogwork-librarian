@@ -6,8 +6,9 @@ import { WEIGHT, QUERIES } from "./constants"
 export interface CardViewProps {
     card: EnrichedCard
     revealDetails: boolean
-    visibleDetails: Set<string>
+    visibleDetails: string[]
     onAdd: () => void
+    onIgnore: () => void
 }
 
 const getBackImageURI = (card: Card, version: keyof ImageUris) => {
@@ -16,7 +17,7 @@ const getBackImageURI = (card: Card, version: keyof ImageUris) => {
         : card.card_faces[1].image_uris[version] ?? ""
 }
 
-export const CardView = ({ onAdd, card, revealDetails, visibleDetails }: CardViewProps) => {
+export const CardView = ({ onAdd, onIgnore, card, revealDetails, visibleDetails }: CardViewProps) => {
     const [flipped, setFlipped] = useState(false)
     const _card = card.data
     const imageSource = flipped ? getBackImageURI(_card,'normal') : _card.getFrontImageURI('normal')
@@ -31,12 +32,13 @@ export const CardView = ({ onAdd, card, revealDetails, visibleDetails }: CardVie
         </a>
         <div className='add-button'>
             {card.data.card_faces.length > 1 && <button onClick={() => setFlipped(prev => !prev)}>flip</button>}
+            <button onClick={onIgnore}>ignore</button>
             <button onClick={onAdd}>add to list</button>
         </div>
         {revealDetails && <div className='detail'>
             <div>{card.data.name}</div>
-            {visibleDetails.has(WEIGHT) && <div>weight: {card.weight.toPrecision(4)}</div>}
-            {visibleDetails.has(QUERIES) && <>
+            {visibleDetails.includes(WEIGHT) && <div>weight: {card.weight.toPrecision(4)}</div>}
+            {visibleDetails.includes(QUERIES) && <>
                 <div>matched queries:</div>
                 <code className="language-regex">{card.matchedQueries.join(',\n')}</code>
             </>}

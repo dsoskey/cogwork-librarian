@@ -29,7 +29,7 @@ export const displayQueries = [
     "c=witherbloom",
     "c<=savai",
     "c=c",
-    'c=urgw', // reported upstream: https://github.com/dekkerglen/CubeCobra/issues/2336
+    'c=urgw', // reported upstream: https://github.com/dekkerglen/CubeCobra/issues/2337
 
 ]
 
@@ -48,11 +48,13 @@ const testQueries = [
     't=merfolk',
     't=CREATURE',
     '-layout:art_series',
+    '-type=token',
+    'pow=0 name:tarmogoyf',
 ]
 
 const unimplementedQueries = [
     `fo:"put the rest on the bottom"`, // oracle works like full-oracle atm
-    "keyword:flying",
+    "keyword:flying", // this searches for the keyword itself, excluding references to the keyword in other abilities
     "is:*", // any of them
 ]
 

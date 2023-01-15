@@ -27,4 +27,5 @@ export const weightAlgorithms = {
 
 export const injectors = {
     noDigital: (query: string) => `-is:digital (${query})`,
+    noToken: (query: string) => `-type:token (${query})`,
 }

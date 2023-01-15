@@ -82,10 +82,10 @@ typeRegexCondition -> ("t"i | "type"i) (":" | "=") regexString
     {% ([_, [operator], value]) => Filters.regexMatch('type_line', value) %}
 
 powerCondition -> ("pow"i | "power"i) anyOperator integerValue
-    {% ([_, [operator], value]) => Filters.powTouOperation('power', operator, value.toString()) %}
+    {% ([_, [operator], value]) => Filters.powTouOperation('power', operator, value) %}
 
 toughCondition -> ("tou"i | "toughness"i) anyOperator integerValue
-    {% ([_, [operator], value]) => Filters.powTouOperation('toughness', operator, value.toString()) %}
+    {% ([_, [operator], value]) => Filters.powTouOperation('toughness', operator, value) %}
 
 loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
     {% ([_, [operator], value]) => Filters.powTouOperation('loyalty', operator, value) %}

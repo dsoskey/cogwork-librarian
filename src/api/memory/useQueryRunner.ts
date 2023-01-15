@@ -5,13 +5,14 @@ import { useReporter } from "../useReporter"
 import { TaskStatus } from "../../types"
 import { queryParser } from './parser'
 import { EnrichedCard, injectors, QueryRunner, QueryRunnerProps, weightAlgorithms } from "../queryRunnerCommon"
+import {sortBy} from "lodash";
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
     corpus: Card[]
 }
 export const useMemoryQueryRunner = ({
     getWeight = weightAlgorithms.uniform,
-    injectPrefix = injectors.noDigital,
+    injectPrefix = injectors.noToken,
     corpus
 }: MemoryQueryRunnerProps): QueryRunner => {
     const [status, setStatus] = useState<TaskStatus>('unstarted')
@@ -33,15 +34,17 @@ export const useMemoryQueryRunner = ({
                 rawData.current[query] = []
                 if (_cache.current[_cacheKey] === undefined) {
                     _cache.current[_cacheKey] = []
-                    // TODO: add prepared query
-
                     try {
+
+                        const preparedQuery = injectPrefix(query)
                         const parser = queryParser()
-                        parser.feed(query)
+                        parser.feed(preparedQuery)
                         console.debug(`parsed ${parser.results}`)
                         // if (parser.results.length  1) {
-                        const cards = corpus.filter(parser.results[0])
-                            // TODO: Handle sorting
+                        const filtered = corpus.filter(parser.results[0])
+                        const sorted = sortBy(filtered, [options.order, "name"])
+                        // TODO: add ascending/descending/auto controls since sortBy only sorts by ascending
+                        const cards = sorted
                             .map((card: Card) => ({
                                 data: card,
                                 weight,
@@ -53,6 +56,7 @@ export const useMemoryQueryRunner = ({
                         report.addComplete()
                         // }
                         return query
+
                     } catch (error) {
                         console.log(error)
                         report.addError()
