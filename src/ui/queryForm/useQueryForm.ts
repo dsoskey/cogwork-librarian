@@ -1,6 +1,8 @@
 import { SearchOptions } from "scryfall-sdk";
 import { useLocalStorage } from "../../api/local/useLocalStorage";
 import { Setter } from "../../types";
+import times from "lodash/times";
+import {displayQueries} from "../../api/queries";
 
 interface QueryFormProps {
     initialQueries?: string[] | (() => string[]),
@@ -15,11 +17,11 @@ interface QueryFormState {
 }
 
 export const useQueryForm = ({
-    initialQueries = [
-        'o:/sacrifice a.*:/ t:artifact',
-        'o:/sacrifice a.*:/ t:creature',
-        'o:/add {.}\\./'
-    ],
+    initialQueries = () => {
+        const queries = times(Math.random() * 2 + 3, () => Math.round(Math.random() * displayQueries.length))
+            .map(i => displayQueries[i])
+        return Array.from(new Set(queries))
+    },
     initialOptions = {
         order: 'cmc',
         dir: 'auto',

@@ -23,10 +23,7 @@ export const App = () => {
     const {
         queries, setQueries,
         options, setOptions,
-    } = useQueryForm({ initialQueries: [
-        `o:"whenever ~ deals"`,
-        `o=extra`
-    ]})
+    } = useQueryForm({})
 
     const queryRunner = {
         local: useMemoryQueryRunner({

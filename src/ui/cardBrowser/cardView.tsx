@@ -17,6 +17,7 @@ const getBackImageURI = (card: Card, version: keyof ImageUris) => {
         : card.card_faces[1].image_uris[version] ?? ""
 }
 
+const DOUBLE_FACED_LAYOUTS = ['transform', 'modal_dfc', 'meld', 'double_sided', 'double_faced_token']
 export const CardView = ({ onAdd, onIgnore, card, revealDetails, visibleDetails }: CardViewProps) => {
     const [flipped, setFlipped] = useState(false)
     const _card = card.data
@@ -31,7 +32,7 @@ export const CardView = ({ onAdd, onIgnore, card, revealDetails, visibleDetails 
             />
         </a>
         <div className='add-button'>
-            {card.data.card_faces.length > 1 && <button onClick={() => setFlipped(prev => !prev)}>flip</button>}
+            {DOUBLE_FACED_LAYOUTS.includes(card.data.layout) && <button onClick={() => setFlipped(prev => !prev)}>flip</button>}
             <button onClick={onIgnore}>ignore</button>
             <button onClick={onAdd}>add to list</button>
         </div>

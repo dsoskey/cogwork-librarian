@@ -8,7 +8,9 @@ export type EqualityOperator = ":" | "="
 export type Operator = EqualityOperator | "!=" | "<>" | "<" | "<=" | ">" | ">="
 
 // these should go on the card object itself
-export const parsePowTou = (value: any) => Number.parseInt(value.toString().replace("*", "0"), 10)
+export const parsePowTou = (value: any) => value !== undefined ?
+    Number.parseInt(value.toString().replace("*", "0"), 10) :
+    0
 
 const replaceNamePlaceholder = (text: string, name: string): string => {
     return text.replace(/~/g, name).toLowerCase()

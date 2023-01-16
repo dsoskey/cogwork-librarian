@@ -45,7 +45,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
                     })
                 })
 
-                const sorted: Array<EnrichedCard> = sortBy(Object.values(orgo), ['weight'])
+                const sorted: Array<EnrichedCard> = sortBy(Object.values(orgo), [i => -i.weight])
                 const throwErr = promiseResults.filter(it => it.status === 'rejected').length
                 setStatus(throwErr ? 'error' : 'success')
                 report.markTimepoint('end')
