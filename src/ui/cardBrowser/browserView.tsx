@@ -14,10 +14,14 @@ interface BrowserViewProps {
     report: QueryReport
     source: DataSource
     addCard: (name: string) => void
+    addIgnoredId: (id: string) => void
+    ignoredIds: string[]
 }
 
-export const BrowserView = React.memo(({ addCard, result, status, source, report }: BrowserViewProps) => {
-    const [ignoredIds, setIgnoredIds] = useLocalStorage<string[]>("ignore-list",[])
+export const BrowserView = React.memo(({
+    addCard, addIgnoredId, ignoredIds,
+    result, status, source, report
+}: BrowserViewProps) => {
     const ignoredIdSet = useMemo(() => new Set(ignoredIds), [ignoredIds])
     const displayableCards = useMemo(() => result.filter(it => !ignoredIdSet.has(it.data.oracle_id)), [result, ignoredIdSet])
     const ignoredCards = useMemo(() => result.filter(it => ignoredIdSet.has(it.data.oracle_id)), [result, ignoredIdSet])
@@ -126,7 +130,7 @@ export const BrowserView = React.memo(({ addCard, result, status, source, report
             <div className="result-container">
                 {displayableCards.slice(lowerBound - 1, upperBound).map(card => <CardView
                     onAdd={() => addCard(card.data.name)}
-                    onIgnore={() => setIgnoredIds(prev => [...prev, card.data.oracle_id])}
+                    onIgnore={() => addIgnoredId(card.data.oracle_id)}
                     key={card.data.id}
                     card={card}
                     revealDetails={revealDetails}

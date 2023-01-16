@@ -2,10 +2,10 @@ import { useCallback } from "react"
 import { Card, SearchOptions } from "scryfall-sdk/out/api/Cards"
 import cloneDeep from 'lodash/cloneDeep'
 import { queryParser } from './parser'
-import {injectors, QueryRunner, QueryRunnerProps, weightAlgorithms} from "../queryRunnerCommon"
-import {sortBy} from "lodash";
-import {Sort} from "scryfall-sdk";
-import {parsePowTou} from "./filter";
+import { QueryRunner, QueryRunnerProps, injectors, weightAlgorithms } from "../queryRunnerCommon"
+import { sortBy } from "lodash";
+import { Sort } from "scryfall-sdk";
+import { parsePowTou } from "./filter";
 import { useQueryCoordinator } from "../useQueryCoordinator";
 
 const sortFunc = (key: keyof typeof Sort): any => {
@@ -97,7 +97,7 @@ export const useMemoryQueryRunner = ({
     }
 
     return {
-        execute: execute(runQuery),
+        run: execute(runQuery),
         result,
         status,
         report

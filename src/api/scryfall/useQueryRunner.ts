@@ -58,7 +58,7 @@ export const useScryfallQueryRunner = ({
     })
 
     return {
-        execute: execute(runQuery),
+        run: execute(runQuery),
         result,
         status,
         report

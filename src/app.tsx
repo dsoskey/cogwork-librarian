@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react'
+import React from 'react'
 import { BrowserView } from './ui/cardBrowser/browserView'
 import { TextEditor } from './ui/textEditor'
 import { useCogDB } from './api/local/useCogDB'
@@ -8,20 +8,17 @@ import { DataSource } from './types'
 import { useQueryForm } from './ui/queryForm/useQueryForm'
 import { weightAlgorithms } from './api/queryRunnerCommon'
 import { useLocalStorage } from './api/local/useLocalStorage'
-import {useMemoryQueryRunner} from "./api/memory/useQueryRunner"
+import { useMemoryQueryRunner } from "./api/memory/useQueryRunner"
+import { useProject } from "./api/useProject";
 
 export const App = () => {
     const { dbStatus, memoryStatus, memory } = useCogDB()
     const [source, setSource] = useLocalStorage<DataSource>("source","scryfall")
-    const [cardList, setCardList] = useLocalStorage<string[]>("saved-cards", [])
-    const addCard = useCallback((next) => setCardList(prev => [...prev.filter(it => it.length > 0), next]), [setCardList])
-    const localQueryRunner = useMemoryQueryRunner({
-        getWeight: weightAlgorithms.zipf,
-        corpus: memory,
-    })
-    const scryQueryRunner = useScryfallQueryRunner({
-        getWeight: weightAlgorithms.zipf,
-    })
+
+    const {
+        addIgnoredId, ignoredIds,
+        addCard, setSavedCards, savedCards
+    } = useProject()
 
     const {
         queries, setQueries,
@@ -32,8 +29,13 @@ export const App = () => {
     ]})
 
     const queryRunner = {
-        local: localQueryRunner,
-        scryfall: scryQueryRunner,
+        local: useMemoryQueryRunner({
+            getWeight: weightAlgorithms.zipf,
+            corpus: memory,
+        }),
+        scryfall: useScryfallQueryRunner({
+            getWeight: weightAlgorithms.zipf,
+        }),
     }[source]
 
     return (
@@ -46,7 +48,7 @@ export const App = () => {
 
                 {memoryStatus === 'success' && <QueryForm
                     status={queryRunner.status}
-                    execute={() => queryRunner.execute(queries, options)}
+                    execute={() => queryRunner.run(queries, options)}
                     queries={queries} setQueries={setQueries}
                     options={options} setOptions={setOptions}
                     source={source} setSource={setSource}
@@ -55,8 +57,8 @@ export const App = () => {
                 <h2>saved cards</h2>
 
                 <TextEditor 
-                    queries={cardList}
-                    setQueries={setCardList}
+                    queries={savedCards}
+                    setQueries={setSavedCards}
                     placeholder='add one card per line'
                 />
             </div>
@@ -66,6 +68,8 @@ export const App = () => {
                 result={queryRunner.result}
                 status={queryRunner.status}
                 addCard={addCard}
+                addIgnoredId={addIgnoredId}
+                ignoredIds={ignoredIds}
                 source={source}
             />
         </div>
