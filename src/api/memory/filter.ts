@@ -7,6 +7,13 @@ export type EqualityOperator = ":" | "="
 
 export type Operator = EqualityOperator | "!=" | "<>" | "<" | "<=" | ">" | ">="
 
+// these should go on the card object itself
+export const parsePowTou = (value: any) => Number.parseInt(value.toString().replace("*", "0"), 10)
+
+const replaceNamePlaceholder = (text: string, name: string): string => {
+    return text.replace(/~/g, name).toLowerCase()
+}
+
 export class MemoryFilterWrapper {
     constructor() {
     }
@@ -50,7 +57,7 @@ export class MemoryFilterWrapper {
         const cardValue = card[field]
         if (cardValue === undefined) return false
 
-        const valueToTest = Number.parseInt(cardValue.toString().replace("*", "0"), 10)
+        const valueToTest = parsePowTou(cardValue)
         switch (operator) {
             case ":":
             case "=":
@@ -69,17 +76,13 @@ export class MemoryFilterWrapper {
         }
     }
 
-    subbed = (text: string, value: string): string => {
-        return text.replace(/~/g, value).toLowerCase()
-    }
-
     textMatch = (field: CardKeys, value: string): Filter<Card> => card =>
         card[field]?.toString()
             .toLowerCase()
-            .includes(this.subbed(value, card.name))
+            .includes(replaceNamePlaceholder(value, card.name))
 
     regexMatch = (field: CardKeys, value: string): Filter<Card> => card =>
-        new RegExp(this.subbed(value, card.name))
+        new RegExp(replaceNamePlaceholder(value, card.name))
             .test((card[field] ?? "").toLowerCase())
 
     colorMatch = (operator: Operator, value: Set<string>): Filter<Card> => (card: Card) => {

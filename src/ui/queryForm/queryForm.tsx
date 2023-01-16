@@ -43,7 +43,6 @@ export const QueryForm = ({
     options, setOptions,
     source, setSource,
 }: QueryFormProps) => {
-    console.log('rendering query form')
     return <>
         <div><label>
             enter one

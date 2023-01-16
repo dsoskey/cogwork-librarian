@@ -13,7 +13,13 @@ export interface QueryRunnerProps {
     injectPrefix?: (query: string) => string,
 }
 
-export interface QueryRunner {
+export interface QueryHandler {
+    result: Array<EnrichedCard>
+    status: TaskStatus,
+    report: QueryReport,
+}
+
+export interface QueryRunner extends QueryHandler {
     execute: (queries: string[], options: SearchOptions) => void
     result: Array<EnrichedCard>
     status: TaskStatus,
