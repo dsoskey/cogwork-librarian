@@ -10,9 +10,12 @@ import { weightAlgorithms } from './api/queryRunnerCommon'
 import { useLocalStorage } from './api/local/useLocalStorage'
 import { useMemoryQueryRunner } from './api/memory/useQueryRunner'
 import { useProject } from './api/useProject'
+import { Footer } from './ui/footer'
+import { useViewportListener } from './viewport'
 
 export const App = () => {
   const { dbStatus, memoryStatus, memory } = useCogDB()
+  const viewport = useViewportListener()
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
 
   const { addIgnoredId, ignoredIds, addCard, setSavedCards, savedCards } =
@@ -58,6 +61,7 @@ export const App = () => {
           setQueries={setSavedCards}
           placeholder='add one card per line'
         />
+        {viewport.desktop && <Footer />}
       </div>
 
       <BrowserView
@@ -69,6 +73,7 @@ export const App = () => {
         ignoredIds={ignoredIds}
         source={source}
       />
+      {viewport.mobile && <Footer />}
     </div>
   )
 }

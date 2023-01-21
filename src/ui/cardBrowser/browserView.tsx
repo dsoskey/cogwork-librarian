@@ -7,6 +7,7 @@ import { EnrichedCard } from '../../api/queryRunnerCommon'
 import { DataSource, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { PageControl } from './pageControl'
+import { useViewportListener } from '../../viewport'
 
 interface BrowserViewProps {
   status: TaskStatus
@@ -28,6 +29,7 @@ export const BrowserView = React.memo(
     source,
     report,
   }: BrowserViewProps) => {
+    const viewport = useViewportListener()
     const ignoredIdSet = useMemo(() => new Set(ignoredIds), [ignoredIds])
     const displayableCards = useMemo(
       () => result.filter((it) => !ignoredIdSet.has(it.data.oracle_id)),
@@ -190,6 +192,18 @@ export const BrowserView = React.memo(
                 visibleDetails={visibleDetails}
               />
             ))}
+          </div>
+        )}
+
+        {viewport.mobile && displayableCards.length > 0 && (
+          <div className='bottom-page-control'>
+            <PageControl
+              page={page}
+              setPage={setPage}
+              pageSize={pageSize}
+              upperBound={upperBound}
+              cardCount={displayableCards.length}
+            />
           </div>
         )}
       </div>

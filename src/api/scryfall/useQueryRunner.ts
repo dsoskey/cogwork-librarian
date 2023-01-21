@@ -31,7 +31,7 @@ class MyCards extends MagicQuerier {
     return emitter
   }
 }
-const MYCARDS = new MyCards()
+const MY_CARDS = new MyCards()
 
 export const useScryfallQueryRunner = ({
   getWeight = weightAlgorithms.uniform,
@@ -48,7 +48,7 @@ export const useScryfallQueryRunner = ({
       if (cache.current[_cacheKey] === undefined) {
         cache.current[_cacheKey] = []
         const preparedQuery = injectPrefix(query)
-        MYCARDS.searchCount(preparedQuery, options).on('data', (data) => {
+        MY_CARDS.searchCount(preparedQuery, options).on('data', (data) => {
           report.setTotalCards((prev) => prev + data)
         })
         Scry.Cards.search(preparedQuery, options)

@@ -1,3 +1,5 @@
+/* global */
+
 :root {
   --dark-color: hsl(25, 32%, 27%);
   --darker-color: hsl(25, 32%, 20%);
@@ -16,15 +18,6 @@
 
 *:focus-visible {
   outline: 2px inset var(--blue);
-}
-
-.root {
-  height: 100vh;
-  overflow: hidden;
-  margin: -8px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
 }
 
 button {
@@ -58,13 +51,38 @@ fieldset {
   border: none;
 }
 
+/* classnames */
+
+.root {
+  margin: -8px;
+}
+
+@media (min-width: 1024px) {
+  .root {
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+}
+
+.footer > :not(:first-child) {
+  padding-left: 4px;
+}
+
 .input-column {
   flex: 2;
   display: flex;
   flex-direction: column;
-  max-width: 50%;
   height: 100%;
   padding: 8px;
+  overflow-y: auto;
 }
 
 .input-column .execute {
@@ -72,8 +90,12 @@ fieldset {
 }
 
 .query-editor {
-  width: 100%;
+  max-width: 1024px;
   height: max-content;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: 'overlap';
 }
 
 .query-editor .controller {
@@ -93,10 +115,10 @@ fieldset {
 
   caret-color: var(--blue);
   color: transparent;
-  width: 500px;
+  /*max-width: 500px;*/
   background-color: transparent;
   resize: none;
-  position: fixed;
+  grid-area: overlap;
   z-index: 3;
   box-sizing: border-box;
 }
@@ -110,20 +132,10 @@ fieldset {
 }
 
 .query-editor .display {
-  width: 500px;
   z-index: 2;
   box-sizing: border-box;
   display: inline-block;
-}
-
-.results * {
-  background-color: inherit;
-}
-
-.results .topbar {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  grid-area: overlap;
 }
 
 .expander {
@@ -140,14 +152,29 @@ fieldset {
   margin: 4px;
 }
 
+@media (min-width: 1024px) {
+  .results {
+    max-width: 66%;
+  }
+}
 .results {
-  flex: 4;
-  max-width: 66%;
   background-color: var(--dark-color);
   border: 2px solid var(--gray-42);
   border-right-color: var(--dark-color);
   border-bottom-color: var(--dark-color);
   color: var(--light-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.results * {
+  background-color: inherit;
+}
+
+.results .topbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .result-controls {
@@ -160,11 +187,16 @@ fieldset {
   top: 0;
 }
 
+@media (min-width: 1024px) {
+  .result-container {
+    overflow-y: scroll;
+    height: 84vh;
+  }
+}
 .result-container {
   padding-top: 8px;
   background-color: var(--darker-color);
-  height: 84vh;
-  overflow-y: scroll;
+  /*overflow-y: scroll;*/
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
@@ -173,6 +205,10 @@ fieldset {
 
 .result-container > :last-child {
   margin-bottom: 24px;
+}
+
+.bottom-page-control {
+  align-self: end;
 }
 
 .card-view {
