@@ -212,11 +212,16 @@ fieldset {
 }
 
 .card-view {
-  width: 24%;
+  width: 49%;
   margin-left: 0.75%;
   padding-bottom: 4px;
   display: flex;
   flex-direction: column;
+}
+@media (min-width: 1024px) {
+  .card-view {
+    width: 24%;
+  }
 }
 
 .card-view img {
