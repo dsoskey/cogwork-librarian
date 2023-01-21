@@ -212,7 +212,6 @@ fieldset {
 }
 
 .card-view {
-  width: 49%;
   margin-left: 0.75%;
   padding-bottom: 4px;
   display: flex;
@@ -223,6 +222,17 @@ fieldset {
     width: 24%;
   }
 }
+@media (max-width: 1024px) and (min-width: 768px) {
+  .card-view {
+    width: 32%;
+  }
+}
+@media (max-width: 768px) {
+  .card-view {
+    width: 49%;
+  }
+}
+
 
 .card-view img {
   clip-path: inset(0 0 0 0 round var(--card-radius));
