@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Card, ImageUris } from "scryfall-sdk"
 import { EnrichedCard } from "src/api/queryRunnerCommon"
 import { WEIGHT, QUERIES } from "./constants"
+import {DOUBLE_FACED_LAYOUTS} from "../../api/card";
 
 export interface CardViewProps {
     card: EnrichedCard
@@ -17,7 +18,6 @@ const getBackImageURI = (card: Card, version: keyof ImageUris) => {
         : card.card_faces[1].image_uris[version] ?? ""
 }
 
-const DOUBLE_FACED_LAYOUTS = ['transform', 'modal_dfc', 'meld', 'double_sided', 'double_faced_token']
 export const CardView = ({ onAdd, onIgnore, card, revealDetails, visibleDetails }: CardViewProps) => {
     const [flipped, setFlipped] = useState(false)
     const _card = card.data
@@ -38,6 +38,7 @@ export const CardView = ({ onAdd, onIgnore, card, revealDetails, visibleDetails 
         </div>
         {revealDetails && <div className='detail'>
             <div>{card.data.name}</div>
+            {visibleDetails.includes("oracle") && <div>{card.data.oracle_text}</div>}
             {visibleDetails.includes(WEIGHT) && <div>weight: {card.weight.toPrecision(4)}</div>}
             {visibleDetails.includes(QUERIES) && <>
                 <div>matched queries:</div>

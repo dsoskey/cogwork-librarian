@@ -49,7 +49,8 @@ condition -> (
     powerCondition |
     toughCondition |
     loyaltyCondition |
-    layoutCondition
+    layoutCondition |
+    isCondition
 ) {% ([[condition]]) => condition %}
 
 # TODO: Why does anyOperator get wrapped in an array?
@@ -93,6 +94,9 @@ loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
 layoutCondition -> ("layout"i) equalityOperator stringValue
     {% ([_, [operator], value]) => Filters.defaultOperation('layout', operator, value) %}
 
+isCondition -> "is"i ":" isValue
+    {% ([_, [operator], value]) => Filters.isVal(value) %}
+
 
 # Values
 stringValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value.toLowerCase() %}
@@ -104,6 +108,16 @@ integerValue -> [0-9]:+ {% ([digits]) => parseInt(digits.join(''), 10) %}
 anyOperator -> ":" | "=" | "!=" | "<>" | "<" | "<=" | ">" | ">=" {% id %}
 
 equalityOperator -> ":" | "=" | "!=" | "<>" {% id %}
+
+isValue -> (
+    "gold"i | "twobrid"i | "hybrid"i | "phyrexian"i | "promo"i | "reprint"i | "firstprint"i | "firstprinting"i | "digital"i
+  | "dfc"i | "mdfc"i |"tdfc"i
+  | "meld"i | "transform"i | "split"i | "flip"i | "leveler"i | "commander"i | "spell"i | "permanent"i | "historic"i
+  | "vanilla"i | "modal"i | "fullart"i | "foil"i | "nonfoil"i | "etched"i
+  | "bikeland"i | "cycleland"i | "bicycleland"i | "bounceland"i | "karoo"i | "canopyland"i | "canland"i | "fetchland"i
+  | "checkland"i | "dual"i | "fastland"i | "filterland"i | "gainland"i | "painland"i | "scryland"i | "shadowland"i | "snarl"i
+  | "slowland"i | "shockland"i | "storageland"i | "creatureland"i | "manland"i | "triland"i | "triome"i | "tangoland"i | "battleland"i
+) {% ([[category]]) => category.toLowerCase() %}
 
 # anything that isn't a special character and isn't "and" or "or"
 noQuoteStringValue ->

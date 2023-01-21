@@ -1,6 +1,6 @@
 import React from 'react'
 
-type ObjectValues<T> = T[keyof T]
+export type ObjectValues<T> = T[keyof T]
 
 export const TASK_STATUS = {
     unstarted: 'unstarted',

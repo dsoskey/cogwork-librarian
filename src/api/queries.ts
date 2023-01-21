@@ -1,3 +1,5 @@
+import {isValues} from "./memory/filter";
+
 export const displayQueries = [
     'o=/whenever ~ deals/',
     'o:/add {.}\\./',
@@ -25,15 +27,18 @@ export const displayQueries = [
     "c=witherbloom",
     "c<=savai",
     "c=c",
+    "name=/^A-/",
     "t:adventure",
     'o:/sacrifice a.*:/ t:artifact',
     'o:/sacrifice a.*:/ t:creature',
     'c=urgw', // reported upstream: https://github.com/dekkerglen/CubeCobra/issues/2337
-
+    'is:modal -t:scheme',
+    'is:filterland',
 ]
 
 const testQueries = [
     ...displayQueries,
+    ...(Object.values(isValues).map(it => `is:${it}`)),
     'layout:art_series',
     'o=draw',
     'o="draw a card"',
@@ -57,7 +62,6 @@ const testQueries = [
 const unimplementedQueries = [
     `fo:"put the rest on the bottom"`, // oracle works like full-oracle atm
     "keyword:flying", // this searches for the keyword itself, excluding references to the keyword in other abilities
-    "is:*", // any of them
 ]
 
 const brokenQueries = [

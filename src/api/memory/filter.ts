@@ -1,5 +1,14 @@
 import {Card} from "scryfall-sdk";
 import {CardKeys} from "../local/db";
+import {
+    DOUBLE_FACED_LAYOUTS,
+    hasNumLandTypes,
+    isDual,
+    IsValue,
+    noReminderText,
+    oracleTextContains,
+    SHOCKLAND_REGEX,
+} from "../card";
 
 export type Filter<T> = (T) => boolean
 
@@ -134,6 +143,130 @@ export class MemoryFilterWrapper {
                 return matchedColors.length === value.size
             case "<>":
                 throw "throw something better please!"
+        }
+    }
+
+    unimplemented = false
+    isVal = (value: IsValue): Filter<Card> => (card: Card) => {
+        switch (value) {
+            case "gold":
+                return (card.colors?.length ?? 0) >= 2
+            case "hybrid":
+            case "phyrexian":
+                return this.unimplemented
+            case "promo":
+                return card.promo
+            case "reprint":
+                return card.reprint
+            case "firstprint":
+            case "firstprinting":
+                return this.unimplemented // Add when processing multiple prints
+            case "digital":
+                return card.digital
+            case "dfc":
+                return DOUBLE_FACED_LAYOUTS.includes(card.layout)
+            case "mdfc":
+                return card.layout === 'modal_dfc'
+            case "meld":
+                return card.layout === 'meld'
+            case "tdfc":
+            case "transform":
+                return card.layout === 'transform'
+            case "split":
+                return card.layout === 'split'
+            case "flip":
+                return card.layout === 'flip'
+            case "leveler":
+                return card.layout === 'leveler'
+            case "commander":
+                return card.type_line.toLowerCase().includes("legendary creature") ||
+                    oracleTextContains(card, (`${card.name} can be your commander.`))
+            case "spell":
+                return ['land', 'token'].filter(type => card.type_line.toLowerCase().includes(type)).length === 0
+            case "permanent":
+                return ["instant", "sorcery"].filter(type => card.type_line.toLowerCase().includes(type)).length === 0
+            case "historic":
+                return ["legendary", "artifact", "saga"].filter(type => card.type_line.toLowerCase().includes(type)).length > 0
+            case "vanilla":
+                return card.oracle_text?.length === 0 || card.card_faces.filter(i => i.oracle_text.length === 0).length > 0
+            case "modal":
+                return /chooses? (\S* or \S*|(up to )?(one|two|three|four|five))( or (more|both)| that hasn't been chosen)?( —|\.)/.test(card.oracle_text?.toLowerCase())
+            case "fullart":
+            case "foil":
+            case "nonfoil":
+            case "etched":
+                return this.unimplemented // Add when processing multiple prints
+            case "bikeland":
+            case "cycleland":
+            case "bicycleland":
+                return hasNumLandTypes(card, 2) &&
+                    card.oracle_text?.includes("Cycling {2}")
+            case "bounceland":
+            case "karoo":
+                return /Add \{.}\{.}\./.test(card.oracle_text) &&
+                    (/When .* enters the battlefield, sacrifice it unless you return an untapped/.test(card.oracle_text) ||
+                    /When .* enters the battlefield, return a land you control to its owner's hand/.test(card.oracle_text))
+            case "canopyland":
+            case "canland":
+                return /Pay 1 life: Add \{.} or \{.}\.\n\{1}, \{T}, Sacrifice/m.test(card.oracle_text)
+            case "fetchland":
+                return /\{T}, Pay 1 life, Sacrifice .*: Search your library for an? .* or .* card, put it onto the battlefield, then shuffle/.test(card.oracle_text)
+            case "checkland":
+                return isDual(card) &&
+                    /.* enters the battlefield tapped unless you control an? .* or an? *./.test(card.oracle_text)
+            case "dual":
+                return hasNumLandTypes(card, 2) &&
+                    noReminderText(card.oracle_text?.toLowerCase()).length === 0
+            case "fastland":
+                return isDual(card) &&
+                    /.* enters the battlefield tapped unless you control two or fewer other lands\./.test(card.oracle_text)
+            case "filterland":
+                return card.type_line.includes("Land") &&
+                    (/\{T}: Add \{C}\.\n{.\/.}, \{T}: Add \{.}{.}, \{.}\{.}, or \{.}\{.}\./m.test(card.oracle_text)
+                    || /\{1}, \{T}: Add \{.}\{.}\./.test(card.oracle_text))
+            case "gainland":
+                return isDual(card) &&
+                    /.* enters the battlefield tapped\./.test(card.oracle_text) &&
+                    /When .* enters the battlefield, you gain 1 life\./.test(card.oracle_text)
+            case "painland":
+                return card.type_line.includes("Land") &&
+                /\{T}: Add {C}\./.test(card.oracle_text) &&
+                /\{T}: Add {.} or {.}\. .* deals 1 damage to you\./.test(card.oracle_text)
+            case "scryland":
+                return isDual(card) &&
+                    /When .* enters the battlefield, scry 1/.test(card.oracle_text)
+            case "shadowland":
+            case "snarl":
+                return isDual(card) &&
+                    /As .* enters the battlefield, you may reveal an? .* or .* card from your hand\. If you don't, .* enters the battlefield tapped./.test(card.oracle_text)
+            case "shockland":
+                return hasNumLandTypes(card, 2) &&
+                    SHOCKLAND_REGEX.test(card.oracle_text)
+            case "storageland":
+                return card.type_line.includes("Land") &&
+                    /storage counter/.test(card.oracle_text)
+            case "manland":
+            case "creatureland":
+                return card.type_line.includes("Land") &&
+                    new RegExp(`(${card.name}|it) becomes? an? .* creature`).test(card.oracle_text)
+            case "triland":
+                    return card.type_line.includes("Land") &&
+                        hasNumLandTypes(card, 0) &&
+                        /\{T}: Add {.}, \{.}, or {.}\./.test(card.oracle_text)
+            case "triome":
+                return card.type_line.includes("Land") &&
+                    hasNumLandTypes(card, 3) &&
+                    /\{T}: Add {.}, \{.}, or {.}\./.test(card.oracle_text)
+            case "tangoland":
+            case "battleland":
+                return card.type_line.includes("Land") &&
+                    hasNumLandTypes(card, 2) &&
+                    /.* enters the battlefield tapped unless you control two or more basic lands\./.test(card.oracle_text)
+            case "slowland":
+                return isDual(card) &&
+                    /.* enters the battlefield tapped unless you control two or more other lands\./.test(card.oracle_text)
+            default:
+                return this.unimplemented
         }
     }
 }
