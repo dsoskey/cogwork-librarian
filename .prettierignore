@@ -1,3 +1,5 @@
+src/api/queries.ts
+
 build
 
 # Logs
@@ -104,3 +106,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Github config
+.github/
+
