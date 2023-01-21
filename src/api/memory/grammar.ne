@@ -174,7 +174,7 @@ colorCombinationValue ->
   | ("selesnya"i) {% () => ['g', 'w'] %}
   | ("silverquill"i | "orzhov"i) {% () => ['w', 'b'] %}
   | ("prismari"i | "izzet"i) {% () => ['u', 'r'] %}
-  | ("witherbloom" | golgari) {% () => ['b', 'g'] %}
+  | ("witherbloom"i | "golgari"i) {% () => ['b', 'g'] %}
   | ("lorehold"i | "boros"i) {% () => ['w', 'r'] %}
   | ("quandrix"i | "simic"i) {% () => ['u', 'g'] %}
   | ("brokers"i | "bant"i) {% () => ['w', 'u', 'g'] %}
