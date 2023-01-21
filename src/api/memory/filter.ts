@@ -247,6 +247,8 @@ export class MemoryFilterWrapper {
         case 'nonfoil':
         case 'etched':
           return this.unimplemented // Add when processing multiple prints
+        case 'token':
+          return card.layout === 'token' || card.type_line.includes("Token")
         case 'bikeland':
         case 'cycleland':
         case 'bicycleland':

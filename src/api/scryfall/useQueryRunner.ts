@@ -35,7 +35,7 @@ const MYCARDS = new MyCards()
 
 export const useScryfallQueryRunner = ({
   getWeight = weightAlgorithms.uniform,
-  injectPrefix = injectors.noDigital,
+  injectPrefix = injectors.none,
 }: QueryRunnerProps): QueryRunner => {
   const { status, result, report, cache, rawData, execute } =
     useQueryCoordinator()

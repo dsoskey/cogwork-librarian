@@ -39,7 +39,7 @@ interface MemoryQueryRunnerProps extends QueryRunnerProps {
 }
 export const useMemoryQueryRunner = ({
   getWeight = weightAlgorithms.uniform,
-  injectPrefix = injectors.noToken,
+  injectPrefix = injectors.none,
   corpus,
 }: MemoryQueryRunnerProps): QueryRunner => {
   const { status, report, cache, result, rawData, execute } =

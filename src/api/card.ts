@@ -47,6 +47,7 @@ export const isValues = {
   foil: 'foil',
   nonfoil: 'nonfoil',
   etched: 'etched',
+  token: 'token',
   bikeland: 'bikeland',
   cycleland: 'cycleland',
   bicycleland: 'bicycleland',
