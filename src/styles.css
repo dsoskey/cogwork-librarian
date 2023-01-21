@@ -1,215 +1,213 @@
 :root {
-    --dark-color: hsl(25, 32%, 27%);
-    --darker-color: hsl(25, 32%, 20%);
-    --darker-color-subdued: hsl(24, 20%, 20%);
-    --light-color: hsl(19, 41%, 88%);
-    --gray-68: hsl(0, 0%, 27%);
-    --gray-68-shadow: hsla(0, 0%, 27%, 0.5);
-    --gray-42: hsl(0, 0%, 50%);
-    --blue: hsla(180, 100%, 69%, 100%);
-    --blue-low-alpha: hsla(180, 100%, 69%, 50%);
-    --green:  hsl(96, 100%, 69%);
-    --card-radius: 12px;
-    background-color: var(--light-color);
-    color: var(--dark-color);
+  --dark-color: hsl(25, 32%, 27%);
+  --darker-color: hsl(25, 32%, 20%);
+  --darker-color-subdued: hsl(24, 20%, 20%);
+  --light-color: hsl(19, 41%, 88%);
+  --gray-68: hsl(0, 0%, 27%);
+  --gray-68-shadow: hsla(0, 0%, 27%, 0.5);
+  --gray-42: hsl(0, 0%, 50%);
+  --blue: hsla(180, 100%, 69%, 100%);
+  --blue-low-alpha: hsla(180, 100%, 69%, 50%);
+  --green: hsl(96, 100%, 69%);
+  --card-radius: 12px;
+  background-color: var(--light-color);
+  color: var(--dark-color);
 }
 
 *:focus-visible {
-    outline: 2px inset var(--blue);
+  outline: 2px inset var(--blue);
 }
 
 .root {
-    height: 100vh;
-    overflow: hidden;
-    margin: -8px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+  height: 100vh;
+  overflow: hidden;
+  margin: -8px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 button {
-    background-color: var(--dark-color);
-    border-top-color: var(--gray-42);
-    border-left-color: var(--gray-42);
-    border-bottom-color: var(--dark-color);
-    border-right-color: var(--dark-color);
-    color: var(--light-color);
+  background-color: var(--dark-color);
+  border-top-color: var(--gray-42);
+  border-left-color: var(--gray-42);
+  border-bottom-color: var(--dark-color);
+  border-right-color: var(--dark-color);
+  color: var(--light-color);
 }
 
 button:disabled {
-    background-color: var(--darker-color);
-    color: var(--gray-42);
+  background-color: var(--darker-color);
+  color: var(--gray-42);
 }
 
 input {
-    color: var(--blue);
-    background-color: var(--gray-68);
-    border-top-color: var(--gray-42);
-    border-left-color: var(--gray-42);
-    border-bottom-color: var(--dark-color);
-    border-right-color: var(--dark-color);
-    font-family: monospace;
+  color: var(--blue);
+  background-color: var(--gray-68);
+  border-top-color: var(--gray-42);
+  border-left-color: var(--gray-42);
+  border-bottom-color: var(--dark-color);
+  border-right-color: var(--dark-color);
+  font-family: monospace;
 }
 
 fieldset {
-    margin-left: 0;
-    padding-left: unset;
-    margin-top: 4px;
-    border: none;
+  margin-left: 0;
+  padding-left: unset;
+  margin-top: 4px;
+  border: none;
 }
 
 .input-column {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    max-width: 50%;
-    height: 100%;
-    padding: 8px;
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  max-width: 50%;
+  height: 100%;
+  padding: 8px;
 }
 
 .input-column .execute {
-    padding-bottom: .25em;
+  padding-bottom: 0.25em;
 }
 
 .query-editor {
-    width: 100%;
-    height: max-content;
+  width: 100%;
+  height: max-content;
 }
 
 .query-editor .controller {
-    /* copies prism theme */
-    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    font-size: 1em;
-    text-align: left;
-    white-space: pre;
-    word-spacing: normal;
-    word-break: normal;
-    word-wrap: normal;
-    line-height: 1.5;
-    padding: 1em;
-    margin: .5em 0;
-    overflow: auto;
-    border: none;
+  /* copies prism theme */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-size: 1em;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  padding: 1em;
+  margin: 0.5em 0;
+  overflow: auto;
+  border: none;
 
-    caret-color: var(--blue);
-    color: transparent;
-    width: 500px;
-    background-color: transparent;
-    resize: none;
-    position: fixed;
-    z-index: 3;
-    box-sizing: border-box;
+  caret-color: var(--blue);
+  color: transparent;
+  width: 500px;
+  background-color: transparent;
+  resize: none;
+  position: fixed;
+  z-index: 3;
+  box-sizing: border-box;
 }
 
 .query-editor .controller::selection {
-    background-color: var(--blue-low-alpha);
+  background-color: var(--blue-low-alpha);
 }
 
 .query-editor .controller::placeholder {
-    color: var(--blue);
+  color: var(--blue);
 }
 
 .query-editor .display {
-    width: 500px;
-    z-index: 2;
-    box-sizing: border-box;
-    display: inline-block;
+  width: 500px;
+  z-index: 2;
+  box-sizing: border-box;
+  display: inline-block;
 }
 
 .results * {
-    background-color: inherit;
+  background-color: inherit;
 }
 
 .results .topbar {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .expander {
-    background-color: inherit;
+  background-color: inherit;
 }
 
 .expander-action {
-    background-color: var(--light-color);
-    color: var(--dark-color);
-    border-color: var(--light-color);
+  background-color: var(--light-color);
+  color: var(--dark-color);
+  border-color: var(--light-color);
 }
 
 .expander-child {
-    margin: 4px;
+  margin: 4px;
 }
 
 .results {
-    flex: 4;
-    max-width: 66%;
-    background-color: var(--dark-color);
-    border: 2px solid var(--gray-42);
-    border-right-color: var(--dark-color);
-    border-bottom-color: var(--dark-color);
-    color: var(--light-color)
+  flex: 4;
+  max-width: 66%;
+  background-color: var(--dark-color);
+  border: 2px solid var(--gray-42);
+  border-right-color: var(--dark-color);
+  border-bottom-color: var(--dark-color);
+  color: var(--light-color);
 }
 
 .result-controls {
-    height: 14vh;
-    padding: 8px;
-    border-bottom: solid 1px var(--gray-68);
-    box-shadow: 0 2px 2px 0 var(--gray-68-shadow);
-    z-index: 2;
-    position: relative;
-    top: 0;
+  height: 14vh;
+  padding: 8px;
+  border-bottom: solid 1px var(--gray-68);
+  box-shadow: 0 2px 2px 0 var(--gray-68-shadow);
+  z-index: 2;
+  position: relative;
+  top: 0;
 }
 
 .result-container {
-    padding-top: 8px;
-    background-color: var(--darker-color);
-    height: 84vh;
-    overflow-y: scroll;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: start;
+  padding-top: 8px;
+  background-color: var(--darker-color);
+  height: 84vh;
+  overflow-y: scroll;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: start;
 }
 
 .result-container > :last-child {
-    margin-bottom: 24px;
+  margin-bottom: 24px;
 }
 
 .card-view {
-    width: 24%;
-    margin-left: .75%;
-    padding-bottom: 4px;
-    display: flex;
-    flex-direction: column;
+  width: 24%;
+  margin-left: 0.75%;
+  padding-bottom: 4px;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-view img {
-    clip-path: inset(0 0 0 0 round var(--card-radius));
-    box-shadow: 4px var(--gray-68);
+  clip-path: inset(0 0 0 0 round var(--card-radius));
+  box-shadow: 4px var(--gray-68);
 }
 
 .card-view .add-button {
-    align-self: center;
+  align-self: center;
 }
 
 .card-view .detail {
-    margin-top: 4px;
+  margin-top: 4px;
 }
 
 .detail-controls {
-    margin-left: 20px;
+  margin-left: 20px;
 }
 
 .loader-holder {
-    width: 500px;
+  width: 500px;
 }
 
 .loader .background {
-    fill: var(--light-color);
+  fill: var(--light-color);
 }
 
 .loader .foreground {
-    fill: var(--green);
+  fill: var(--green);
 }
-
-

@@ -3,6 +3,6 @@ export enum Stage {
   Prod = 'Prod',
 }
 export interface ReefClientConfig {
-  stage: Stage;
-  apiUrl: string;
+  stage: Stage
+  apiUrl: string
 }

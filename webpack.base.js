@@ -1,9 +1,9 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
 
-const distDir = path.join(__dirname, 'dist');
-const stage = process.env.STAGE ?? 'development';
+const distDir = path.join(__dirname, 'dist')
+const stage = process.env.STAGE ?? 'development'
 
 module.exports = {
   mode: 'development',
@@ -18,7 +18,7 @@ module.exports = {
     alias: {
       configuration: path.join(__dirname, 'config', stage),
     },
-    fallback:  { "events": require.resolve("events/") }
+    fallback: { events: require.resolve('events/') },
   },
   module: {
     rules: [
@@ -37,4 +37,4 @@ module.exports = {
   },
   devtool: 'eval-source-map',
   plugins: [new HtmlWebpackPlugin({ template: 'src/index.html' })],
-};
+}

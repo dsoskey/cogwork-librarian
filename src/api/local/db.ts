@@ -1,4 +1,4 @@
-import Dexie, {Table} from 'dexie'
+import Dexie, { Table } from 'dexie'
 import { Card } from 'scryfall-sdk'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 
@@ -6,27 +6,27 @@ type ManifestKeys = 'id' | 'uri' | 'type' | 'updated_at'
 export type Manifest = Pick<BulkDataDefinition, ManifestKeys>
 
 export type CardKeys =
- 'id' |
- 'oracle_id' | 
- 'cmc' |
- 'color_identity' |
- 'colors' |
- 'name' |
- 'oracle_text' |
- 'power' |
- 'toughness'
+  | 'id'
+  | 'oracle_id'
+  | 'cmc'
+  | 'color_identity'
+  | 'colors'
+  | 'name'
+  | 'oracle_text'
+  | 'power'
+  | 'toughness'
 export type CardTable = Pick<Card, CardKeys>
 
 export class TypedDexie extends Dexie {
-    manifest!: Table<Manifest>
+  manifest!: Table<Manifest>
 
-    card!: Table<CardTable>
+  card!: Table<CardTable>
 
-    constructor() {
-        super('cogwork-librarian')
+  constructor() {
+    super('cogwork-librarian')
 
-        this.version(1).stores({
-            /*
+    this.version(1).stores({
+      /*
             source: https://scryfall.com/docs/api/bulk-data
             √ id 	UUID 		A unique ID for this bulk item.
             √ uri 	URI 		The Scryfall API URI for this file.
@@ -39,9 +39,9 @@ export class TypedDexie extends Dexie {
             content_type 	MIME Type 		The MIME type of this file.
             content_encoding 	Encoding 		The Content-Encoding encoding that will be used to transmit this file when you download it.
             */
-            manifest: 'id, uri, type, updated_at',
-        
-            /*
+      manifest: 'id, uri, type, updated_at',
+
+      /*
             ## Core
             arena_id 	Integer 	Nullable 	This card’s Arena ID, if any. A large percentage of cards are not available on Arena and do not have this ID.
             √ id 	UUID 		A unique ID for this card in Scryfall’s database.
@@ -84,9 +84,8 @@ export class TypedDexie extends Dexie {
             toughness 	String 	Nullable 	This card’s toughness, if any. Note that some cards have toughnesses that are not numeric, such as *.
             type_line 	String 		The type line of this card. 
             */
-            card: 'id, oracle_id, cmc, color_identity, colors, name, oracle_text, power, toughness',
-        })
-    }
+      card: 'id, oracle_id, cmc, color_identity, colors, name, oracle_text, power, toughness',
+    })
+  }
 }
 export const cogDB = new TypedDexie()
-
