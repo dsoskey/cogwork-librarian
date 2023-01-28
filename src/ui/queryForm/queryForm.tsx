@@ -3,12 +3,13 @@ import React from 'react'
 import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
 import { TextEditor } from '../textEditor'
 import { DataSource, DATA_SOURCE, Setter, TaskStatus } from '../../types'
+import { Input } from '../input'
 
 const description: Record<DataSource, String> = {
   scryfall:
-    'fetches from scryfall using its API. the current recommended experience',
+    'fetches from scryfall using its API. Supports full scryfall syntax, but large query sets will take longer.',
   local:
-    'WARNING: ALPHA! Syntax is under active development! processes queries against a local database of oracle cards',
+    'processes queries against a local database of oracle cards. Syntax is currently limited to play-relevant card fields, but local processing is significantly faster than scryfall',
 }
 
 const sortOptions: Array<keyof typeof Sort> = [
@@ -27,11 +28,19 @@ const sortOptions: Array<keyof typeof Sort> = [
   // 'artist',
 ]
 
+const ScryfallLink = () => (
+  <a href='https://scryfall.com/docs/syntax' rel='noreferrer' target='_blank'>
+    scryfall query
+  </a>
+)
+
 export interface QueryFormProps {
   status: TaskStatus
   execute: () => void
   queries: string[]
   setQueries: Setter<string[]>
+  prefix: string
+  setPrefix: Setter<string>
   options: SearchOptions
   setOptions: Setter<SearchOptions>
   source: DataSource
@@ -39,6 +48,8 @@ export interface QueryFormProps {
 }
 
 export const QueryForm = ({
+  prefix,
+  setPrefix,
   status,
   execute,
   queries,
@@ -50,21 +61,30 @@ export const QueryForm = ({
 }: QueryFormProps) => {
   return (
     <>
-      <div>
+      <div className='column'>
         <label>
-          enter one{' '}
-          <a
-            href='https://scryfall.com/docs/syntax'
-            rel='noreferrer'
-            target='_blank'
-          >
-            scryfall query
-          </a>{' '}
-          per row
+          enter a base <ScryfallLink /> to include in each subquery
         </label>
+        <Input
+          value={prefix}
+          onChange={(e) => {
+            setPrefix(e.target.value)
+          }}
+          language='regex'
+        />
       </div>
 
-      <TextEditor queries={queries} setQueries={setQueries} language='regex' />
+      <div className='column'>
+        <label>
+          enter one or more scryfall queries to combine with the base query, one
+          per row
+        </label>
+        <TextEditor
+          queries={queries}
+          setQueries={setQueries}
+          language='regex'
+        />
+      </div>
 
       <div className='execute'>
         <button disabled={status === 'loading'} onClick={execute}>

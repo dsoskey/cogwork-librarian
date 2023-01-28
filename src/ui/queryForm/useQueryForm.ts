@@ -7,13 +7,18 @@ import { displayQueries } from '../../api/queries'
 interface QueryFormProps {
   initialQueries?: string[] | (() => string[])
   initialOptions?: SearchOptions | (() => SearchOptions)
+  initialPrefix?: string | (() => string)
 }
 
-interface QueryFormState {
+export interface QueryFormFields {
   queries: string[]
-  setQueries: Setter<string[]>
+  prefix: string
   options: SearchOptions
+}
+interface QueryFormState extends QueryFormFields {
+  setQueries: Setter<string[]>
   setOptions: Setter<SearchOptions>
+  setPrefix: Setter<string>
 }
 
 export const useQueryForm = ({
@@ -27,6 +32,7 @@ export const useQueryForm = ({
     order: 'cmc',
     dir: 'auto',
   },
+  initialPrefix = '-is:token',
 }: QueryFormProps): QueryFormState => {
   const [options, setOptions] = useLocalStorage<SearchOptions>(
     'search-options',
@@ -36,6 +42,7 @@ export const useQueryForm = ({
     'queries',
     initialQueries
   )
+  const [prefix, setPrefix] = useLocalStorage<string>('prefix', initialPrefix)
 
-  return { options, setOptions, queries, setQueries }
+  return { options, setOptions, queries, setQueries, prefix, setPrefix }
 }

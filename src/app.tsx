@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { BrowserView } from './ui/cardBrowser/browserView'
 import { TextEditor } from './ui/textEditor'
 import { useCogDB } from './api/local/useCogDB'
@@ -6,7 +6,10 @@ import { QueryForm } from './ui/queryForm/queryForm'
 import { useScryfallQueryRunner } from './api/scryfall/useQueryRunner'
 import { DataSource } from './types'
 import { useQueryForm } from './ui/queryForm/useQueryForm'
-import { weightAlgorithms } from './api/queryRunnerCommon'
+import {
+  weightAlgorithms,
+  injectPrefix as _injectPrefix,
+} from './api/queryRunnerCommon'
 import { useLocalStorage } from './api/local/useLocalStorage'
 import { useMemoryQueryRunner } from './api/memory/useQueryRunner'
 import { useProject } from './api/useProject'
@@ -21,15 +24,19 @@ export const App = () => {
   const { addIgnoredId, ignoredIds, addCard, setSavedCards, savedCards } =
     useProject()
 
-  const { queries, setQueries, options, setOptions } = useQueryForm({})
+  const { queries, setQueries, options, setOptions, prefix, setPrefix } =
+    useQueryForm({})
+  const injectPrefix = useCallback(_injectPrefix(prefix), [prefix])
 
   const queryRunner = {
     local: useMemoryQueryRunner({
       getWeight: weightAlgorithms.zipf,
       corpus: memory,
+      injectPrefix,
     }),
     scryfall: useScryfallQueryRunner({
       getWeight: weightAlgorithms.zipf,
+      injectPrefix,
     }),
   }[source]
 
@@ -43,6 +50,8 @@ export const App = () => {
 
         {memoryStatus === 'success' && (
           <QueryForm
+            prefix={prefix}
+            setPrefix={setPrefix}
             status={queryRunner.status}
             execute={() => queryRunner.run(queries, options)}
             queries={queries}

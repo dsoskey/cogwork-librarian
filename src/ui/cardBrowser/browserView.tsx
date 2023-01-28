@@ -4,10 +4,11 @@ import { PAGE_SIZE, WEIGHT, QUERIES } from './constants'
 import { Loader } from '../loader'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { EnrichedCard } from '../../api/queryRunnerCommon'
-import { DataSource, TaskStatus } from '../../types'
+import { DataSource, ObjectValues, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { PageControl } from './pageControl'
 import { useViewportListener } from '../../viewport'
+import { ResizeHandle } from '../resizeHandle'
 
 interface BrowserViewProps {
   status: TaskStatus
@@ -19,6 +20,13 @@ interface BrowserViewProps {
   ignoredIds: string[]
 }
 
+const displays = {
+  search: 'search',
+  ignore: 'ignore',
+} as const
+type Display = ObjectValues<typeof displays>
+
+const MIN = 500
 export const BrowserView = React.memo(
   ({
     addCard,
@@ -30,6 +38,9 @@ export const BrowserView = React.memo(
     report,
   }: BrowserViewProps) => {
     const viewport = useViewportListener()
+    // TODO: Add collection switching
+    const [displayedCollection, setDisplayedCollection] =
+      useState<Display>('search')
     const ignoredIdSet = useMemo(() => new Set(ignoredIds), [ignoredIds])
     const displayableCards = useMemo(
       () => result.filter((it) => !ignoredIdSet.has(it.data.oracle_id)),
@@ -39,6 +50,14 @@ export const BrowserView = React.memo(
       () => result.filter((it) => ignoredIdSet.has(it.data.oracle_id)),
       [result, ignoredIdSet]
     )
+    const cardsToDisplay = useMemo(() => {
+      switch (displayedCollection) {
+        case 'ignore':
+          return ignoredCards
+        case 'search':
+          return displayableCards
+      }
+    }, [displayedCollection, ignoredCards, displayableCards])
 
     const [revealDetails, setRevealDetails] = useLocalStorage(
       'reveal-details',
@@ -54,12 +73,14 @@ export const BrowserView = React.memo(
     const lowerBound = page * pageSize + 1
     const upperBound = (page + 1) * pageSize
 
+    const [width, setWidth] = useState<number>(viewport.width * 66)
+
     if (status == 'unstarted') {
       return null
     }
 
-    return (
-      <div className='results'>
+    const Content = () => (
+      <div className='column content'>
         <div className='result-controls'>
           {status === 'loading' && (
             <h2>running queries against {source}. please be patient...</h2>
@@ -180,9 +201,9 @@ export const BrowserView = React.memo(
           </div>
         </div>
 
-        {displayableCards.length > 0 && (
+        {cardsToDisplay.length > 0 && (
           <div className='result-container'>
-            {displayableCards.slice(lowerBound - 1, upperBound).map((card) => (
+            {cardsToDisplay.slice(lowerBound - 1, upperBound).map((card) => (
               <CardView
                 onAdd={() => addCard(card.data.name)}
                 onIgnore={() => addIgnoredId(card.data.oracle_id)}
@@ -206,6 +227,22 @@ export const BrowserView = React.memo(
             />
           </div>
         )}
+      </div>
+    )
+
+    return viewport.desktop ? (
+      <div className='results' style={{ width }}>
+        <ResizeHandle
+          onChange={setWidth}
+          min={MIN}
+          max={viewport.width * 0.8}
+          viewport={viewport}
+        />
+        <Content />
+      </div>
+    ) : (
+      <div className='results'>
+        <Content />
       </div>
     )
   }

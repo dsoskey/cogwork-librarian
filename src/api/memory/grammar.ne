@@ -105,7 +105,7 @@ regexString -> "/" [^/]:* "/"  {% function(d) {return d[1].join(""); } %}
 
 integerValue -> [0-9]:+ {% ([digits]) => parseInt(digits.join(''), 10) %}
 
-anyOperator -> ":" | "=" | "!=" | "<>" | "<" | "<=" | ">" | ">=" {% id %}
+anyOperator -> ":" | "=" | "!=" | "<>" | "<=" | "<" | ">=" | ">" {% id %}
 
 equalityOperator -> ":" | "=" | "!=" | "<>" {% id %}
 

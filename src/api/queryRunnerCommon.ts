@@ -31,8 +31,23 @@ export const weightAlgorithms = {
   uniform: (_: number) => 1,
 }
 
-export const injectors = {
-  none: (query: string) => query,
-  noDigital: (query: string) => `-is:digital (${query})`,
-  noToken: (query: string) => `-is:token (${query})`,
-}
+// useQueryCoordinator filters out empty queries so empty query handling is never reached
+// idea: queryCoordinator sends off one empty query if the whole array is empty OR
+// queryCoordinator throws an error if there are no base queries
+export const injectPrefix =
+  (prefix: string) =>
+  (query: string): string => {
+    const trimmedPrefix = prefix.trim()
+    const trimmedQuery = query.trim()
+    const prefixEmpty = trimmedPrefix.length === 0
+    const queryEmpty = trimmedQuery.length === 0
+    if (prefixEmpty && queryEmpty) {
+      return ''
+    } else if (prefixEmpty) {
+      return query
+    } else if (queryEmpty) {
+      return prefix
+    } else {
+      return `${prefix} (${query})`
+    }
+  }

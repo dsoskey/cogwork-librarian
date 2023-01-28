@@ -1,12 +1,13 @@
 import { Card } from 'scryfall-sdk'
 import { CardKeys } from '../local/db'
 import {
+  anyFaceContains,
+  anyFaceRegexMatch,
   DOUBLE_FACED_LAYOUTS,
   hasNumLandTypes,
   isDual,
   IsValue,
   noReminderText,
-  oracleTextContains,
   SHOCKLAND_REGEX,
 } from '../card'
 
@@ -26,6 +27,7 @@ const replaceNamePlaceholder = (text: string, name: string): string => {
   return text.replace(/~/g, name).toLowerCase()
 }
 
+// TODO: handle card faces for all filters
 export class MemoryFilterWrapper {
   constructor() {}
 
@@ -94,48 +96,60 @@ export class MemoryFilterWrapper {
   textMatch =
     (field: CardKeys, value: string): Filter<Card> =>
     (card: Card) =>
-      card[field]
-        ?.toString()
-        .toLowerCase()
-        .includes(replaceNamePlaceholder(value, card.name))
+      anyFaceContains(card, field, replaceNamePlaceholder(value, card.name))
 
   regexMatch =
     (field: CardKeys, value: string): Filter<Card> =>
     (card: Card) =>
-      new RegExp(replaceNamePlaceholder(value, card.name)).test(
-        (card[field] ?? '').toString().toLowerCase()
+      anyFaceRegexMatch(
+        card,
+        field,
+        new RegExp(replaceNamePlaceholder(value, card.name))
       )
 
   colorMatch =
     (operator: Operator, value: Set<string>): Filter<Card> =>
     (card: Card) => {
-      if (card.colors === undefined) return false
-      const colors = card.colors.map((it) => it.toLowerCase())
-      const matchedColors = colors.filter((color) => value.has(color))
-      const notMatchedColors = colors.filter((color) => !value.has(color))
+      const faceMatchMap = [
+        card.colors,
+        ...card.card_faces.map(it => it.colors)
+      ].filter(it => it !== undefined)
+        .map(colors => colors.map((it) => it.toLowerCase()))
+        .map((colors) => ({
+        match: colors.filter((color) => value.has(color)),
+        not: colors.filter((color) => !value.has(color)),
+      }))
       switch (operator) {
         case '=':
           return (
-            matchedColors.length === value.size && notMatchedColors.length === 0
+            faceMatchMap.filter(
+              (it) => it.match.length === value.size && it.not.length === 0
+            ).length > 0
           )
         case '!=':
-          return matchedColors.length === 0
+          return faceMatchMap.filter((it) => it.match.length === 0).length > 0
         case '<':
-          return (
-            notMatchedColors.length === 0 && matchedColors.length < value.size
-          )
+          return faceMatchMap.filter(it =>
+            it.not.length === 0 && it.match.length < value.size
+          ).length > 0
         case '<=':
           return (
-            notMatchedColors.length === 0 && matchedColors.length <= value.size
+            faceMatchMap.filter(
+              (it) => it.not.length === 0 && it.match.length <= value.size
+            ).length > 0
           )
         case '>':
-          return (
-            notMatchedColors.length > 0 && matchedColors.length === value.size
-          )
+          if (card.name.includes("Kessig Prowler")){
+            console.log("something wunky!")
+          }
+          return faceMatchMap.filter(it =>
+            it.not.length > 0 && it.match.length === value.size
+          ).length > 0
         // Scryfall adapts ":" to the context. in this context it acts as >=
         case ':':
         case '>=':
-          return matchedColors.length === value.size
+          console.log("something funky!")
+          return faceMatchMap.filter(it => it.match.length === value.size).length > 0
         case '<>':
           throw 'throw something better please!'
       }
@@ -196,6 +210,11 @@ export class MemoryFilterWrapper {
         case 'digital':
           return card.digital
         case 'dfc':
+          if (card.name.includes("Kessig Prowler")) {
+            console.log("is val")
+            console.log(card)
+            console.log(DOUBLE_FACED_LAYOUTS.includes(card.layout))
+          }
           return DOUBLE_FACED_LAYOUTS.includes(card.layout)
         case 'mdfc':
           return card.layout === 'modal_dfc'
@@ -213,7 +232,11 @@ export class MemoryFilterWrapper {
         case 'commander':
           return (
             card.type_line.toLowerCase().includes('legendary creature') ||
-            oracleTextContains(card, `${card.name} can be your commander.`)
+            anyFaceContains(
+              card,
+              'oracle_text',
+              `${card.name} can be your commander.`
+            )
           )
         case 'spell':
           return (

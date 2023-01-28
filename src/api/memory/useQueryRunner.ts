@@ -5,7 +5,6 @@ import { queryParser } from './parser'
 import {
   QueryRunner,
   QueryRunnerProps,
-  injectors,
   weightAlgorithms,
 } from '../queryRunnerCommon'
 import { sortBy } from 'lodash'
@@ -39,7 +38,7 @@ interface MemoryQueryRunnerProps extends QueryRunnerProps {
 }
 export const useMemoryQueryRunner = ({
   getWeight = weightAlgorithms.uniform,
-  injectPrefix = injectors.none,
+  injectPrefix,
   corpus,
 }: MemoryQueryRunnerProps): QueryRunner => {
   const { status, report, cache, result, rawData, execute } =
@@ -47,9 +46,8 @@ export const useMemoryQueryRunner = ({
 
   const getCards = useCallback(
     (query: string, options: SearchOptions) => {
-      const preparedQuery = injectPrefix(query)
       const parser = queryParser()
-      parser.feed(preparedQuery)
+      parser.feed(query)
       console.debug(`parsed ${parser.results}`)
       const filtered = corpus.filter(parser.results[0])
       const sorted = sortBy(filtered, [sortFunc(options.order), 'name'])
@@ -79,31 +77,32 @@ export const useMemoryQueryRunner = ({
     options: SearchOptions
   ) => {
     const weight = getWeight(index)
-    const _cacheKey = `${query}:${JSON.stringify(options)}`
-    rawData.current[query] = []
+    const preparedQuery = injectPrefix(query)
+    const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
+    rawData.current[preparedQuery] = []
     if (cache.current[_cacheKey] === undefined) {
       cache.current[_cacheKey] = []
       try {
-        const cards = getCards(query, options).map((card: Card) => ({
+        const cards = getCards(preparedQuery, options).map((card: Card) => ({
           data: card,
           weight,
           matchedQueries: [query],
         }))
-        rawData.current[query] = cloneDeep(cards)
+        rawData.current[preparedQuery] = cloneDeep(cards)
         cache.current[_cacheKey] = cards
         report.addCardCount(cards.length)
         report.addComplete()
-        return query
+        return preparedQuery
       } catch (error) {
         console.log(error)
         report.addError()
         throw error
       }
     } else {
-      rawData.current[query] = cloneDeep(cache.current[_cacheKey])
-      report.addCardCount(rawData.current[query].length)
+      rawData.current[preparedQuery] = cloneDeep(cache.current[_cacheKey])
+      report.addCardCount(rawData.current[preparedQuery].length)
       report.addComplete()
-      return query
+      return preparedQuery
     }
   }
 

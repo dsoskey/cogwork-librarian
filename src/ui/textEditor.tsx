@@ -40,7 +40,7 @@ export const TextEditor = ({
     <div className='query-editor'>
       <textarea
         ref={controller}
-        className='controller'
+        className='controller coglib-prism-theme'
         value={value}
         placeholder={placeholder}
         onChange={(event) => {

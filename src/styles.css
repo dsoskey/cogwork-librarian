@@ -35,13 +35,8 @@ button:disabled {
 }
 
 input {
-  color: var(--blue);
-  background-color: var(--gray-68);
-  border-top-color: var(--gray-42);
-  border-left-color: var(--gray-42);
-  border-bottom-color: var(--dark-color);
-  border-right-color: var(--dark-color);
-  font-family: monospace;
+  color: #ccc;
+  background-color: #2d2d2d;
 }
 
 fieldset {
@@ -67,13 +62,52 @@ fieldset {
   }
 }
 
-.footer {
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
   display: flex;
   flex-direction: row;
 }
 
+.footer {
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 16px;
+}
+
+@media (max-width: 1024px) {
+  .footer {
+    padding-left: 8px;
+  }
+}
+
 .footer > :not(:first-child) {
   padding-left: 4px;
+}
+
+.coglib-prism-theme {
+  /* copies prism theme */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-size: 1em;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  padding: 1em;
+  margin: 0.5em 0;
+  overflow: auto;
+  border: none;
+}
+
+.input-column input {
+  box-sizing: border-box;
+  max-width: 1024px;
+  caret-color: var(--blue);
 }
 
 .input-column {
@@ -99,23 +133,8 @@ fieldset {
 }
 
 .query-editor .controller {
-  /* copies prism theme */
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  font-size: 1em;
-  text-align: left;
-  white-space: pre;
-  word-spacing: normal;
-  word-break: normal;
-  word-wrap: normal;
-  line-height: 1.5;
-  padding: 1em;
-  margin: 0.5em 0;
-  overflow: auto;
-  border: none;
-
   caret-color: var(--blue);
   color: transparent;
-  /*max-width: 500px;*/
   background-color: transparent;
   resize: none;
   grid-area: overlap;
@@ -123,7 +142,8 @@ fieldset {
   box-sizing: border-box;
 }
 
-.query-editor .controller::selection {
+.query-editor .controller::selection,
+.input-column input::selection {
   background-color: var(--blue-low-alpha);
 }
 
@@ -154,7 +174,7 @@ fieldset {
 
 @media (min-width: 1024px) {
   .results {
-    max-width: 66%;
+    max-width: 80%;
   }
 }
 .results {
@@ -164,11 +184,15 @@ fieldset {
   border-bottom-color: var(--dark-color);
   color: var(--light-color);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .results * {
   background-color: inherit;
+}
+
+.results .content {
+  flex: 1;
 }
 
 .results .topbar {
@@ -232,7 +256,6 @@ fieldset {
     width: 49%;
   }
 }
-
 
 .card-view img {
   clip-path: inset(0 0 0 0 round var(--card-radius));

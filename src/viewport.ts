@@ -5,7 +5,7 @@ const calcWidth = () =>
 const calcHeight = () =>
   Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
 
-interface Viewport {
+export interface Viewport {
   width: number
   height: number
   desktop: boolean

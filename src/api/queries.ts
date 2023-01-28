@@ -62,6 +62,11 @@ const testQueries = [
 const unimplementedQueries = [
   `fo:"put the rest on the bottom"`, // oracle works like full-oracle atm
   'keyword:flying', // this searches for the keyword itself, excluding references to the keyword in other abilities
+  't:plane', // this currently gets planeswalkers too, but scryfall only shows planes
 ]
 
-const brokenQueries = []
+const brokenQueries = [
+  // Both of these aren't handling all of the card faces properly
+  "is:dfc c<=w",
+  "is:dfc ci<=w",
+]

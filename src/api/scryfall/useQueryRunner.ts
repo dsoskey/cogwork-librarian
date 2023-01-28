@@ -7,7 +7,6 @@ import MagicQuerier, {
   SearchError,
 } from 'scryfall-sdk/out/util/MagicQuerier'
 import {
-  injectors,
   QueryRunner,
   QueryRunnerProps,
   weightAlgorithms,
@@ -35,7 +34,7 @@ const MY_CARDS = new MyCards()
 
 export const useScryfallQueryRunner = ({
   getWeight = weightAlgorithms.uniform,
-  injectPrefix = injectors.none,
+  injectPrefix,
 }: QueryRunnerProps): QueryRunner => {
   const { status, result, report, cache, rawData, execute } =
     useQueryCoordinator()
@@ -43,17 +42,17 @@ export const useScryfallQueryRunner = ({
   const runQuery = (query: string, index: number, options: SearchOptions) =>
     new Promise((resolve, reject) => {
       const weight = getWeight(index)
-      const _cacheKey = `${query}:${JSON.stringify(options)}`
-      rawData.current[query] = []
+      const preparedQuery = injectPrefix(query)
+      const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
+      rawData.current[preparedQuery] = []
       if (cache.current[_cacheKey] === undefined) {
         cache.current[_cacheKey] = []
-        const preparedQuery = injectPrefix(query)
         MY_CARDS.searchCount(preparedQuery, options).on('data', (data) => {
           report.setTotalCards((prev) => prev + data)
         })
         Scry.Cards.search(preparedQuery, options)
           .on('data', (data) => {
-            rawData.current[query].push({
+            rawData.current[preparedQuery].push({
               data,
               weight,
               matchedQueries: [query],
@@ -74,10 +73,10 @@ export const useScryfallQueryRunner = ({
             reject(e)
           })
       } else {
-        rawData.current[query] = cloneDeep(cache.current[_cacheKey])
-        report.addCardCount(rawData.current[query].length)
+        rawData.current[preparedQuery] = cloneDeep(cache.current[_cacheKey])
+        report.addCardCount(rawData.current[preparedQuery].length)
         report.addComplete()
-        resolve(query)
+        resolve(preparedQuery)
       }
     })
 
