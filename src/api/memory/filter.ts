@@ -112,13 +112,14 @@ export class MemoryFilterWrapper {
     (card: Card) => {
       const faceMatchMap = [
         card.colors,
-        ...card.card_faces.map(it => it.colors)
-      ].filter(it => it !== undefined)
-        .map(colors => colors.map((it) => it.toLowerCase()))
+        ...card.card_faces.map((it) => it.colors),
+      ]
+        .filter((it) => it !== undefined)
+        .map((colors) => colors.map((it) => it.toLowerCase()))
         .map((colors) => ({
-        match: colors.filter((color) => value.has(color)),
-        not: colors.filter((color) => !value.has(color)),
-      }))
+          match: colors.filter((color) => value.has(color)),
+          not: colors.filter((color) => !value.has(color)),
+        }))
       switch (operator) {
         case '=':
           return (
@@ -129,9 +130,11 @@ export class MemoryFilterWrapper {
         case '!=':
           return faceMatchMap.filter((it) => it.match.length === 0).length > 0
         case '<':
-          return faceMatchMap.filter(it =>
-            it.not.length === 0 && it.match.length < value.size
-          ).length > 0
+          return (
+            faceMatchMap.filter(
+              (it) => it.not.length === 0 && it.match.length < value.size
+            ).length > 0
+          )
         case '<=':
           return (
             faceMatchMap.filter(
@@ -139,13 +142,18 @@ export class MemoryFilterWrapper {
             ).length > 0
           )
         case '>':
-          return faceMatchMap.filter(it =>
-            it.not.length > 0 && it.match.length === value.size
-          ).length > 0
+          return (
+            faceMatchMap.filter(
+              (it) => it.not.length > 0 && it.match.length === value.size
+            ).length > 0
+          )
         // Scryfall adapts ":" to the context. in this context it acts as >=
         case ':':
         case '>=':
-          return faceMatchMap.filter(it => it.match.length === value.size).length > 0
+          return (
+            faceMatchMap.filter((it) => it.match.length === value.size).length >
+            0
+          )
         case '<>':
           throw 'throw something better please!'
       }
@@ -154,7 +162,7 @@ export class MemoryFilterWrapper {
   colorIdentityMatch =
     (operator: Operator, value: Set<string>): Filter<Card> =>
     (card: Card) => {
-      const colors = card.color_identity.map(it => it.toLowerCase())
+      const colors = card.color_identity.map((it) => it.toLowerCase())
       const matchedColors = colors.filter((color) => value.has(color))
       const notMatchedColors = colors.filter((color) => !value.has(color))
       switch (operator) {
