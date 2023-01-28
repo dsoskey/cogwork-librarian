@@ -139,16 +139,12 @@ export class MemoryFilterWrapper {
             ).length > 0
           )
         case '>':
-          if (card.name.includes("Kessig Prowler")){
-            console.log("something wunky!")
-          }
           return faceMatchMap.filter(it =>
             it.not.length > 0 && it.match.length === value.size
           ).length > 0
         // Scryfall adapts ":" to the context. in this context it acts as >=
         case ':':
         case '>=':
-          console.log("something funky!")
           return faceMatchMap.filter(it => it.match.length === value.size).length > 0
         case '<>':
           throw 'throw something better please!'
@@ -158,8 +154,7 @@ export class MemoryFilterWrapper {
   colorIdentityMatch =
     (operator: Operator, value: Set<string>): Filter<Card> =>
     (card: Card) => {
-      if (card.colors === undefined) return false
-      const colors = card.colors.map((it) => it.toLowerCase())
+      const colors = card.color_identity.map(it => it.toLowerCase())
       const matchedColors = colors.filter((color) => value.has(color))
       const notMatchedColors = colors.filter((color) => !value.has(color))
       switch (operator) {
@@ -210,11 +205,6 @@ export class MemoryFilterWrapper {
         case 'digital':
           return card.digital
         case 'dfc':
-          if (card.name.includes("Kessig Prowler")) {
-            console.log("is val")
-            console.log(card)
-            console.log(DOUBLE_FACED_LAYOUTS.includes(card.layout))
-          }
           return DOUBLE_FACED_LAYOUTS.includes(card.layout)
         case 'mdfc':
           return card.layout === 'modal_dfc'
