@@ -6,6 +6,12 @@ interface QueryExample extends QueryFormFields {
 
 export const queryExamples: QueryExample[] = [
   {
+    title: 'savai knights matters, centered in white',
+    prefix: 'o:knight ci:brw',
+    queries: ['t:knight', 'ci=bw or ci=rw', 'ci=br', 'ci:brw'],
+    options: {},
+  },
+  {
     title: 'ketria spellslinger',
     prefix: 'c<=urg o:/(?<!(only as an? ))(instant|sorcery)/ -o:flash',
     queries: [
@@ -24,14 +30,14 @@ export const queryExamples: QueryExample[] = [
     title: 'savai sacrifice',
     prefix: '-t:vanguard ci:rwb o:/sacrifice an? *./',
     queries: [
-      "o:/draw .* cards?/",
-      "o:/deals? .* damage/",
-      "o:/loses? .* life/",
-      "o:/gains? .* life/",
-      "o:/scry/",
-      "t:creature",
-      "-t:planeswalker -t:creature",
-      "ci:brw",
+      'o:/draw .* cards?/',
+      'o:/deals? .* damage/',
+      'o:/loses? .* life/',
+      'o:/gains? .* life/',
+      'o:/scry/',
+      't:creature',
+      '-t:planeswalker -t:creature',
+      'ci:brw',
     ],
     options: {},
   },
@@ -39,10 +45,4 @@ export const queryExamples: QueryExample[] = [
   //   title: 'modifying creatures',
   //
   // }
-  {
-    title: 'savai knights matters, centered in white',
-    prefix: 'o:knight ci:brw',
-    queries: ['t:knight', 'ci=bw or ci=rw', 'ci=br', 'ci:brw'],
-    options: {},
-  },
 ]

@@ -18,11 +18,13 @@ export const Modal = ({ onClose, title, open, children }: ModalProps) => {
   })
 
   return (
-    <div className={`modal display-${open ? "block" : "none"}`}>
+    <div className={`modal display-${open ? 'block' : 'none'}`}>
       <dialog className='modal-main' open={open}>
         <div className='row'>
           <div className='modal-title'>{title}</div>
-          <button className='modal-close' type='button' onClick={onClose}>X</button>
+          <button className='modal-close' type='button' onClick={onClose}>
+            X
+          </button>
         </div>
 
         {children}

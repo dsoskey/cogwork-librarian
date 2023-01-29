@@ -80,8 +80,8 @@ export const QueryForm = ({
 
       <div className='column'>
         <label>
-          enter one or more subqueries to combine with the base query, one
-          per row
+          enter one or more subqueries to combine with the base query, one per
+          row
         </label>
         <TextEditor
           queries={queries}
@@ -95,29 +95,33 @@ export const QueryForm = ({
           scour{status === 'loading' && 'ing'} the library
         </button>
 
-        <button onClick={() => setExampleOpen(true)}>
-          browse examples
-        </button>
+        <button onClick={() => setExampleOpen(true)}>browse examples</button>
         <Modal
           title={<h2>example queries</h2>}
           open={exampleOpen}
           onClose={() => setExampleOpen(false)}
         >
           <div className='example-content'>
-            {queryExamples.map(example => (
+            {queryExamples.map((example) => (
               <div key={example.title}>
                 <div className='row'>
                   <h3>{example.title}</h3>
-                  <button onClick={() => {
-                    setPrefix(example.prefix)
-                    setQueries(example.queries)
-                    setExampleOpen(false)
-                  }}>use example</button>
+                  <button
+                    onClick={() => {
+                      setPrefix(example.prefix)
+                      setQueries(example.queries)
+                      setExampleOpen(false)
+                    }}
+                  >
+                    use example
+                  </button>
                 </div>
-                <pre className='language-regex'><code>{example.prefix}</code></pre>
-                <pre className='language-regex'><code>
-                {example.queries.join('\n')}
-              </code></pre>
+                <pre className='language-regex'>
+                  <code>{example.prefix}</code>
+                </pre>
+                <pre className='language-regex'>
+                  <code>{example.queries.join('\n')}</code>
+                </pre>
               </div>
             ))}
           </div>
