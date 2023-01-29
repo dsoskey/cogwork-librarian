@@ -70,6 +70,11 @@ fieldset {
 .row {
   display: flex;
   flex-direction: row;
+  align-items: center;
+}
+
+.row > :not(:first-child) {
+  margin-left: 4px;
 }
 
 .footer {
@@ -104,12 +109,6 @@ fieldset {
   border: none;
 }
 
-.input-column input {
-  box-sizing: border-box;
-  max-width: 1024px;
-  caret-color: var(--blue);
-}
-
 .input-column {
   flex: 2;
   display: flex;
@@ -117,6 +116,16 @@ fieldset {
   height: 100%;
   padding: 8px;
   overflow-y: auto;
+}
+
+.example-content button {
+  height: unset;
+}
+
+.input-column input {
+  box-sizing: border-box;
+  max-width: 1024px;
+  caret-color: var(--blue);
 }
 
 .input-column .execute {

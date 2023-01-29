@@ -1,9 +1,11 @@
 import { cloneDeep } from 'lodash'
-import React from 'react'
+import React, { useState } from 'react'
 import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
 import { TextEditor } from '../textEditor'
 import { DataSource, DATA_SOURCE, Setter, TaskStatus } from '../../types'
 import { Input } from '../input'
+import { Modal } from '../modal'
+import { queryExamples } from '../../api/example'
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -59,6 +61,8 @@ export const QueryForm = ({
   source,
   setSource,
 }: QueryFormProps) => {
+  const [exampleOpen, setExampleOpen] = useState<boolean>(false)
+
   return (
     <>
       <div className='column'>
@@ -76,7 +80,7 @@ export const QueryForm = ({
 
       <div className='column'>
         <label>
-          enter one or more scryfall queries to combine with the base query, one
+          enter one or more subqueries to combine with the base query, one
           per row
         </label>
         <TextEditor
@@ -90,6 +94,34 @@ export const QueryForm = ({
         <button disabled={status === 'loading'} onClick={execute}>
           scour{status === 'loading' && 'ing'} the library
         </button>
+
+        <button onClick={() => setExampleOpen(true)}>
+          browse examples
+        </button>
+        <Modal
+          title={<h2>example queries</h2>}
+          open={exampleOpen}
+          onClose={() => setExampleOpen(false)}
+        >
+          <div className='example-content'>
+            {queryExamples.map(example => (
+              <div key={example.title}>
+                <div className='row'>
+                  <h3>{example.title}</h3>
+                  <button onClick={() => {
+                    setPrefix(example.prefix)
+                    setQueries(example.queries)
+                    setExampleOpen(false)
+                  }}>use example</button>
+                </div>
+                <pre className='language-regex'><code>{example.prefix}</code></pre>
+                <pre className='language-regex'><code>
+                {example.queries.join('\n')}
+              </code></pre>
+              </div>
+            ))}
+          </div>
+        </Modal>
       </div>
 
       <h2>search options</h2>
