@@ -86,7 +86,7 @@ export const QueryForm = ({
         <TextEditor
           queries={queries}
           setQueries={setQueries}
-          language='regex'
+          language='scryfall-extended'
         />
       </div>
 

@@ -7,7 +7,7 @@ export interface QueryInputProps {
   setQueries: React.Dispatch<React.SetStateAction<string[]>>
   queries: string[]
   placeholder?: string | undefined
-  language?: 'regex'
+  language?: 'regex' | 'scryfall-extended'
 }
 
 export const TextEditor = ({

@@ -25,7 +25,7 @@ export const AppInfo = () => {
           boxes, and other custom magic formats. craft more complex queries to
           find the cards that fit your environment or archetype. save cards to
           your list for easy export. ignore cards you want to exclude from all
-          future search results
+          future search results.
         </p>
 
         <p>
@@ -68,7 +68,7 @@ export const AppInfo = () => {
           </ol>
         </p>
 
-        <h4>1. combine the base query with each subquery.</h4>
+        <h4>1. combine the base query with each subquery</h4>
         <p>starting from an input like this:</p>
         <pre className='language-regex'>
           <code>{EXAMPLE.prefix}</code>

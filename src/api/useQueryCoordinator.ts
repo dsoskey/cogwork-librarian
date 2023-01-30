@@ -34,7 +34,9 @@ export const useQueryCoordinator = (): QueryExecutor => {
     (runQuery: QueryRunnerFunc) =>
       (queries: string[], options: SearchOptions) => {
         setStatus('loading')
-        const filteredQueries = queries.filter((q) => q.trim().length > 0)
+        const filteredQueries = queries.filter(
+          (q) => q.trim().length > 0 && q.trim().charAt(0) !== '#'
+        )
         report.reset(filteredQueries.length)
         rawData.current = {}
         Promise.allSettled(

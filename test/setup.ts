@@ -1,1 +1,1 @@
-console.log("setting up nothing!")
+console.log('setting up nothing!')
