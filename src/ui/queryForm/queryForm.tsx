@@ -74,14 +74,14 @@ export const QueryForm = ({
           onChange={(e) => {
             setPrefix(e.target.value)
           }}
-          language='regex'
+          language='scryfall-extended'
         />
       </div>
 
       <div className='column'>
         <label>
           enter one or more subqueries to combine with the base query, one per
-          row
+          row. exclude rows by adding a <code className='language-scryfall-extended'>#</code> at the beginning of the row
         </label>
         <TextEditor
           queries={queries}
@@ -116,10 +116,10 @@ export const QueryForm = ({
                     use example
                   </button>
                 </div>
-                <pre className='language-regex'>
+                <pre className='language-scryfall-extended'>
                   <code>{example.prefix}</code>
                 </pre>
-                <pre className='language-regex'>
+                <pre className='language-scryfall-extended'>
                   <code>{example.queries.join('\n')}</code>
                 </pre>
               </div>

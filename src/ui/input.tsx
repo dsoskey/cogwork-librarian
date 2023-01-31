@@ -1,10 +1,11 @@
 import React, { ChangeEventHandler } from 'react'
 import Prism from 'prismjs'
+import { Language } from '../api/memory/syntaxHighlighting'
 
 export interface InputProps {
   value: string
   onChange: ChangeEventHandler<HTMLInputElement>
-  language?: 'regex'
+  language?: Language
 }
 
 export const Input = ({ value, onChange, language }: InputProps) => {

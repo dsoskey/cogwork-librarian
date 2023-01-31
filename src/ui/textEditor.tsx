@@ -1,5 +1,6 @@
 import Prism from 'prismjs'
 import React, { useRef } from 'react'
+import { Language } from '../api/memory/syntaxHighlighting'
 
 const MIN_TEXTAREA_HEIGHT = 32
 
@@ -7,7 +8,7 @@ export interface QueryInputProps {
   setQueries: React.Dispatch<React.SetStateAction<string[]>>
   queries: string[]
   placeholder?: string | undefined
-  language?: 'regex' | 'scryfall-extended'
+  language?: Language
 }
 
 export const TextEditor = ({
