@@ -9,7 +9,7 @@ const operators = ':|=|!=|<>|<=|<|>=|>'
 // Anything defined by scryfall itself goes here
 export const scryfall: Grammar = {
   negation: {
-    pattern: new RegExp(`(^|\\b)-(${keywords})`),
+    pattern: new RegExp(`(^|\\s)-(${keywords})`),
     alias: 'deleted',
     greedy: true,
   },

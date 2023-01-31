@@ -38,6 +38,7 @@ const ScryfallLink = () => (
 
 export interface QueryFormProps {
   status: TaskStatus
+  canRunQuery: boolean
   execute: () => void
   queries: string[]
   setQueries: Setter<string[]>
@@ -53,6 +54,7 @@ export const QueryForm = ({
   prefix,
   setPrefix,
   status,
+  canRunQuery,
   execute,
   queries,
   setQueries,
@@ -91,8 +93,9 @@ export const QueryForm = ({
       </div>
 
       <div className='execute'>
-        <button disabled={status === 'loading'} onClick={execute}>
-          scour{status === 'loading' && 'ing'} the library
+        <button disabled={!canRunQuery || status === 'loading'} onClick={execute}>
+          {canRunQuery && `scour${status === 'loading' ? 'ing' : ''} the library`}
+          {!canRunQuery && `preparing the library`}
         </button>
 
         <button onClick={() => setExampleOpen(true)}>browse examples</button>

@@ -45,23 +45,24 @@ export const App = () => {
       <div className='input-column'>
         <h1>cogwork librarian</h1>
 
-        {dbStatus === 'loading' && 'Indexing local database...'}
-        {memoryStatus === 'loading' && 'Loading local database into memory...'}
+        <div>
+          {dbStatus === 'loading' && 'Indexing local database...'}
+          {memoryStatus === 'loading' && 'Loading local database into memory...'}
+        </div>
 
-        {memoryStatus === 'success' && (
-          <QueryForm
-            prefix={prefix}
-            setPrefix={setPrefix}
-            status={queryRunner.status}
-            execute={() => queryRunner.run(queries, options)}
-            queries={queries}
-            setQueries={setQueries}
-            options={options}
-            setOptions={setOptions}
-            source={source}
-            setSource={setSource}
-          />
-        )}
+        <QueryForm
+          prefix={prefix}
+          setPrefix={setPrefix}
+          status={queryRunner.status}
+          canRunQuery={source === 'scryfall' || memoryStatus === 'success'}
+          execute={() => queryRunner.run(queries, options)}
+          queries={queries}
+          setQueries={setQueries}
+          options={options}
+          setOptions={setOptions}
+          source={source}
+          setSource={setSource}
+        />
 
         <h2>saved cards</h2>
 
