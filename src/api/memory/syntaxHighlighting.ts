@@ -3,7 +3,7 @@ import Prism, { Grammar } from 'prismjs'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
 const keywords =
-  'mv|cmc|name|c|color|ci|id|identity|oracle|o|text|t|type|pow|power|tou|toughness|loy|loyalty|layout|is'
+  'mv|cmc|name|color|ci|c|id|identity|oracle|o|text|type|power|pow|toughness|tou|loy|loyalty|layout|is|t'
 const operators = ':|=|!=|<>|<=|<|>=|>'
 
 // Anything defined by scryfall itself goes here
