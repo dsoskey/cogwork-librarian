@@ -75,6 +75,7 @@ export const isValues = {
   triome: 'triome',
   tangoland: 'tangoland',
   battleland: 'battleland',
+  extra: 'extra',
 } as const
 export type IsValue = ObjectValues<typeof isValues>
 

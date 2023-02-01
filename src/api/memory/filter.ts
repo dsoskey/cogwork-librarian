@@ -398,6 +398,14 @@ export class MemoryFilterWrapper {
               card.oracle_text
             )
           )
+        case 'extra':
+          return (
+            ['wc97', 'wc98', 'wc99', 'wc00', 'wc01', 'wc02', 'wc03', 'wc04',
+              'tfth', 'tbth', 'tdag', 'thp3', 'thp2', 'thp1',
+              'olep', 'pcel', 'psdg', '30a', 'past'].includes(card.set.toLowerCase()) ||
+            /(^|\b)(vanguard|plane|scheme|phenomenon|token|card|emblem)(\b|$)/.test(card.type_line.toLowerCase()) ||
+              card.set_type === 'memorabilia'
+          )
         default:
           return this.unimplemented
       }
