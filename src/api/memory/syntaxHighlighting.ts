@@ -66,7 +66,7 @@ export const scryfall: Grammar = {
 // Anything built on top of scryfall goes here
 export const scryfallExtended: Grammar = {
   comment: {
-    pattern: /^\s*#.*/,
-    greedy: true,
+    pattern: /(^|\n)\s*#.*/,
   },
+  ...scryfall,
 }

@@ -9,10 +9,7 @@ import './styles.css'
 import { FlagContextProvider } from './flags'
 
 Prism.languages['scryfall'] = scryfall
-Prism.languages['scryfall-extended'] = Prism.languages.extend(
-  'scryfall',
-  scryfallExtended
-)
+Prism.languages['scryfall-extended'] = scryfallExtended
 
 Scry.setTimeout(50)
 
