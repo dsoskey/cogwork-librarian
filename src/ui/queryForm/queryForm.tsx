@@ -1,11 +1,11 @@
 import { cloneDeep } from 'lodash'
-import React, { useState } from 'react'
+import React from 'react'
 import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
 import { TextEditor } from '../textEditor'
 import { DataSource, DATA_SOURCE, Setter, TaskStatus } from '../../types'
 import { Input } from '../input'
-import { Modal } from '../modal'
-import { queryExamples } from '../../api/example'
+import { AppInfo } from '../appInfo'
+import { ExampleGallery } from './exampleGallery'
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -63,8 +63,6 @@ export const QueryForm = ({
   source,
   setSource,
 }: QueryFormProps) => {
-  const [exampleOpen, setExampleOpen] = useState<boolean>(false)
-
   return (
     <>
       <div className='column'>
@@ -80,10 +78,12 @@ export const QueryForm = ({
         />
       </div>
 
-      <div className='column'>
+      <div className={`column ${source}`}>
         <label>
           enter one or more subqueries to combine with the base query, one per
-          row. exclude rows by adding a <code className='language-scryfall-extended'>#</code> at the beginning of the row
+          row. exclude rows by adding a{' '}
+          <code className='language-scryfall-extended'>#</code> at the beginning
+          of the row
         </label>
         <TextEditor
           queries={queries}
@@ -93,42 +93,18 @@ export const QueryForm = ({
       </div>
 
       <div className='execute'>
-        <button disabled={!canRunQuery || status === 'loading'} onClick={execute}>
-          {canRunQuery && `scour${status === 'loading' ? 'ing' : ''} the library`}
+        <button
+          disabled={!canRunQuery || status === 'loading'}
+          onClick={execute}
+        >
+          {canRunQuery &&
+            `scour${status === 'loading' ? 'ing' : ''} the library`}
           {!canRunQuery && `preparing the library`}
         </button>
 
-        <button onClick={() => setExampleOpen(true)}>browse examples</button>
-        <Modal
-          title={<h2>example queries</h2>}
-          open={exampleOpen}
-          onClose={() => setExampleOpen(false)}
-        >
-          <div className='example-content'>
-            {queryExamples.map((example) => (
-              <div key={example.title}>
-                <div className='row'>
-                  <h3>{example.title}</h3>
-                  <button
-                    onClick={() => {
-                      setPrefix(example.prefix)
-                      setQueries(example.queries)
-                      setExampleOpen(false)
-                    }}
-                  >
-                    use example
-                  </button>
-                </div>
-                <pre className='language-scryfall-extended'>
-                  <code>{example.prefix}</code>
-                </pre>
-                <pre className='language-scryfall-extended'>
-                  <code>{example.queries.join('\n')}</code>
-                </pre>
-              </div>
-            ))}
-          </div>
-        </Modal>
+        <ExampleGallery setPrefix={setPrefix} setQueries={setQueries} />
+
+        <AppInfo />
       </div>
 
       <h2>search options</h2>

@@ -89,6 +89,17 @@ pre[class*='language-'] {
 .token.builtin {
   color: #7ec699;
 }
+
+.local .token.deleted.limited,
+.local .token.keyword.limited {
+  color: #ff0202;
+  background: rgba(20, 20, 20, 0.5);
+  text-decoration: line-through 0.1rem;
+}
+.token.keyword.limited {
+  /*background: #1F1C26;*/
+}
+
 .token.function.important,
 .token.keyword.important {
   color: #ff0202;

@@ -44,6 +44,7 @@ condition -> (
     nameRegexCondition |
     oracleCondition |
     oracleRegexCondition |
+    keywordCondition |
     typeCondition |
     typeRegexCondition |
     powerCondition |
@@ -54,7 +55,7 @@ condition -> (
 ) {% ([[condition]]) => condition %}
 
 # TODO: Why does anyOperator get wrapped in an array?
-cmcCondition -> ("mv"i | "cmc"i) anyOperator integerValue
+cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
     {% ([_, [operator], value]) => Filters.defaultOperation('cmc', operator, value) %}
 
 # TODO: Investigate name search with no field prefix
@@ -67,7 +68,7 @@ nameRegexCondition -> ("name"i) (":" | "=") regexString
 colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
     {% ([_, [operator], value]) => Filters.colorMatch(operator, new Set(value)) %}
 
-colorIdentityCondition -> ("ci"i | "id"i | "identity"i) anyOperator colorCombinationValue
+colorIdentityCondition -> ("ci"i | "identity"i | "id"i) anyOperator colorCombinationValue
     {% ([_, [operator], value]) => Filters.colorIdentityMatch(operator, new Set(value)) %}
 
 oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue
@@ -75,6 +76,9 @@ oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue
 
 oracleRegexCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") regexString
     {% ([_, [operator], value]) => Filters.regexMatch('oracle_text', value) %}
+
+keywordCondition -> "keyword"i (":" | "=") stringValue
+    {% ([_, [operator], value]) => Filters.keywordMatch(value) %}
 
 typeCondition -> ("t"i | "type"i) (":" | "=") stringValue
     {% ([_, [operator], value]) => Filters.textMatch('type_line', value) %}

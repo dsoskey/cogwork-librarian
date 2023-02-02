@@ -6,6 +6,7 @@ import Prism from 'prismjs'
 import { scryfall, scryfallExtended } from './api/memory/syntaxHighlighting'
 import './prism-cogwork.css'
 import './styles.css'
+import { FlagContextProvider } from './flags'
 
 Prism.languages['scryfall'] = scryfall
 Prism.languages['scryfall-extended'] = Prism.languages.extend(
@@ -15,4 +16,9 @@ Prism.languages['scryfall-extended'] = Prism.languages.extend(
 
 Scry.setTimeout(50)
 
-render(<App />, document.getElementById('app'))
+render(
+  <FlagContextProvider>
+    <App />
+  </FlagContextProvider>,
+  document.getElementById('app')
+)

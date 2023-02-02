@@ -1,10 +1,8 @@
 import React from 'react'
-import { AppInfo } from './appInfo'
 
 export const Footer = () => {
   return (
     <div className='footer'>
-      <AppInfo />
       <div>
         <a
           href='https://github.com/dsoskey/cogwork-librarian'

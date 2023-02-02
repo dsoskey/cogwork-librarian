@@ -39,45 +39,45 @@ export const AppInfo = () => {
         <p>
           for the average search query, scryfall is more than sufficient.
           cogwork librarian offers some key advantages over scryfall:
-          <ol>
-            <li>
-              it is designed with brainstorming lists in mind. the ignorelist
-              and the base/sub query model let you focus only on the subset of
-              cards that you care about
-            </li>
-            <li>
-              the in-memory query processor allows cogwork librarian to run
-              offline after the initial database download. this also makes the
-              search orders of magnitude faster than communicating with scryfall
-              directly.
-            </li>
-          </ol>
         </p>
+        <ol>
+          <li>
+            it is designed with brainstorming lists in mind. the ignorelist and
+            the base/sub query model let you focus only on the subset of cards
+            that you care about
+          </li>
+          <li>
+            the in-memory query processor allows cogwork librarian to run
+            offline after the initial database download. this also makes the
+            search orders of magnitude faster than communicating with scryfall
+            directly.
+          </li>
+        </ol>
 
         <h3>how does the base/sub query model work?</h3>
         <p>
           the base/sub query model aims to let you curate complex searches with
           minimal syntax. it uses a custom 3-step algorithm on top of scryfall's
           filter syntax:
-          <ol>
-            <li>combine the base query with each subquery</li>
-            <li>
-              weigh each query, assigning that weight to each card in the query
-            </li>
-            <li>aggregate cards by total query weight</li>
-          </ol>
         </p>
+        <ol>
+          <li>combine the base query with each subquery</li>
+          <li>
+            weigh each query, assigning that weight to each card in the query
+          </li>
+          <li>aggregate cards by total query weight</li>
+        </ol>
 
         <h4>1. combine the base query with each subquery</h4>
         <p>starting from an input like this:</p>
-        <pre className='language-regex'>
+        <pre className='language-scryfall-extended'>
           <code>{EXAMPLE.prefix}</code>
         </pre>
-        <pre className='language-regex'>
+        <pre className='language-scryfall-extended'>
           <code>{EXAMPLE.queries.join('\n')}</code>
         </pre>
         <p>cogwork librarian transforms the queries into this:</p>
-        <pre className='language-regex'>
+        <pre className='language-scryfall-extended'>
           <code>{EXAMPLE.queries.map(injectPrefix).join('\n')}</code>
         </pre>
         <p>
@@ -92,7 +92,7 @@ export const AppInfo = () => {
           once prepared, each query is weighed by its order in the list of
           queries (first being highest)
         </p>
-        <pre className='language-regex'>
+        <pre className='language-scryfall-extended'>
           <code>
             {EXAMPLE.queries
               .map(injectPrefix)
@@ -119,19 +119,19 @@ export const AppInfo = () => {
         <p>
           while nothing on this list is a guarantee, here are some features i'm
           looking to implement:
-          <ul>
-            <li>syntax highlighting and documentation</li>
-            <li>
-              local data source management. this would allow you to import a
-              custom collection to run searches on
-            </li>
-            <li>project import/export with per-project saved/ignored lists</li>
-            <li>
-              full scryfall syntax support for in-memory filtering, potentially
-              as a standalone code library
-            </li>
-          </ul>
         </p>
+        <ul>
+          <li>syntax highlighting and documentation</li>
+          <li>
+            local data source management. this would allow you to import a
+            custom collection to run searches on
+          </li>
+          <li>project import/export with per-project saved/ignored lists</li>
+          <li>
+            full scryfall syntax support for in-memory filtering, potentially as
+            a standalone code library
+          </li>
+        </ul>
 
         <h3>this looks cool! how can i contribute?</h3>
         <p>
