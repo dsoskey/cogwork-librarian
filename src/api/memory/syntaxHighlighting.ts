@@ -41,7 +41,7 @@ export const scryfall: Grammar = {
     alias: ['keyword', 'important'],
   },
   operator: {
-    pattern: new RegExp(`${operators}|(\\b(and|or)\\b)`, 'i'),
+    pattern: new RegExp(`\\(|\\)|${operators}|(\\b(and|or)\\b)`, 'i'),
   },
   regex: {
     pattern: /\/[^/]+\//,
