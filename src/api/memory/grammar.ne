@@ -186,10 +186,15 @@ colorCombinationValue ->
   | ("maestros"i | "grixis"i) {% () => ['u', 'b', 'r'] %}
   | ("riveteers"i | "jund"i) {% () => ['b', 'r', 'g'] %}
   | ("cabaretti"i | "naya"i) {% () => ['w', 'r', 'g'] %}
-  | ("savai"i | "mardu"i) {% () => ['w', 'b', 'r'] %}
-  | ("ketria"i | "temur"i) {% () => ['u', 'r', 'g'] %}
-  | ("indatha"i | "abzan"i) {% () => ['w', 'b', 'g'] %}
-  | ("raugrin"i | "jeskai"i) {% () => ['w', 'u', 'r'] %}
-  | ("zagoth"i | "sultai"i) {% () => ['u', 'b', 'g'] %}
+  | ("savai"i | "dega"i | "mardu"i) {% () => ['w', 'b', 'r'] %}
+  | ("ketria"i | "ceta"i | "temur"i) {% () => ['u', 'r', 'g'] %}
+  | ("indatha"i | "necra"i | "abzan"i) {% () => ['w', 'b', 'g'] %}
+  | ("raugrin"i | "raka"i | "jeskai"i) {% () => ['w', 'u', 'r'] %}
+  | ("zagoth"i | "ana"i | "sultai"i) {% () => ['u', 'b', 'g'] %}
+  | "chaos"i {% () => ['b','g','r','u'] %}
+  | "aggression"i {% () => ['b','g','r','w'] %}
+  | "altruism"i {% () => ['w','g','r','u'] %}
+  | "growth"i {% () => ['b','g','w','u'] %}
+  | "artifice"i {% () => ['b','w','r','u'] %}
   | ("rainbow"i | "fivecolor"i) {% () => ['w', 'u', 'b', 'r', 'g'] %}
   | comb5NonEmpty["w"i, "u"i, "b"i, "r"i, "g"i] {% ([comb]) => comb.map((c) => c.toLowerCase()) %}

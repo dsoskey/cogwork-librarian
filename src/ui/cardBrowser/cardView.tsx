@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, ImageUris } from 'scryfall-sdk'
 import { EnrichedCard } from 'src/api/queryRunnerCommon'
 import { WEIGHT, QUERIES } from './constants'
 import { DOUBLE_FACED_LAYOUTS } from '../../api/card'
+import Prism from 'prismjs'
 
 export interface CardViewProps {
   card: EnrichedCard
@@ -25,6 +26,9 @@ export const CardView = ({
   revealDetails,
   visibleDetails,
 }: CardViewProps) => {
+  useEffect(() => {
+    Prism.highlightAll()
+  }, [card])
   const [flipped, setFlipped] = useState(false)
   const _card = card.data
   const imageSource = flipped
@@ -64,7 +68,7 @@ export const CardView = ({
           {visibleDetails.includes(QUERIES) && (
             <>
               <div>matched queries:</div>
-              <code className='language-regex'>
+              <code className='language-scryfall-extended'>
                 {card.matchedQueries.join(',\n')}
               </code>
             </>
