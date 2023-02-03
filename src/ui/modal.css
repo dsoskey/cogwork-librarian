@@ -11,6 +11,8 @@
 .modal-main {
   position: fixed;
   background: var(--light-color);
+  border-color: var(--darker-color);
+  color: var(--dark-color);
   width: 80%;
   max-height: 80%;
   top: 50%;

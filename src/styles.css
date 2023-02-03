@@ -10,6 +10,7 @@
   --gray-42: hsl(0, 0%, 50%);
   --blue: hsla(180, 100%, 69%, 100%);
   --blue-low-alpha: hsla(180, 100%, 69%, 50%);
+  --blue-mid-alpha: hsla(180, 100%, 69%, 75%);
   --green: hsl(96, 100%, 69%);
   --card-radius: 12px;
   background-color: var(--light-color);
@@ -26,12 +27,12 @@ button {
   border-left-color: var(--gray-42);
   border-bottom-color: var(--dark-color);
   border-right-color: var(--dark-color);
-  color: var(--light-color);
+  color: var(--blue-mid-alpha);
 }
 
 button:disabled {
   background-color: var(--darker-color);
-  color: var(--gray-42);
+  color: var(--blue-low-alpha);
 }
 
 input {

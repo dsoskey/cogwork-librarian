@@ -8,7 +8,7 @@ const cheeseSS = (dragging: boolean) => ({
   left: 0,
   width: dragging ? 12 : 8,
   zIndex: 10,
-  background: dragging ? '#CCC' : '#999',
+  background: dragging ? 'var(--blue)' : 'var(--blue-mid-alpha)',
   transition: 'width 100ms ease-out, background 100ms ease-out',
   cursor: 'col-resize',
   fontSize: 10,

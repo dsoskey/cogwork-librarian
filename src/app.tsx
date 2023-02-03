@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import { BrowserView } from './ui/cardBrowser/browserView'
-import { TextEditor } from './ui/textEditor'
 import { useCogDB } from './api/local/useCogDB'
 import { QueryForm } from './ui/queryForm/queryForm'
 import { useScryfallQueryRunner } from './api/scryfall/useQueryRunner'
@@ -15,6 +14,7 @@ import { useMemoryQueryRunner } from './api/memory/useQueryRunner'
 import { useProject } from './api/useProject'
 import { Footer } from './ui/footer'
 import { useViewportListener } from './viewport'
+import { SavedCards } from './ui/savedCards'
 
 export const App = () => {
   const { dbStatus, memoryStatus, memory } = useCogDB()
@@ -64,13 +64,7 @@ export const App = () => {
           setSource={setSource}
         />
 
-        <h2>saved cards</h2>
-
-        <TextEditor
-          queries={savedCards}
-          setQueries={setSavedCards}
-          placeholder='add one card per line'
-        />
+        <SavedCards savedCards={savedCards} setSavedCards={setSavedCards} />
         {viewport.desktop && <Footer />}
       </div>
 

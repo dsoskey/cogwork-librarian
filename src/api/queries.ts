@@ -109,6 +109,7 @@ const unimplementedQueries = [
   'is:foil',
   'is:spotlight',
   'new:flavor',
+  'has:indicator',
   'new:art',
   'new:artist',
   'border:white',
