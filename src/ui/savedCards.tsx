@@ -1,4 +1,4 @@
-import { TextEditor } from './textEditor'
+import { TextEditor } from './component/textEditor'
 import React, { useState } from 'react'
 import { Setter, TaskStatus } from '../types'
 

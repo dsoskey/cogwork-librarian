@@ -1,9 +1,9 @@
 import { cloneDeep } from 'lodash'
 import React from 'react'
 import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
-import { TextEditor } from '../textEditor'
+import { TextEditor } from '../component/textEditor'
 import { DataSource, DATA_SOURCE, Setter, TaskStatus } from '../../types'
-import { Input } from '../input'
+import { Input } from '../component/input'
 import { AppInfo } from '../appInfo'
 import { ExampleGallery } from './exampleGallery'
 

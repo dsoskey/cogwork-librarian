@@ -7,7 +7,7 @@ import { DataSource, ObjectValues, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { PageControl } from './pageControl'
 import { useViewportListener } from '../../viewport'
-import { ResizeHandle } from '../resizeHandle'
+import { ResizeHandle } from '../component/resizeHandle'
 import { TopBar } from './topBar'
 import { useDebugDetails } from './useDebugDetails'
 

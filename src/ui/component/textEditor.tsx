@@ -1,6 +1,6 @@
 import Prism from 'prismjs'
 import React, { useEffect, useRef } from 'react'
-import { Language } from '../api/memory/syntaxHighlighting'
+import { Language } from '../../api/memory/syntaxHighlighting'
 
 const MIN_TEXTAREA_HEIGHT = 32
 

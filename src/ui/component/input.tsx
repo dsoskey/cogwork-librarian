@@ -1,6 +1,6 @@
 import React, { ChangeEventHandler, useEffect, useRef } from 'react'
 import Prism from 'prismjs'
-import { Language } from '../api/memory/syntaxHighlighting'
+import { Language } from '../../api/memory/syntaxHighlighting'
 
 export interface InputProps {
   value: string

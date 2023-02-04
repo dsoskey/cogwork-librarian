@@ -1,4 +1,4 @@
-import { Loader } from '../loader'
+import { Loader } from '../component/loader'
 import { QUERIES, WEIGHT } from './constants'
 import { PageControl } from './pageControl'
 import React from 'react'

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal } from './modal'
+import { Modal } from './component/modal'
 import { queryExamples } from '../api/example'
 import {
   injectPrefix as _injectPrefix,

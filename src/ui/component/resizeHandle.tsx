@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Viewport } from '../viewport'
+import { Viewport } from '../../viewport'
 
 const cheeseSS = (dragging: boolean) => ({
   position: 'relative',

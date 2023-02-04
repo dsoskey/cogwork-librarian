@@ -1,4 +1,4 @@
-import { Modal } from '../modal'
+import { Modal } from '../component/modal'
 import { queryExamples } from '../../api/example'
 import React, { useContext, useState } from 'react'
 import { Setter } from '../../types'
