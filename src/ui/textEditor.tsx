@@ -1,5 +1,5 @@
 import Prism from 'prismjs'
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Language } from '../api/memory/syntaxHighlighting'
 
 const MIN_TEXTAREA_HEIGHT = 32
@@ -17,9 +17,13 @@ export const TextEditor = ({
   placeholder,
   language,
 }: QueryInputProps) => {
-  const value = queries.join('\n')
+  const separator = '\n'
+  const value = queries.join(separator)
   const controller = useRef<HTMLTextAreaElement>()
   const faker = useRef<HTMLPreElement>()
+  const onScroll = (event) => {
+    faker.current.scrollLeft = event.target.scrollLeft
+  }
 
   React.useLayoutEffect(() => {
     Prism.highlightAll()
@@ -37,6 +41,11 @@ export const TextEditor = ({
     faker.current.style.height = newHeight
   }, [value])
 
+  useEffect(() => {
+    controller.current.addEventListener('scroll', onScroll)
+    return () => controller.current.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
     <div className='query-editor'>
       <textarea
@@ -45,7 +54,7 @@ export const TextEditor = ({
         value={value}
         placeholder={placeholder}
         onChange={(event) => {
-          setQueries(event.target.value.split('\n'))
+          setQueries(event.target.value.split(separator))
         }}
       />
 

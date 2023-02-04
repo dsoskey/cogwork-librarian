@@ -17,7 +17,7 @@ import { useViewportListener } from './viewport'
 import { SavedCards } from './ui/savedCards'
 
 export const App = () => {
-  const { dbStatus, memoryStatus, memory } = useCogDB()
+  const { dbStatus, memStatus, memory } = useCogDB()
   const viewport = useViewportListener()
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
 
@@ -47,14 +47,14 @@ export const App = () => {
 
         <div>
           {dbStatus === 'loading' && 'Indexing local database...'}
-          {memoryStatus === 'loading' && 'Loading local database into memory...'}
+          {memStatus === 'loading' && 'Loading local database into memory...'}
         </div>
 
         <QueryForm
           prefix={prefix}
           setPrefix={setPrefix}
           status={queryRunner.status}
-          canRunQuery={source === 'scryfall' || memoryStatus === 'success'}
+          canRunQuery={source === 'scryfall' || memStatus === 'success'}
           execute={() => queryRunner.run(queries, options)}
           queries={queries}
           setQueries={setQueries}

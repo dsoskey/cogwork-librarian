@@ -65,7 +65,7 @@ export const QueryForm = ({
 }: QueryFormProps) => {
   return (
     <>
-      <div className='column'>
+      <div className={`column ${source}`}>
         <label>
           enter a base <ScryfallLink /> to include in each subquery
         </label>

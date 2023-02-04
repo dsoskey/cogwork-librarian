@@ -3,9 +3,10 @@ import Prism, { Grammar } from 'prismjs'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
 const keywords =
-  'keyword|manavalue|mv|cmc|name|color|ci|c|id|identity|oracle|o|text|type|power|pow|toughness|tou|loyalty|loy|layout|is|t'
+  'keyword|manavalue|mv|cmc|name|color|ci|c|id|identity|oracle|o|text|type|power|pow|toughness|tou|loyalty|loy|layout|is|t|' +
+  'mana|m'
 const keywordsToImplement =
-  'fo|mana|devotion|produces|powtou|pt|rarity|r|include|set|edition|s|e|in|number|cn|st|cube|banned|restricted|usd|eur|tix|' +
+  'fo|devotion|produces|powtou|pt|rarity|r|include|set|edition|s|e|in|number|cn|st|cube|banned|restricted|usd|eur|tix|' +
   'artist|a|has|watermark|wm|flavor|format|ft|f|border|stamp|year|date|art|atag|arttag|function|otag|oracletag|not|language|lang|' +
   'unique|order|direction|prefer'
 console.debug(
@@ -42,6 +43,30 @@ export const scryfall: Grammar = {
   },
   operator: {
     pattern: new RegExp(`\\(|\\)|${operators}|(\\b(and|or)\\b)`, 'i'),
+  },
+  manaCost: {
+    pattern: /\{..?(\/.)?}/,
+    alias: 'string',
+    inside: {
+      white: {
+        pattern: /w/i,
+      },
+      blue: {
+        pattern: /u/i,
+      },
+      black: {
+        pattern: /b/i,
+      },
+      red: {
+        pattern: /r/i,
+      },
+      green: {
+        pattern: /g/i,
+      },
+      generic: {
+        pattern: /\d+|x|y|z|\{|}|\//,
+      },
+    },
   },
   regex: {
     pattern: /\/[^/]+\//,

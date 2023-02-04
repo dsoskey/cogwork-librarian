@@ -1,6 +1,8 @@
 import { Card } from 'scryfall-sdk'
 import { ObjectValues } from '../types'
 import { CardKeys } from './local/db'
+import mapValues from 'lodash/mapValues'
+import cloneDeep from 'lodash/cloneDeep'
 
 export const DOUBLE_FACED_LAYOUTS = [
   'transform',
@@ -78,6 +80,138 @@ export const isValues = {
   extra: 'extra',
 } as const
 export type IsValue = ObjectValues<typeof isValues>
+
+const MANA_SYMBOLS = {
+  generic: 'generic',
+  w: 'w',
+  u: 'u',
+  b: 'b',
+  r: 'r',
+  g: 'g',
+  c: 'c',
+  s: 's',
+  x: 'x',
+  y: 'y',
+
+  'w/u': 'w/u',
+  'w/b': 'w/b',
+  'w/r': 'w/r',
+  'w/g': 'w/g',
+
+  'u/w': 'u/w',
+  'u/b': 'u/b',
+  'u/r': 'u/r',
+  'u/g': 'u/g',
+
+  'b/w': 'b/w',
+  'b/u': 'b/u',
+  'b/r': 'b/r',
+  'b/g': 'b/g',
+
+  'r/w': 'r/w',
+  'r/u': 'r/u',
+  'r/b': 'r/b',
+  'r/g': 'r/g',
+
+  'g/w': 'g/w',
+  'g/u': 'g/u',
+  'g/r': 'g/r',
+  'g/b': 'g/b',
+
+  'w/p': 'w/p',
+  'u/p': 'u/p',
+  'b/p': 'b/p',
+  'r/p': 'r/p',
+  'g/p': 'g/p',
+  'p/w': 'p/w',
+  'p/u': 'p/u',
+  'p/b': 'p/b',
+  'p/r': 'p/r',
+  'p/g': 'p/g',
+
+  'w/2': 'w/2',
+  'u/2': 'u/2',
+  'b/2': 'b/2',
+  'r/2': 'r/2',
+  'g/2': 'g/2',
+  '2/w': '2/w',
+  '2/u': '2/u',
+  '2/b': '2/b',
+  '2/r': '2/r',
+  '2/g': '2/g',
+} as const
+export type ManaSymbol = ObjectValues<typeof MANA_SYMBOLS>
+
+// manaSymbol -> total count of that type of mana
+export type ManaCost = Record<ManaSymbol, number>
+export const emptyCost: ManaCost = mapValues(MANA_SYMBOLS, () => 0)
+
+export const manaAliases: Record<ManaSymbol, ManaSymbol> = {
+  '2/b': '2/b',
+  '2/g': '2/g',
+  '2/r': '2/r',
+  '2/u': '2/u',
+  '2/w': '2/w',
+  'b/2': '2/b',
+  'b/p': 'b/p',
+  'g/2': '2/g',
+  'g/p': 'g/p',
+  'p/b': 'b/p',
+  'p/g': 'g/p',
+  'p/r': 'r/p',
+  'p/u': 'u/p',
+  'p/w': 'w/p',
+  'r/2': '2/r',
+  'r/p': 'r/p',
+  'u/2': '2/u',
+  'u/p': 'u/p',
+  'w/2': '2/w',
+  'w/p': 'w/p',
+  'b/g': 'b/g',
+  'b/r': 'b/r',
+  'b/u': 'u/b',
+  'b/w': 'w/b',
+  'g/b': 'b/g',
+  'g/r': 'r/g',
+  'g/u': 'u/g',
+  'g/w': 'w/g',
+  'r/b': 'b/r',
+  'r/g': 'r/g',
+  'r/u': 'u/r',
+  'r/w': 'w/r',
+  'u/b': 'u/b',
+  'u/g': 'u/g',
+  'u/r': 'u/r',
+  'u/w': 'w/u',
+  'w/b': 'w/b',
+  'w/g': 'w/g',
+  'w/r': 'w/r',
+  'w/u': 'w/u',
+  x: 'x',
+  y: 'y',
+  generic: 'generic',
+  w: 'w',
+  u: 'u',
+  b: 'b',
+  r: 'r',
+  g: 'g',
+  c: 'c',
+  s: 's',
+}
+
+export const toManaCost = (rawCost: string[]): ManaCost => {
+  const result: ManaCost = cloneDeep(emptyCost)
+  rawCost.forEach((rawSymbol) => {
+    // hybrids are considered NaN
+    const asNum = rawSymbol.includes('/') ? NaN : Number.parseInt(rawSymbol, 10)
+    if (Number.isNaN(asNum)) {
+      result[manaAliases[rawSymbol]] += 1
+    } else {
+      result.generic += asNum
+    }
+  })
+  return result
+}
 
 export const isDual = (card: Card) =>
   card.type_line.includes('Land') && /Add \{.} or \{.}\./.test(card.oracle_text)

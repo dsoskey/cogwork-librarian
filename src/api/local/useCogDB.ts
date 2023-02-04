@@ -7,7 +7,7 @@ import { Card } from 'scryfall-sdk'
 
 export interface CogDB {
   dbStatus: TaskStatus
-  memoryStatus: TaskStatus
+  memStatus: TaskStatus
   memory: Card[]
   manifest: Manifest
 }
@@ -47,5 +47,5 @@ export const useCogDB = (): CogDB => {
     [_memoryDB]
   )
 
-  return { dbStatus, memoryStatus, manifest, memory }
+  return { dbStatus, memStatus: memoryStatus, manifest, memory }
 }

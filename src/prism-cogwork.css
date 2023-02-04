@@ -54,18 +54,28 @@ pre[class*='language-'] {
   color: #999;
 }
 
+.token.generic {
+  color: #bbb
+}
+
+
+.token.white {
+  color: whitesmoke;
+}
+
 .token.punctuation {
-  /*color: #ccc;*/
   color: #bbb440;
 }
 
 .token.tag,
 .token.attr-name,
 .token.namespace,
+.token.red,
 .token.deleted {
   color: #e2777a;
 }
 
+.token.blue,
 .token.function-name {
   color: #6196cc;
 }
@@ -83,6 +93,7 @@ pre[class*='language-'] {
   color: #f8c555;
 }
 
+.token.green,
 .token.selector,
 .token.atrule,
 .token.keyword,

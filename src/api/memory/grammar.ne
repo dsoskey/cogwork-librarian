@@ -40,6 +40,7 @@ condition -> (
     cmcCondition |
     colorCondition |
     colorIdentityCondition |
+    manaCostCondition |
     nameCondition |
     nameRegexCondition |
     oracleCondition |
@@ -70,6 +71,9 @@ colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
 
 colorIdentityCondition -> ("ci"i | "identity"i | "id"i) anyOperator colorCombinationValue
     {% ([_, [operator], value]) => Filters.colorIdentityMatch(operator, new Set(value)) %}
+
+manaCostCondition -> ("mana"i | "m"i) anyOperator manaCostValue
+    {% ([_, [operator], value]) => Filters.manaCostMatch(operator, value) %}
 
 oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue
     {% ([_, [operator], value]) => Filters.textMatch('oracle_text', value) %}
@@ -198,3 +202,19 @@ colorCombinationValue ->
   | "artifice"i {% () => ['b','w','r','u'] %}
   | ("rainbow"i | "fivecolor"i) {% () => ['w', 'u', 'b', 'r', 'g'] %}
   | comb5NonEmpty["w"i, "u"i, "b"i, "r"i, "g"i] {% ([comb]) => comb.map((c) => c.toLowerCase()) %}
+
+manaCostValue -> manaSymbol:+ {% id %}
+
+manaSymbol -> innerManaSymbol {% id %}
+  | "{" innerManaSymbol "}" {% ([, inner]) => inner %}
+
+innerManaSymbol -> [0-9]:+ {% ([digits]) => digits.join('') %}
+  | ("x"i | "y"i | "z"i | "w"i | "u"i | "b"i | "r"i | "g"i | "s"i | "c"i) {% ([[color]]) => color.toLowerCase() %}
+  | ( "2"i "/" ("w"i | "u"i | "b"i | "r"i | "g"i)
+    | "p"i "/" ("w"i | "u"i | "b"i | "r"i | "g"i)
+    | "w"i "/" ("2"i | "p"i | "u"i | "b"i | "r"i | "g"i)
+    | "u"i "/" ("2"i | "p"i | "w"i | "b"i | "r"i | "g"i)
+    | "b"i "/" ("2"i | "p"i | "w"i | "u"i | "r"i | "g"i)
+    | "r"i "/" ("2"i | "p"i | "w"i | "u"i | "b"i | "g"i)
+    | "g"i "/" ("2"i | "p"i | "w"i | "u"i | "b"i | "r"i)
+    ) {% ([[color, , [secondColor]]]) => color + "/" + secondColor %}

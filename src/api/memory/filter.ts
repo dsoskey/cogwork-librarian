@@ -1,5 +1,6 @@
 import { Card } from 'scryfall-sdk'
 import { CardKeys } from '../local/db'
+import isEqual from 'lodash/isEqual'
 import {
   anyFaceContains,
   anyFaceRegexMatch,
@@ -9,6 +10,7 @@ import {
   IsValue,
   noReminderText,
   SHOCKLAND_REGEX,
+  toManaCost,
 } from '../card'
 
 export type Filter<T> = (T) => boolean
@@ -194,6 +196,55 @@ export class MemoryFilterWrapper {
         case '<>':
           throw 'throw something better please!'
       }
+    }
+
+  manaCostMatch =
+    (operator: Operator, value: string[]): Filter<Card> =>
+    (card: Card) => {
+      const targetCost = toManaCost(value)
+      const entries = Object.entries(targetCost)
+      const cardCosts = [
+        card.mana_cost,
+        ...card.card_faces.map((it) => it.mana_cost),
+      ]
+        .filter((it) => it !== undefined)
+        .map((cost) =>
+          cost
+            .toLowerCase()
+            .slice(1, cost.length - 1)
+            .split('}{')
+            .sort()
+        )
+        .filter((rawCost) => {
+          const cost = toManaCost(rawCost)
+          switch (operator) {
+            case '=':
+              return isEqual(cost, targetCost)
+            case '!=':
+            case '<>':
+              return !isEqual(cost, targetCost)
+            case '<':
+              return (
+                entries.filter(([key, val]) => cost[key] < val).length > 0 &&
+                entries.filter(([key, val]) => cost[key] > val).length === 0
+              )
+            case '<=':
+              return (
+                entries.filter(([key, val]) => cost[key] > val).length === 0
+              )
+            case '>':
+              return (
+                entries.filter(([key, val]) => cost[key] > val).length > 0 &&
+                entries.filter(([key, val]) => cost[key] < val).length === 0
+              )
+            case ':':
+            case '>=':
+              return (
+                entries.filter(([key, val]) => cost[key] < val).length === 0
+              )
+          }
+        })
+      return cardCosts.length > 0
     }
 
   unimplemented = false
