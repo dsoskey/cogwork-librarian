@@ -1,7 +1,9 @@
+import React from 'react'
 import { QueryFormFields } from '../ui/queryForm/useQueryForm'
 
-interface QueryExample extends QueryFormFields {
+interface QueryExample extends Omit<QueryFormFields, 'options'> {
   title: string
+  description?: React.ReactNode
 }
 
 export const queryExamples: QueryExample[] = [
@@ -9,7 +11,6 @@ export const queryExamples: QueryExample[] = [
     title: 'savai knights matters, centered in white',
     prefix: 'o:knight ci:brw',
     queries: ['t:knight', 'ci=bw or ci=rw', 'ci=br', 'ci:brw'],
-    options: {},
   },
   {
     title: 'ketria spellslinger',
@@ -24,7 +25,6 @@ export const queryExamples: QueryExample[] = [
       'c>=rg',
       'c>=gu',
     ],
-    options: {},
   },
   {
     title: 'savai sacrifice',
@@ -39,10 +39,24 @@ export const queryExamples: QueryExample[] = [
       '-t:planeswalker -t:creature',
       'ci:brw',
     ],
-    options: {},
   },
   // {
   //   title: 'modifying creatures',
   //
   // }
+  {
+    title: 'generic planeswalker reanimation',
+    description: <>
+      in the main query, use <code className='language-regex'>.*</code> to match for any text in the reanimation ability.
+      the subqueries filter out most reanimation spells whose text doesn't mention planeswalkers or permanents.
+      this query is easier to assemble than one that accounts for all reanimation variants
+      in the regex, and it still filters out ~80% of the cards of the main query
+      (385 {'-->'} 47 pre-ONE)
+    </>,
+    prefix: 'o:/return .* from (your|a) graveyard to the battlefield/',
+    queries: [
+      "o:planeswalker",
+      "o:permanent",
+    ],
+  },
 ]

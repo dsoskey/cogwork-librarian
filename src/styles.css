@@ -47,6 +47,16 @@ fieldset {
   border: none;
 }
 
+h1, h2, h3 {
+  margin-top: .5em;
+  margin-bottom: .5em;
+}
+
+p {
+ margin-top: .5em;
+ margin-bottom: .5em;
+}
+
 /* classnames */
 
 .root {
@@ -150,10 +160,12 @@ fieldset {
   grid-area: overlap;
   z-index: 3;
   box-sizing: border-box;
-  overflow-x: scroll;
+  overflow: auto;
+  scrollbar-color: var(--blue-mid-alpha) var(--dark-color);
 }
 .query-editor input.controller {
   padding-right: 0;
+  scrollbar-width: revert;
 }
 
 .query-editor .controller::selection,
@@ -170,10 +182,6 @@ fieldset {
   box-sizing: border-box;
   display: inline-block;
   grid-area: overlap;
-  scrollbar-width: none; /* Firefox */
-}
-.query-editor .display::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
 }
 
 .expander {

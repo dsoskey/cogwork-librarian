@@ -21,8 +21,10 @@ export const TextEditor = ({
   const value = queries.join(separator)
   const controller = useRef<HTMLTextAreaElement>()
   const faker = useRef<HTMLPreElement>()
+
   const onScroll = (event) => {
     faker.current.scrollLeft = event.target.scrollLeft
+    faker.current.scrollTop = event.target.scrollTop
   }
 
   React.useLayoutEffect(() => {
@@ -39,6 +41,7 @@ export const TextEditor = ({
     )}px`
     controller.current.style.height = newHeight
     faker.current.style.height = newHeight
+    onScroll({ target: controller.current })
   }, [value])
 
   useEffect(() => {

@@ -27,7 +27,7 @@ const activeCollections = {
 } as const
 type ActiveCollection = ObjectValues<typeof activeCollections>
 
-const MIN_WIDTH = 500
+const MAX_INPUT_WIDTH = 1024
 export const BrowserView = React.memo(
   ({
     addCard,
@@ -82,7 +82,7 @@ export const BrowserView = React.memo(
       <div className='results' style={{ width }}>
         <ResizeHandle
           onChange={setWidth}
-          min={MIN_WIDTH}
+          min={viewport.width - MAX_INPUT_WIDTH}
           max={viewport.width * 0.8}
           viewport={viewport}
         />
