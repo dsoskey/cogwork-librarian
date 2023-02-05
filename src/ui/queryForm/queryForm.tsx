@@ -48,6 +48,8 @@ export interface QueryFormProps {
   setOptions: Setter<SearchOptions>
   source: DataSource
   setSource: Setter<DataSource>
+  // slot to put database settings in
+  dbSettings: React.ReactNode
 }
 
 export const QueryForm = ({
@@ -62,6 +64,7 @@ export const QueryForm = ({
   setOptions,
   source,
   setSource,
+  dbSettings,
 }: QueryFormProps) => {
   return (
     <>
@@ -125,6 +128,7 @@ export const QueryForm = ({
           </div>
         ))}
       </fieldset>
+      <div>{dbSettings}</div>
 
       <div>
         <label htmlFor='sort'>sort by: </label>

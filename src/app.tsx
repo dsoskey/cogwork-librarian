@@ -15,9 +15,10 @@ import { useProject } from './api/useProject'
 import { Footer } from './ui/footer'
 import { useViewportListener } from './viewport'
 import { SavedCards } from './ui/savedCards'
+import { DatabaseSettings } from './ui/queryForm/databaseSettings'
 
 export const App = () => {
-  const { dbStatus, memStatus, memory } = useCogDB()
+  const { saveToDB, dbStatus, memStatus, memory, setMemory, manifest, setManifest } = useCogDB()
   const viewport = useViewportListener()
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
 
@@ -62,6 +63,13 @@ export const App = () => {
           setOptions={setOptions}
           source={source}
           setSource={setSource}
+          dbSettings={<DatabaseSettings
+            dbStatus={dbStatus}
+            saveToDB={saveToDB}
+            setMemory={setMemory}
+            manifest={manifest}
+            setManifest={setManifest}
+          />}
         />
 
         <SavedCards savedCards={savedCards} setSavedCards={setSavedCards} />
