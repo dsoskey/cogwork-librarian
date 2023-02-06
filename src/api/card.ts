@@ -222,26 +222,28 @@ export const hasNumLandTypes = (card: Card, num: number) =>
 export const anyFaceContains = (
   card: Card,
   field: CardKeys,
-  value: string
+  value: string,
+  fieldTransform: (string) => string = (it) => it
 ): boolean =>
-  card[field]?.toString().toLowerCase().includes(value) ||
+  fieldTransform(card[field]?.toString().toLowerCase() ?? '').includes(value) ||
   card.card_faces.filter((face) =>
-    face[field]?.toString().toLowerCase().includes(value)
+    fieldTransform(face[field]?.toString().toLowerCase() ?? '').includes(value)
   ).length > 0
 
 export const anyFaceRegexMatch = (
   card: Card,
   field: CardKeys,
-  regex: RegExp
+  regex: RegExp,
+  fieldTransform: (string) => string = (it) => it
 ): boolean =>
   (card[field] !== undefined
-    ? regex.test(card[field].toString().toLowerCase())
+    ? regex.test(fieldTransform(card[field].toString().toLowerCase()))
     : false) ||
   card.card_faces.filter((face) =>
     face[field] !== undefined
-      ? regex.test(face[field].toString().toLowerCase())
+      ? regex.test(fieldTransform(face[field].toString().toLowerCase()))
       : false
   ).length > 0
 
 export const noReminderText = (text: string): string =>
-  text.replace(/\(.*\)/, '')
+  text.replace(/\(.*\)/gi, '')

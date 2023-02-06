@@ -1,12 +1,14 @@
 import 'prismjs/components/prism-regex.js'
-import Prism, { Grammar } from 'prismjs'
+import Prism, { Environment, Grammar } from 'prismjs'
+import { syntaxDocs } from './syntaxDocs'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
+// todo: derive from syntaxdocs types
 const keywords =
   'keyword|manavalue|mv|cmc|name|color|ci|c|id|identity|oracle|o|text|type|power|pow|toughness|tou|loyalty|loy|layout|is|t|' +
-  'mana|m'
+  'mana|m|fo'
 const keywordsToImplement =
-  'fo|devotion|produces|powtou|pt|rarity|r|include|set|edition|s|e|in|number|cn|st|cube|banned|restricted|usd|eur|tix|' +
+  'devotion|produces|powtou|pt|rarity|r|include|set|edition|s|e|in|number|cn|st|cube|banned|restricted|usd|eur|tix|' +
   'artist|a|has|watermark|wm|flavor|format|ft|f|border|stamp|year|date|art|atag|arttag|function|otag|oracletag|not|language|lang|' +
   'unique|order|direction|prefer'
 console.debug(
@@ -15,7 +17,6 @@ console.debug(
 const operators = ':|=|!=|<>|<=|<|>=|>'
 
 // Anything defined by scryfall itself goes here
-// todo: parentheses
 export const scryfall: Grammar = {
   negation: {
     pattern: new RegExp(`-(${keywords})(?=(${operators}))`, 'i'),
@@ -94,4 +95,16 @@ export const scryfallExtended: Grammar = {
     pattern: /(^|\n)\s*#.*/,
   },
   ...scryfall,
+}
+
+export const linkWrap = (env: Environment) => {
+  if (/(^|(local-))keyword/.test(env.type)) {
+    env.tag = 'a'
+
+    env.attributes.href = syntaxDocs[env.content]
+
+    env.attributes.target = '_blank'
+
+    env.attributes.rel = 'noreferrer noopener'
+  }
 }

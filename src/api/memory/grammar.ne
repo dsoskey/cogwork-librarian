@@ -45,6 +45,8 @@ condition -> (
     nameRegexCondition |
     oracleCondition |
     oracleRegexCondition |
+    fullOracleCondition |
+    fullOracleRegexCondition |
     keywordCondition |
     typeCondition |
     typeRegexCondition |
@@ -76,9 +78,15 @@ manaCostCondition -> ("mana"i | "m"i) anyOperator manaCostValue
     {% ([_, [operator], value]) => Filters.manaCostMatch(operator, value) %}
 
 oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue
-    {% ([_, [operator], value]) => Filters.textMatch('oracle_text', value) %}
+    {% ([_, [operator], value]) => Filters.noReminderTextMatch('oracle_text', value) %}
 
 oracleRegexCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") regexString
+    {% ([_, [operator], value]) => Filters.noReminderRegexMatch('oracle_text', value) %}
+
+fullOracleCondition -> ("fo"i) (":" | "=") stringValue
+    {% ([_, [operator], value]) => Filters.textMatch('oracle_text', value) %}
+
+fullOracleRegexCondition -> ("fo"i) (":" | "=") regexString
     {% ([_, [operator], value]) => Filters.regexMatch('oracle_text', value) %}
 
 keywordCondition -> "keyword"i (":" | "=") stringValue

@@ -47,14 +47,16 @@ fieldset {
   border: none;
 }
 
-h1, h2, h3 {
-  margin-top: .5em;
-  margin-bottom: .5em;
+h1,
+h2,
+h3 {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 p {
- margin-top: .5em;
- margin-bottom: .5em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 /* classnames */
@@ -152,6 +154,22 @@ p {
   grid-template-areas: 'overlap';
 }
 
+.query-editor .links {
+  grid-area: overlap;
+  box-sizing: border-box;
+  display: inline-block;
+  background: transparent;
+}
+.query-editor .links :not(a) {
+  color: transparent;
+}
+.query-editor .links.show {
+  z-index: 4;
+}
+.query-editor .links.hide {
+  z-index: 1;
+}
+
 .query-editor .controller {
   caret-color: var(--blue);
   color: transparent;
@@ -182,6 +200,9 @@ p {
   box-sizing: border-box;
   display: inline-block;
   grid-area: overlap;
+}
+.query-editor .display a {
+  text-decoration: none;
 }
 
 .expander {

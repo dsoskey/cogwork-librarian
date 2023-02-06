@@ -40,7 +40,9 @@ export const ExampleGallery = ({
                   use example
                 </button>
               </div>
-              {example.description !== undefined && <p>{example.description}</p>}
+              {example.description !== undefined && (
+                <p>{example.description}</p>
+              )}
               <pre className='language-scryfall-extended'>
                 <code>{example.prefix}</code>
               </pre>

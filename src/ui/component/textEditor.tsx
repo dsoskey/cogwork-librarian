@@ -1,5 +1,5 @@
 import Prism from 'prismjs'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Language } from '../../api/memory/syntaxHighlighting'
 
 const MIN_TEXTAREA_HEIGHT = 32
@@ -11,6 +11,7 @@ export interface QueryInputProps {
   language?: Language
 }
 
+const linkKeys = ['Meta', 'Control']
 export const TextEditor = ({
   queries,
   setQueries,
@@ -21,10 +22,25 @@ export const TextEditor = ({
   const value = queries.join(separator)
   const controller = useRef<HTMLTextAreaElement>()
   const faker = useRef<HTMLPreElement>()
+  const linker = useRef<HTMLPreElement>()
+  const [revealLinks, setRevealLinks] = useState<boolean>(false)
+  const showLinks = (event) => {
+    if (linkKeys.includes(event.key)) {
+      setRevealLinks(true)
+    }
+  }
+  const hideLinks = (event) => {
+    if (linkKeys.includes(event.key)) {
+      setRevealLinks(false)
+      controller.current.focus()
+    }
+  }
 
   const onScroll = (event) => {
     faker.current.scrollLeft = event.target.scrollLeft
     faker.current.scrollTop = event.target.scrollTop
+    linker.current.scrollLeft = event.target.scrollLeft
+    linker.current.scrollTop = event.target.scrollTop
   }
 
   React.useLayoutEffect(() => {
@@ -34,6 +50,7 @@ export const TextEditor = ({
     // Reset height - important to shrink on delete
     controller.current.style.height = 'inherit'
     faker.current.style.height = 'inherit'
+    linker.current.style.height = 'inherit'
     // Set height
     const newHeight = `${Math.max(
       controller.current.scrollHeight,
@@ -41,6 +58,7 @@ export const TextEditor = ({
     )}px`
     controller.current.style.height = newHeight
     faker.current.style.height = newHeight
+    linker.current.style.height = newHeight
     onScroll({ target: controller.current })
   }, [value])
 
@@ -50,12 +68,23 @@ export const TextEditor = ({
   }, [])
 
   return (
-    <div className='query-editor'>
+    <div className='query-editor' onKeyDown={showLinks} onKeyUp={hideLinks}>
+      <pre
+        ref={linker}
+        tabIndex={-1}
+        aria-hidden // Is this an accessibility issue with the links? also consider
+        className={`language-${language ?? 'none'} links ${
+          revealLinks ? 'show' : 'hide'
+        }`}
+      >
+        <code className='match-braces'>{value}</code>
+      </pre>
       <textarea
         ref={controller}
         className='controller coglib-prism-theme'
         value={value}
         placeholder={placeholder}
+        spellCheck={false}
         onChange={(event) => {
           setQueries(event.target.value.split(separator))
         }}
@@ -64,6 +93,7 @@ export const TextEditor = ({
       <pre
         ref={faker}
         tabIndex={-1}
+        aria-hidden
         className={`language-${language ?? 'none'} display`}
       >
         <code className='match-braces'>{value}</code>

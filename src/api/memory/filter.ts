@@ -97,8 +97,23 @@ export class MemoryFilterWrapper {
 
   textMatch =
     (field: CardKeys, value: string): Filter<Card> =>
+    (card: Card) => {
+      return anyFaceContains(
+        card,
+        field,
+        replaceNamePlaceholder(value, card.name)
+      )
+    }
+
+  noReminderTextMatch =
+    (field: CardKeys, value: string): Filter<Card> =>
     (card: Card) =>
-      anyFaceContains(card, field, replaceNamePlaceholder(value, card.name))
+      anyFaceContains(
+        card,
+        field,
+        replaceNamePlaceholder(value, card.name),
+        noReminderText
+      )
 
   regexMatch =
     (field: CardKeys, value: string): Filter<Card> =>
@@ -107,6 +122,16 @@ export class MemoryFilterWrapper {
         card,
         field,
         new RegExp(replaceNamePlaceholder(value, card.name))
+      )
+
+  noReminderRegexMatch =
+    (field: CardKeys, value: string): Filter<Card> =>
+    (card: Card) =>
+      anyFaceRegexMatch(
+        card,
+        field,
+        new RegExp(replaceNamePlaceholder(value, card.name)),
+        noReminderText
       )
 
   keywordMatch = (value: string) => (card: Card) =>
