@@ -12,6 +12,7 @@ import {
   SHOCKLAND_REGEX,
   toManaCost,
 } from '../card'
+import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
 
 export type Filter<T> = (T) => boolean
 
@@ -271,6 +272,9 @@ export class MemoryFilterWrapper {
         })
       return cardCosts.length > 0
     }
+
+  formatMatch = (legality: Legality, value: Format) => (card: Card) =>
+    card.legalities[value] === legality as unknown as string
 
   unimplemented = false
   isVal =

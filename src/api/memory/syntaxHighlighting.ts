@@ -6,10 +6,10 @@ export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
 // todo: derive from syntaxdocs types
 const keywords =
   'keyword|manavalue|mv|cmc|name|color|ci|c|id|identity|oracle|o|text|type|power|pow|toughness|tou|loyalty|loy|layout|is|t|' +
-  'mana|m|fo'
+  'mana|m|fo|banned|restricted|format|f'
 const keywordsToImplement =
-  'devotion|produces|powtou|pt|rarity|r|include|set|edition|s|e|in|number|cn|st|cube|banned|restricted|usd|eur|tix|' +
-  'artist|a|has|watermark|wm|flavor|format|ft|f|border|stamp|year|date|art|atag|arttag|function|otag|oracletag|not|language|lang|' +
+  'devotion|produces|powtou|pt|rarity|r|include|set|edition|s|e|in|number|cn|st|cube|usd|eur|tix|' +
+  'artist|a|has|watermark|wm|flavor|ft|border|stamp|year|date|art|atag|arttag|function|otag|oracletag|not|language|lang|' +
   'unique|order|direction|prefer'
 console.debug(
   `${keywordsToImplement.split('|').length} keywords to add to local syntax`

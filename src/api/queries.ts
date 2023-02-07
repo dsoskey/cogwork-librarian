@@ -57,17 +57,20 @@ export const testQueries = [
   '-type=token',
   'pow=0 name:tarmogoyf',
   'keyword:flying',
+  `fo:"put the rest on the bottom"`,
+  'format:pioneer',
+  'banned:modern',
+  'restricted:vintage',
+  'is:spell',
 ]
 
 const unimplementedQueries = [
-  `fo:"put the rest on the bottom"`, // oracle works like full-oracle atm
   't:plane', // this currently gets planeswalkers too, but scryfall only shows planes
   'pow>tou',
   'pt<=5',
   'is:frenchvanilla',
   'is:party',
   'is:historic',
-  'is:spell',
   'include:extras', // this one seems to be processed separately?
   'r:rare',
   'rarity:r',
@@ -96,9 +99,6 @@ const unimplementedQueries = [
   'is:commander',
   'is:brawler',
   'is:companion',
-  'format:pioneer',
-  'banned:modern',
-  'restricted:vintage',
   'usd>5',
   'eur<1',
   'tix>10',

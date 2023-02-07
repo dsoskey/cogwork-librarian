@@ -54,6 +54,9 @@ condition -> (
     toughCondition |
     loyaltyCondition |
     layoutCondition |
+    formatCondition |
+    bannedCondition |
+    restrictedCondition |
     isCondition
 ) {% ([[condition]]) => condition %}
 
@@ -110,6 +113,15 @@ loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
 layoutCondition -> ("layout"i) equalityOperator stringValue
     {% ([_, [operator], value]) => Filters.defaultOperation('layout', operator, value) %}
 
+formatCondition -> ("format"i | "f"i) equalityOperator formatValue
+    {% ([_, [operator], value]) => Filters.formatMatch('legal', value) %}
+
+bannedCondition -> "banned"i equalityOperator formatValue
+    {% ([_, [operator], value]) => Filters.formatMatch('banned', value) %}
+
+restrictedCondition -> "restricted"i equalityOperator formatValue
+    {% ([_, [operator], value]) => Filters.formatMatch('restricted', value) %}
+
 isCondition -> "is"i ":" isValue
     {% ([_, [operator], value]) => Filters.isVal(value) %}
 
@@ -124,6 +136,11 @@ integerValue -> [0-9]:+ {% ([digits]) => parseInt(digits.join(''), 10) %}
 anyOperator -> ":" | "=" | "!=" | "<>" | "<=" | "<" | ">=" | ">" {% id %}
 
 equalityOperator -> ":" | "=" | "!=" | "<>" {% id %}
+
+formatValue -> (
+    "standard"i | "future"i | "historic"i | "pioneer"i | "modern"i | "legacy"i |
+    "pauper"i |"vintage"i | "penny"i | "commander"i | "brawl"i | "duel"i | "oldschool"i
+) {% ([[format]]) => format.toLowerCase() %}
 
 isValue -> (
     "gold"i | "twobrid"i | "hybrid"i | "phyrexian"i | "promo"i | "reprint"i | "firstprint"i | "firstprinting"i | "digital"i
