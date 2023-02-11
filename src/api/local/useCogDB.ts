@@ -20,9 +20,12 @@ export const useCogDB = (): CogDB => {
   const [dbStatus, setDbStatus] = useState<TaskStatus>('unstarted')
   const [memStatus, setMemStatus] = useState<TaskStatus>('unstarted')
   const [memory, setMemory] = useState<NormedCard[]>([])
-  const [manifest, setManifest] = useLocalStorage<
-    CollectionMetadata | undefined
-  >('manifest', undefined)
+  const [manifest, setManifest] = useState<CollectionMetadata>({
+    id: 'loading',
+    name: 'loading',
+    type: 'loading',
+    lastUpdated: new Date(),
+  })
 
   const saveToDB = async () => {
     setDbStatus('loading')
@@ -40,7 +43,7 @@ export const useCogDB = (): CogDB => {
       let res: NormedCard[] = []
       console.debug(`loading mem ${new Date()}`)
       const count = await cogDB.collection.count()
-      console.debug(`counted ${count} cards!`)
+      console.debug(`counted ${count} collections!`)
       if (count === 0) {
         setDbStatus('loading')
         console.debug('refreshing db')
@@ -73,7 +76,7 @@ export const useCogDB = (): CogDB => {
     dbStatus,
     saveToDB,
     memStatus,
-    manifest,
+    manifest: manifest,
     setManifest,
     memory,
     setMemory,
