@@ -139,4 +139,5 @@ const brokenQueries = [
   // Both of these aren't handling all of the card faces properly
   "is:dfc c<=w",
   "is:dfc ci<=w",
+  "is:token",
 ]

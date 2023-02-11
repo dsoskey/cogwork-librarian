@@ -55,7 +55,9 @@ const PRINT_KEYS = {
 } as const
 type PrintKeys = ObjectValues<typeof PRINT_KEYS>
 
-type Printing = Pick<Card, PrintKeys>
+export type Printing = Pick<Card, PrintKeys>
+
+export type OracleKeys = keyof Omit<Card, PrintKeys>
 export interface NormedCard extends Omit<Card, PrintKeys> {
   printings: Printing[]
 }

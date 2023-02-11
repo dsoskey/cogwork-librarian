@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Modal } from '../component/modal'
 import { Setter, TaskStatus } from '../../types'
 import { Card } from 'scryfall-sdk'
-import { CollectionMetadata, toMetadata } from '../../api/local/db'
+import { Manifest, toManifest } from '../../api/local/db'
 import { normCardList, NormedCard } from '../../api/local/normedCard'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import * as Scry from 'scryfall-sdk'
@@ -14,8 +14,8 @@ export interface DatabaseSettingsProps {
   dbStatus: TaskStatus
   saveToDB: () => Promise<void>
   setMemory: Setter<NormedCard[]>
-  manifest: CollectionMetadata | undefined
-  setManifest: Setter<CollectionMetadata>
+  manifest: Manifest | undefined
+  setManifest: Setter<Manifest>
 }
 export const DatabaseSettings = ({
   dbStatus,
@@ -28,15 +28,15 @@ export const DatabaseSettings = ({
   const [dbDirty, setDbDirty] = useState<boolean>(false)
   const [importStatus, setImportStatus] = useState<TaskStatus>('unstarted')
 
-  const [targetSource, setTargetSource] = useState<
+  const [targetDefinition, setTargetDefinition] = useState<
     BulkDataDefinition | undefined
   >()
-  const [scryfallSources, setScryfallSources] = useState<BulkDataDefinition[]>(
-    []
-  )
+  const [bulkDataDefinitions, setBulkDataDefinitions] = useState<
+    BulkDataDefinition[]
+  >([])
   useEffect(() => {
     Scry.BulkData.definitions().then((definitions) =>
-      setScryfallSources(definitions.filter((it) => it.type !== 'rulings'))
+      setBulkDataDefinitions(definitions.filter((it) => it.type !== 'rulings'))
     )
   }, [])
 
@@ -86,32 +86,31 @@ export const DatabaseSettings = ({
           <div className='row db-import'>
             <div className='scryfall-import'>
               <h3>import from scryfall</h3>
-              {scryfallSources.map((it) => (
+              {bulkDataDefinitions.map((it) => (
                 <div key={it.uri} className='scryfall-option'>
                   <input
                     id={`source-${it.type}`}
                     type='radio'
                     value={it.type}
-                    checked={it.type === targetSource?.type}
-                    onChange={() => setTargetSource(it)}
+                    checked={it.type === targetDefinition?.type}
+                    onChange={() => setTargetDefinition(it)}
                   />
                   <label htmlFor={`source-${it.type}`}>{it.name}</label>
-                  {/* @ts-ignore. TODO: upgrade to scryfall-sdk 4 to remove this */}
                   <code className='size'>{humanFileSize(it.size)}</code>
                   <div>{it.description}</div>
                 </div>
               ))}
               <button
                 disabled={
-                  importStatus === 'loading' || targetSource === undefined
+                  importStatus === 'loading' || targetDefinition === undefined
                 }
                 onClick={async () => {
-                  if (targetSource) {
-                    console.log(targetSource)
+                  if (targetDefinition) {
+                    console.log(targetDefinition)
                     setImportStatus('loading')
-                    const cards = await downloadCards(targetSource)
+                    const cards = await downloadCards(targetDefinition)
                     setMemory(cards)
-                    setManifest(toMetadata(targetSource))
+                    setManifest(toManifest(targetDefinition))
                     setDbDirty(true)
                     setImportStatus('success')
                   }

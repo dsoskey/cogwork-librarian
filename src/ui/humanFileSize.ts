@@ -1,5 +1,5 @@
 // shamelessly stolen from https://stackoverflow.com/a/16023872
-export const humanFileSize = (bytes: number, si: boolean): string => {
+export const humanFileSize = (bytes: number, si: boolean = false): string => {
   const thresh = si ? 1000 : 1024
   let _bytes = bytes
   if (_bytes < thresh) return `${_bytes}B`

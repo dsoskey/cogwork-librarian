@@ -36,5 +36,10 @@ module.exports = {
     historyApiFallback: true,
   },
   devtool: 'eval-source-map',
-  plugins: [new HtmlWebpackPlugin({ template: 'src/index.html' })],
+  plugins: [
+    new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
+      resource.request = resource.request.replace(/^node:/, '')
+    }),
+    new HtmlWebpackPlugin({ template: 'src/index.html' }),
+  ],
 }

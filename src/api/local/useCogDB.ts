@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
-import { cogDB, CollectionMetadata, toMetadata } from './db'
+import { cogDB, Manifest, toManifest } from './db'
 import { downloadCards, putFile } from './populate'
-import { useLocalStorage } from './useLocalStorage'
 import { NormedCard } from './normedCard'
 import * as Scry from 'scryfall-sdk'
 
@@ -11,8 +10,8 @@ export interface CogDB {
   memStatus: TaskStatus
   memory: NormedCard[]
   setMemory: Setter<NormedCard[]>
-  manifest: CollectionMetadata
-  setManifest: Setter<CollectionMetadata>
+  manifest: Manifest
+  setManifest: Setter<Manifest>
   saveToDB: () => Promise<void>
 }
 
@@ -20,7 +19,7 @@ export const useCogDB = (): CogDB => {
   const [dbStatus, setDbStatus] = useState<TaskStatus>('unstarted')
   const [memStatus, setMemStatus] = useState<TaskStatus>('unstarted')
   const [memory, setMemory] = useState<NormedCard[]>([])
-  const [manifest, setManifest] = useState<CollectionMetadata>({
+  const [manifest, setManifest] = useState<Manifest>({
     id: 'loading',
     name: 'loading',
     type: 'loading',
@@ -48,10 +47,12 @@ export const useCogDB = (): CogDB => {
         setDbStatus('loading')
         console.debug('refreshing db')
         try {
-          const newManifest = toMetadata(
-            await Scry.BulkData.definitionByType('default_cards'))
+          const bulkDataDefinition = await Scry.BulkData.definitionByType(
+            'default_cards'
+          )
+          const newManifest = toManifest(bulkDataDefinition)
           setManifest(newManifest)
-          res = await downloadCards(newManifest)
+          res = await downloadCards(bulkDataDefinition)
           await putFile(newManifest, res)
           setDbStatus('success')
         } catch (_) {
@@ -76,7 +77,7 @@ export const useCogDB = (): CogDB => {
     dbStatus,
     saveToDB,
     memStatus,
-    manifest: manifest,
+    manifest,
     setManifest,
     memory,
     setMemory,

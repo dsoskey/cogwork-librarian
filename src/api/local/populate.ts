@@ -1,23 +1,18 @@
-import * as Scry from 'scryfall-sdk'
 import { Card } from 'scryfall-sdk'
-import { cogDB, CollectionMetadata, Manifest } from './db'
+import { cogDB, Manifest } from './db'
 import { normCardList, NormedCard } from './normedCard'
+import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 export const downloadCards = async (
-  manifest: Manifest
+  manifest: BulkDataDefinition
 ): Promise<NormedCard[]> => {
-  const download = await Scry.BulkData.downloadByType(
-    manifest.type,
-    manifest.updated_at
-  )
-  const results: Array<Card> = (download as any).map(Scry.Card.construct)
+  const download = await fetch(manifest.download_uri, { method: 'GET' })
+
+  const results: Array<Card> = (await download.json()).map(Card.construct)
 
   return normCardList(results)
 }
-export const putFile = async (
-  manifest: CollectionMetadata,
-  data: NormedCard[]
-) => {
-  console.info('putting!')
+
+export const putFile = async (manifest: Manifest, data: NormedCard[]) => {
   try {
     await cogDB.collection.put({
       ...manifest,

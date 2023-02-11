@@ -1,9 +1,8 @@
 import { Card } from 'scryfall-sdk'
 import { ObjectValues } from '../types'
-import { CardKeys } from './local/db'
 import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
-import { NormedCard } from './local/normedCard'
+import { NormedCard, OracleKeys } from './local/normedCard'
 
 export const DOUBLE_FACED_LAYOUTS = [
   'transform',
@@ -222,7 +221,7 @@ export const hasNumLandTypes = (card: Card | NormedCard, num: number) =>
 
 export const anyFaceContains = (
   card: Card | NormedCard,
-  field: CardKeys,
+  field: OracleKeys,
   value: string,
   fieldTransform: (string) => string = (it) => it
 ): boolean =>
@@ -233,7 +232,7 @@ export const anyFaceContains = (
 
 export const anyFaceRegexMatch = (
   card: Card | NormedCard,
-  field: CardKeys,
+  field: OracleKeys,
   regex: RegExp,
   fieldTransform: (string) => string = (it) => it
 ): boolean =>

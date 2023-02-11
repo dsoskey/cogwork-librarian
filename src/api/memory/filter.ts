@@ -1,4 +1,3 @@
-import { CardKeys } from '../local/db'
 import isEqual from 'lodash/isEqual'
 import {
   anyFaceContains,
@@ -12,7 +11,7 @@ import {
   toManaCost,
 } from '../card'
 import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
-import { NormedCard } from '../local/normedCard'
+import { NormedCard, OracleKeys } from '../local/normedCard'
 
 export type Filter<T> = (T) => boolean
 
@@ -55,7 +54,7 @@ export class NormedFilterWrapper {
   }
 
   defaultOperation =
-    (field: CardKeys, operator: Operator, value: any): Filter<NormedCard> =>
+    (field: OracleKeys, operator: Operator, value: any): Filter<NormedCard> =>
     (card: NormedCard) => {
       const cardValue = card[field]
       if (cardValue === undefined) return false
@@ -79,7 +78,7 @@ export class NormedFilterWrapper {
 
   powTouOperation =
     (
-      field: CardKeys,
+      field: OracleKeys,
       operator: Operator,
       targetValue: number
     ): Filter<NormedCard> =>
@@ -107,7 +106,7 @@ export class NormedFilterWrapper {
     }
 
   textMatch =
-    (field: CardKeys, value: string): Filter<NormedCard> =>
+    (field: OracleKeys, value: string): Filter<NormedCard> =>
     (card: NormedCard) => {
       return anyFaceContains(
         card,
@@ -117,7 +116,7 @@ export class NormedFilterWrapper {
     }
 
   noReminderTextMatch =
-    (field: CardKeys, value: string): Filter<NormedCard> =>
+    (field: OracleKeys, value: string): Filter<NormedCard> =>
     (card: NormedCard) =>
       anyFaceContains(
         card,
@@ -127,7 +126,7 @@ export class NormedFilterWrapper {
       )
 
   regexMatch =
-    (field: CardKeys, value: string): Filter<NormedCard> =>
+    (field: OracleKeys, value: string): Filter<NormedCard> =>
     (card: NormedCard) =>
       anyFaceRegexMatch(
         card,
@@ -136,7 +135,7 @@ export class NormedFilterWrapper {
       )
 
   noReminderRegexMatch =
-    (field: CardKeys, value: string): Filter<NormedCard> =>
+    (field: OracleKeys, value: string): Filter<NormedCard> =>
     (card: NormedCard) =>
       anyFaceRegexMatch(
         card,
