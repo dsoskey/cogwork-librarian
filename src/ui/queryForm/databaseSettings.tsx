@@ -14,7 +14,7 @@ export interface DatabaseSettingsProps {
   dbStatus: TaskStatus
   saveToDB: () => Promise<void>
   setMemory: Setter<NormedCard[]>
-  manifest: CollectionMetadata
+  manifest: CollectionMetadata | undefined
   setManifest: Setter<CollectionMetadata>
 }
 export const DatabaseSettings = ({
@@ -54,14 +54,14 @@ export const DatabaseSettings = ({
           <div>
             <h3>in memory {importStatus === 'loading' && '(importing...)'}</h3>
             <div>
-              <strong>source:</strong> <code>{manifest.name}</code>
+              <strong>source:</strong> <code>{manifest.name ?? '-'}</code>
             </div>
             <div>
-              <strong>type:</strong> <code>{manifest.type}</code>
+              <strong>type:</strong> <code>{manifest.type ?? '-'}</code>
             </div>
             <div>
               <strong>last updated:</strong>{' '}
-              <code>{manifest.lastUpdated?.toString()}</code>
+              <code>{manifest.lastUpdated?.toString() ?? '-'}</code>
             </div>
             {dbDirty && (
               <div className='dirty-db-message'>
