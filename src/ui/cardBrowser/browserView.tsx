@@ -40,6 +40,7 @@ export const BrowserView = React.memo(
   }: BrowserViewProps) => {
     const viewport = useViewportListener()
     const [width, setWidth] = useState<number>(viewport.width * 66)
+    const [displayType, setDisplayType] = useState<'cards' | 'json'>('cards')
 
     // TODO: Add collection switching
     const [activeCollection, setActiveCollection] =
@@ -105,7 +106,7 @@ export const BrowserView = React.memo(
             pageSize={pageSize}
           />
 
-          {activeCards.length > 0 && (
+          {activeCards.length > 0 && displayType === 'cards' && (
             <div className='result-container'>
               {currentPage.map((card) => (
                 <CardView
@@ -117,6 +118,19 @@ export const BrowserView = React.memo(
                   visibleDetails={visibleDetails}
                 />
               ))}
+            </div>
+          )}
+          {activeCards.length > 0 && displayType === 'json' && (
+            <div className='result-container'>
+              <pre>
+                <code>
+                  {JSON.stringify(
+                    result.map((it) => it.data),
+                    null,
+                    4
+                  )}
+                </code>
+              </pre>
             </div>
           )}
         </div>
@@ -142,7 +156,7 @@ export const BrowserView = React.memo(
             pageSize={pageSize}
           />
 
-          {activeCards.length > 0 && (
+          {activeCards.length > 0 && displayType === 'cards' && (
             <>
               <div className='result-container'>
                 {currentPage.map((card) => (
@@ -166,6 +180,19 @@ export const BrowserView = React.memo(
                   cardCount={activeCards.length}
                 />
               </div>
+            </>
+          )}
+          {activeCards.length > 0 && displayType === 'json' && (
+            <>
+              <pre>
+                <code>
+                  {JSON.stringify(
+                    result.map((it) => it.data),
+                    null,
+                    4
+                  )}
+                </code>
+              </pre>
             </>
           )}
         </div>

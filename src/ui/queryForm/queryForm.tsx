@@ -113,22 +113,26 @@ export const QueryForm = ({
       <h2>search options</h2>
       <fieldset>
         <legend>data source:</legend>
-        {Object.keys(DATA_SOURCE).map((it: DataSource) => (
-          <div key={it}>
-            <input
-              id={`source-${it}`}
-              type='radio'
-              value={it}
-              checked={it === source}
-              onChange={() => setSource(it)}
-            />
-            <label htmlFor={`source-${it}`}>
-              {it} - {description[it]}
-            </label>
-          </div>
-        ))}
+        <div className='row source-select'>
+          {Object.keys(DATA_SOURCE).map((it: DataSource) => (
+            <div
+              key={it}
+              className={`source-option ${it === source ? 'selected' : ''}`}
+            >
+              <input
+                id={`source-${it}`}
+                type='radio'
+                value={it}
+                checked={it === source}
+                onChange={() => setSource(it)}
+              />
+              <label htmlFor={`source-${it}`}>{it}</label>
+              {it === 'local' && dbSettings}
+              <div>{description[it]}</div>
+            </div>
+          ))}
+        </div>
       </fieldset>
-      <div>{dbSettings}</div>
 
       <div>
         <label htmlFor='sort'>sort by: </label>

@@ -11,6 +11,7 @@ import { sortBy } from 'lodash'
 import { Sort } from 'scryfall-sdk'
 import { parsePowTou } from './filter'
 import { useQueryCoordinator } from '../useQueryCoordinator'
+import { NormedCard, pickPrinting } from '../local/normedCard'
 
 const sortFunc = (key: keyof typeof Sort): any => {
   switch (key) {
@@ -34,7 +35,7 @@ const sortFunc = (key: keyof typeof Sort): any => {
 }
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
-  corpus: Card[]
+  corpus: NormedCard[]
 }
 export const useMemoryQueryRunner = ({
   getWeight = weightAlgorithms.uniform,
@@ -66,7 +67,7 @@ export const useMemoryQueryRunner = ({
       } else if (options.dir === 'desc') {
         sorted.reverse()
       }
-      return sorted
+      return sorted.flatMap(pickPrinting)
     },
     [corpus]
   )

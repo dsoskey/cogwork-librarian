@@ -43,6 +43,7 @@ input {
 fieldset {
   margin-left: 0;
   padding-left: unset;
+  padding-right: unset;
   margin-top: 4px;
   border: none;
 }
@@ -135,9 +136,12 @@ p {
   height: unset;
 }
 
+.input-column > * {
+  max-width: 1024px;
+}
+
 .input-column input {
   box-sizing: border-box;
-  max-width: 1024px;
   caret-color: var(--blue);
 }
 
@@ -146,7 +150,6 @@ p {
 }
 
 .query-editor {
-  max-width: 1024px;
   height: max-content;
   display: grid;
   grid-template-columns: 1fr;
@@ -205,6 +208,21 @@ p {
   text-decoration: none;
 }
 
+.source-select {
+  align-items: stretch;
+}
+.source-option {
+  flex: 1;
+  border: var(--dark-color) inset 2px;
+  padding: 4px;
+}
+.source-option.selected {
+  border: var(--blue) inset 2px;
+}
+.source-option .db-settings {
+  margin-left: 4px;
+}
+
 .expander {
   background-color: inherit;
 }
@@ -217,6 +235,58 @@ p {
 
 .expander-child {
   margin: 4px;
+}
+
+.dirty-db-message {
+  color: red;
+  font-weight: bold;
+}
+
+.db-import {
+  height: 369px;
+  align-items: flex-start;
+}
+.db-import > * {
+  flex: 1;
+  margin-top: 8px;
+}
+
+.db-import .scryfall-option {
+  padding: 4px;
+}
+
+.db-import .scryfall-option .size {
+  margin-left: 4px;
+}
+
+.db-import .file {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: 'overlap';
+  border: var(--blue-mid-alpha) 2px inset;
+}
+.db-import .file input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: inline-block;
+  grid-area: overlap;
+  cursor: pointer;
+}
+.db-import .file label {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: inline-block;
+  grid-area: overlap;
+  background: var(--blue);
+  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 1024px) {

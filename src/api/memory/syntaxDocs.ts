@@ -29,7 +29,7 @@ export const keywords = {
   text: 'text',
   tou: 'tou',
   toughness: 'toughness',
-  type: 'type'
+  type: 'type',
 } as const
 
 export const keywordsToImplement = {
@@ -78,7 +78,7 @@ export const keywordsToImplement = {
   usd: 'usd',
   watermark: 'watermark',
   wm: 'wm',
-  year: 'year'
+  year: 'year',
 } as const
 
 const all = {

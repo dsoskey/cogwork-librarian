@@ -18,7 +18,15 @@ import { SavedCards } from './ui/savedCards'
 import { DatabaseSettings } from './ui/queryForm/databaseSettings'
 
 export const App = () => {
-  const { saveToDB, dbStatus, memStatus, memory, setMemory, manifest, setManifest } = useCogDB()
+  const {
+    saveToDB,
+    dbStatus,
+    memStatus,
+    memory,
+    setMemory,
+    manifest,
+    setManifest,
+  } = useCogDB()
   const viewport = useViewportListener()
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
 
@@ -46,11 +54,6 @@ export const App = () => {
       <div className='input-column'>
         <h1>cogwork librarian</h1>
 
-        <div>
-          {dbStatus === 'loading' && 'Indexing local database...'}
-          {memStatus === 'loading' && 'Loading local database into memory...'}
-        </div>
-
         <QueryForm
           prefix={prefix}
           setPrefix={setPrefix}
@@ -63,13 +66,15 @@ export const App = () => {
           setOptions={setOptions}
           source={source}
           setSource={setSource}
-          dbSettings={<DatabaseSettings
-            dbStatus={dbStatus}
-            saveToDB={saveToDB}
-            setMemory={setMemory}
-            manifest={manifest}
-            setManifest={setManifest}
-          />}
+          dbSettings={
+            <DatabaseSettings
+              dbStatus={dbStatus}
+              saveToDB={saveToDB}
+              setMemory={setMemory}
+              manifest={manifest}
+              setManifest={setManifest}
+            />
+          }
         />
 
         <SavedCards savedCards={savedCards} setSavedCards={setSavedCards} />

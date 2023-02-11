@@ -3,6 +3,7 @@ import { ObjectValues } from '../types'
 import { CardKeys } from './local/db'
 import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
+import { NormedCard } from './local/normedCard'
 
 export const DOUBLE_FACED_LAYOUTS = [
   'transform',
@@ -213,14 +214,14 @@ export const toManaCost = (rawCost: string[]): ManaCost => {
   return result
 }
 
-export const isDual = (card: Card) =>
+export const isDual = (card: Card | NormedCard) =>
   card.type_line.includes('Land') && /Add \{.} or \{.}\./.test(card.oracle_text)
-export const hasNumLandTypes = (card: Card, num: number) =>
+export const hasNumLandTypes = (card: Card | NormedCard, num: number) =>
   BASIC_LAND_TYPES.filter((type) => card.type_line.toLowerCase().includes(type))
     .length === num
 
 export const anyFaceContains = (
-  card: Card,
+  card: Card | NormedCard,
   field: CardKeys,
   value: string,
   fieldTransform: (string) => string = (it) => it
@@ -231,7 +232,7 @@ export const anyFaceContains = (
   ).length > 0
 
 export const anyFaceRegexMatch = (
-  card: Card,
+  card: Card | NormedCard,
   field: CardKeys,
   regex: RegExp,
   fieldTransform: (string) => string = (it) => it
@@ -244,6 +245,5 @@ export const anyFaceRegexMatch = (
       ? regex.test(fieldTransform(face[field].toString().toLowerCase()))
       : false
   ).length > 0
-
 export const noReminderText = (text: string): string =>
   text.replace(/\(.*\)/gi, '')

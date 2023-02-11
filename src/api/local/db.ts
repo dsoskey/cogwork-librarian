@@ -17,10 +17,26 @@ export type CardKeys =
   | 'toughness'
 export type CardTable = Pick<Card, CardKeys>
 
+export interface Collection {
+  id: string
+  name: string
+  type: string
+  blob: Blob
+  lastUpdated: Date
+}
+export type CollectionMetadata = Omit<Collection, 'blob'>
+export const toMetadata = (manifest: Manifest) => ({
+  ...manifest,
+  name: manifest.uri,
+  lastUpdated: new Date(manifest.updated_at),
+})
+
 export class TypedDexie extends Dexie {
   manifest!: Table<Manifest>
 
   card!: Table<CardTable>
+
+  collection!: Table<Collection>
 
   constructor() {
     super('cogwork-librarian')
@@ -85,6 +101,12 @@ export class TypedDexie extends Dexie {
             type_line 	String 		The type line of this card. 
             */
       card: 'id, oracle_id, cmc, color_identity, colors, name, oracle_text, power, toughness',
+    })
+
+    this.version(2).stores({
+      collection: 'id, name, last_updated',
+      card: null,
+      manifest: null,
     })
   }
 }

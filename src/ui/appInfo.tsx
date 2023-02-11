@@ -25,7 +25,9 @@ export const AppInfo = () => {
           boxes, and other custom magic formats. craft more complex queries to
           find the cards that fit your environment or archetype. save cards to
           your list for easy export. ignore cards you want to exclude from all
-          future search results.
+          future search results. load a custom list of cards that fit scryfall's
+          card format to power the most custom environments with scryfall's
+          syntax.
         </p>
 
         <p>
@@ -51,6 +53,12 @@ export const AppInfo = () => {
             offline after the initial database download. this also makes the
             search orders of magnitude faster than communicating with scryfall
             directly.
+          </li>
+          <li>
+            cogwork librarian works with any scryfall-compatible list of cards,
+            including custom cards! download any of scryfall's bulk data sets
+            through cogwork librarian itself, or import your own json file to
+            use a custom data set.
           </li>
         </ol>
 
@@ -121,16 +129,13 @@ export const AppInfo = () => {
           looking to implement:
         </p>
         <ul>
-          <li>syntax highlighting and documentation</li>
-          <li>
-            local data source management. this would allow you to import a
-            custom collection to run searches on
-          </li>
-          <li>project import/export with per-project saved/ignored lists</li>
+          <li>locally-sourced syntax documentation</li>
           <li>
             full scryfall syntax support for in-memory filtering, potentially as
             a standalone code library
           </li>
+          <li>project import/export with per-project saved/ignored lists</li>
+          <li>shareable search links</li>
         </ul>
 
         <h3>this looks cool! how can i contribute?</h3>

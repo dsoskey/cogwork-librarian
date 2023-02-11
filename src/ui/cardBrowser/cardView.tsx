@@ -33,7 +33,7 @@ export const CardView = ({
   const _card = card.data
   const imageSource = flipped
     ? getBackImageURI(_card, 'normal')
-    : _card.getFrontImageURI('normal')
+    : _card.image_uris?.normal ?? _card.getFrontImageURI('normal')
 
   return (
     <div className='card-view'>

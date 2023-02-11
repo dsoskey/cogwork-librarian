@@ -1,4 +1,3 @@
-import { Card } from 'scryfall-sdk'
 import { CardKeys } from '../local/db'
 import isEqual from 'lodash/isEqual'
 import {
@@ -13,6 +12,7 @@ import {
   toManaCost,
 } from '../card'
 import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
+import { NormedCard } from '../local/normedCard'
 
 export type Filter<T> = (T) => boolean
 
@@ -31,26 +31,32 @@ const replaceNamePlaceholder = (text: string, name: string): string => {
 }
 
 // TODO: handle card faces for all filters
-export class MemoryFilterWrapper {
+export class NormedFilterWrapper {
   constructor() {}
 
-  identity = (): Filter<Card> => (_) => true
+  identity = (): Filter<NormedCard> => (_) => true
 
-  and = (clause1: Filter<Card>, clause2: Filter<Card>): Filter<Card> => {
-    return (c: Card) => clause1(c) && clause2(c)
+  and = (
+    clause1: Filter<NormedCard>,
+    clause2: Filter<NormedCard>
+  ): Filter<NormedCard> => {
+    return (c: NormedCard) => clause1(c) && clause2(c)
   }
 
-  or = (clause1: Filter<Card>, clause2: Filter<Card>): Filter<Card> => {
-    return (c: Card) => clause1(c) || clause2(c)
+  or = (
+    clause1: Filter<NormedCard>,
+    clause2: Filter<NormedCard>
+  ): Filter<NormedCard> => {
+    return (c: NormedCard) => clause1(c) || clause2(c)
   }
 
-  not = (clause: Filter<Card>): Filter<Card> => {
-    return (c: Card) => !clause(c)
+  not = (clause: Filter<NormedCard>): Filter<NormedCard> => {
+    return (c: NormedCard) => !clause(c)
   }
 
   defaultOperation =
-    (field: CardKeys, operator: Operator, value: any): Filter<Card> =>
-    (card: Card) => {
+    (field: CardKeys, operator: Operator, value: any): Filter<NormedCard> =>
+    (card: NormedCard) => {
       const cardValue = card[field]
       if (cardValue === undefined) return false
       switch (operator) {
@@ -72,8 +78,12 @@ export class MemoryFilterWrapper {
     }
 
   powTouOperation =
-    (field: CardKeys, operator: Operator, targetValue: number): Filter<Card> =>
-    (card: Card) => {
+    (
+      field: CardKeys,
+      operator: Operator,
+      targetValue: number
+    ): Filter<NormedCard> =>
+    (card: NormedCard) => {
       const cardValue = card[field]
       if (cardValue === undefined) return false
 
@@ -97,8 +107,8 @@ export class MemoryFilterWrapper {
     }
 
   textMatch =
-    (field: CardKeys, value: string): Filter<Card> =>
-    (card: Card) => {
+    (field: CardKeys, value: string): Filter<NormedCard> =>
+    (card: NormedCard) => {
       return anyFaceContains(
         card,
         field,
@@ -107,8 +117,8 @@ export class MemoryFilterWrapper {
     }
 
   noReminderTextMatch =
-    (field: CardKeys, value: string): Filter<Card> =>
-    (card: Card) =>
+    (field: CardKeys, value: string): Filter<NormedCard> =>
+    (card: NormedCard) =>
       anyFaceContains(
         card,
         field,
@@ -117,8 +127,8 @@ export class MemoryFilterWrapper {
       )
 
   regexMatch =
-    (field: CardKeys, value: string): Filter<Card> =>
-    (card: Card) =>
+    (field: CardKeys, value: string): Filter<NormedCard> =>
+    (card: NormedCard) =>
       anyFaceRegexMatch(
         card,
         field,
@@ -126,8 +136,8 @@ export class MemoryFilterWrapper {
       )
 
   noReminderRegexMatch =
-    (field: CardKeys, value: string): Filter<Card> =>
-    (card: Card) =>
+    (field: CardKeys, value: string): Filter<NormedCard> =>
+    (card: NormedCard) =>
       anyFaceRegexMatch(
         card,
         field,
@@ -135,12 +145,12 @@ export class MemoryFilterWrapper {
         noReminderText
       )
 
-  keywordMatch = (value: string) => (card: Card) =>
+  keywordMatch = (value: string) => (card: NormedCard) =>
     card.keywords.map((it) => it.toLowerCase()).includes(value.toLowerCase())
 
   colorMatch =
-    (operator: Operator, value: Set<string>): Filter<Card> =>
-    (card: Card) => {
+    (operator: Operator, value: Set<string>): Filter<NormedCard> =>
+    (card: NormedCard) => {
       const faceMatchMap = [
         card.colors,
         ...card.card_faces.map((it) => it.colors),
@@ -191,8 +201,8 @@ export class MemoryFilterWrapper {
     }
 
   colorIdentityMatch =
-    (operator: Operator, value: Set<string>): Filter<Card> =>
-    (card: Card) => {
+    (operator: Operator, value: Set<string>): Filter<NormedCard> =>
+    (card: NormedCard) => {
       const colors = card.color_identity.map((it) => it.toLowerCase())
       const matchedColors = colors.filter((color) => value.has(color))
       const notMatchedColors = colors.filter((color) => !value.has(color))
@@ -225,8 +235,8 @@ export class MemoryFilterWrapper {
     }
 
   manaCostMatch =
-    (operator: Operator, value: string[]): Filter<Card> =>
-    (card: Card) => {
+    (operator: Operator, value: string[]): Filter<NormedCard> =>
+    (card: NormedCard) => {
       const targetCost = toManaCost(value)
       const entries = Object.entries(targetCost)
       const cardCosts = [
@@ -273,13 +283,13 @@ export class MemoryFilterWrapper {
       return cardCosts.length > 0
     }
 
-  formatMatch = (legality: Legality, value: Format) => (card: Card) =>
-    card.legalities[value] === legality as unknown as string
+  formatMatch = (legality: Legality, value: Format) => (card: NormedCard) =>
+    card.legalities[value] === (legality as unknown as string)
 
   unimplemented = false
   isVal =
-    (value: IsValue): Filter<Card> =>
-    (card: Card) => {
+    (value: IsValue): Filter<NormedCard> =>
+    (card: NormedCard) => {
       switch (value) {
         case 'gold':
           return (card.colors?.length ?? 0) >= 2
@@ -287,14 +297,14 @@ export class MemoryFilterWrapper {
         case 'phyrexian':
           return this.unimplemented
         case 'promo':
-          return card.promo
+          return card.printings.find((it) => it.promo) !== undefined
         case 'reprint':
-          return card.reprint
+          return card.printings.find((it) => it.reprint) !== undefined
         case 'firstprint':
         case 'firstprinting':
           return this.unimplemented // Add when processing multiple prints
         case 'digital':
-          return card.digital
+          return card.printings.find((it) => it.digital) !== undefined
         case 'dfc':
           return DOUBLE_FACED_LAYOUTS.includes(card.layout)
         case 'mdfc':
@@ -482,37 +492,11 @@ export class MemoryFilterWrapper {
             )
           )
         case 'extra':
-          return (
-            [
-              'wc97',
-              'wc98',
-              'wc99',
-              'wc00',
-              'wc01',
-              'wc02',
-              'wc03',
-              'wc04',
-              'tfth',
-              'tbth',
-              'tdag',
-              'thp3',
-              'thp2',
-              'thp1',
-              'olep',
-              'pcel',
-              'psdg',
-              '30a',
-              'past',
-            ].includes(card.set.toLowerCase()) ||
-            /(^|\b)(vanguard|plane|scheme|phenomenon|token|card|emblem)(\b|$)/.test(
-              card.type_line.toLowerCase()
-            ) ||
-            card.set_type === 'memorabilia'
-          )
+          return this.unimplemented
         default:
           return this.unimplemented
       }
     }
 }
 
-export const Filters = new MemoryFilterWrapper()
+export const Filters = new NormedFilterWrapper()
