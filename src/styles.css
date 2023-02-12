@@ -92,10 +92,27 @@ p {
   margin-left: 4px;
 }
 
+.page-title {
+  margin-left: 1em;
+}
+
 .footer {
+  margin-left: -8px;
+  margin-right: -8px;
+  max-width: 100% !important;
+  padding: 16px 8px;
+  background: var(--darkest-color);
+  color: var(--light-color);
+  font-size: .8em;
+}
+.footer .links {
   display: flex;
   flex-direction: row;
-  padding-bottom: 16px;
+  margin-left: 4px;
+}
+.footer a,
+.footer a:visited {
+  color: var(--light-color);
 }
 
 @media (max-width: 1024px) {

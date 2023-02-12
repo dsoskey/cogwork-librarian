@@ -16,6 +16,7 @@ import { Footer } from './ui/footer'
 import { useViewportListener } from './viewport'
 import { SavedCards } from './ui/savedCards'
 import { DatabaseSettings } from './ui/queryForm/databaseSettings'
+import { CoglibIcon } from './api/memory/coglibIcon'
 
 export const App = () => {
   const {
@@ -52,7 +53,10 @@ export const App = () => {
   return (
     <div className='root'>
       <div className='input-column'>
-        <h1>cogwork librarian</h1>
+        <h1 className='row'>
+          <CoglibIcon isActive={false} size='2em' />
+          <span className='page-title'>cogwork librarian</span>
+        </h1>
 
         <QueryForm
           prefix={prefix}

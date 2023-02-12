@@ -2,7 +2,7 @@ import React from 'react'
 
 export interface SourceIconProps {
   isActive: boolean
-  size: number
+  size: number | string
 }
 export const ScryfallIcon = (
   { isActive, size}
