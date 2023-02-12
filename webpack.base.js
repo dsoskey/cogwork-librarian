@@ -40,6 +40,9 @@ module.exports = {
     new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
       resource.request = resource.request.replace(/^node:/, '')
     }),
-    new HtmlWebpackPlugin({ template: 'src/index.html' }),
+    new HtmlWebpackPlugin({
+      template: 'src/index.html',
+      favicon: 'src/icon.svg'
+    }),
   ],
 }
