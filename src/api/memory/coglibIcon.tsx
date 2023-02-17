@@ -2,15 +2,20 @@ import React from 'react'
 import { SourceIconProps } from '../scryfall/scryfallIcon'
 
 export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
-    const highlightColor = isActive ? 'var(--blue)': '#fff'
-    const strokeWidth = 20
-    return <svg xmlns="http://www.w3.org/2000/svg"
-                width={size} height={size}
-                viewBox="0 0 460 460">
-
-
-        <path id="shadow" fill="black" opacity='.09'
-              d="M 215.00,1.21
+  const highlightColor = isActive ? 'var(--blue)' : '#fff'
+  const strokeWidth = 20
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      width={size}
+      height={size}
+      viewBox='0 0 460 460'
+    >
+      <path
+        id='shadow'
+        fill='black'
+        opacity='.09'
+        d='M 215.00,1.21
            C 215.00,1.21 197.00,3.28 197.00,3.28
              184.96,4.90 167.51,9.12 156.00,13.00
              99.27,32.15 51.19,73.35 24.37,127.00
@@ -25,10 +30,12 @@ export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
              368.81,44.73 344.60,29.68 319.00,18.72
              296.92,9.27 272.91,3.66 249.00,1.91
              249.00,1.91 239.00,1.21 239.00,1.21
-             239.00,1.21 215.00,1.21 215.00,1.21 Z" />
-        <path id="border"
-              fill={highlightColor}
-              d="M 216.00,16.21
+             239.00,1.21 215.00,1.21 215.00,1.21 Z'
+      />
+      <path
+        id='border'
+        fill={highlightColor}
+        d='M 216.00,16.21
            C 216.00,16.21 199.00,18.28 199.00,18.28
              189.81,19.59 172.74,23.65 164.00,26.69
              104.78,47.34 58.79,90.65 35.45,149.00
@@ -41,10 +48,12 @@ export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
              401.06,101.35 384.76,82.00 366.00,65.87
              348.97,51.23 326.10,37.49 305.00,29.68
              284.60,22.13 258.81,16.03 237.00,16.21
-             237.00,16.21 216.00,16.21 216.00,16.21 Z" />
-        <path id="background"
-              fill="var(--darkest-color)"
-              d="M 216.00,34.42
+             237.00,16.21 216.00,16.21 216.00,16.21 Z'
+      />
+      <path
+        id='background'
+        fill='var(--darkest-color)'
+        d='M 216.00,34.42
            C 216.00,34.42 200.00,36.27 200.00,36.27
              183.85,38.77 167.01,44.01 152.00,50.43
              110.19,68.31 74.21,104.84 55.31,146.00
@@ -55,11 +64,13 @@ export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
              338.35,394.24 356.73,379.91 372.07,363.00
              441.96,285.98 439.72,163.90 365.91,90.09
              344.38,68.56 317.77,52.89 289.00,43.33
-             268.54,36.54 237.41,31.82 216.00,34.42 Z" />
+             268.54,36.54 237.41,31.82 216.00,34.42 Z'
+      />
 
-
-        <path id="gear-background" fill="var(--darker-color)"
-              d="M 165.00,183.21
+      <path
+        id='gear-background'
+        fill='var(--darker-color)'
+        d='M 165.00,183.21
            C 156.84,184.61 152.16,185.10 144.00,187.43
              112.68,196.36 86.89,218.35 73.31,248.00
              45.36,308.99 75.71,381.17 140.00,402.33
@@ -70,19 +81,26 @@ export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
              244.27,204.84 230.83,196.17 217.00,190.81
              205.11,186.20 190.77,183.02 178.00,183.21
              178.00,183.21 165.00,183.21 165.00,183.21 Z
-           M 243.00,52.00" />
-        <path id="gear-inner"
-              stroke={highlightColor} strokeWidth={strokeWidth}
-              d="M 168.00,245.44
+           M 243.00,52.00'
+      />
+      <path
+        id='gear-inner'
+        stroke={highlightColor}
+        strokeWidth={strokeWidth}
+        d='M 168.00,245.44
            C 157.71,247.34 150.02,250.10 142.00,257.18
              111.08,284.49 124.16,335.67 165.00,344.00
              170.48,345.11 176.45,345.43 182.00,344.56
              189.75,343.35 196.46,341.05 203.00,336.64
              208.44,332.97 212.97,328.44 216.64,323.00
-             240.91,287.00 210.90,239.94 168.00,245.44 Z" />
-        <path id="gear-teeth"
-              fill={highlightColor} stroke={highlightColor} strokeWidth={strokeWidth * 2 / 3}
-              d="M 110.15,202.14
+             240.91,287.00 210.90,239.94 168.00,245.44 Z'
+      />
+      <path
+        id='gear-teeth'
+        fill={highlightColor}
+        stroke={highlightColor}
+        strokeWidth={(strokeWidth * 2) / 3}
+        d='M 110.15,202.14
            C 110.15,202.14 125.18,225.12 125.18,225.12
              125.18,225.12 114.84,235.46 114.84,235.46
              114.84,235.46 103.53,246.78 103.53,246.78
@@ -117,10 +135,14 @@ export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
              160.38,379.00 175.00,379.00 175.00,379.00
              175.00,379.00 191.00,379.00 191.00,379.00
              191.00,379.00 195.75,405.62 195.75,405.62
-             195.75,405.62 154.75,405.88 154.75,405.88 Z" />
-        <path id="gear outer"
-              fill="none" stroke={highlightColor} strokeWidth={strokeWidth}
-              d="M 165.00,183.21
+             195.75,405.62 154.75,405.88 154.75,405.88 Z'
+      />
+      <path
+        id='gear outer'
+        fill='none'
+        stroke={highlightColor}
+        strokeWidth={strokeWidth}
+        d='M 165.00,183.21
            C 156.84,184.61 152.16,185.10 144.00,187.43
              112.68,196.36 86.89,218.35 73.31,248.00
              45.36,308.99 75.71,381.17 140.00,402.33
@@ -131,38 +153,49 @@ export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
              244.27,204.84 230.83,196.17 217.00,190.81
              205.11,186.20 190.77,183.02 178.00,183.21
              178.00,183.21 165.00,183.21 165.00,183.21 Z
-           M 243.00,52.00" />
+           M 243.00,52.00'
+      />
 
-        <path id="head-top-fill"
-              fill="var(--dark-color)"
-              d="M 380.00,142.00
+      <path
+        id='head-top-fill'
+        fill='var(--dark-color)'
+        d='M 380.00,142.00
            C 380.00,142.00 339.00,30.00 230.00,81.00
              230.00,81.00 32.00,230.00 32.00,230.00
              32.00,230.00 115.00,180.00 175.00,230.00
              322.00,155.00 306.00,179.00 306.00,179.00
-             306.00,179.00 380.00,142.00 380.00,142.00 Z" />
-        <path id="head-top"
-              fill="none" stroke={highlightColor} strokeWidth={strokeWidth}
-              d="M 380.00,142.00
+             306.00,179.00 380.00,142.00 380.00,142.00 Z'
+      />
+      <path
+        id='head-top'
+        fill='none'
+        stroke={highlightColor}
+        strokeWidth={strokeWidth}
+        d='M 380.00,142.00
            C 380.00,142.00 339.00,30.00 230.00,81.00
              230.00,81.00 32.00,230.00 32.00,230.00
              32.00,230.00 115.00,180.00 175.00,230.00
              322.00,155.00 306.00,179.00 306.00,179.00
-             306.00,179.00 380.00,142.00 380.00,142.00 Z" />
-        <path id="head-bottom-fill"
-              fill="var(--dark-color)"
-              d="M 175.00,295.00
+             306.00,179.00 380.00,142.00 380.00,142.00 Z'
+      />
+      <path
+        id='head-bottom-fill'
+        fill='var(--dark-color)'
+        d='M 175.00,295.00
            C 175.00,295.00 290.00,156.00 433.00,131.00
              433.00,131.00 303.00,373.00 303.00,373.00
-             303.00,373.00 301.00,345.00 175.00,295.00 Z" />
-        <path id="head-bottom"
-              fill="none" stroke={highlightColor} strokeWidth={strokeWidth}
-              d="M 175.00,295.00
+             303.00,373.00 301.00,345.00 175.00,295.00 Z'
+      />
+      <path
+        id='head-bottom'
+        fill='none'
+        stroke={highlightColor}
+        strokeWidth={strokeWidth}
+        d='M 175.00,295.00
            C 175.00,295.00 290.00,156.00 433.00,131.00
              433.00,131.00 303.00,373.00 303.00,373.00
-             303.00,373.00 301.00,345.00 175.00,295.00 Z" />
-
+             303.00,373.00 301.00,345.00 175.00,295.00 Z'
+      />
     </svg>
-
+  )
 }
-  

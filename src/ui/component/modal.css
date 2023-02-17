@@ -1,15 +1,5 @@
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 20;
-}
-
-.modal-main {
-  position: fixed;
   background: var(--light-color);
   border-color: var(--darker-color);
   color: var(--dark-color);
@@ -19,6 +9,10 @@
   left: 50%;
   transform: translate(-50%, -50%);
   overflow-y: scroll;
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.75);
 }
 
 .modal-title {

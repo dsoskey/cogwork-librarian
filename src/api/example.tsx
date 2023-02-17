@@ -72,4 +72,23 @@ export const queryExamples: QueryExample[] = [
     prefix: 'fo:counter ci:bwug',
     queries: ['o:toxic', 'o:proliferate', 'o:infect', 't:artifact'],
   },
+  {
+    title: 'blending morph into blink',
+    description: (
+      <>
+        this query shows how comments work. as written, this ignores the morph
+        subquery. remove the <code className='language-scryfall-extended'>#</code>
+        from the first query to include them at the front of the search.
+        the two blink queries are separated to rank immediate blinks
+        from end of turn blinks.
+      </>
+    ),
+    prefix: 'ci:wurg',
+    queries: [
+      '# o:morph or o:manifest',
+      'o:/exile .* creature .*, then return (it|that card) to the battlefield/',
+      'o:/exile .* creature. return (it|that card) to the battlefield/',
+      'o:/when ~ enters the battlefield/',
+    ],
+  },
 ]

@@ -137,9 +137,15 @@ export const QueryForm = ({
                   <div className='row'>
                     <div className='radio-button-holder'>
                       {it === 'scryfall' ? (
-                        <ScryfallIcon isActive={source==='scryfall'} size={iconSize} />
+                        <ScryfallIcon
+                          isActive={source === 'scryfall'}
+                          size={iconSize}
+                        />
                       ) : (
-                        <CoglibIcon size={iconSize} isActive={source==='local'} />
+                        <CoglibIcon
+                          size={iconSize}
+                          isActive={source === 'local'}
+                        />
                       )}
                       <input
                         id={`source-${it}`}

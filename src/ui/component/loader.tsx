@@ -6,6 +6,8 @@ export interface LoaderProps {
   count: number
   total: number
 }
+
+// should this be a <progress> instead of an svg?
 export const Loader = ({ width, count, total, label }: LoaderProps) => {
   const height = 20
   const rx = 4

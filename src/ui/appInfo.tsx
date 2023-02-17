@@ -52,7 +52,7 @@ export const AppInfo = () => {
             the in-memory query processor allows cogwork librarian to run
             offline after the initial database download. this also makes the
             search orders of magnitude faster than communicating with scryfall
-            directly.
+            directly. why wait for answers?
           </li>
           <li>
             cogwork librarian works with any scryfall-compatible list of cards,
@@ -130,6 +130,7 @@ export const AppInfo = () => {
         </p>
         <ul>
           <li>locally-sourced syntax documentation</li>
+          <li>query history</li>
           <li>
             full scryfall syntax support for in-memory filtering, potentially as
             a standalone code library

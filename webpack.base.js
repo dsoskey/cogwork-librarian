@@ -42,7 +42,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: 'src/index.html',
-      favicon: 'src/icon.svg'
+      favicon: 'src/icon.svg',
     }),
   ],
 }

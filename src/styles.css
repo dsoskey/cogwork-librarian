@@ -103,7 +103,7 @@ p {
   padding: 16px 8px;
   background: var(--darkest-color);
   color: var(--light-color);
-  font-size: .8em;
+  font-size: 0.8em;
 }
 .footer .links {
   display: flex;
@@ -240,7 +240,7 @@ p {
   grid-template-rows: 1fr;
   grid-template-areas: 'overlap';
 }
-.source-option .radio-button-holder input[type=radio] {
+.source-option .radio-button-holder input[type='radio'] {
   opacity: 0;
   grid-area: overlap;
   z-index: 2;
