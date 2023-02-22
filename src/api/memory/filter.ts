@@ -12,12 +12,26 @@ import {
 } from '../card'
 import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
 import { NormedCard, OracleKeys } from '../local/normedCard'
+import { ObjectValues } from '../../types'
 
 export type Filter<T> = (T) => boolean
 
-export type EqualityOperator = ':' | '='
+export const EQ_OPERATORS = {
+  ':': ':',
+  '=': '=',
+} as const
+export type EqualityOperator = ObjectValues<typeof EQ_OPERATORS>
 
-export type Operator = EqualityOperator | '!=' | '<>' | '<' | '<=' | '>' | '>='
+export const OPERATORS = {
+  ...EQ_OPERATORS,
+  '!=': '!=',
+  '<>': '<>',
+  '<': '<',
+  '<=': '<=',
+  '>': '>',
+  '>=': '>=',
+} as const
+export type Operator = ObjectValues<typeof OPERATORS>
 
 // these should go on the card object itself
 export const parsePowTou = (value: any) =>

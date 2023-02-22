@@ -1,28 +1,27 @@
-import { EnrichedCard, QueryHandler } from './queryRunnerCommon'
+import {
+  EnrichedCard,
+  QueryHandler,
+  QueryRunnerFunc,
+} from './queryRunnerCommon'
 import { SearchOptions } from 'scryfall-sdk'
 import { TaskStatus } from '../types'
 import { useReporter } from './useReporter'
 import { MutableRefObject, useCallback, useRef, useState } from 'react'
 import { sortBy } from 'lodash'
-
-type QueryRunnerFunc = (
-  query: string,
-  index: number,
-  options: SearchOptions
-) => Promise<string>
+import { CogError } from '../error'
 
 type QueryStore<T> = MutableRefObject<{ [query: string]: Array<T> }>
 
 export interface QueryExecutor extends QueryHandler {
   execute: (
-    QueryRunnerFunc
+    funk: QueryRunnerFunc
   ) => (queries: string[], options: SearchOptions) => void
   cache: QueryStore<EnrichedCard>
   rawData: QueryStore<EnrichedCard>
 }
-
 export const useQueryCoordinator = (): QueryExecutor => {
   const [status, setStatus] = useState<TaskStatus>('unstarted')
+  const [errors, setErrors] = useState<CogError[]>([])
   const [result, setResult] = useState<Array<EnrichedCard>>([])
   const report = useReporter()
 
@@ -30,6 +29,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
   const cache = useRef<{ [query: string]: Array<EnrichedCard> }>({})
   const rawData = useRef<{ [query: string]: Array<EnrichedCard> }>({})
 
+  // should this be async/await so app can autoscroll on mobile when execute is done ?
   const execute = useCallback(
     (runQuery: QueryRunnerFunc) =>
       (queries: string[], options: SearchOptions) => {
@@ -59,10 +59,14 @@ export const useQueryCoordinator = (): QueryExecutor => {
           const sorted: Array<EnrichedCard> = sortBy(Object.values(orgo), [
             (it) => -it.weight,
           ])
-          const throwErr = promiseResults.filter(
-            (it) => it.status === 'rejected'
-          ).length
-          setStatus(throwErr ? 'error' : 'success')
+
+          const errors = promiseResults
+            .filter((it) => it.status === 'fulfilled' && it.value.isErr())
+            // @ts-ignore
+            .map((it) => it.value.error)
+
+          setErrors(errors)
+          setStatus(errors.length ? 'error' : 'success')
           report.markTimepoint('end')
           setResult(sorted)
         })
@@ -77,5 +81,6 @@ export const useQueryCoordinator = (): QueryExecutor => {
     execute,
     rawData,
     cache,
+    errors,
   }
 }

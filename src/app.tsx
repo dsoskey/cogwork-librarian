@@ -89,6 +89,7 @@ export const App = () => {
         report={queryRunner.report}
         result={queryRunner.result}
         status={queryRunner.status}
+        errors={queryRunner.errors}
         addCard={addCard}
         addIgnoredId={addIgnoredId}
         ignoredIds={ignoredIds}

@@ -64,12 +64,13 @@ condition -> (
 cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
     {% ([_, [operator], value]) => Filters.defaultOperation('cmc', operator, value) %}
 
-# TODO: Investigate name search with no field prefix
 nameCondition -> ("name"i) (":" | "=") stringValue
-    {% ([_, [operator], value]) => Filters.textMatch('name', value) %}
+    {% ([_, [operator], value]) => Filters.textMatch('name', value) %} |
+    stringValue {% ([value]) => Filters.textMatch('name', value) %}
 
 nameRegexCondition -> ("name"i) (":" | "=") regexString
-    {% ([_, [operator], value]) => Filters.regexMatch('name', value) %}
+    {% ([_, [operator], value]) => Filters.regexMatch('name', value) %} |
+    regexString {% ([value]) => Filters.regexMatch('name', value) %}
 
 colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
     {% ([_, [operator], value]) => Filters.colorMatch(operator, new Set(value)) %}

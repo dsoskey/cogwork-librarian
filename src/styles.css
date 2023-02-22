@@ -348,13 +348,10 @@ p {
   flex: 1;
 }
 
-.results .topbar {
+.result-controls {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
-
-.result-controls {
   height: 14vh;
   padding: 8px;
   border-bottom: solid 1px var(--gray-68);

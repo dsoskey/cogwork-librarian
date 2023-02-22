@@ -1,6 +1,8 @@
 import React, { ChangeEventHandler, useEffect, useRef, useState } from 'react'
-import Prism from 'prismjs'
-import { Language } from '../../api/memory/syntaxHighlighting'
+import {
+  Language,
+  useHighlightPrism,
+} from '../../api/memory/syntaxHighlighting'
 
 export interface InputProps {
   value: string
@@ -29,9 +31,7 @@ export const Input = ({ value, onChange, language }: InputProps) => {
     faker.current.scrollLeft = event.target.scrollLeft
     linker.current.scrollLeft = event.target.scrollLeft
   }
-  React.useLayoutEffect(() => {
-    Prism.highlightAll()
-  }, [value])
+  useHighlightPrism([value])
 
   useEffect(() => {
     controller.current.addEventListener('scroll', onScroll)

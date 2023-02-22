@@ -10,6 +10,8 @@ import { useViewportListener } from '../../viewport'
 import { ResizeHandle } from '../component/resizeHandle'
 import { TopBar } from './topBar'
 import { useDebugDetails } from './useDebugDetails'
+import { CogError } from '../../error'
+import { useHighlightPrism } from '../../api/memory/syntaxHighlighting'
 
 interface BrowserViewProps {
   status: TaskStatus
@@ -19,6 +21,7 @@ interface BrowserViewProps {
   addCard: (name: string) => void
   addIgnoredId: (id: string) => void
   ignoredIds: string[]
+  errors: CogError[]
 }
 
 const activeCollections = {
@@ -37,6 +40,7 @@ export const BrowserView = React.memo(
     status,
     source,
     report,
+    errors,
   }: BrowserViewProps) => {
     const viewport = useViewportListener()
     const [width, setWidth] = useState<number>(viewport.width * 66)
@@ -74,6 +78,9 @@ export const BrowserView = React.memo(
       () => activeCards.slice(lowerBound - 1, upperBound),
       [activeCards, lowerBound, upperBound]
     )
+    const showCards = activeCards.length > 0 && status !== 'error'
+
+    useHighlightPrism([result, revealDetails, visibleDetails])
 
     if (status == 'unstarted') {
       return null
@@ -89,6 +96,7 @@ export const BrowserView = React.memo(
         />
         <div className='column content'>
           <TopBar
+            errors={errors}
             source={source}
             status={status}
             report={report}
@@ -106,31 +114,30 @@ export const BrowserView = React.memo(
             pageSize={pageSize}
           />
 
-          {activeCards.length > 0 && displayType === 'cards' && (
+          {showCards && (
             <div className='result-container'>
-              {currentPage.map((card) => (
-                <CardView
-                  onAdd={() => addCard(card.data.name)}
-                  onIgnore={() => addIgnoredId(card.data.oracle_id)}
-                  key={card.data.id}
-                  card={card}
-                  revealDetails={revealDetails}
-                  visibleDetails={visibleDetails}
-                />
-              ))}
-            </div>
-          )}
-          {activeCards.length > 0 && displayType === 'json' && (
-            <div className='result-container'>
-              <pre>
-                <code>
-                  {JSON.stringify(
-                    result.map((it) => it.data),
-                    null,
-                    4
-                  )}
-                </code>
-              </pre>
+              {displayType === 'cards' &&
+                currentPage.map((card) => (
+                  <CardView
+                    onAdd={() => addCard(card.data.name)}
+                    onIgnore={() => addIgnoredId(card.data.oracle_id)}
+                    key={card.data.id}
+                    card={card}
+                    revealDetails={revealDetails}
+                    visibleDetails={visibleDetails}
+                  />
+                ))}
+              {displayType === 'json' && (
+                <pre>
+                  <code>
+                    {JSON.stringify(
+                      result.map((it) => it.data),
+                      null,
+                      4
+                    )}
+                  </code>
+                </pre>
+              )}
             </div>
           )}
         </div>
@@ -139,6 +146,7 @@ export const BrowserView = React.memo(
       <div className='results'>
         <div className='column content'>
           <TopBar
+            errors={errors}
             source={source}
             status={status}
             report={report}
@@ -156,7 +164,7 @@ export const BrowserView = React.memo(
             pageSize={pageSize}
           />
 
-          {activeCards.length > 0 && displayType === 'cards' && (
+          {showCards && (
             <>
               <div className='result-container'>
                 {currentPage.map((card) => (
@@ -169,8 +177,18 @@ export const BrowserView = React.memo(
                     visibleDetails={visibleDetails}
                   />
                 ))}
+                {displayType === 'json' && (
+                  <pre>
+                    <code>
+                      {JSON.stringify(
+                        result.map((it) => it.data),
+                        null,
+                        4
+                      )}
+                    </code>
+                  </pre>
+                )}
               </div>
-
               <div className='bottom-page-control'>
                 <PageControl
                   page={page}
@@ -180,19 +198,6 @@ export const BrowserView = React.memo(
                   cardCount={activeCards.length}
                 />
               </div>
-            </>
-          )}
-          {activeCards.length > 0 && displayType === 'json' && (
-            <>
-              <pre>
-                <code>
-                  {JSON.stringify(
-                    result.map((it) => it.data),
-                    null,
-                    4
-                  )}
-                </code>
-              </pre>
             </>
           )}
         </div>

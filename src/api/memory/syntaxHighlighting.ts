@@ -1,6 +1,8 @@
-import 'prismjs/components/prism-regex.js'
+import React from 'react'
 import Prism, { Environment, Grammar } from 'prismjs'
+import 'prismjs/components/prism-regex.js'
 import { syntaxDocs } from './syntaxDocs'
+import { OPERATORS } from './filter'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
 // todo: derive from syntaxdocs types
@@ -14,7 +16,7 @@ const keywordsToImplement =
 console.debug(
   `${keywordsToImplement.split('|').length} keywords to add to local syntax`
 )
-const operators = ':|=|!=|<>|<=|<|>=|>'
+const operators = Object.values(OPERATORS).join('|')
 
 // Anything defined by scryfall itself goes here
 export const scryfall: Grammar = {
@@ -107,4 +109,10 @@ export const linkWrap = (env: Environment) => {
 
     env.attributes.rel = 'noreferrer noopener'
   }
+}
+
+export const useHighlightPrism = (deps: any[]) => {
+  React.useLayoutEffect(() => {
+    Prism.highlightAll()
+  }, deps)
 }

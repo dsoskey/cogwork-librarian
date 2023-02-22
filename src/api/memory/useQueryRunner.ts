@@ -4,6 +4,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import { queryParser } from './parser'
 import {
   QueryRunner,
+  QueryRunnerFunc,
   QueryRunnerProps,
   weightAlgorithms,
 } from '../queryRunnerCommon'
@@ -12,6 +13,8 @@ import { Sort } from 'scryfall-sdk'
 import { parsePowTou } from './filter'
 import { useQueryCoordinator } from '../useQueryCoordinator'
 import { NormedCard, pickPrinting } from '../local/normedCard'
+import { err, errAsync, ok, okAsync, Result } from 'neverthrow'
+import { CogError, displayMessage, NearlyError } from '../../error'
 
 const sortFunc = (key: keyof typeof Sort): any => {
   switch (key) {
@@ -42,13 +45,26 @@ export const useMemoryQueryRunner = ({
   injectPrefix,
   corpus,
 }: MemoryQueryRunnerProps): QueryRunner => {
-  const { status, report, cache, result, rawData, execute } =
+  const { status, report, cache, result, rawData, execute, errors } =
     useQueryCoordinator()
 
   const getCards = useCallback(
-    (query: string, options: SearchOptions) => {
+    (
+      query: string,
+      index: number,
+      options: SearchOptions
+    ): Result<Card[], CogError> => {
       const parser = queryParser()
-      parser.feed(query)
+      try {
+        parser.feed(query)
+      } catch (error) {
+        const { message } = error as NearlyError
+        return err({
+          query,
+          debugMessage: message,
+          displayMessage: displayMessage(query, index, error),
+        })
+      }
       console.debug(`parsed ${parser.results}`)
       const filtered = corpus.filter(parser.results[0])
       const sorted = sortBy(filtered, [sortFunc(options.order), 'name'])
@@ -67,12 +83,12 @@ export const useMemoryQueryRunner = ({
       } else if (options.dir === 'desc') {
         sorted.reverse()
       }
-      return sorted.flatMap(pickPrinting)
+      return ok(sorted.flatMap(pickPrinting))
     },
     [corpus]
   )
 
-  const runQuery = async (
+  const runQuery: QueryRunnerFunc = (
     query: string,
     index: number,
     options: SearchOptions
@@ -82,9 +98,16 @@ export const useMemoryQueryRunner = ({
     const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
     rawData.current[preparedQuery] = []
     if (cache.current[_cacheKey] === undefined) {
-      cache.current[_cacheKey] = []
+      // TODO: remove try catch when getCards no longer can throw
       try {
-        const cards = getCards(preparedQuery, options).map((card: Card) => ({
+        const cardResult = getCards(preparedQuery, index, options)
+        if (cardResult.isErr()) {
+          report.addError()
+          return errAsync(cardResult.error)
+        }
+
+        cache.current[_cacheKey] = []
+        const cards = cardResult.value.map((card: Card) => ({
           data: card,
           weight,
           matchedQueries: [query],
@@ -93,18 +116,21 @@ export const useMemoryQueryRunner = ({
         cache.current[_cacheKey] = cards
         report.addCardCount(cards.length)
         report.addComplete()
-        return preparedQuery
       } catch (error) {
         console.log(error)
         report.addError()
-        throw error
+        return errAsync({
+          query: preparedQuery,
+          displayMessage: error.toLocaleString(),
+          debugMessage: error.toLocaleString(),
+        })
       }
     } else {
       rawData.current[preparedQuery] = cloneDeep(cache.current[_cacheKey])
       report.addCardCount(rawData.current[preparedQuery].length)
       report.addComplete()
-      return preparedQuery
     }
+    return okAsync(preparedQuery)
   }
 
   return {
@@ -112,5 +138,6 @@ export const useMemoryQueryRunner = ({
     result,
     status,
     report,
+    errors,
   }
 }
