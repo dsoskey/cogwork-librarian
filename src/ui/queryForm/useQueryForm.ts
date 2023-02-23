@@ -1,13 +1,11 @@
 import { SearchOptions } from 'scryfall-sdk'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { Setter } from '../../types'
-import times from 'lodash/times'
-import { displayQueries } from '../../api/queries'
+import { QueryExample } from '../../api/example'
 
 interface QueryFormProps {
-  initialQueries?: string[] | (() => string[])
   initialOptions?: SearchOptions | (() => SearchOptions)
-  initialPrefix?: string | (() => string)
+  example: () => QueryExample
 }
 
 export interface QueryFormFields {
@@ -22,27 +20,23 @@ interface QueryFormState extends QueryFormFields {
 }
 
 export const useQueryForm = ({
-  initialQueries = () => {
-    const queries = times(Math.random() * 2 + 3, () =>
-      Math.round(Math.random() * displayQueries.length)
-    ).map((index) => displayQueries[index])
-    return Array.from(new Set(queries))
-  },
   initialOptions = {
     order: 'cmc',
     dir: 'auto',
   },
-  initialPrefix = '-is:token',
+  example,
 }: QueryFormProps): QueryFormState => {
+  const _ex = example()
+  console.log(_ex)
   const [options, setOptions] = useLocalStorage<SearchOptions>(
     'search-options',
     initialOptions
   )
   const [queries, setQueries] = useLocalStorage<string[]>(
     'queries',
-    initialQueries
+    _ex.queries
   )
-  const [prefix, setPrefix] = useLocalStorage<string>('prefix', initialPrefix)
+  const [prefix, setPrefix] = useLocalStorage<string>('prefix', _ex.prefix)
 
   return { options, setOptions, queries, setQueries, prefix, setPrefix }
 }

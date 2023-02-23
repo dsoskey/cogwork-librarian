@@ -17,6 +17,8 @@ import { useViewportListener } from './viewport'
 import { SavedCards } from './ui/savedCards'
 import { DatabaseSettings } from './ui/queryForm/databaseSettings'
 import { CoglibIcon } from './api/memory/coglibIcon'
+import { queryExamples } from './api/example'
+import _random from 'lodash/random'
 
 export const App = () => {
   const {
@@ -35,7 +37,9 @@ export const App = () => {
     useProject()
 
   const { queries, setQueries, options, setOptions, prefix, setPrefix } =
-    useQueryForm({})
+    useQueryForm({
+      example: () => queryExamples[_random(queryExamples.length - 1)]
+    })
   const injectPrefix = useCallback(_injectPrefix(prefix), [prefix])
 
   const queryRunner = {

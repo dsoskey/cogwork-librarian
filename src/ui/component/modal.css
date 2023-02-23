@@ -5,9 +5,6 @@
   color: var(--dark-color);
   width: 80%;
   max-height: 80%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   overflow-y: scroll;
 }
 

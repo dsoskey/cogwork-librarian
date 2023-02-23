@@ -20,7 +20,9 @@ export const useLocalStorage = <T>(
       // Get from local storage by key
       const item = window.localStorage.getItem(`${key}.coglib.sosk.watch`)
       // Parse stored json or if none return initialValue
-      return item ? construct(JSON.parse(item)) : lazyVal()
+      const result = item ? construct(JSON.parse(item)) : lazyVal()
+      window.localStorage.setItem(`${key}.coglib.sosk.watch`, JSON.stringify(result))
+      return result
     } catch (error) {
       // If error also return initialValue
       console.log(error)
