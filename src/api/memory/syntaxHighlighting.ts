@@ -8,9 +8,9 @@ export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
 // todo: derive from syntaxdocs types
 const keywords =
   'keyword|manavalue|mv|cmc|name|color|ci|c|id|identity|oracle|o|text|type|power|pow|toughness|tou|loyalty|loy|layout|is|t|' +
-  'mana|m|fo|banned|restricted|format|f'
+  'mana|m|banned|restricted|format|fo|f|rarity|r|set|edition|st|s|e'
 const keywordsToImplement =
-  'devotion|produces|powtou|pt|rarity|r|include|set|edition|s|e|in|number|cn|st|cube|usd|eur|tix|' +
+  'devotion|produces|powtou|pt|include|in|number|cn|cube|usd|eur|tix|' +
   'artist|a|has|watermark|wm|flavor|ft|border|stamp|year|date|art|atag|arttag|function|otag|oracletag|not|language|lang|' +
   'unique|order|direction|prefer'
 console.debug(

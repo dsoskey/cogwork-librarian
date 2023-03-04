@@ -27,9 +27,10 @@ export const CardView = ({
 }: CardViewProps) => {
   const [flipped, setFlipped] = useState(false)
   const _card = card.data
+  const version = 'normal'
   const imageSource = flipped
-    ? getBackImageURI(_card, 'normal')
-    : _card.image_uris?.normal ?? _card.getFrontImageURI('normal')
+    ? getBackImageURI(_card, version)
+    : _card.image_uris?.normal ?? _card.getFrontImageURI(version)
 
   return (
     <div className='card-view'>
@@ -43,6 +44,9 @@ export const CardView = ({
           src={imageSource}
           alt={card.data.name}
           title={card.data.name}
+          onError={() => {
+            // load local backup
+          }}
         />
       </a>
       <div className='add-button'>

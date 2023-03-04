@@ -3,6 +3,7 @@ import { ObjectValues } from '../../types'
 import _groupBy from 'lodash/groupBy'
 import _pick from 'lodash/pick'
 import _omit from 'lodash/omit'
+import { Filter } from '../memory/filterBase'
 
 const PRINT_KEYS = {
   arena_id: 'arena_id',
@@ -80,12 +81,13 @@ export const pickPrinting = ({ printings, ...rest }: NormedCard): Card => {
   })
 }
 
-export const allPrintings = ({ printings, ...rest }: NormedCard): Card[] => {
-  console.log(printings)
-  return printings.map((it) =>
-    Card.construct(<Card>{
-      ...rest,
-      ...it,
-    })
-  )
-}
+export const allPrintings =
+  (filterFunc: Filter<Printing>) =>
+  ({ printings, ...rest }: NormedCard): Card[] => {
+    return printings.filter(filterFunc).map((it) =>
+      Card.construct(<Card>{
+        ...rest,
+        ...it,
+      })
+    )
+  }

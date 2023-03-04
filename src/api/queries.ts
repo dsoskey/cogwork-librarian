@@ -62,6 +62,10 @@ export const testQueries = [
   'banned:modern',
   'restricted:vintage',
   'is:spell',
+  'r:rare',
+  'rarity:r',
+  'set:m11',
+  'edition:m12',
 ]
 
 const unimplementedQueries = [
@@ -72,10 +76,6 @@ const unimplementedQueries = [
   'is:party',
   'is:historic',
   'include:extras', // this one seems to be processed separately?
-  'r:rare',
-  'rarity:r',
-  'set:m11',
-  'edition:m12',
   'in:rare',
   'number:69',
   'st:funny',

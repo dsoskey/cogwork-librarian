@@ -38,7 +38,7 @@ export const App = () => {
 
   const { queries, setQueries, options, setOptions, prefix, setPrefix } =
     useQueryForm({
-      example: () => queryExamples[_random(queryExamples.length - 1)]
+      example: () => queryExamples[_random(queryExamples.length - 1)],
     })
   const injectPrefix = useCallback(_injectPrefix(prefix), [prefix])
 

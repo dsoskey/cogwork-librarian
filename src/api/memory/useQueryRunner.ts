@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { Card, SearchOptions } from 'scryfall-sdk/out/api/Cards'
 import cloneDeep from 'lodash/cloneDeep'
-import { queryParser } from './parser'
+import { printingParser, queryParser } from './parser'
 import {
   QueryRunner,
   QueryRunnerFunc,
@@ -12,7 +12,7 @@ import { sortBy } from 'lodash'
 import { Sort } from 'scryfall-sdk'
 import { parsePowTou } from './filter'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { NormedCard, pickPrinting } from '../local/normedCard'
+import { allPrintings, NormedCard } from '../local/normedCard'
 import { err, errAsync, ok, okAsync, Result } from 'neverthrow'
 import { CogError, displayMessage, NearlyError } from '../../error'
 
@@ -83,7 +83,18 @@ export const useMemoryQueryRunner = ({
       } else if (options.dir === 'desc') {
         sorted.reverse()
       }
-      return ok(sorted.flatMap(pickPrinting))
+      const printParser = printingParser()
+      try {
+        printParser.feed(query)
+      } catch (error) {
+        const { message } = error as NearlyError
+        return err({
+          query,
+          debugMessage: message,
+          displayMessage: displayMessage(query, index, error),
+        })
+      }
+      return ok(sorted.flatMap(allPrintings(printParser.results[0])))
     },
     [corpus]
   )
