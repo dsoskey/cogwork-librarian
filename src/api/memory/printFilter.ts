@@ -1,6 +1,6 @@
 import { identity, and, or, not, Filter } from './filterBase'
 import { Printing } from '../local/normedCard'
-import { Operator } from './filter'
+import { Operator } from './oracleFilter'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'
 
 const rarityFilter =

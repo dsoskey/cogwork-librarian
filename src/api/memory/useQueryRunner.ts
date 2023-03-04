@@ -10,7 +10,7 @@ import {
 } from '../queryRunnerCommon'
 import { sortBy } from 'lodash'
 import { Sort } from 'scryfall-sdk'
-import { parsePowTou } from './filter'
+import { parsePowTou } from './oracleFilter'
 import { useQueryCoordinator } from '../useQueryCoordinator'
 import { allPrintings, NormedCard } from '../local/normedCard'
 import { err, errAsync, ok, okAsync, Result } from 'neverthrow'

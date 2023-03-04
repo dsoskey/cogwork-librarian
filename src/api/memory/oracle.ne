@@ -3,7 +3,7 @@
 @builtin "string.ne"
 
 @{%
-const { oracleFilters } = require('./filter')
+const { oracleFilters } = require('./oracleFilter')
 %}
 
 main -> filterStart {% id %}

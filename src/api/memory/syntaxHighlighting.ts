@@ -2,7 +2,7 @@ import React from 'react'
 import Prism, { Environment, Grammar } from 'prismjs'
 import 'prismjs/components/prism-regex.js'
 import { syntaxDocs } from './syntaxDocs'
-import { OPERATORS } from './filter'
+import { OPERATORS } from './oracleFilter'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
 // todo: derive from syntaxdocs types
