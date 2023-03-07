@@ -12,9 +12,11 @@ import { sortBy } from 'lodash'
 import { Sort } from 'scryfall-sdk'
 import { parsePowTou } from './oracleFilter'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { allPrintings, NormedCard } from '../local/normedCard'
+import { allPrintings, NormedCard, pickPrinting } from '../local/normedCard'
 import { err, errAsync, ok, okAsync, Result } from 'neverthrow'
 import { CogError, displayMessage, NearlyError } from '../../error'
+import { FilterRes } from './filterBase'
+import { printFilterNames } from './printFilter'
 
 const sortFunc = (key: keyof typeof Sort): any => {
   switch (key) {
@@ -48,6 +50,10 @@ export const useMemoryQueryRunner = ({
   const { status, report, cache, result, rawData, execute, errors } =
     useQueryCoordinator()
 
+  // parse query
+  // filter normedCards
+  // filter prints
+  // sort
   const getCards = useCallback(
     (
       query: string,
@@ -56,17 +62,34 @@ export const useMemoryQueryRunner = ({
     ): Result<Card[], CogError> => {
       const parser = queryParser()
       try {
+        console.debug(`feeding ${query}`)
         parser.feed(query)
+        console.debug(`parsed`)
+        console.debug(parser.results)
+        if (parser.results.length > 1) {
+          const uniqueParses = new Set<string>(
+            parser.results.map((it) => {
+              return it.filtersUsed.toString()
+            })
+          )
+          if (uniqueParses.size > 1) {
+            console.warn('ambiguous parse!')
+          }
+        }
       } catch (error) {
         const { message } = error as NearlyError
+        console.log(message)
         return err({
           query,
           debugMessage: message,
           displayMessage: displayMessage(query, index, error),
         })
       }
-      console.debug(`parsed ${parser.results}`)
-      const filtered = corpus.filter(parser.results[0])
+
+      const { filterFunc, filtersUsed } = parser
+        .results[0] as FilterRes<NormedCard>
+      const filtered = corpus.filter(filterFunc)
+      // Sort should be done after picking prints once we have print-specific sorting
       const sorted = sortBy(filtered, [sortFunc(options.order), 'name'])
       if (options.dir === 'auto') {
         switch (options.order) {
@@ -83,6 +106,7 @@ export const useMemoryQueryRunner = ({
       } else if (options.dir === 'desc') {
         sorted.reverse()
       }
+
       const printParser = printingParser()
       try {
         printParser.feed(query)
@@ -94,7 +118,12 @@ export const useMemoryQueryRunner = ({
           displayMessage: displayMessage(query, index, error),
         })
       }
-      return ok(sorted.flatMap(allPrintings(printParser.results[0])))
+      const printFilterFunc = filtersUsed.filter((it) =>
+        printFilterNames.has(it)
+      ).length
+        ? allPrintings(printParser.results[0].filterFunc)
+        : pickPrinting
+      return ok(sorted.flatMap(printFilterFunc))
     },
     [corpus]
   )

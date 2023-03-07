@@ -13,7 +13,7 @@ import {
 import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
 import { NormedCard, OracleKeys } from '../local/normedCard'
 import { ObjectValues } from '../../types'
-import { identity, and, or, not, Filter } from './filterBase'
+import { not, Filter, andRes, identityRes, orRes, notRes } from './filterBase'
 import { printFilters } from './printFilter'
 
 export const EQ_OPERATORS = {
@@ -486,21 +486,38 @@ const rarityFilter =
   (it: NormedCard) =>
     it.printings.find(printFilters.rarityFilter(operator, value)) !== undefined
 
+// IDEA: look out for a cool way to wrap these in the not
+const notRarityFilter =
+  (operator: Operator, value: string): Filter<NormedCard> =>
+  (it: NormedCard) =>
+    it.printings.find(not(printFilters.rarityFilter(operator, value))) !==
+    undefined
+
 const setFilter =
   (value: string): Filter<NormedCard> =>
   (it) =>
     it.printings.find(printFilters.setFilter(value)) !== undefined
+
+const notSetFilter =
+  (value: string): Filter<NormedCard> =>
+  (it) =>
+    it.printings.find(not(printFilters.setFilter(value))) !== undefined
 
 const setTypeFilter =
   (value: string): Filter<NormedCard> =>
   (it) =>
     it.printings.find(printFilters.setTypeFilter(value)) !== undefined
 
+const notSetTypeFilter =
+  (value: string): Filter<NormedCard> =>
+  (it) =>
+    it.printings.find(not(printFilters.setTypeFilter(value))) !== undefined
+
 export const oracleFilters = {
-  identity,
-  and,
-  or,
-  not,
+  identity: identityRes,
+  and: andRes,
+  or: orRes,
+  not: notRes,
   defaultOperation,
   powTouOperation,
   textMatch,
@@ -514,6 +531,9 @@ export const oracleFilters = {
   formatMatch,
   isVal,
   rarityFilter,
+  notRarityFilter,
   setFilter,
+  notSetFilter,
   setTypeFilter,
+  notSetTypeFilter,
 }

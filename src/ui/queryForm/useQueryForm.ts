@@ -27,7 +27,6 @@ export const useQueryForm = ({
   example,
 }: QueryFormProps): QueryFormState => {
   const _ex = example()
-  console.log(_ex)
   const [options, setOptions] = useLocalStorage<SearchOptions>(
     'search-options',
     initialOptions

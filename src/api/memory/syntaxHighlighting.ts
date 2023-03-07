@@ -10,9 +10,8 @@ const keywords =
   'keyword|manavalue|mv|cmc|name|color|ci|c|id|identity|oracle|o|text|type|power|pow|toughness|tou|loyalty|loy|layout|is|t|' +
   'mana|m|banned|restricted|format|fo|f|rarity|r|set|edition|st|s|e'
 const keywordsToImplement =
-  'devotion|produces|powtou|pt|include|in|number|cn|cube|usd|eur|tix|' +
-  'artist|a|has|watermark|wm|flavor|ft|border|stamp|year|date|art|atag|arttag|function|otag|oracletag|not|language|lang|' +
-  'unique|order|direction|prefer'
+  'devotion|produces|powtou|pt|include|in|number|cn|cube|usd|eur|tix|unique|order|direction|prefer|' +
+  'artist|a|has|watermark|wm|flavor|ft|border|stamp|year|date|art|atag|arttag|function|otag|oracletag|not|language|lang'
 console.debug(
   `${keywordsToImplement.split('|').length} keywords to add to local syntax`
 )
