@@ -1,40 +1,36 @@
 import React from 'react'
 import Prism, { Environment, Grammar } from 'prismjs'
 import 'prismjs/components/prism-regex.js'
-import { syntaxDocs } from './syntaxDocs'
+import { keywords, keywordsToImplement, syntaxDocs } from './syntaxDocs'
 import { OPERATORS } from './oracleFilter'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
-// todo: derive from syntaxdocs types
-const keywords =
-  'keyword|manavalue|mv|cmc|name|color|ci|c|id|identity|oracle|o|text|type|power|pow|toughness|tou|loyalty|loy|layout|is|t|' +
-  'mana|m|banned|restricted|format|fo|f|rarity|r|set|edition|st|s|e'
-const keywordsToImplement =
-  'devotion|produces|powtou|pt|include|in|number|cn|cube|usd|eur|tix|unique|order|direction|prefer|' +
-  'artist|a|has|watermark|wm|flavor|ft|border|stamp|year|date|art|atag|arttag|function|otag|oracletag|not|language|lang'
+const keywordRegex = Object.values(keywords).join('|')
+const toImplementRegex = Object.values(keywordsToImplement).join('|')
+
 console.debug(
-  `${keywordsToImplement.split('|').length} keywords to add to local syntax`
+  `${Object.values(keywordsToImplement).length} keywords to add to local syntax`
 )
 const operators = Object.values(OPERATORS).join('|')
 
 // Anything defined by scryfall itself goes here
 export const scryfall: Grammar = {
   negation: {
-    pattern: new RegExp(`-(${keywords})(?=(${operators}))`, 'i'),
+    pattern: new RegExp(`-(${keywordRegex})(?=(${operators}))`, 'i'),
     alias: 'deleted',
     greedy: true,
   },
   'not-local-negation': {
-    pattern: new RegExp(`-(${keywordsToImplement})(?=(${operators}))`, 'i'),
+    pattern: new RegExp(`-(${toImplementRegex})(?=(${operators}))`, 'i'),
     alias: ['deleted', 'limited'],
     greedy: true,
   },
   keyword: {
-    pattern: new RegExp(`(^|\\b)(${keywords})(?=(${operators}))`, 'i'),
+    pattern: new RegExp(`(^|\\b)(${keywordRegex})(?=(${operators}))`, 'i'),
   },
   'not-local-keyword': {
     pattern: new RegExp(
-      `(^|\\b)(${keywordsToImplement})(?=(${operators}))`,
+      `(^|\\b)(${toImplementRegex})(?=(${operators}))`,
       'i'
     ),
     alias: ['keyword', 'limited'],
