@@ -13,7 +13,7 @@ import {
 import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
 import { NormedCard, OracleKeys } from '../local/normedCard'
 import { ObjectValues } from '../../types'
-import { not, Filter, andRes, identityRes, orRes, notRes } from './filterBase'
+import { not, Filter, andRes, identityRes, orRes, notRes, FilterRes } from './filterBase'
 import { printFilters } from './printFilter'
 
 export const EQ_OPERATORS = {
@@ -528,6 +528,23 @@ const notArtistFilter =
   (it) =>
     it.printings.find(not(printFilters.artistFilter(value))) !== undefined
 
+const collectorNumberFilter = (operator: Operator, value: number): FilterRes<NormedCard> => ({
+    filtersUsed: ["collector-number"],
+    filterFunc: (it) => it.printings
+      .find(printFilters.collectorNumberFilter(operator, value)) !== undefined,
+    inverseFunc: (it) => it.printings
+      .find(not(printFilters.collectorNumberFilter(operator, value))) !== undefined,
+  })
+
+const borderFilter =
+  (value: string): FilterRes<NormedCard> => ({
+    filtersUsed: ["border"],
+    filterFunc: (it) => it.printings
+      .find(printFilters.borderFilter(value)) !== undefined,
+    inverseFunc: (it) => it.printings
+      .find(not(printFilters.borderFilter(value))) !== undefined,
+  })
+
 export const oracleFilters = {
   identity: identityRes,
   and: andRes,
@@ -554,4 +571,6 @@ export const oracleFilters = {
   notSetTypeFilter,
   artistFilter,
   notArtistFilter,
+  collectorNumberFilter,
+  borderFilter,
 }

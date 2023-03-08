@@ -5,6 +5,7 @@ export const keywords = {
   artist: 'artist',
   banned: 'banned',
   c: 'c',
+  cn: 'cn',
   ci: 'ci',
   commander: 'commander',
   cmc: 'cmc',
@@ -46,13 +47,12 @@ export const keywords = {
 } as const
 
 export const keywordsToImplement = {
-  art: 'art',
-  arttag: 'arttag',
-  atag: 'atag',
+  // Requires tagging data
+  art: 'art', arttag: 'arttag', atag: 'atag',
   border: 'border',
-  b: 'b',
-  block: 'block',
-  cn: 'cn',
+  // Requires set data
+  b: 'b', block: 'block',
+  // Could be cool for loading a custom cube list
   cube: 'cube',
   date: 'date',
   devotion: 'devotion',

@@ -76,12 +76,16 @@ export const normCardList = (cardList: Card[]): NormedCard[] => {
 
 export const findPrinting =
   (filterFunc: Filter<Printing>) =>
-    ({ printings, ...rest }: NormedCard): Card => {
-      return Card.construct(<Card>{
-          ...rest,
-          ...(printings.find(filterFunc) ?? printings[0]),
-        }
-      )
+    ({ printings, ...rest }: NormedCard): Card | undefined => {
+      const maybePrint = printings.find(filterFunc)
+      if (maybePrint !== undefined) {
+        return Card.construct(<Card>{
+            ...rest,
+            ...maybePrint,
+          }
+        )
+      }
+      return undefined
     }
 
 export const allPrintings =

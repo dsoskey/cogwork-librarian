@@ -51,6 +51,33 @@ const artistFilter =
   (value: string): Filter<Printing> =>
   (it) => it.artist.toLowerCase().includes(value)
 
+const collectorNumberFilter =
+  (operator: Operator, value: number): Filter<Printing> =>
+  (it) => {
+    const printCN = parseInt(it.collector_number, 10)
+
+    switch (operator) {
+      case '=':
+      case ':':
+        return printCN === value
+      case '!=':
+      case '<>':
+        return printCN !== value
+      case '>':
+        return printCN > value
+      case '>=':
+        return printCN >= value
+      case '<':
+        return printCN < value
+      case '<=':
+        return printCN <= value
+    }
+  }
+
+const borderFilter =
+  (value: string): Filter<Printing> =>
+  (it) => it.border_color === value
+
 export const printFilters = {
   identity: identityRes,
   and: andRes,
@@ -61,4 +88,6 @@ export const printFilters = {
   setTypeFilter,
   artistFilter,
   oracleFilter,
+  collectorNumberFilter,
+  borderFilter,
 }

@@ -66,6 +66,7 @@ export const testQueries = [
   'rarity:r',
   'set:m11',
   'edition:m12',
+  'border:white cn:69',
 ]
 
 const unimplementedQueries = [

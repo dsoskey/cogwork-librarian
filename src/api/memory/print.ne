@@ -60,7 +60,9 @@ condition -> (
     rarityCondition |
     setCondition |
     setTypeCondition |
-    artistCondition
+    artistCondition |
+    borderCondition |
+    collectorNumberCondition
 ) {% ([[condition]]) => condition %}
 
 cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
@@ -112,5 +114,16 @@ artistCondition -> ("a"i | "artist"i) equalityOperator stringValue
         filterFunc: printFilters.artistFilter(value)
     }) %}
 
+collectorNumberCondition -> "cn"i anyOperator integerValue
+    {% ([_, [operator], value]) => ({
+        filtersUsed: [],
+        filterFunc: printFilters.collectorNumberFilter(operator, value),
+    }) %}
+
+borderCondition -> "border"i equalityOperator stringValue
+    {% ([_, [operator], value]) => ({
+        filtersUsed: [],
+        filterFunc: printFilters.borderFilter(value),
+    }) %}
 
 @include "./values.ne"

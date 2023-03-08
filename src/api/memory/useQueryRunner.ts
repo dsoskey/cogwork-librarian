@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { Card, SearchOptions } from 'scryfall-sdk/out/api/Cards'
 import cloneDeep from 'lodash/cloneDeep'
 import { printingParser, queryParser } from './parser'
@@ -50,82 +49,85 @@ export const useMemoryQueryRunner = ({
   const { status, report, cache, result, rawData, execute, errors } =
     useQueryCoordinator()
 
-  // parse query
-  // filter normedCards
-  // filter prints
-  // sort
-  const getCards = useCallback(
-    (
-      query: string,
-      index: number,
-      options: SearchOptions
-    ): Result<Card[], CogError> => {
-      const parser = queryParser()
-      try {
-        console.debug(`feeding ${query}`)
-        parser.feed(query)
-        console.debug(`parsed`)
-        console.debug(parser.results)
-        if (parser.results.length > 1) {
-          const uniqueParses = new Set<string>(
-            parser.results.map((it) => {
-              return it.filtersUsed.toString()
-            })
-          )
-          if (uniqueParses.size > 1) {
-            console.warn('ambiguous parse!')
-          }
+  const getCards = (
+    query: string,
+    index: number,
+    options: SearchOptions
+  ): Result<Card[], CogError> => {
+    // parse query
+    const parser = queryParser()
+    try {
+      console.debug(`feeding ${query}`)
+      parser.feed(query)
+      console.debug(`parsed`)
+      console.debug(parser.results)
+      if (parser.results.length > 1) {
+        const uniqueParses = new Set<string>(
+          parser.results.map((it) => {
+            return it.filtersUsed.toString()
+          })
+        )
+        if (uniqueParses.size > 1) {
+          console.warn('ambiguous parse!')
         }
-      } catch (error) {
-        const { message } = error as NearlyError
-        console.log(message)
-        return err({
-          query,
-          debugMessage: message,
-          displayMessage: displayMessage(query, index, error),
-        })
       }
+    } catch (error) {
+      const { message } = error as NearlyError
+      console.log(message)
+      return err({
+        query,
+        debugMessage: message,
+        displayMessage: displayMessage(query, index, error),
+      })
+    }
 
-      const { filterFunc, filtersUsed } = parser
-        .results[0] as FilterRes<NormedCard>
-      const filtered = corpus.filter(filterFunc)
-      // Sort should be done after picking prints once we have print-specific sorting
-      const sorted = sortBy(filtered, [sortFunc(options.order), 'name'])
-      if (options.dir === 'auto') {
-        switch (options.order) {
-          case 'usd':
-          case 'tix':
-          case 'eur':
-          case 'edhrec':
-            sorted.reverse()
-            break
-          case 'released':
-          default:
-            break
-        }
-      } else if (options.dir === 'desc') {
-        sorted.reverse()
-      }
+    // filter normedCards
+    const { filterFunc, filtersUsed } = parser
+      .results[0] as FilterRes<NormedCard>
+    const filtered = corpus.filter(filterFunc)
 
-      const printParser = printingParser()
-      try {
-        printParser.feed(query)
-      } catch (error) {
-        const { message } = error as NearlyError
-        return err({
-          query,
-          debugMessage: message,
-          displayMessage: displayMessage(query, index, error),
-        })
+    // parse print logic
+    const printParser = printingParser()
+    try {
+      printParser.feed(query)
+    } catch (error) {
+      const { message } = error as NearlyError
+      return err({
+        query,
+        debugMessage: message,
+        displayMessage: displayMessage(query, index, error),
+      })
+    }
+    const printFilterFunc = filtersUsed
+      .filter((it) => showAllFilter.has(it)).length
+      ? allPrintings
+      : findPrinting
+
+    // filter prints
+    const printFiltered: Card[] = filtered
+      .flatMap(printFilterFunc(printParser.results[0].filterFunc))
+      .filter(it => it !== undefined)
+
+    // sort
+    const sorted = sortBy(printFiltered, [sortFunc(options.order), 'name']) as Card[]
+    if (options.dir === 'auto') {
+      switch (options.order) {
+        case 'usd':
+        case 'tix':
+        case 'eur':
+        case 'edhrec':
+          sorted.reverse()
+          break
+        case 'released':
+        default:
+          break
       }
-      const printFilterFunc = filtersUsed
-        .filter((it) => showAllFilter.has(it)).length
-          ? allPrintings
-          : findPrinting
-      return ok(sorted.flatMap(printFilterFunc(printParser.results[0].filterFunc)))
-    },
-    [corpus]
-  )
+    } else if (options.dir === 'desc') {
+      sorted.reverse()
+    }
+
+    return ok(sorted)
+  }
 
   const runQuery: QueryRunnerFunc = (
     query: string,
