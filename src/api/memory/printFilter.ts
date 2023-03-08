@@ -11,7 +11,7 @@ import { Printing } from '../local/normedCard'
 import { Operator } from './oracleFilter'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'
 
-export const printFilterNames = new Set(['rarity', 'set', 'setType'])
+export const showAllFilter = new Set(['rarity', 'set', 'setType'])
 
 const oracleFilter = (): FilterRes<Printing> => ({
   ...identityRes(),
@@ -41,13 +41,15 @@ const rarityFilter =
 
 const setFilter =
   (value: string): Filter<Printing> =>
-  (it) =>
-    it.set === value || it.set_name.toLowerCase() === value
+  (it) => it.set === value || it.set_name.toLowerCase() === value
 
 const setTypeFilter =
   (value: string): Filter<Printing> =>
-  (it) =>
-    it.set_type === value
+  (it) => it.set_type === value
+
+const artistFilter =
+  (value: string): Filter<Printing> =>
+  (it) => it.artist.toLowerCase().includes(value)
 
 export const printFilters = {
   identity: identityRes,
@@ -57,5 +59,6 @@ export const printFilters = {
   rarityFilter,
   setFilter,
   setTypeFilter,
+  artistFilter,
   oracleFilter,
 }

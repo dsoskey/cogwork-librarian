@@ -12,11 +12,11 @@ import { sortBy } from 'lodash'
 import { Sort } from 'scryfall-sdk'
 import { parsePowTou } from './oracleFilter'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { allPrintings, NormedCard, pickPrinting } from '../local/normedCard'
+import { allPrintings, findPrinting, NormedCard } from '../local/normedCard'
 import { err, errAsync, ok, okAsync, Result } from 'neverthrow'
 import { CogError, displayMessage, NearlyError } from '../../error'
 import { FilterRes } from './filterBase'
-import { printFilterNames } from './printFilter'
+import { showAllFilter } from './printFilter'
 
 const sortFunc = (key: keyof typeof Sort): any => {
   switch (key) {
@@ -118,12 +118,11 @@ export const useMemoryQueryRunner = ({
           displayMessage: displayMessage(query, index, error),
         })
       }
-      const printFilterFunc = filtersUsed.filter((it) =>
-        printFilterNames.has(it)
-      ).length
-        ? allPrintings(printParser.results[0].filterFunc)
-        : pickPrinting
-      return ok(sorted.flatMap(printFilterFunc))
+      const printFilterFunc = filtersUsed
+        .filter((it) => showAllFilter.has(it)).length
+          ? allPrintings
+          : findPrinting
+      return ok(sorted.flatMap(printFilterFunc(printParser.results[0].filterFunc)))
     },
     [corpus]
   )

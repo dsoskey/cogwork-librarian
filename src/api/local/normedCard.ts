@@ -74,12 +74,15 @@ export const normCardList = (cardList: Card[]): NormedCard[] => {
   }))
 }
 
-export const pickPrinting = ({ printings, ...rest }: NormedCard): Card => {
-  return Card.construct(<Card>{
-    ...rest,
-    ...printings[0],
-  })
-}
+export const findPrinting =
+  (filterFunc: Filter<Printing>) =>
+    ({ printings, ...rest }: NormedCard): Card => {
+      return Card.construct(<Card>{
+          ...rest,
+          ...(printings.find(filterFunc) ?? printings[0]),
+        }
+      )
+    }
 
 export const allPrintings =
   (filterFunc: Filter<Printing>) =>

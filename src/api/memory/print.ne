@@ -53,11 +53,14 @@ condition -> (
     formatCondition |
     bannedCondition |
     restrictedCondition |
-    isCondition
+    isCondition |
+    notCondition |
+    inCondition
 ) {% () => printFilters.oracleFilter() %} | (
     rarityCondition |
     setCondition |
-    setTypeCondition
+    setTypeCondition |
+    artistCondition
 ) {% ([[condition]]) => condition %}
 
 cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
@@ -81,6 +84,8 @@ formatCondition -> ("format"i | "f"i) equalityOperator formatValue
 bannedCondition -> "banned"i equalityOperator formatValue
 restrictedCondition -> "restricted"i equalityOperator formatValue
 isCondition -> "is"i ":" isValue
+notCondition -> "not"i ":" isValue
+inCondition -> "in"i ":" stringValue
 
 # print-specific
 rarityCondition ->  ("r"i | "rarity"i) anyOperator rarityValue
@@ -100,5 +105,12 @@ setTypeCondition -> "st"i equalityOperator stringValue
         filtersUsed: [],
         filterFunc: printFilters.setTypeFilter(value)
     }) %}
+
+artistCondition -> ("a"i | "artist"i) equalityOperator stringValue
+    {% ([_, [operator], value]) => ({
+        filtersUsed: [],
+        filterFunc: printFilters.artistFilter(value)
+    }) %}
+
 
 @include "./values.ne"

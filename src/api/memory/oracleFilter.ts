@@ -481,6 +481,11 @@ const isVal =
     }
   }
 
+const inFilter =
+  (value: string): Filter<NormedCard> =>
+    (it) =>
+      it.printings.filter(printFilters.setFilter(value)).length > 0
+
 const rarityFilter =
   (operator: Operator, value: string): Filter<NormedCard> =>
   (it: NormedCard) =>
@@ -513,6 +518,16 @@ const notSetTypeFilter =
   (it) =>
     it.printings.find(not(printFilters.setTypeFilter(value))) !== undefined
 
+const artistFilter =
+  (value: string): Filter<NormedCard> =>
+  (it) =>
+    it.printings.find(printFilters.artistFilter(value)) !== undefined
+
+const notArtistFilter =
+  (value: string): Filter<NormedCard> =>
+  (it) =>
+    it.printings.find(not(printFilters.artistFilter(value))) !== undefined
+
 export const oracleFilters = {
   identity: identityRes,
   and: andRes,
@@ -530,10 +545,13 @@ export const oracleFilters = {
   manaCostMatch,
   formatMatch,
   isVal,
+  inFilter,
   rarityFilter,
   notRarityFilter,
   setFilter,
   notSetFilter,
   setTypeFilter,
   notSetTypeFilter,
+  artistFilter,
+  notArtistFilter,
 }

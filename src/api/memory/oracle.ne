@@ -56,9 +56,12 @@ condition -> (
     bannedCondition |
     restrictedCondition |
     isCondition |
+    notCondition |
+    inCondition |
     rarityCondition |
     setCondition |
-    setTypeCondition
+    setTypeCondition |
+    artistCondition
 ) {% ([[condition]]) => condition %}
 
 
@@ -196,7 +199,21 @@ isCondition -> "is"i ":" isValue
         filterFunc: oracleFilters.isVal(value),
     }) %}
 
+notCondition -> "not"i ":" isValue
+    {% ([_, [operator], value]) => oracleFilters.not({
+        filtersUsed: ["is"],
+        filterFunc: oracleFilters.isVal(value),
+    }) %}
+
+inCondition -> "in"i ":" stringValue
+    {% ([_, [operator], value]) => ({
+        filtersUsed: ["in"],
+        filterFunc: oracleFilters.inFilter(value),
+    }) %}
+
+
 # print-matters
+# todo: oracleFilter defines the object structure that's returned
 rarityCondition -> ("r"i | "rarity"i) anyOperator rarityValue
     {% ([_, [operator], value]) => ({
         filtersUsed: ["rarity"],
@@ -216,6 +233,13 @@ setTypeCondition -> "st"i equalityOperator stringValue
         filtersUsed: ["set-type"],
         filterFunc: oracleFilters.setTypeFilter(value),
         inverseFunc: oracleFilters.notSetTypeFilter(value),
+    }) %}
+
+artistCondition -> ("a"i | "artist"i) equalityOperator stringValue
+    {% ([_, [operator], value]) => ({
+        filtersUsed: ["artist"],
+        filterFunc: oracleFilters.artistFilter(value),
+        inverseFunc: oracleFilters.notArtistFilter(value),
     }) %}
 
 @include "./values.ne"

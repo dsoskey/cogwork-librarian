@@ -1,6 +1,8 @@
 import { ObjectValues } from '../../types'
 
 export const keywords = {
+  a: 'a',
+  artist: 'artist',
   banned: 'banned',
   c: 'c',
   ci: 'ci',
@@ -15,6 +17,7 @@ export const keywords = {
   id: 'id',
   identity: 'identity',
   is: 'is',
+  in: 'in',
   keyword: 'keyword',
   layout: 'layout',
   loy: 'loy',
@@ -24,6 +27,7 @@ export const keywords = {
   manavalue: 'manavalue',
   mv: 'mv',
   name: 'name',
+  not: 'not',
   o: 'o',
   oracle: 'oracle',
   pow: 'pow',
@@ -42,9 +46,7 @@ export const keywords = {
 } as const
 
 export const keywordsToImplement = {
-  a: 'a',
   art: 'art',
-  artist: 'artist',
   arttag: 'arttag',
   atag: 'atag',
   border: 'border',
@@ -62,11 +64,9 @@ export const keywordsToImplement = {
   function: 'function',
   game: 'game',
   has: 'has',
-  in: 'in',
   include: 'include',
   lang: 'lang',
   language: 'language',
-  not: 'not',
   number: 'number',
   oracletag: 'oracletag',
   order: 'order',
