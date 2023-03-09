@@ -1,3 +1,5 @@
+import { Operator } from './oracleFilter'
+
 export type Filter<T> = (it: T) => boolean
 
 export interface FilterRes<T> {
@@ -71,5 +73,30 @@ export const notRes = <T>(clause: FilterRes<T>): FilterRes<T> => {
   return {
     filtersUsed: ['(', 'not', ...clause.filtersUsed, ')'],
     filterFunc: (c: T) => !clause.filterFunc(c),
+  }
+}
+
+/**
+ * left and right must be comparable using builtin operators
+ * @param left hand side of comparison
+ * @param operator to use in comparison
+ * @param right hand side of comparison
+ */
+export const defaultCompare = <T>(left: T, operator: Operator, right: T) => {
+  switch (operator) {
+    case '=':
+    case ':':
+      return left === right
+    case '!=':
+    case '<>':
+      return left !== right
+    case '>':
+      return left > right
+    case '>=':
+      return left >= right
+    case '<':
+      return left < right
+    case '<=':
+      return left <= right
   }
 }

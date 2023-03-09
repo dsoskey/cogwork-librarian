@@ -6,12 +6,13 @@ import {
   andRes,
   orRes,
   notRes,
+  defaultCompare,
 } from './filterBase'
 import { Printing } from '../local/normedCard'
 import { Operator } from './oracleFilter'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'
 
-export const showAllFilter = new Set(['date', 'rarity', 'set', 'setType'])
+export const showAllFilter = new Set(['date', 'rarity', 'set', 'setType', 'usd', 'eur', 'tix'])
 
 const oracleFilter = (): FilterRes<Printing> => ({
   ...identityRes(),
@@ -55,23 +56,7 @@ const collectorNumberFilter =
   (operator: Operator, value: number): Filter<Printing> =>
   (it) => {
     const printCN = parseInt(it.collector_number, 10)
-
-    switch (operator) {
-      case '=':
-      case ':':
-        return printCN === value
-      case '!=':
-      case '<>':
-        return printCN !== value
-      case '>':
-        return printCN > value
-      case '>=':
-        return printCN >= value
-      case '<':
-        return printCN < value
-      case '<=':
-        return printCN <= value
-    }
+    return defaultCompare(printCN, operator, value)
   }
 
 const borderFilter =
@@ -89,24 +74,19 @@ const dateFilter = (operator: Operator, value: string): Filter<Printing> => {
       throw `printing ${it.id} has a malformed released_at date. check your database for corruption.`
     }
 
-    switch (operator) {
-      case '=':
-      case ':':
-        return printDate === valueDate
-      case '!=':
-      case '<>':
-        return printDate !== valueDate
-      case '>':
-        return printDate > valueDate
-      case '>=':
-        return printDate >= valueDate
-      case '<':
-        return printDate < valueDate
-      case '<=':
-        return printDate <= valueDate
-    }
+    return defaultCompare(printDate, operator, valueDate)
   }
 }
+
+const priceFilter = (unit: string, operator: Operator, value: number): Filter<Printing> => (it) => {
+  const printPrice = it.prices[unit]
+  if (printPrice === null || printPrice === undefined) {
+    return false
+  }
+  // should this throw an error if value is NaN? this can happen for `tix<=`
+  return defaultCompare(Number.parseFloat(printPrice), operator, value)
+}
+
 export const printFilters = {
   identity: identityRes,
   and: andRes,
@@ -120,4 +100,5 @@ export const printFilters = {
   collectorNumberFilter,
   borderFilter,
   dateFilter,
+  priceFilter,
 }

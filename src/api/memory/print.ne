@@ -63,7 +63,8 @@ condition -> (
     artistCondition |
     borderCondition |
     collectorNumberCondition |
-    dateCondition
+    dateCondition |
+    priceCondition
 ) {% ([[condition]]) => condition %}
 
 cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
@@ -98,19 +99,19 @@ rarityCondition ->  ("r"i | "rarity"i) anyOperator rarityValue
     }) %}
 
 setCondition -> ("s"i | "set"i| "e"i | "edition"i) equalityOperator stringValue
-    {% ([_, [operator], value]) => ({
+    {% ([_, [_op], value]) => ({
         filtersUsed: [],
         filterFunc: printFilters.setFilter(value)
     }) %}
 
 setTypeCondition -> "st"i equalityOperator stringValue
-    {% ([_, [operator], value]) => ({
+    {% ([_, [_op], value]) => ({
         filtersUsed: [],
         filterFunc: printFilters.setTypeFilter(value)
     }) %}
 
 artistCondition -> ("a"i | "artist"i) equalityOperator stringValue
-    {% ([_, [operator], value]) => ({
+    {% ([_, [_op], value]) => ({
         filtersUsed: [],
         filterFunc: printFilters.artistFilter(value)
     }) %}
@@ -122,7 +123,7 @@ collectorNumberCondition -> "cn"i anyOperator integerValue
     }) %}
 
 borderCondition -> "border"i equalityOperator stringValue
-    {% ([_, [operator], value]) => ({
+    {% ([_, [_op], value]) => ({
         filtersUsed: [],
         filterFunc: printFilters.borderFilter(value),
     }) %}
@@ -131,6 +132,12 @@ dateCondition -> "date"i anyOperator stringValue
     {% ([_, [operator], value]) => ({
         filtersUsed: [],
         filterFunc: printFilters.dateFilter(operator, value),
+    })%}
+
+priceCondition -> ("usd"i | "eur"i | "tix"i) anyOperator numberValue
+    {% ([unit, [operator], value]) => ({
+        filtersUsed: [],
+        filterFunc: printFilters.priceFilter(unit, operator, value),
     })%}
 
 @include "./values.ne"

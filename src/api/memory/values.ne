@@ -6,6 +6,9 @@ regexString -> "/" [^/]:* "/"  {% function(d) {return d[1].join(""); } %}
 
 integerValue -> [0-9]:+ {% ([digits]) => parseInt(digits.join(''), 10) %}
 
+numberValue -> [0-9]:* ("." [0-9]:+):?
+    {% ([preDec, dec]) => parseFloat(`${preDec.flat().join('')}${dec?.flat().join('')}`) %}
+
 anyOperator -> ":" | "=" | "!=" | "<>" | "<=" | "<" | ">=" | ">" {% id %}
 
 equalityOperator -> ":" | "=" | "!=" | "<>" {% id %}

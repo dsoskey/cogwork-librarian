@@ -14,6 +14,7 @@ export const keywords = {
   date: 'date',
   e: 'e',
   edition: 'edition',
+  eur: 'eur',
   f: 'f',
   fo: 'fo',
   format: 'format',
@@ -43,9 +44,11 @@ export const keywords = {
   st: 'st',
   t: 't',
   text: 'text',
+  tix: 'tix',
   tou: 'tou',
   toughness: 'toughness',
   type: 'type',
+  usd: 'usd',
 } as const
 
 export const keywordsToImplement = {
@@ -57,7 +60,6 @@ export const keywordsToImplement = {
   cube: 'cube',
   devotion: 'devotion',
   direction: 'direction',
-  eur: 'eur',
   flavor: 'flavor',
   frame: 'frame',
   ft: 'ft',
@@ -76,9 +78,7 @@ export const keywordsToImplement = {
   produces: 'produces',
   pt: 'pt',
   stamp: 'stamp',
-  tix: 'tix',
   unique: 'unique',
-  usd: 'usd',
   watermark: 'watermark',
   wm: 'wm',
   year: 'year',

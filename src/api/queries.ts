@@ -69,6 +69,9 @@ export const testQueries = [
   'border:white cn:69',
   'not:promo',
   'date<=2015-08-18',
+  'usd>5',
+  'eur<1',
+  'tix>10',
 ]
 
 const unimplementedQueries = [
@@ -102,9 +105,6 @@ const unimplementedQueries = [
   'is:commander',
   'is:brawler',
   'is:companion',
-  'usd>5',
-  'eur<1',
-  'tix>10',
   'has:watermark',
   'flavor:banana',
   'wm:orzhov',

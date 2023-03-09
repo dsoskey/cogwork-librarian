@@ -536,6 +536,15 @@ const dateFilter =
       .find(not(printFilters.dateFilter(operator, value))) !== undefined,
   })
 
+const priceFilter =
+  (unit: string, operator: Operator, value: number): FilterRes<NormedCard> => ({
+    filtersUsed: [unit],
+    filterFunc: (it) => it.printings
+      .find(printFilters.priceFilter(unit, operator, value)) !== undefined,
+    inverseFunc: (it) => it.printings
+      .find(not(printFilters.priceFilter(unit, operator, value))) !== undefined,
+  })
+
 export const oracleFilters = {
   identity: identityRes,
   and: andRes,
@@ -561,4 +570,5 @@ export const oracleFilters = {
   collectorNumberFilter,
   borderFilter,
   dateFilter,
+  priceFilter,
 }
