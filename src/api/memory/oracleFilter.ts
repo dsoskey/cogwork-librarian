@@ -486,47 +486,29 @@ const inFilter =
     (it) =>
       it.printings.filter(printFilters.setFilter(value)).length > 0
 
-const rarityFilter =
-  (operator: Operator, value: string): Filter<NormedCard> =>
-  (it: NormedCard) =>
-    it.printings.find(printFilters.rarityFilter(operator, value)) !== undefined
+const rarityFilter = (operator: Operator, value: string): FilterRes<NormedCard> => ({
+  filtersUsed: ["rarity"],
+  filterFunc: (it) => it.printings.find(printFilters.rarityFilter(operator, value)) !== undefined,
+  inverseFunc: (it) => it.printings.find(not(printFilters.rarityFilter(operator, value))) !== undefined
+})
 
-// IDEA: look out for a cool way to wrap these in the not
-const notRarityFilter =
-  (operator: Operator, value: string): Filter<NormedCard> =>
-  (it: NormedCard) =>
-    it.printings.find(not(printFilters.rarityFilter(operator, value))) !==
-    undefined
+const setFilter = (value: string): FilterRes<NormedCard> => ({
+  filtersUsed: ["set"],
+  filterFunc: (it) => it.printings.find(printFilters.setFilter(value)) !== undefined,
+  inverseFunc: (it) => it.printings.find(not(printFilters.setFilter(value))) !== undefined,
+})
 
-const setFilter =
-  (value: string): Filter<NormedCard> =>
-  (it) =>
-    it.printings.find(printFilters.setFilter(value)) !== undefined
+const setTypeFilter = (value: string): FilterRes<NormedCard> => ({
+  filtersUsed: ["set-type"],
+  filterFunc: (it) => it.printings.find(printFilters.setTypeFilter(value)) !== undefined,
+  inverseFunc: (it) => it.printings.find(not(printFilters.setTypeFilter(value))) !== undefined,
+})
 
-const notSetFilter =
-  (value: string): Filter<NormedCard> =>
-  (it) =>
-    it.printings.find(not(printFilters.setFilter(value))) !== undefined
-
-const setTypeFilter =
-  (value: string): Filter<NormedCard> =>
-  (it) =>
-    it.printings.find(printFilters.setTypeFilter(value)) !== undefined
-
-const notSetTypeFilter =
-  (value: string): Filter<NormedCard> =>
-  (it) =>
-    it.printings.find(not(printFilters.setTypeFilter(value))) !== undefined
-
-const artistFilter =
-  (value: string): Filter<NormedCard> =>
-  (it) =>
-    it.printings.find(printFilters.artistFilter(value)) !== undefined
-
-const notArtistFilter =
-  (value: string): Filter<NormedCard> =>
-  (it) =>
-    it.printings.find(not(printFilters.artistFilter(value))) !== undefined
+const artistFilter = (value: string): FilterRes<NormedCard> => ({
+  filtersUsed: ["artist"],
+  filterFunc: (it) => it.printings.find(printFilters.artistFilter(value)) !== undefined,
+  inverseFunc: (it) => it.printings.find(not(printFilters.artistFilter(value))) !== undefined
+})
 
 const collectorNumberFilter = (operator: Operator, value: number): FilterRes<NormedCard> => ({
     filtersUsed: ["collector-number"],
@@ -573,13 +555,9 @@ export const oracleFilters = {
   isVal,
   inFilter,
   rarityFilter,
-  notRarityFilter,
   setFilter,
-  notSetFilter,
   setTypeFilter,
-  notSetTypeFilter,
   artistFilter,
-  notArtistFilter,
   collectorNumberFilter,
   borderFilter,
   dateFilter,

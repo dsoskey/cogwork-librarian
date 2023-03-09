@@ -218,32 +218,16 @@ inCondition -> "in"i ":" stringValue
 # print-matters
 # todo: oracleFilter defines the object structure that's returned
 rarityCondition -> ("r"i | "rarity"i) anyOperator rarityValue
-    {% ([_, [operator], value]) => ({
-        filtersUsed: ["rarity"],
-        filterFunc: oracleFilters.rarityFilter(operator, value),
-        inverseFunc: oracleFilters.notRarityFilter(operator, value),
-    }) %}
+    {% ([_, [operator], value]) => oracleFilters.rarityFilter(operator, value) %}
 
 setCondition -> ("s"i | "set"i| "e"i | "edition"i) equalityOperator stringValue
-    {% ([_, [_op], value]) => ({
-        filtersUsed: ["set"],
-        filterFunc: oracleFilters.setFilter(value),
-        inverseFunc: oracleFilters.notSetFilter(value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.setFilter(value) %}
 
 setTypeCondition -> "st"i equalityOperator stringValue
-    {% ([_, [_op], value]) => ({
-        filtersUsed: ["set-type"],
-        filterFunc: oracleFilters.setTypeFilter(value),
-        inverseFunc: oracleFilters.notSetTypeFilter(value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.setTypeFilter(value) %}
 
 artistCondition -> ("a"i | "artist"i) equalityOperator stringValue
-    {% ([_, [_op], value]) => ({
-        filtersUsed: ["artist"],
-        filterFunc: oracleFilters.artistFilter(value),
-        inverseFunc: oracleFilters.notArtistFilter(value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.artistFilter(value) %}
 
 collectorNumberCondition -> "cn"i anyOperator integerValue
     {% ([_, [operator], value]) => oracleFilters.collectorNumberFilter(operator, value) %}
