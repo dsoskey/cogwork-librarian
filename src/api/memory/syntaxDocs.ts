@@ -4,12 +4,14 @@ export const keywords = {
   a: 'a',
   artist: 'artist',
   banned: 'banned',
+  border: 'border',
   c: 'c',
   cn: 'cn',
   ci: 'ci',
   commander: 'commander',
   cmc: 'cmc',
   color: 'color',
+  date: 'date',
   e: 'e',
   edition: 'edition',
   f: 'f',
@@ -49,12 +51,10 @@ export const keywords = {
 export const keywordsToImplement = {
   // Requires tagging data
   art: 'art', arttag: 'arttag', atag: 'atag',
-  border: 'border',
   // Requires set data
   b: 'b', block: 'block',
   // Could be cool for loading a custom cube list
   cube: 'cube',
-  date: 'date',
   devotion: 'devotion',
   direction: 'direction',
   eur: 'eur',

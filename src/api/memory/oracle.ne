@@ -63,7 +63,8 @@ condition -> (
     setTypeCondition |
     artistCondition |
     borderCondition |
-    collectorNumberCondition
+    collectorNumberCondition |
+    dateCondition
 ) {% ([[condition]]) => condition %}
 
 
@@ -249,5 +250,8 @@ collectorNumberCondition -> "cn"i anyOperator integerValue
 
 borderCondition -> "border"i equalityOperator stringValue
     {% ([_, [_op], value]) => oracleFilters.borderFilter(value) %}
+
+dateCondition -> "date"i anyOperator stringValue
+    {% ([_, [operator], value]) => oracleFilters.dateFilter(operator, value) %}
 
 @include "./values.ne"

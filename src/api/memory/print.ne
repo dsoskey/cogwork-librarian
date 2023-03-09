@@ -62,7 +62,8 @@ condition -> (
     setTypeCondition |
     artistCondition |
     borderCondition |
-    collectorNumberCondition
+    collectorNumberCondition |
+    dateCondition
 ) {% ([[condition]]) => condition %}
 
 cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
@@ -125,5 +126,11 @@ borderCondition -> "border"i equalityOperator stringValue
         filtersUsed: [],
         filterFunc: printFilters.borderFilter(value),
     }) %}
+
+dateCondition -> "date"i anyOperator stringValue
+    {% ([_, [operator], value]) => ({
+        filtersUsed: [],
+        filterFunc: printFilters.dateFilter(operator, value),
+    })%}
 
 @include "./values.ne"

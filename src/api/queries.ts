@@ -67,6 +67,8 @@ export const testQueries = [
   'set:m11',
   'edition:m12',
   'border:white cn:69',
+  'not:promo',
+  'date<=2015-08-18',
 ]
 
 const unimplementedQueries = [
@@ -120,9 +122,7 @@ const unimplementedQueries = [
   'stamp:arena',
   '-in:mtgo f:legacy',
   'year=2020',
-  'date<=2015-08-18',
   'date>ori',
-  'not:promo', // opposite of `is`
   'lang:any',
   'language:japanese',
   'in:ru',
