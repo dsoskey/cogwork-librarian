@@ -18,6 +18,8 @@ export const keywords = {
   f: 'f',
   fo: 'fo',
   format: 'format',
+  frame: 'frame',
+  flavor: 'flavor', ft: 'ft',
   id: 'id',
   identity: 'identity',
   is: 'is',
@@ -54,25 +56,22 @@ export const keywords = {
 export const keywordsToImplement = {
   // Requires tagging data
   art: 'art', arttag: 'arttag', atag: 'atag',
+  function: 'function', oracletag: 'oracletag', otag: 'otag',
   // Requires set data
   b: 'b', block: 'block',
   // Could be cool for loading a custom cube list
   cube: 'cube',
   devotion: 'devotion',
+  // Requires sort parser
   direction: 'direction',
-  flavor: 'flavor',
-  frame: 'frame',
-  ft: 'ft',
-  function: 'function',
   game: 'game',
   has: 'has',
   include: 'include',
   lang: 'lang',
   language: 'language',
   number: 'number',
-  oracletag: 'oracletag',
+
   order: 'order',
-  otag: 'otag',
   powtou: 'powtou',
   prefer: 'prefer',
   produces: 'produces',

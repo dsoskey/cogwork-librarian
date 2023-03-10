@@ -65,6 +65,9 @@ condition -> (
     borderCondition |
     collectorNumberCondition |
     dateCondition |
+    frameCondition |
+    flavorCondition |
+    flavorRegexCondition |
     priceCondition
 ) {% ([[condition]]) => condition %}
 
@@ -241,5 +244,14 @@ dateCondition -> "date"i anyOperator stringValue
 
 priceCondition -> ("usd"i | "eur"i | "tix"i) anyOperator numberValue
     {% ([unit, [operator], value]) => oracleFilters.priceFilter(unit, operator, value) %}
+
+frameCondition -> "frame"i equalityOperator stringValue
+    {% ([_, [_op], value]) => oracleFilters.frameFilter(value) %}
+
+flavorCondition -> ("flavor"i | "ft"i) equalityOperator stringValue
+    {% ([_, [_op], value]) => oracleFilters.flavorMatch(value) %}
+
+flavorRegexCondition -> ("flavor"i | "ft"i) equalityOperator regexString
+    {% ([_, [_op], value]) => oracleFilters.flavorRegex(value) %}
 
 @include "./values.ne"

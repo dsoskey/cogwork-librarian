@@ -12,7 +12,7 @@ import { Printing } from '../local/normedCard'
 import { Operator } from './oracleFilter'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'
 
-export const showAllFilter = new Set(['date', 'rarity', 'set', 'setType', 'usd', 'eur', 'tix'])
+export const showAllFilter = new Set(['date', 'frame', 'rarity', 'set', 'setType', 'usd', 'eur', 'tix'])
 
 const oracleFilter = (): FilterRes<Printing> => ({
   ...identityRes(),
@@ -87,6 +87,19 @@ const priceFilter = (unit: string, operator: Operator, value: number): Filter<Pr
   return defaultCompare(Number.parseFloat(printPrice), operator, value)
 }
 
+const frameFilter = (value: string): Filter<Printing> => it => it.frame === value
+
+// TODO; deal with multi-face print-specific on everything that's relevant
+const flavorMatch = (value: string): Filter<Printing> => it => {
+  return it.flavor_text?.toLowerCase().includes(value) ||
+  it.card_faces.filter(it => it.flavor_text?.toLowerCase().includes(value)).length > 0
+}
+
+const flavorRegex = (value: string): Filter<Printing> => it => {
+  const regexp = new RegExp(value)
+  return regexp.test(it.flavor_text) ||
+    it.card_faces.filter(face => regexp.test(face.flavor_text)).length > 0
+}
 export const printFilters = {
   identity: identityRes,
   and: andRes,
@@ -101,4 +114,7 @@ export const printFilters = {
   borderFilter,
   dateFilter,
   priceFilter,
+  frameFilter,
+  flavorMatch,
+  flavorRegex,
 }

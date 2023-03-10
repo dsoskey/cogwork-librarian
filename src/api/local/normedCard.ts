@@ -4,16 +4,19 @@ import _groupBy from 'lodash/groupBy'
 import _pick from 'lodash/pick'
 import _omit from 'lodash/omit'
 import { Filter } from '../memory/filterBase'
+import { CardFace } from 'scryfall-sdk/out/api/Cards'
 
 const PRINT_KEYS = {
   arena_id: 'arena_id',
   artist: 'artist',
   booster: 'booster',
   border_color: 'border_color',
+  card_faces: 'card_faces',
   cardmarket_id: 'cardmarket_id',
   collector_number: 'collector_number',
   digital: 'digital',
   finishes: 'finishes',
+  flavor_text: 'flavor_text',
   frame: 'frame',
   games: 'games',
   highres_image: 'highres_image',
@@ -61,6 +64,7 @@ export type Printing = Pick<Card, PrintKeys>
 export type OracleKeys = keyof Omit<Card, PrintKeys>
 export interface NormedCard extends Omit<Card, PrintKeys> {
   printings: Printing[]
+  card_faces: CardFace[]
 }
 
 export const normCardList = (cardList: Card[]): NormedCard[] => {
@@ -71,6 +75,7 @@ export const normCardList = (cardList: Card[]): NormedCard[] => {
     printings: cards.map(
       (it) => _pick(it, Object.keys(PRINT_KEYS)) as Printing
     ),
+    card_faces: cards[0].card_faces,
   }))
 }
 

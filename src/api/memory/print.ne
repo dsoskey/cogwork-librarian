@@ -64,6 +64,9 @@ condition -> (
     borderCondition |
     collectorNumberCondition |
     dateCondition |
+    frameCondition |
+#    flavorRegexCondition |
+    flavorCondition |
     priceCondition
 ) {% ([[condition]]) => condition %}
 
@@ -139,5 +142,24 @@ priceCondition -> ("usd"i | "eur"i | "tix"i) anyOperator numberValue
         filtersUsed: [],
         filterFunc: printFilters.priceFilter(unit, operator, value),
     })%}
+
+frameCondition -> "frame"i equalityOperator stringValue
+    {% ([_, [_op], value]) => ({
+        filtersUsed: [],
+        filterFunc: printFilters.frameFilter(value),
+    }) %}
+
+# TODO: disambiguiate regex from text
+#flavorRegexCondition -> ("flavor"i | "ft"i) equalityOperator regexString
+#    {% ([_, [_op], value]) => ({
+#        filtersUsed: [],
+#        filterFunc: printFilters.flavorRegex(value),
+#    }) %}
+flavorCondition -> ("flavor"i | "ft"i) equalityOperator stringValue
+    {% ([_, [_op], value]) => ({
+        filtersUsed: [],
+        filterFunc: printFilters.flavorMatch(value),
+    }) %}
+
 
 @include "./values.ne"

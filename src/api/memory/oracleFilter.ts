@@ -545,6 +545,31 @@ const priceFilter =
       .find(not(printFilters.priceFilter(unit, operator, value))) !== undefined,
   })
 
+const frameFilter =
+  (value: string): FilterRes<NormedCard> => ({
+    filtersUsed: ["frame"],
+    filterFunc: (it) => it.printings
+      .find(printFilters.frameFilter(value)) !== undefined,
+    inverseFunc: (it) => it.printings
+      .find(not(printFilters.frameFilter(value))) !== undefined,
+  })
+
+const flavorMatch = (value: string): FilterRes<NormedCard> => ({
+  filtersUsed: ["flavor"],
+  filterFunc: (it) => it.printings
+    .find(printFilters.flavorMatch(value)) !== undefined,
+  inverseFunc: (it) => it.printings
+    .find(not(printFilters.flavorMatch(value))) !== undefined,
+})
+
+const flavorRegex = (value: string): FilterRes<NormedCard> => ({
+  filtersUsed: ["flavor"],
+  filterFunc: (it) => it.printings
+    .find(printFilters.flavorRegex(value)) !== undefined,
+  inverseFunc: (it) => it.printings
+    .find(not(printFilters.flavorRegex(value))) !== undefined,
+})
+
 export const oracleFilters = {
   identity: identityRes,
   and: andRes,
@@ -570,5 +595,8 @@ export const oracleFilters = {
   collectorNumberFilter,
   borderFilter,
   dateFilter,
+  frameFilter,
   priceFilter,
+  flavorMatch,
+  flavorRegex,
 }
