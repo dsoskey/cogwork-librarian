@@ -10,12 +10,13 @@ import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { ExpanderButton } from '../component/expanderButton'
 import { ScryfallIcon } from '../../api/scryfall/scryfallIcon'
 import { CoglibIcon } from '../../api/memory/coglibIcon'
+import { SyntaxDocs } from './syntaxDocs'
 
 const description: Record<DataSource, String> = {
   scryfall:
     'fetches from scryfall using its API. Supports full scryfall syntax, but large query sets will take longer.',
   local:
-    'processes queries against a local database of oracle cards. Syntax is currently limited to play-relevant card fields, but local processing is significantly faster than scryfall',
+    'processes queries against a local database of oracle cards. syntax support is incomplete, but it runs an order of magnitude faster than communicating with scryfall',
 }
 
 const sortOptions: Array<keyof typeof Sort> = [
@@ -115,6 +116,8 @@ export const QueryForm = ({
         </button>
 
         <ExampleGallery setPrefix={setPrefix} setQueries={setQueries} />
+
+        <SyntaxDocs />
 
         <AppInfo />
       </div>

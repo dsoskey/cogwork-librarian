@@ -273,8 +273,8 @@ p {
   margin: 4px;
 }
 
-.dirty-db-message {
-  color: red;
+.alert {
+  color: #BD0000;
   font-weight: bold;
 }
 

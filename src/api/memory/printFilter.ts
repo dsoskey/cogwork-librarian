@@ -14,7 +14,7 @@ import { Rarity } from 'scryfall-sdk/out/api/Cards'
 
 export const showAllFilter = new Set([
   'date', 'frame', 'rarity', 'set', 'setType', 'usd', 'eur', 'tix',
-  'language', 'stamp', 'watermark',
+  'language', 'stamp', 'watermark', 'year',
 ])
 
 const oracleFilter = (): FilterRes<Printing> => ({

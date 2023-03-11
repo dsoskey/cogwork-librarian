@@ -48,22 +48,7 @@ const defaultOperation =
   (card: NormedCard) => {
     const cardValue = card[field]
     if (cardValue === undefined) return false
-    switch (operator) {
-      case ':':
-      case '=':
-        return cardValue === value
-      case '!=':
-      case '<>':
-        return cardValue !== value
-      case '<':
-        return cardValue < value
-      case '<=':
-        return cardValue <= value
-      case '>':
-        return cardValue > value
-      case '>=':
-        return cardValue >= value
-    }
+    return defaultCompare(cardValue, operator, value)
   }
 
 const powTouOperation =
@@ -503,101 +488,48 @@ const isVal =
         return unimplemented
     }
   }
-
-const inFilter =
-  (value: string): Filter<NormedCard> =>
-    (it) =>
-      it.printings.filter(printFilters.setFilter(value)).length > 0
-
-const rarityFilter = (operator: Operator, value: string): FilterRes<NormedCard> => ({
-  filtersUsed: ["rarity"],
-  filterFunc: (it) => it.printings.find(printFilters.rarityFilter(operator, value)) !== undefined,
-  inverseFunc: (it) => it.printings.find(not(printFilters.rarityFilter(operator, value))) !== undefined
-})
-
-const setFilter = (value: string): FilterRes<NormedCard> => ({
-  filtersUsed: ["set"],
-  filterFunc: (it) => it.printings.find(printFilters.setFilter(value)) !== undefined,
-  inverseFunc: (it) => it.printings.find(not(printFilters.setFilter(value))) !== undefined,
-})
-
-const setTypeFilter = (value: string): FilterRes<NormedCard> => ({
-  filtersUsed: ["set-type"],
-  filterFunc: (it) => it.printings.find(printFilters.setTypeFilter(value)) !== undefined,
-  inverseFunc: (it) => it.printings.find(not(printFilters.setTypeFilter(value))) !== undefined,
-})
-
-const artistFilter = (value: string): FilterRes<NormedCard> => ({
-  filtersUsed: ["artist"],
-  filterFunc: (it) => it.printings.find(printFilters.artistFilter(value)) !== undefined,
-  inverseFunc: (it) => it.printings.find(not(printFilters.artistFilter(value))) !== undefined
-})
-
-const collectorNumberFilter = (operator: Operator, value: number): FilterRes<NormedCard> => ({
-    filtersUsed: ["collector-number"],
-    filterFunc: (it) => it.printings
-      .find(printFilters.collectorNumberFilter(operator, value)) !== undefined,
-    inverseFunc: (it) => it.printings
-      .find(not(printFilters.collectorNumberFilter(operator, value))) !== undefined,
-  })
-
-const borderFilter =
-  (value: string): FilterRes<NormedCard> => ({
-    filtersUsed: ["border"],
-    filterFunc: (it) => it.printings
-      .find(printFilters.borderFilter(value)) !== undefined,
-    inverseFunc: (it) => it.printings
-      .find(not(printFilters.borderFilter(value))) !== undefined,
-  })
-
-const dateFilter =
-  (operator: Operator, value: string): FilterRes<NormedCard> => ({
-    filtersUsed: ["date"],
-    filterFunc: (it) => it.printings
-      .find(printFilters.dateFilter(operator, value)) !== undefined,
-    inverseFunc: (it) => it.printings
-      .find(not(printFilters.dateFilter(operator, value))) !== undefined,
-  })
-
-const priceFilter =
-  (unit: string, operator: Operator, value: number): FilterRes<NormedCard> => ({
-    filtersUsed: [unit],
-    filterFunc: (it) => it.printings
-      .find(printFilters.priceFilter(unit, operator, value)) !== undefined,
-    inverseFunc: (it) => it.printings
-      .find(not(printFilters.priceFilter(unit, operator, value))) !== undefined,
-  })
-
-const frameFilter =
-  (value: string): FilterRes<NormedCard> => ({
-    filtersUsed: ["frame"],
-    filterFunc: (it) => it.printings
-      .find(printFilters.frameFilter(value)) !== undefined,
-    inverseFunc: (it) => it.printings
-      .find(not(printFilters.frameFilter(value))) !== undefined,
-  })
-
-const flavorMatch = (value: string): FilterRes<NormedCard> => ({
-  filtersUsed: ["flavor"],
-  filterFunc: (it) => it.printings
-    .find(printFilters.flavorMatch(value)) !== undefined,
-  inverseFunc: (it) => it.printings
-    .find(not(printFilters.flavorMatch(value))) !== undefined,
-})
-
-const flavorRegex = (value: string): FilterRes<NormedCard> => ({
-  filtersUsed: ["flavor"],
-  filterFunc: (it) => it.printings
-    .find(printFilters.flavorRegex(value)) !== undefined,
-  inverseFunc: (it) => it.printings
-    .find(not(printFilters.flavorRegex(value))) !== undefined,
-})
+  
+const inFilter = (value: string): Filter<NormedCard> => it =>
+  it.printings.filter(printFilters.setFilter(value)).length > 0
 
 const handlePrint = (filtersUsed: string[], printFilter: Filter<Printing>): FilterRes<NormedCard> => ({
   filtersUsed,
   filterFunc: (it) => it.printings.find(printFilter) !== undefined,
   inverseFunc: (it) => it.printings.find(not(printFilter)) !== undefined,
 })
+
+const rarityFilter = (operator: Operator, value: string): FilterRes<NormedCard> =>
+  handlePrint(["rarity"], printFilters.rarityFilter(operator, value))
+
+const setFilter = (value: string): FilterRes<NormedCard> =>
+  handlePrint(["set"], printFilters.setFilter(value))
+
+const setTypeFilter = (value: string): FilterRes<NormedCard> =>
+  handlePrint(["set-type"], printFilters.setTypeFilter(value))
+
+const artistFilter = (value: string): FilterRes<NormedCard> =>
+  handlePrint(["artist"], printFilters.artistFilter(value))
+
+const collectorNumberFilter = (operator: Operator, value: number): FilterRes<NormedCard> =>
+  handlePrint(["collector-number"], printFilters.collectorNumberFilter(operator, value))
+
+const borderFilter = (value: string): FilterRes<NormedCard> =>
+  handlePrint(["border"], printFilters.borderFilter(value))
+
+const dateFilter = (operator: Operator, value: string): FilterRes<NormedCard> =>
+  handlePrint(["date"], printFilters.dateFilter(operator, value))
+
+const priceFilter = (unit: string, operator: Operator, value: number): FilterRes<NormedCard> =>
+  handlePrint([unit], printFilters.priceFilter(unit, operator, value))
+
+const frameFilter = (value: string): FilterRes<NormedCard> =>
+  handlePrint(["flavor"], printFilters.frameFilter(value))
+
+const flavorMatch = (value: string): FilterRes<NormedCard> =>
+  handlePrint(["flavor"], printFilters.flavorMatch(value))
+
+const flavorRegex = (value: string): FilterRes<NormedCard> =>
+  handlePrint(["flavor"], printFilters.flavorRegex(value))
 
 const gameFilter = (value: string) =>
   handlePrint(['game'], printFilters.gameFilter(value))

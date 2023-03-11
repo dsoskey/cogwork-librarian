@@ -10,6 +10,8 @@ import * as Scry from 'scryfall-sdk'
 import { downloadCards } from '../../api/local/populate'
 import { humanFileSize } from '../humanFileSize'
 
+const LAST_UPDATE = new Date("2023-03-10")
+
 export interface DatabaseSettingsProps {
   dbStatus: TaskStatus
   saveToDB: () => Promise<void>
@@ -27,7 +29,7 @@ export const DatabaseSettings = ({
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [dbDirty, setDbDirty] = useState<boolean>(false)
   const [importStatus, setImportStatus] = useState<TaskStatus>('unstarted')
-
+  const outOfDate = manifest.lastUpdated < LAST_UPDATE
   const [targetDefinition, setTargetDefinition] = useState<
     BulkDataDefinition | undefined
   >()
@@ -41,10 +43,13 @@ export const DatabaseSettings = ({
   }, [])
 
   return (
-    <>
-      <button className='db-settings' onClick={() => setModalOpen(true)}>
-        settings
-      </button>
+    <div>
+      <div className="row">
+        <button className='db-settings' onClick={() => setModalOpen(true)}>
+          settings
+        </button>
+        {outOfDate && <span className='alert'>DATABASE UPDATE REQUIRED</span>}
+      </div>
       <Modal
         open={modalOpen}
         title={<h2>database settings</h2>}
@@ -63,8 +68,15 @@ export const DatabaseSettings = ({
               <strong>last updated:</strong>{' '}
               <code>{manifest.lastUpdated.toString()}</code>
             </div>
+            {outOfDate && (
+              <div className='alert'>
+                cogwork librarian's syntax has updated since you last synced your database, so new queries may not function.{" "}
+                to fix the issue, re-import your data file the same way you did last time and save to local database.{" "}
+                if you've never imported a data set, choose "Default Cards" from import from scryfall below.
+              </div>
+            )}
             {dbDirty && (
-              <div className='dirty-db-message'>
+              <div className='alert'>
                 in-memory data set hasn't been saved to database yet
               </div>
             )}
@@ -164,6 +176,6 @@ export const DatabaseSettings = ({
           </div>
         </div>
       </Modal>
-    </>
+    </div>
   )
 }
