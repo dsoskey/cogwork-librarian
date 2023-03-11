@@ -25,6 +25,7 @@ const PRINT_KEYS = {
   illustration_id: 'illustration_id',
   image_status: 'image_status',
   image_uris: 'image_uris',
+  lang: 'lang',
   mtgo_foil_id: 'mtgo_foil_id',
   mtgo_id: 'mtgo_id',
   multiverse_ids: 'multiverse_ids',

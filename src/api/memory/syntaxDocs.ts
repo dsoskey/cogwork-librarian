@@ -20,11 +20,13 @@ export const keywords = {
   format: 'format',
   frame: 'frame',
   flavor: 'flavor', ft: 'ft',
+  game: 'game',
   id: 'id',
   identity: 'identity',
   is: 'is',
   in: 'in',
   keyword: 'keyword',
+  lang: 'lang', language: 'language',
   layout: 'layout',
   loy: 'loy',
   loyalty: 'loyalty',
@@ -34,16 +36,17 @@ export const keywords = {
   mv: 'mv',
   name: 'name',
   not: 'not',
-  o: 'o',
-  oracle: 'oracle',
-  pow: 'pow',
-  power: 'power',
+  number: 'number',
+  o: 'o', oracle: 'oracle',
+  pow: 'pow', power: 'power',
+  powtou: 'powtou', pt: 'pt',
   r: 'r',
   rarity: 'rarity',
   restricted: 'restricted',
   s: 's',
   set: 'set',
   st: 'st',
+  stamp: 'stamp',
   t: 't',
   text: 'text',
   tix: 'tix',
@@ -51,9 +54,12 @@ export const keywords = {
   toughness: 'toughness',
   type: 'type',
   usd: 'usd',
+  watermark: 'watermark', wm: 'wm',
+  year: 'year',
 } as const
 
 export const keywordsToImplement = {
+  "!": "!",
   // Requires tagging data
   art: 'art', arttag: 'arttag', atag: 'atag',
   function: 'function', oracletag: 'oracletag', otag: 'otag',
@@ -62,25 +68,15 @@ export const keywordsToImplement = {
   // Could be cool for loading a custom cube list
   cube: 'cube',
   devotion: 'devotion',
-  // Requires sort parser
+  // Requires sort parser??
   direction: 'direction',
-  game: 'game',
-  has: 'has',
-  include: 'include',
-  lang: 'lang',
-  language: 'language',
-  number: 'number',
-
+  "new": "new",
   order: 'order',
-  powtou: 'powtou',
+  has: 'has', // has:indicator has:watermark
+  include: 'include', // include:extras
   prefer: 'prefer',
   produces: 'produces',
-  pt: 'pt',
-  stamp: 'stamp',
   unique: 'unique',
-  watermark: 'watermark',
-  wm: 'wm',
-  year: 'year',
 } as const
 
 const all = {
@@ -90,21 +86,22 @@ const all = {
 
 type Keyword = ObjectValues<typeof all>
 export const syntaxDocs: Record<Keyword, string> = {
+  '!': 'https://scryfall.com/docs/syntax#exact',
   a: 'https://scryfall.com/docs/syntax#flavor',
   art: 'https://scryfall.com/docs/syntax#tagger',
   artist: 'https://scryfall.com/docs/syntax#flavor',
   arttag: 'https://scryfall.com/docs/syntax#tagger',
   atag: 'https://scryfall.com/docs/syntax#tagger',
-  banned: 'https://scryfall.com/docs/syntax#legality',
-  border: 'https://scryfall.com/docs/syntax#frame',
   b: 'https://scryfall.com/docs/syntax#sets',
+  banned: 'https://scryfall.com/docs/syntax#legality',
   block: 'https://scryfall.com/docs/syntax#sets',
+  border: 'https://scryfall.com/docs/syntax#frame',
   c: 'https://scryfall.com/docs/syntax#colors',
   ci: 'https://scryfall.com/docs/syntax#colors',
-  commander: 'https://scryfall.com/docs/syntax#colors',
   cmc: 'https://scryfall.com/docs/syntax#mana',
   cn: 'https://scryfall.com/docs/syntax#sets',
   color: 'https://scryfall.com/docs/syntax#colors',
+  commander: 'https://scryfall.com/docs/syntax#colors',
   cube: 'https://scryfall.com/docs/syntax#cubes',
   date: 'https://scryfall.com/docs/syntax#year',
   devotion: 'https://scryfall.com/docs/syntax#mana',
@@ -114,9 +111,9 @@ export const syntaxDocs: Record<Keyword, string> = {
   eur: 'https://scryfall.com/docs/syntax#prices',
   f: 'https://scryfall.com/docs/syntax#legality',
   flavor: 'https://scryfall.com/docs/syntax#flavor',
-  frame: 'https://scryfall.com/docs/syntax#frame',
   fo: 'https://scryfall.com/docs/syntax#oracle',
   format: 'https://scryfall.com/docs/syntax#legality',
+  frame: 'https://scryfall.com/docs/syntax#frame',
   ft: 'https://scryfall.com/docs/syntax#flavor',
   function: 'https://scryfall.com/docs/syntax#tagger',
   game: 'https://scryfall.com/docs/syntax#promos',
@@ -137,6 +134,7 @@ export const syntaxDocs: Record<Keyword, string> = {
   manavalue: 'https://scryfall.com/docs/syntax#mana',
   mv: 'https://scryfall.com/docs/syntax#mana',
   name: 'https://scryfall.com/docs/syntax#regex',
+  new: 'https://scryfall.com/docs/syntax#rarity',
   not: 'https://scryfall.com/docs/syntax#negating',
   number: 'https://scryfall.com/docs/syntax#sets',
   o: 'https://scryfall.com/docs/syntax#oracle',
@@ -167,5 +165,5 @@ export const syntaxDocs: Record<Keyword, string> = {
   usd: 'https://scryfall.com/docs/syntax#prices',
   watermark: 'https://scryfall.com/docs/syntax#flavor',
   wm: 'https://scryfall.com/docs/syntax#flavor',
-  year: 'https://scryfall.com/docs/syntax#year',
+  year: 'https://scryfall.com/docs/syntax#year'
 }

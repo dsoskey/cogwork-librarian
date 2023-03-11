@@ -89,6 +89,7 @@ export const useMemoryQueryRunner = ({
     // parse print logic
     const printParser = printingParser()
     try {
+      console.debug(`feeding ${query} to print parser`)
       printParser.feed(query)
     } catch (error) {
       const { message } = error as NearlyError

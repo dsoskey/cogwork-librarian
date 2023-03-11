@@ -50,6 +50,7 @@ condition -> (
     typeRegexCondition |
     powerCondition |
     toughCondition |
+    powTouCondition |
     loyaltyCondition |
     layoutCondition |
     formatCondition |
@@ -68,7 +69,11 @@ condition -> (
     frameCondition |
     flavorCondition |
     flavorRegexCondition |
-    priceCondition
+    gameCondition |
+    languageCondition |
+    priceCondition |
+    stampCondition |
+    watermarkCondition
 ) {% ([[condition]]) => condition %}
 
 
@@ -170,6 +175,9 @@ toughCondition -> ("tou"i | "toughness"i) anyOperator integerValue
         filterFunc: oracleFilters.powTouOperation('toughness', operator, value),
     }) %}
 
+powTouCondition -> ("pt"i | "powtou"i) anyOperator integerValue
+    {% ([_, [operator], value]) => oracleFilters.powTouTotalOperation(operator, value) %}
+
 loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
     {% ([_, [operator], value]) => ({
         filtersUsed: ["loyalty"],
@@ -233,13 +241,13 @@ setTypeCondition -> "st"i equalityOperator stringValue
 artistCondition -> ("a"i | "artist"i) equalityOperator stringValue
     {% ([_, [_op], value]) => oracleFilters.artistFilter(value) %}
 
-collectorNumberCondition -> "cn"i anyOperator integerValue
+collectorNumberCondition -> ("cn"i | "number"i) anyOperator integerValue
     {% ([_, [operator], value]) => oracleFilters.collectorNumberFilter(operator, value) %}
 
 borderCondition -> "border"i equalityOperator stringValue
     {% ([_, [_op], value]) => oracleFilters.borderFilter(value) %}
 
-dateCondition -> "date"i anyOperator stringValue
+dateCondition -> ("date"i | "year"i) anyOperator stringValue
     {% ([_, [operator], value]) => oracleFilters.dateFilter(operator, value) %}
 
 priceCondition -> ("usd"i | "eur"i | "tix"i) anyOperator numberValue
@@ -253,5 +261,17 @@ flavorCondition -> ("flavor"i | "ft"i) equalityOperator stringValue
 
 flavorRegexCondition -> ("flavor"i | "ft"i) equalityOperator regexString
     {% ([_, [_op], value]) => oracleFilters.flavorRegex(value) %}
+
+gameCondition -> "game"i equalityOperator stringValue
+    {% ([_, [_op], value]) => oracleFilters.gameFilter(value) %}
+
+languageCondition -> ("lang"i | "language"i) equalityOperator stringValue
+    {% ([_, [_op], value]) => oracleFilters.languageFilter(value) %}
+
+stampCondition -> "stamp"i equalityOperator stringValue
+    {% ([_, [_op], value]) => oracleFilters.stampFilter(value) %}
+
+watermarkCondition -> ("wm"i | "watermark"i) equalityOperator stringValue
+    {% ([_, [_op], value]) => oracleFilters.watermarkFilter(value) %}
 
 @include "./values.ne"

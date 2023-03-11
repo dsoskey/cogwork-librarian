@@ -48,6 +48,7 @@ condition -> (
     typeRegexCondition |
     powerCondition |
     toughCondition |
+    powTouCondition |
     loyaltyCondition |
     layoutCondition |
     formatCondition |
@@ -67,7 +68,11 @@ condition -> (
     frameCondition |
 #    flavorRegexCondition |
     flavorCondition |
-    priceCondition
+    gameCondition |
+    languageCondition |
+    priceCondition |
+    stampCondition |
+    watermarkCondition
 ) {% ([[condition]]) => condition %}
 
 cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
@@ -85,6 +90,7 @@ typeCondition -> ("t"i | "type"i) (":" | "=") stringValue
 typeRegexCondition -> ("t"i | "type"i) (":" | "=") regexString
 powerCondition -> ("pow"i | "power"i) anyOperator integerValue
 toughCondition -> ("tou"i | "toughness"i) anyOperator integerValue
+powTouCondition -> ("pt"i | "powtou"i) anyOperator integerValue
 loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
 layoutCondition -> ("layout"i) equalityOperator stringValue
 formatCondition -> ("format"i | "f"i) equalityOperator formatValue
@@ -119,7 +125,7 @@ artistCondition -> ("a"i | "artist"i) equalityOperator stringValue
         filterFunc: printFilters.artistFilter(value)
     }) %}
 
-collectorNumberCondition -> "cn"i anyOperator integerValue
+collectorNumberCondition -> ("cn"i | "number"i) anyOperator integerValue
     {% ([_, [operator], value]) => ({
         filtersUsed: [],
         filterFunc: printFilters.collectorNumberFilter(operator, value),
@@ -131,7 +137,7 @@ borderCondition -> "border"i equalityOperator stringValue
         filterFunc: printFilters.borderFilter(value),
     }) %}
 
-dateCondition -> "date"i anyOperator stringValue
+dateCondition -> ("date"i | "year"i) anyOperator stringValue
     {% ([_, [operator], value]) => ({
         filtersUsed: [],
         filterFunc: printFilters.dateFilter(operator, value),
@@ -161,5 +167,28 @@ flavorCondition -> ("flavor"i | "ft"i) equalityOperator stringValue
         filterFunc: printFilters.flavorMatch(value),
     }) %}
 
+gameCondition -> "game"i equalityOperator stringValue
+    {% ([_, [_op], value]) =>  ({
+        filtersUsed: [],
+        filterFunc: printFilters.gameFilter(value),
+    }) %}
+
+languageCondition -> ("lang"i | "language"i) equalityOperator stringValue
+    {% ([_, [_op], value]) =>  ({
+        filtersUsed: [],
+        filterFunc: printFilters.languageFilter(value),
+    }) %}
+
+stampCondition -> "stamp"i equalityOperator stringValue
+    {% ([_, [_op], value]) => ({
+        filtersUsed: [],
+        filterFunc: printFilters.stampFilter(value),
+    }) %}
+
+watermarkCondition -> ("wm"i | "watermark"i) equalityOperator stringValue
+    {% ([_, [_op], value]) => ({
+        filtersUsed: [],
+        filterFunc: printFilters.watermarkFilter(value),
+    }) %}
 
 @include "./values.ne"

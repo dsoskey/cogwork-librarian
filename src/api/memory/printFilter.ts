@@ -12,7 +12,10 @@ import { Printing } from '../local/normedCard'
 import { Operator } from './oracleFilter'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'
 
-export const showAllFilter = new Set(['date', 'frame', 'rarity', 'set', 'setType', 'usd', 'eur', 'tix'])
+export const showAllFilter = new Set([
+  'date', 'frame', 'rarity', 'set', 'setType', 'usd', 'eur', 'tix',
+  'language', 'stamp', 'watermark',
+])
 
 const oracleFilter = (): FilterRes<Printing> => ({
   ...identityRes(),
@@ -100,6 +103,23 @@ const flavorRegex = (value: string): Filter<Printing> => it => {
   return regexp.test(it.flavor_text) ||
     it.card_faces.filter(face => regexp.test(face.flavor_text)).length > 0
 }
+
+const gameFilter = (value: string): Filter<Printing> => it =>
+  it.games.find(game => game === value) !== undefined
+
+const languageFilter = (value: string): Filter<Printing> => it => {
+  if (value === 'any') {
+     return true
+  }
+  return it.lang === value
+}
+
+const stampFilter = (value: string): Filter<Printing> => it =>
+  it.security_stamp !== undefined ? it.security_stamp.toString() === value : false
+
+const watermarkFilter = (value: string): Filter<Printing> => it =>
+  it.watermark === value
+
 export const printFilters = {
   identity: identityRes,
   and: andRes,
@@ -117,4 +137,8 @@ export const printFilters = {
   frameFilter,
   flavorMatch,
   flavorRegex,
+  gameFilter,
+  languageFilter,
+  stampFilter,
+  watermarkFilter,
 }

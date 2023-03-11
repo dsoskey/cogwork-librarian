@@ -11,9 +11,9 @@ import {
   toManaCost,
 } from '../card'
 import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
-import { NormedCard, OracleKeys } from '../local/normedCard'
+import { NormedCard, OracleKeys, Printing } from '../local/normedCard'
 import { ObjectValues } from '../../types'
-import { not, Filter, andRes, identityRes, orRes, notRes, FilterRes } from './filterBase'
+import { not, Filter, andRes, identityRes, orRes, notRes, FilterRes, defaultCompare } from './filterBase'
 import { printFilters } from './printFilter'
 
 export const EQ_OPERATORS = {
@@ -94,6 +94,29 @@ const powTouOperation =
         return valueToTest >= targetValue
     }
   }
+  
+const powTouTotalOperation = (operator: Operator, targetValue: number): FilterRes<NormedCard> => ({
+  filtersUsed: ['powtou'],
+  filterFunc: (card) => {
+    const faces = [
+      {
+        power: card.power,
+        toughness: card.toughness
+      },
+      ...card.card_faces.map(jt => ({
+        power: jt.power,
+        toughness:jt.toughness,
+      }))
+    ]
+    
+    return faces
+      .filter(it => it.toughness !== undefined && it.power !== undefined)
+      .map(({ power, toughness }) => parsePowTou(power) + parsePowTou(toughness))
+      .filter(faceValue => defaultCompare(faceValue, operator, targetValue))
+      .length > 0
+  }
+})
+  
 
 const textMatch =
   (field: OracleKeys, value: string): Filter<NormedCard> =>
@@ -570,6 +593,24 @@ const flavorRegex = (value: string): FilterRes<NormedCard> => ({
     .find(not(printFilters.flavorRegex(value))) !== undefined,
 })
 
+const handlePrint = (filtersUsed: string[], printFilter: Filter<Printing>): FilterRes<NormedCard> => ({
+  filtersUsed,
+  filterFunc: (it) => it.printings.find(printFilter) !== undefined,
+  inverseFunc: (it) => it.printings.find(not(printFilter)) !== undefined,
+})
+
+const gameFilter = (value: string) =>
+  handlePrint(['game'], printFilters.gameFilter(value))
+
+const languageFilter = (value: string) =>
+  handlePrint(['language'], printFilters.languageFilter(value))
+
+const stampFilter = (value: string) =>
+  handlePrint(['stamp'], printFilters.stampFilter(value))
+
+const watermarkFilter = (value: string) =>
+  handlePrint(["watermark"], printFilters.watermarkFilter(value))
+
 export const oracleFilters = {
   identity: identityRes,
   and: andRes,
@@ -577,6 +618,7 @@ export const oracleFilters = {
   not: notRes,
   defaultOperation,
   powTouOperation,
+  powTouTotalOperation,
   textMatch,
   noReminderTextMatch,
   regexMatch,
@@ -599,4 +641,8 @@ export const oracleFilters = {
   priceFilter,
   flavorMatch,
   flavorRegex,
+  gameFilter,
+  languageFilter,
+  stampFilter,
+  watermarkFilter,
 }
