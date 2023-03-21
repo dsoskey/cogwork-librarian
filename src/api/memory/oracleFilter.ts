@@ -13,7 +13,16 @@ import {
 import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
 import { NormedCard, OracleKeys, Printing } from '../local/normedCard'
 import { ObjectValues } from '../../types'
-import { not, Filter, andRes, identityRes, orRes, notRes, FilterRes, defaultCompare } from './filterBase'
+import {
+  not,
+  Filter,
+  andRes,
+  identityRes,
+  orRes,
+  notRes,
+  FilterRes,
+  defaultCompare,
+} from './filterBase'
 import { printFilters } from './printFilter'
 
 export const EQ_OPERATORS = {
@@ -79,29 +88,35 @@ const powTouOperation =
         return valueToTest >= targetValue
     }
   }
-  
-const powTouTotalOperation = (operator: Operator, targetValue: number): FilterRes<NormedCard> => ({
+
+const powTouTotalOperation = (
+  operator: Operator,
+  targetValue: number
+): FilterRes<NormedCard> => ({
   filtersUsed: ['powtou'],
   filterFunc: (card) => {
     const faces = [
       {
         power: card.power,
-        toughness: card.toughness
+        toughness: card.toughness,
       },
-      ...card.card_faces.map(jt => ({
+      ...card.card_faces.map((jt) => ({
         power: jt.power,
-        toughness:jt.toughness,
-      }))
+        toughness: jt.toughness,
+      })),
     ]
-    
-    return faces
-      .filter(it => it.toughness !== undefined && it.power !== undefined)
-      .map(({ power, toughness }) => parsePowTou(power) + parsePowTou(toughness))
-      .filter(faceValue => defaultCompare(faceValue, operator, targetValue))
-      .length > 0
-  }
+
+    return (
+      faces
+        .filter((it) => it.toughness !== undefined && it.power !== undefined)
+        .map(
+          ({ power, toughness }) => parsePowTou(power) + parsePowTou(toughness)
+        )
+        .filter((faceValue) => defaultCompare(faceValue, operator, targetValue))
+        .length > 0
+    )
+  },
 })
-  
 
 const textMatch =
   (field: OracleKeys, value: string): Filter<NormedCard> =>
@@ -488,48 +503,66 @@ const isVal =
         return unimplemented
     }
   }
-  
-const inFilter = (value: string): Filter<NormedCard> => it =>
-  it.printings.filter(printFilters.setFilter(value)).length > 0
 
-const handlePrint = (filtersUsed: string[], printFilter: Filter<Printing>): FilterRes<NormedCard> => ({
+const inFilter =
+  (value: string): Filter<NormedCard> =>
+  (it) =>
+    it.printings.filter(printFilters.setFilter(value)).length > 0
+
+const handlePrint = (
+  filtersUsed: string[],
+  printFilter: Filter<Printing>
+): FilterRes<NormedCard> => ({
   filtersUsed,
   filterFunc: (it) => it.printings.find(printFilter) !== undefined,
   inverseFunc: (it) => it.printings.find(not(printFilter)) !== undefined,
 })
 
-const rarityFilter = (operator: Operator, value: string): FilterRes<NormedCard> =>
-  handlePrint(["rarity"], printFilters.rarityFilter(operator, value))
+const rarityFilter = (
+  operator: Operator,
+  value: string
+): FilterRes<NormedCard> =>
+  handlePrint(['rarity'], printFilters.rarityFilter(operator, value))
 
 const setFilter = (value: string): FilterRes<NormedCard> =>
-  handlePrint(["set"], printFilters.setFilter(value))
+  handlePrint(['set'], printFilters.setFilter(value))
 
 const setTypeFilter = (value: string): FilterRes<NormedCard> =>
-  handlePrint(["set-type"], printFilters.setTypeFilter(value))
+  handlePrint(['set-type'], printFilters.setTypeFilter(value))
 
 const artistFilter = (value: string): FilterRes<NormedCard> =>
-  handlePrint(["artist"], printFilters.artistFilter(value))
+  handlePrint(['artist'], printFilters.artistFilter(value))
 
-const collectorNumberFilter = (operator: Operator, value: number): FilterRes<NormedCard> =>
-  handlePrint(["collector-number"], printFilters.collectorNumberFilter(operator, value))
+const collectorNumberFilter = (
+  operator: Operator,
+  value: number
+): FilterRes<NormedCard> =>
+  handlePrint(
+    ['collector-number'],
+    printFilters.collectorNumberFilter(operator, value)
+  )
 
 const borderFilter = (value: string): FilterRes<NormedCard> =>
-  handlePrint(["border"], printFilters.borderFilter(value))
+  handlePrint(['border'], printFilters.borderFilter(value))
 
 const dateFilter = (operator: Operator, value: string): FilterRes<NormedCard> =>
-  handlePrint(["date"], printFilters.dateFilter(operator, value))
+  handlePrint(['date'], printFilters.dateFilter(operator, value))
 
-const priceFilter = (unit: string, operator: Operator, value: number): FilterRes<NormedCard> =>
+const priceFilter = (
+  unit: string,
+  operator: Operator,
+  value: number
+): FilterRes<NormedCard> =>
   handlePrint([unit], printFilters.priceFilter(unit, operator, value))
 
 const frameFilter = (value: string): FilterRes<NormedCard> =>
-  handlePrint(["flavor"], printFilters.frameFilter(value))
+  handlePrint(['flavor'], printFilters.frameFilter(value))
 
 const flavorMatch = (value: string): FilterRes<NormedCard> =>
-  handlePrint(["flavor"], printFilters.flavorMatch(value))
+  handlePrint(['flavor'], printFilters.flavorMatch(value))
 
 const flavorRegex = (value: string): FilterRes<NormedCard> =>
-  handlePrint(["flavor"], printFilters.flavorRegex(value))
+  handlePrint(['flavor'], printFilters.flavorRegex(value))
 
 const gameFilter = (value: string) =>
   handlePrint(['game'], printFilters.gameFilter(value))
@@ -541,7 +574,7 @@ const stampFilter = (value: string) =>
   handlePrint(['stamp'], printFilters.stampFilter(value))
 
 const watermarkFilter = (value: string) =>
-  handlePrint(["watermark"], printFilters.watermarkFilter(value))
+  handlePrint(['watermark'], printFilters.watermarkFilter(value))
 
 export const oracleFilters = {
   identity: identityRes,

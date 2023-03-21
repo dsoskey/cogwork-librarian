@@ -36,10 +36,10 @@ export const App = () => {
   const { addIgnoredId, ignoredIds, addCard, setSavedCards, savedCards } =
     useProject()
 
-  const { queries, setQueries, options, setOptions, prefix, setPrefix } =
-    useQueryForm({
-      example: () => queryExamples[_random(queryExamples.length - 1)],
-    })
+  const { queries, setQueries, options, setOptions } = useQueryForm({
+    example: () => queryExamples[_random(queryExamples.length - 1)],
+  })
+  const [prefix, ...subQueries] = queries
   const injectPrefix = useCallback(_injectPrefix(prefix), [prefix])
 
   const queryRunner = {
@@ -63,11 +63,9 @@ export const App = () => {
         </h1>
 
         <QueryForm
-          prefix={prefix}
-          setPrefix={setPrefix}
           status={queryRunner.status}
           canRunQuery={source === 'scryfall' || memStatus === 'success'}
-          execute={() => queryRunner.run(queries, options)}
+          execute={() => queryRunner.run(subQueries, options)}
           queries={queries}
           setQueries={setQueries}
           options={options}

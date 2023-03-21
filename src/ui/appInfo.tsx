@@ -3,6 +3,7 @@ import { Modal } from './component/modal'
 import { queryExamples } from '../api/example'
 import {
   injectPrefix as _injectPrefix,
+  SCORE_PRECISION,
   weightAlgorithms,
 } from '../api/queryRunnerCommon'
 
@@ -78,14 +79,14 @@ export const AppInfo = () => {
 
         <h4>1. combine the base query with each subquery</h4>
         <p>starting from an input like this:</p>
-        <pre className='language-scryfall-extended'>
+        <pre className='language-scryfall'>
           <code>{EXAMPLE.prefix}</code>
         </pre>
-        <pre className='language-scryfall-extended'>
+        <pre className='language-scryfall'>
           <code>{EXAMPLE.queries.join('\n')}</code>
         </pre>
         <p>cogwork librarian transforms the queries into this:</p>
-        <pre className='language-scryfall-extended'>
+        <pre className='language-scryfall'>
           <code>{EXAMPLE.queries.map(injectPrefix).join('\n')}</code>
         </pre>
         <p>
@@ -100,13 +101,15 @@ export const AppInfo = () => {
           once prepared, each query is weighed by its order in the list of
           queries (first being highest)
         </p>
-        <pre className='language-scryfall-extended'>
+        <pre className='language-scryfall'>
           <code>
             {EXAMPLE.queries
               .map(injectPrefix)
               .map(
                 (it, index) =>
-                  `[${weightAlgorithms.zipf(index).toPrecision(4)}] ${it}`
+                  `[${weightAlgorithms
+                    .zipf(index)
+                    .toPrecision(SCORE_PRECISION)}] ${it}`
               )
               .join('\n')}
           </code>

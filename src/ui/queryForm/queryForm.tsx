@@ -1,9 +1,8 @@
 import { cloneDeep } from 'lodash'
 import React from 'react'
 import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
-import { TextEditor } from '../component/textEditor'
+import { renderQueryInfo, TextEditor } from '../component/textEditor'
 import { DataSource, DATA_SOURCE, Setter, TaskStatus } from '../../types'
-import { Input } from '../component/input'
 import { AppInfo } from '../appInfo'
 import { ExampleGallery } from './exampleGallery'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
@@ -47,8 +46,6 @@ export interface QueryFormProps {
   execute: () => void
   queries: string[]
   setQueries: Setter<string[]>
-  prefix: string
-  setPrefix: Setter<string>
   options: SearchOptions
   setOptions: Setter<SearchOptions>
   source: DataSource
@@ -58,8 +55,6 @@ export interface QueryFormProps {
 }
 
 export const QueryForm = ({
-  prefix,
-  setPrefix,
   status,
   canRunQuery,
   execute,
@@ -80,21 +75,9 @@ export const QueryForm = ({
     <>
       <div className={`column ${source}`}>
         <label>
-          enter a base <ScryfallLink /> to include in each subquery
-        </label>
-        <Input
-          value={prefix}
-          onChange={(e) => {
-            setPrefix(e.target.value)
-          }}
-          language='scryfall-extended'
-        />
-      </div>
-
-      <div className={`column ${source}`}>
-        <label>
-          enter one or more subqueries to combine with the base query, one per
-          row. exclude rows by adding a{' '}
+          enter a base <ScryfallLink /> to include in each subquery, and enter
+          any number of subqueries to combine with the base query, one per row.
+          exclude subqueries by adding a{' '}
           <code className='language-scryfall-extended'>#</code> at the beginning
           of the row
         </label>
@@ -102,6 +85,7 @@ export const QueryForm = ({
           queries={queries}
           setQueries={setQueries}
           language='scryfall-extended'
+          renderQueryInfo={renderQueryInfo()}
         />
       </div>
 
@@ -115,7 +99,7 @@ export const QueryForm = ({
           {!canRunQuery && `preparing the library`}
         </button>
 
-        <ExampleGallery setPrefix={setPrefix} setQueries={setQueries} />
+        <ExampleGallery setQueries={setQueries} />
 
         <SyntaxDocs />
 

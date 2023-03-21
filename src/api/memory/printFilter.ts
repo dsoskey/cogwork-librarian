@@ -13,8 +13,17 @@ import { Operator } from './oracleFilter'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'
 
 export const showAllFilter = new Set([
-  'date', 'frame', 'rarity', 'set', 'setType', 'usd', 'eur', 'tix',
-  'language', 'stamp', 'watermark', 'year',
+  'date',
+  'frame',
+  'set',
+  'setType',
+  'usd',
+  'eur',
+  'tix',
+  'language',
+  'stamp',
+  'watermark',
+  'year',
 ])
 
 const oracleFilter = (): FilterRes<Printing> => ({
@@ -45,15 +54,18 @@ const rarityFilter =
 
 const setFilter =
   (value: string): Filter<Printing> =>
-  (it) => it.set === value || it.set_name.toLowerCase() === value
+  (it) =>
+    it.set === value || it.set_name.toLowerCase() === value
 
 const setTypeFilter =
   (value: string): Filter<Printing> =>
-  (it) => it.set_type === value
+  (it) =>
+    it.set_type === value
 
 const artistFilter =
   (value: string): Filter<Printing> =>
-  (it) => it.artist.toLowerCase().includes(value)
+  (it) =>
+    it.artist.toLowerCase().includes(value)
 
 const collectorNumberFilter =
   (operator: Operator, value: number): Filter<Printing> =>
@@ -64,7 +76,8 @@ const collectorNumberFilter =
 
 const borderFilter =
   (value: string): Filter<Printing> =>
-  (it) => it.border_color === value
+  (it) =>
+    it.border_color === value
 
 const dateFilter = (operator: Operator, value: string): Filter<Printing> => {
   const valueDate = new Date(value)
@@ -81,44 +94,69 @@ const dateFilter = (operator: Operator, value: string): Filter<Printing> => {
   }
 }
 
-const priceFilter = (unit: string, operator: Operator, value: number): Filter<Printing> => (it) => {
-  const printPrice = it.prices[unit]
-  if (printPrice === null || printPrice === undefined) {
-    return false
+const priceFilter =
+  (unit: string, operator: Operator, value: number): Filter<Printing> =>
+  (it) => {
+    const printPrice = it.prices[unit]
+    if (printPrice === null || printPrice === undefined) {
+      return false
+    }
+    // should this throw an error if value is NaN? this can happen for `tix<=`
+    return defaultCompare(Number.parseFloat(printPrice), operator, value)
   }
-  // should this throw an error if value is NaN? this can happen for `tix<=`
-  return defaultCompare(Number.parseFloat(printPrice), operator, value)
-}
 
-const frameFilter = (value: string): Filter<Printing> => it => it.frame === value
+const frameFilter =
+  (value: string): Filter<Printing> =>
+  (it) =>
+    it.frame === value
 
 // TODO; deal with multi-face print-specific on everything that's relevant
-const flavorMatch = (value: string): Filter<Printing> => it => {
-  return it.flavor_text?.toLowerCase().includes(value) ||
-  it.card_faces.filter(it => it.flavor_text?.toLowerCase().includes(value)).length > 0
-}
-
-const flavorRegex = (value: string): Filter<Printing> => it => {
-  const regexp = new RegExp(value)
-  return regexp.test(it.flavor_text) ||
-    it.card_faces.filter(face => regexp.test(face.flavor_text)).length > 0
-}
-
-const gameFilter = (value: string): Filter<Printing> => it =>
-  it.games.find(game => game === value) !== undefined
-
-const languageFilter = (value: string): Filter<Printing> => it => {
-  if (value === 'any') {
-     return true
+const flavorMatch =
+  (value: string): Filter<Printing> =>
+  (it) => {
+    return (
+      it.flavor_text?.toLowerCase().includes(value) ||
+      it.card_faces.filter((it) =>
+        it.flavor_text?.toLowerCase().includes(value)
+      ).length > 0
+    )
   }
-  return it.lang === value
-}
 
-const stampFilter = (value: string): Filter<Printing> => it =>
-  it.security_stamp !== undefined ? it.security_stamp.toString() === value : false
+const flavorRegex =
+  (value: string): Filter<Printing> =>
+  (it) => {
+    const regexp = new RegExp(value)
+    return (
+      regexp.test(it.flavor_text) ||
+      it.card_faces.filter((face) => regexp.test(face.flavor_text)).length > 0
+    )
+  }
 
-const watermarkFilter = (value: string): Filter<Printing> => it =>
-  it.watermark === value
+const gameFilter =
+  (value: string): Filter<Printing> =>
+  (it) =>
+    it.games.find((game) => game === value) !== undefined
+
+const languageFilter =
+  (value: string): Filter<Printing> =>
+  (it) => {
+    if (value === 'any') {
+      return true
+    }
+    return it.lang === value
+  }
+
+const stampFilter =
+  (value: string): Filter<Printing> =>
+  (it) =>
+    it.security_stamp !== undefined
+      ? it.security_stamp.toString() === value
+      : false
+
+const watermarkFilter =
+  (value: string): Filter<Printing> =>
+  (it) =>
+    it.watermark === value
 
 export const printFilters = {
   identity: identityRes,

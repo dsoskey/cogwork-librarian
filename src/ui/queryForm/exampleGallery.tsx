@@ -4,16 +4,13 @@ import React, { useContext, useState } from 'react'
 import { Setter } from '../../types'
 import { FlagContext } from '../../flags'
 import { testQueries } from '../../api/queries'
+import { rankInfo, renderQueryInfo } from '../component/textEditor'
 
 export interface ExampleGalleryProps {
-  setPrefix: Setter<string>
   setQueries: Setter<string[]>
 }
 
-export const ExampleGallery = ({
-  setPrefix,
-  setQueries,
-}: ExampleGalleryProps) => {
+export const ExampleGallery = ({ setQueries }: ExampleGalleryProps) => {
   const [exampleOpen, setExampleOpen] = useState<boolean>(false)
   const { debug } = useContext(FlagContext)
 
@@ -32,8 +29,7 @@ export const ExampleGallery = ({
                 <h3>{example.title}</h3>
                 <button
                   onClick={() => {
-                    setPrefix(example.prefix)
-                    setQueries(example.queries)
+                    setQueries([example.prefix, ...example.queries])
                     setExampleOpen(false)
                   }}
                 >
@@ -43,12 +39,19 @@ export const ExampleGallery = ({
               {example.description !== undefined && (
                 <p>{example.description}</p>
               )}
-              <pre className='language-scryfall-extended'>
-                <code>{example.prefix}</code>
-              </pre>
-              <pre className='language-scryfall-extended'>
-                <code>{example.queries.join('\n')}</code>
-              </pre>
+              <div className='example-query'>
+                <pre className='language-none'>
+                  <code>
+                    {renderQueryInfo(rankInfo)([
+                      example.prefix,
+                      ...example.queries,
+                    ]).join('\n')}
+                  </code>
+                </pre>
+                <pre className='language-scryfall-extended'>
+                  <code>{[example.prefix, ...example.queries].join('\n')}</code>
+                </pre>
+              </div>
             </div>
           ))}
           {debug && (

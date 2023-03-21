@@ -59,7 +59,7 @@ export const keywords = {
 } as const
 
 export const keywordsToImplement = {
-  "!": "!",
+  '!': '!',
   // Requires tagging data
   art: 'art', arttag: 'arttag', atag: 'atag',
   function: 'function', oracletag: 'oracletag', otag: 'otag',
@@ -70,7 +70,7 @@ export const keywordsToImplement = {
   devotion: 'devotion',
   // Requires sort parser??
   direction: 'direction',
-  "new": "new",
+  new: 'new',
   order: 'order',
   has: 'has', // has:indicator has:watermark
   include: 'include', // include:extras
@@ -165,5 +165,5 @@ export const syntaxDocs: Record<Keyword, string> = {
   usd: 'https://scryfall.com/docs/syntax#prices',
   watermark: 'https://scryfall.com/docs/syntax#flavor',
   wm: 'https://scryfall.com/docs/syntax#flavor',
-  year: 'https://scryfall.com/docs/syntax#year'
+  year: 'https://scryfall.com/docs/syntax#year',
 }

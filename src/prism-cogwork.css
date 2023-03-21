@@ -46,6 +46,10 @@ pre[class*='language-'] {
   white-space: normal;
 }
 
+.token.main-query {
+  background: var(--darkest-color);
+}
+
 .token.comment,
 .token.block-comment,
 .token.prolog,

@@ -30,7 +30,8 @@ export const useQueryCoordinator = (): QueryExecutor => {
   const rawData = useRef<{ [query: string]: Array<EnrichedCard> }>({})
 
   // should this be async/await so app can autoscroll on mobile when execute is done ?
-  const execute = (runQuery: QueryRunnerFunc) =>
+  const execute =
+    (runQuery: QueryRunnerFunc) =>
     (queries: string[], options: SearchOptions) => {
       setStatus('loading')
       const filteredQueries = queries.filter(
@@ -38,7 +39,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
       )
       if (filteredQueries.length === 0) {
         // add a dummy query to inject the base query into for a single query
-        filteredQueries.push("")
+        filteredQueries.push('')
       }
       report.reset(filteredQueries.length)
       rawData.current = {}

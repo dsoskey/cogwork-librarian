@@ -1,29 +1,63 @@
 import Prism from 'prismjs'
 import React, { useEffect, useRef, useState } from 'react'
 import { Language } from '../../api/memory/syntaxHighlighting'
+import { SCORE_PRECISION, weightAlgorithms } from '../../api/queryRunnerCommon'
 
 const MIN_TEXTAREA_HEIGHT = 32
 
 export interface QueryInputProps {
   setQueries: React.Dispatch<React.SetStateAction<string[]>>
   queries: string[]
+  renderQueryInfo?: (queries: string[]) => string[]
   placeholder?: string | undefined
   language?: Language
 }
+export const scoreInfo = (count: number) =>
+  weightAlgorithms.zipf(count - 1).toPrecision(SCORE_PRECISION)
+export const rankInfo = (count: number) =>
+  count > 1 ? `${' '.repeat(4 - count.toString().length)}${count}` : 'SUB1'
+
+export const renderQueryInfo =
+  (renderSubquery: (count: number) => string = rankInfo) =>
+  (queries: string[]): string[] => {
+    if (queries.length === 0) {
+      return []
+    }
+    const [_, ...rest] = queries
+    let count = 1
+    const result = ['BASE']
+    rest.forEach((subQuery) => {
+      if (
+        subQuery.trimStart().startsWith('#') ||
+        subQuery.trim().length === 0
+      ) {
+        result.push('')
+      } else {
+        result.push(renderSubquery(count))
+        count += 1
+      }
+    })
+    return result
+  }
 
 const linkKeys = ['Meta', 'Control']
 export const TextEditor = ({
   queries,
   setQueries,
+  renderQueryInfo,
   placeholder,
   language,
 }: QueryInputProps) => {
   const separator = '\n'
   const value = queries.join(separator)
   const controller = useRef<HTMLTextAreaElement>()
+  const brown = useRef<HTMLDivElement | undefined>()
   const faker = useRef<HTMLPreElement>()
   const linker = useRef<HTMLPreElement>()
   const [revealLinks, setRevealLinks] = useState<boolean>(false)
+
+  const lineInfo =
+    renderQueryInfo !== undefined ? renderQueryInfo(queries).join(separator) : ''
   const showLinks = (event) => {
     if (linkKeys.includes(event.key)) {
       setRevealLinks(true)
@@ -50,6 +84,7 @@ export const TextEditor = ({
     // Reset height - important to shrink on delete
     controller.current.style.height = 'inherit'
     faker.current.style.height = 'inherit'
+    if (brown.current) brown.current.style.height = 'inherit'
     linker.current.style.height = 'inherit'
     // Set height
     const newHeight = `${Math.max(
@@ -58,6 +93,7 @@ export const TextEditor = ({
     )}px`
     controller.current.style.height = newHeight
     faker.current.style.height = newHeight
+    if (brown.current) brown.current.style.height = newHeight
     linker.current.style.height = newHeight
     onScroll({ target: controller.current })
   }, [value])
@@ -79,6 +115,7 @@ export const TextEditor = ({
       >
         <code className='match-braces'>{value}</code>
       </pre>
+      {renderQueryInfo !== undefined && <div ref={brown} className='brown' />}
       <textarea
         ref={controller}
         className='controller coglib-prism-theme'
@@ -98,6 +135,11 @@ export const TextEditor = ({
       >
         <code className='match-braces'>{value}</code>
       </pre>
+      {renderQueryInfo !== undefined && (
+        <pre tabIndex={-1} className='language-none labels'>
+          <code>{lineInfo}</code>
+        </pre>
+      )}
     </div>
   )
 }

@@ -37,6 +37,8 @@ export interface QueryRunner extends QueryHandler {
   report: QueryReport
 }
 
+export const SCORE_PRECISION = 2
+
 export const weightAlgorithms = {
   zipf: (index: number) => 1 / (index + 2),
   uniform: (_: number) => 1,

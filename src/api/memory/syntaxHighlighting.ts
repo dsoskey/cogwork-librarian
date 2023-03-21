@@ -88,10 +88,23 @@ export const scryfall: Grammar = {
 
 // Anything built on top of scryfall goes here
 export const scryfallExtended: Grammar = {
-  comment: {
-    pattern: /(^|\n)\s*#.*/,
+  'invalid-comment': {
+    pattern: /^#.+/,
+    alias: ['keyword', 'important'],
   },
-  ...scryfall,
+  comment: {
+    pattern: /\n\s*#.*/,
+  },
+  'sub-query': {
+    pattern: /\n.*/,
+    inside: scryfall,
+    alias: ['sub-query'],
+  },
+  'base-query': {
+    pattern: /.*/,
+    inside: scryfall,
+    alias: ['main-query'],
+  },
 }
 
 export const linkWrap = (env: Environment) => {

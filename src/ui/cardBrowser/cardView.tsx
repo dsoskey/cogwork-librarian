@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Card, ImageUris } from 'scryfall-sdk'
-import { EnrichedCard } from 'src/api/queryRunnerCommon'
+import { EnrichedCard, SCORE_PRECISION } from '../../api/queryRunnerCommon'
 import { WEIGHT, QUERIES } from './constants'
 import { DOUBLE_FACED_LAYOUTS } from '../../api/card'
 
@@ -64,7 +64,7 @@ export const CardView = ({
           )}
           {visibleDetails.includes(WEIGHT) && (
             <div>
-              weight: <code>{card.weight.toPrecision(4)}</code>
+              weight: <code>{card.weight.toPrecision(SCORE_PRECISION)}</code>
             </div>
           )}
           {visibleDetails.includes(QUERIES) && (
