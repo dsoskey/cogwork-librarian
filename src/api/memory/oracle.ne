@@ -87,21 +87,13 @@ nameCondition -> ("name"i) (":" | "=") stringValue
     {% ([_, [_op], value]) => ({
         filtersUsed: ["name"],
         filterFunc: oracleFilters.textMatch('name', value)
-    })%} |
-    stringValue {% ([value]) => ({
-        filtersUsed: ["name"],
-        filterFunc: oracleFilters.textMatch('name', value),
-    }) %}
+    })%}
 
 nameRegexCondition -> ("name"i) (":" | "=") regexString
     {% ([_, [_op], value]) => ({
         filtersUsed: ["name"],
         filterFunc: oracleFilters.regexMatch('name', value)
-    })%} |
-    regexString {% ([value]) => ({
-        filtersUsed: ["name"],
-        filterFunc: oracleFilters.regexMatch('name', value),
-    }) %}
+    })%}
 
 colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
     {% ([_, [operator], value]) => ({
