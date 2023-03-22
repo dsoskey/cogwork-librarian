@@ -31,7 +31,7 @@ export const renderQueryInfo =
         subQuery.trimStart().startsWith('#') ||
         subQuery.trim().length === 0
       ) {
-        result.push('')
+        result.push(' ')
       } else {
         result.push(renderSubquery(count))
         count += 1
@@ -57,7 +57,7 @@ export const TextEditor = ({
   const [revealLinks, setRevealLinks] = useState<boolean>(false)
 
   const lineInfo =
-    renderQueryInfo !== undefined ? renderQueryInfo(queries).join(separator) : ''
+    renderQueryInfo !== undefined ? renderQueryInfo(queries) : []
   const showLinks = (event) => {
     if (linkKeys.includes(event.key)) {
       setRevealLinks(true)
@@ -102,9 +102,23 @@ export const TextEditor = ({
     controller.current.addEventListener('scroll', onScroll)
     return () => controller.current.removeEventListener('scroll', onScroll)
   }, [])
-
   return (
     <div className='query-editor' onKeyDown={showLinks} onKeyUp={hideLinks}>
+      {renderQueryInfo !== undefined && (
+        <pre tabIndex={-1} className='language-none labels'>
+          {lineInfo.map((line, index) => <code key={index} onClick={() => {
+            console.log("clicko!")
+            const query = queries[index]
+            const mindex = queries.slice(0, index).map(it => it.length)
+              // the 1 accounts for \n
+              .reduce((prev, next) => prev + next + 1, 0)
+            // the 1 accounts for \n
+            const maxdex = mindex + query.length + 1
+            controller.current.focus()
+            controller.current.setSelectionRange(mindex, maxdex)
+          }}>{line}</code>)}
+        </pre>
+      )}
       <pre
         ref={linker}
         tabIndex={-1}
@@ -115,7 +129,6 @@ export const TextEditor = ({
       >
         <code className='match-braces'>{value}</code>
       </pre>
-      {renderQueryInfo !== undefined && <div ref={brown} className='brown' />}
       <textarea
         ref={controller}
         className='controller coglib-prism-theme'
@@ -135,11 +148,6 @@ export const TextEditor = ({
       >
         <code className='match-braces'>{value}</code>
       </pre>
-      {renderQueryInfo !== undefined && (
-        <pre tabIndex={-1} className='language-none labels'>
-          <code>{lineInfo}</code>
-        </pre>
-      )}
     </div>
   )
 }

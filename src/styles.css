@@ -151,13 +151,13 @@ p {
   overflow-y: auto;
 }
 
-.example-content .example-query {
+.example-query {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.example-content .example-query > :last-child {
+.example-query > :last-child {
   flex: 1;
 }
 
@@ -179,6 +179,8 @@ p {
 }
 
 .query-editor {
+  margin-top: 8px;
+  margin-bottom: 8px;
   height: max-content;
   display: grid;
   grid-template-columns: auto auto 1fr;
@@ -186,22 +188,24 @@ p {
   grid-template-areas: 'labels brown overlap';
 }
 
+.query-editor pre, .query-editor textarea {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .query-editor .labels {
   grid-area: labels;
   z-index: 4;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
 }
 
-/* try to give query-editor the focus ring itself. then get rid of brown */
-.query-editor:focus-within .labels {
+.query-editor:focus-within * {
+  outline: none;
+}
+.query-editor:focus-within {
   outline: 2px inset var(--blue);
-}
-
-.query-editor .brown {
-  grid-area: brown;
-  margin-top: 8px;
-  width: 2px;
-  z-index: 10;
-  background-color: var(--darker-color);
 }
 
 .query-editor .links {

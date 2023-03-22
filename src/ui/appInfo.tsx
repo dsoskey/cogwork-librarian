@@ -6,6 +6,7 @@ import {
   SCORE_PRECISION,
   weightAlgorithms,
 } from '../api/queryRunnerCommon'
+import { rankInfo, renderQueryInfo } from './component/textEditor'
 
 const EXAMPLE = queryExamples[0]
 const injectPrefix = _injectPrefix(EXAMPLE.prefix)
@@ -79,12 +80,20 @@ export const AppInfo = () => {
 
         <h4>1. combine the base query with each subquery</h4>
         <p>starting from an input like this:</p>
-        <pre className='language-scryfall'>
-          <code>{EXAMPLE.prefix}</code>
-        </pre>
-        <pre className='language-scryfall'>
-          <code>{EXAMPLE.queries.join('\n')}</code>
-        </pre>
+        <div className='example-query'>
+          <pre className='language-none'>
+            <code>
+              {renderQueryInfo(rankInfo)([
+                EXAMPLE.prefix,
+                ...EXAMPLE.queries,
+              ]).join('\n')}
+            </code>
+          </pre>
+          <pre className='language-scryfall-extended'>
+            <code>{[EXAMPLE.prefix, ...EXAMPLE.queries].join('\n')}</code>
+          </pre>
+        </div>
+
         <p>cogwork librarian transforms the queries into this:</p>
         <pre className='language-scryfall'>
           <code>{EXAMPLE.queries.map(injectPrefix).join('\n')}</code>
