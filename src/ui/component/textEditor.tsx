@@ -8,6 +8,7 @@ const MIN_TEXTAREA_HEIGHT = 32
 export interface QueryInputProps {
   setQueries: React.Dispatch<React.SetStateAction<string[]>>
   queries: string[]
+  onSubmit?: () => void
   renderQueryInfo?: (queries: string[]) => string[]
   placeholder?: string | undefined
   language?: Language
@@ -44,6 +45,7 @@ const linkKeys = ['Meta', 'Control']
 export const TextEditor = ({
   queries,
   setQueries,
+  onSubmit,
   renderQueryInfo,
   placeholder,
   language,
@@ -61,6 +63,10 @@ export const TextEditor = ({
   const showLinks = (event) => {
     if (linkKeys.includes(event.key)) {
       setRevealLinks(true)
+    }
+
+    if (event.metaKey && event.key == "Enter") {
+      onSubmit?.()
     }
   }
   const hideLinks = (event) => {

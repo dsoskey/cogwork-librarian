@@ -2,18 +2,14 @@ import { cloneDeep } from 'lodash'
 import React from 'react'
 import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
 import { renderQueryInfo, TextEditor } from '../component/textEditor'
-import { DataSource, DATA_SOURCE, Setter, TaskStatus } from '../../types'
-import { AppInfo } from '../appInfo'
-import { ExampleGallery } from './exampleGallery'
-import { useLocalStorage } from '../../api/local/useLocalStorage'
-import { ExpanderButton } from '../component/expanderButton'
+import { DataSource, Setter, TaskStatus } from '../../types'
 import { ScryfallIcon } from '../../api/scryfall/scryfallIcon'
 import { CoglibIcon } from '../../api/memory/coglibIcon'
-import { SyntaxDocs } from './syntaxDocs'
+import { InfoModal } from '../component/infoModal'
 
 const description: Record<DataSource, String> = {
   scryfall:
-    'fetches from scryfall using its API. Supports full scryfall syntax, but large query sets will take longer.',
+    'fetches from scryfall using its API. Supports full scryfall syntax, but larger query sets will take longer to process.',
   local:
     'processes queries against a local database of oracle cards. syntax support is incomplete, but it runs an order of magnitude faster than communicating with scryfall',
 }
@@ -66,10 +62,6 @@ export const QueryForm = ({
   setSource,
   dbSettings,
 }: QueryFormProps) => {
-  const [showOptions, setShowOptions] = useLocalStorage<boolean>(
-    'showSearchOptions',
-    true
-  )
   const iconSize = 30
   return (
     <>
@@ -84,12 +76,102 @@ export const QueryForm = ({
         <TextEditor
           queries={queries}
           setQueries={setQueries}
+          onSubmit={execute}
           language='scryfall-extended'
           renderQueryInfo={renderQueryInfo()}
         />
       </div>
 
-      <div className='execute'>
+      <div className='row execute-controls'>
+        <div className='row'>
+          <label>data source:</label>
+          <div className={`source-option row ${source === 'scryfall' ? 'selected' : ''}`}>
+            <div className='radio-button-holder'>
+              <ScryfallIcon
+                isActive={source === 'scryfall'}
+                size={iconSize}
+              />
+              <input
+                id={`source-scryfall`}
+                type='radio'
+                value='scryfall'
+                checked={source === 'scryfall'}
+                onChange={() => setSource('scryfall')}
+              />
+            </div>
+            <label htmlFor={`source-scryfall`}>scryfall</label>
+            <InfoModal title={<h2 className='row'><ScryfallIcon
+              size={iconSize}
+            /><span>data source: scryfall</span></h2>} info={description['scryfall']} />
+          </div>
+
+          <div className={`source-option row ${source === 'local' ? 'selected' : ''}`}>
+            <div className='radio-button-holder'>
+              <CoglibIcon
+                size={iconSize}
+                isActive={source === 'local'}
+              />
+              <input
+                id={`source-local`}
+                type='radio'
+                value='local'
+                checked={source === 'local'}
+                onChange={() => setSource('local')}
+              />
+            </div>
+            <label htmlFor={`source-local`}>local</label>
+            {dbSettings}
+              <InfoModal title={<h2 className='row'>
+                <CoglibIcon
+                  size={iconSize}
+                /><span>data source: local</span></h2>} info={description['local']} />
+          </div>
+        </div>
+
+        <span>
+          <label htmlFor='sort'>sort by: </label>
+          <select
+            name='sort'
+            value={options.order}
+            onChange={(event) => {
+              setOptions((prev) => {
+                const newVal = cloneDeep(prev)
+                newVal.order = event.target.value as keyof typeof Sort
+                return newVal
+              })
+            }}
+          >
+            {sortOptions.map((it) => (
+              <option key={it} value={it}>
+                {it}
+              </option>
+            ))}
+          </select>
+        </span>
+
+        <span>
+          <label htmlFor='dir'>direction: </label>
+          <select
+            name='dir'
+            value={options.dir}
+            onChange={(event) => {
+              setOptions((prev) => {
+                const newVal = cloneDeep(prev)
+                newVal.dir = event.target.value as keyof typeof SortDirection
+                return newVal
+              })
+            }}
+          >
+            {Object.keys(SortDirection)
+              .filter((it) => Number.isNaN(Number.parseInt(it)))
+              .map((it) => (
+                <option key={it} value={it}>
+                  {it}
+                </option>
+              ))}
+          </select>
+        </span>
+
         <button
           disabled={!canRunQuery || status === 'loading'}
           onClick={execute}
@@ -98,104 +180,7 @@ export const QueryForm = ({
             `scour${status === 'loading' ? 'ing' : ''} the library`}
           {!canRunQuery && `preparing the library`}
         </button>
-
-        <ExampleGallery setQueries={setQueries} />
-
-        <SyntaxDocs />
-
-        <AppInfo />
       </div>
-
-      <h2>
-        search options{' '}
-        <ExpanderButton open={showOptions} setOpen={setShowOptions} />
-      </h2>
-      {showOptions && (
-        <>
-          <fieldset>
-            <legend>data source:</legend>
-            <div className='row source-select'>
-              {/* TODO: de-loop */}
-              {Object.keys(DATA_SOURCE).map((it: DataSource) => (
-                <div
-                  key={it}
-                  className={`source-option ${it === source ? 'selected' : ''}`}
-                >
-                  <div className='row'>
-                    <div className='radio-button-holder'>
-                      {it === 'scryfall' ? (
-                        <ScryfallIcon
-                          isActive={source === 'scryfall'}
-                          size={iconSize}
-                        />
-                      ) : (
-                        <CoglibIcon
-                          size={iconSize}
-                          isActive={source === 'local'}
-                        />
-                      )}
-                      <input
-                        id={`source-${it}`}
-                        type='radio'
-                        value={it}
-                        checked={it === source}
-                        onChange={() => setSource(it)}
-                      />
-                    </div>
-                    <label htmlFor={`source-${it}`}>{it}</label>
-                    {it === 'local' && dbSettings}
-                  </div>
-                  <div>{description[it]}</div>
-                </div>
-              ))}
-            </div>
-          </fieldset>
-
-          <div>
-            <label htmlFor='sort'>sort by: </label>
-            <select
-              id='sort'
-              value={options.order}
-              onChange={(event) => {
-                setOptions((prev) => {
-                  const newVal = cloneDeep(prev)
-                  newVal.order = event.target.value as keyof typeof Sort
-                  return newVal
-                })
-              }}
-            >
-              {sortOptions.map((it) => (
-                <option key={it} value={it}>
-                  {it}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor='dir'>sort dir: </label>
-            <select
-              id='dir'
-              value={options.dir}
-              onChange={(event) => {
-                setOptions((prev) => {
-                  const newVal = cloneDeep(prev)
-                  newVal.dir = event.target.value as keyof typeof SortDirection
-                  return newVal
-                })
-              }}
-            >
-              {Object.keys(SortDirection)
-                .filter((it) => Number.isNaN(Number.parseInt(it)))
-                .map((it) => (
-                  <option key={it} value={it}>
-                    {it}
-                  </option>
-                ))}
-            </select>
-          </div>
-        </>
-      )}
     </>
   )
 }

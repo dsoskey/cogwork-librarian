@@ -89,7 +89,7 @@ p {
   align-items: center;
 }
 
-.row > :not(:first-child) {
+.row > :not(dialog):not(:first-child)  {
   margin-left: 4px;
 }
 
@@ -174,13 +174,9 @@ p {
   caret-color: var(--blue);
 }
 
-.input-column .execute {
-  padding-bottom: 0.25em;
-}
-
 .query-editor {
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-top: 4px;
+  margin-bottom: 4px;
   height: max-content;
   display: grid;
   grid-template-columns: auto auto 1fr;
@@ -199,6 +195,7 @@ p {
   display: flex;
   flex-direction: column;
   cursor: default;
+  padding-right: 0;
 }
 
 .query-editor:focus-within * {
@@ -260,14 +257,18 @@ p {
   text-decoration: none;
 }
 
-.source-select {
-  align-items: stretch;
+.execute-controls {
+ flex-wrap: wrap;
 }
+.execute-controls > * {
+  margin-bottom: 4px;
+}
+
 .source-option {
-  flex: 1;
   border: var(--dark-color) inset 2px;
   padding: 4px;
 }
+
 .source-option .radio-button-holder {
   display: grid;
   grid-template-columns: 1fr;
@@ -288,6 +289,7 @@ p {
 
 .source-option.selected {
   border: var(--blue) inset 2px;
+  background-color: var(--blue);
 }
 .source-option .db-settings {
   margin-left: 4px;
@@ -386,7 +388,6 @@ p {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  height: 14vh;
   padding: 8px;
   border-bottom: solid 1px var(--gray-68);
   box-shadow: 0 2px 2px 0 var(--gray-68-shadow);
@@ -398,7 +399,7 @@ p {
 @media (min-width: 1024px) {
   .result-container {
     overflow-y: scroll;
-    height: 84vh;
+    height: 91vh;
   }
 }
 .result-container {

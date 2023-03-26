@@ -43,7 +43,7 @@ export const BrowserView = React.memo(
     errors,
   }: BrowserViewProps) => {
     const viewport = useViewportListener()
-    const [width, setWidth] = useState<number>(viewport.width * 66)
+    const [width, setWidth] = useState<number>(viewport.width * .5)
     const [displayType, setDisplayType] = useState<'cards' | 'json'>('cards')
 
     // TODO: Add collection switching

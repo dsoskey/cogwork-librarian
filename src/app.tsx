@@ -19,6 +19,9 @@ import { DatabaseSettings } from './ui/queryForm/databaseSettings'
 import { CoglibIcon } from './api/memory/coglibIcon'
 import { queryExamples } from './api/example'
 import _random from 'lodash/random'
+import { ExampleGallery } from './ui/queryForm/exampleGallery'
+import { SyntaxDocs } from './ui/queryForm/syntaxDocs'
+import { AppInfo } from './ui/appInfo'
 
 export const App = () => {
   const {
@@ -57,10 +60,19 @@ export const App = () => {
   return (
     <div className='root'>
       <div className='input-column'>
-        <h1 className='row'>
-          <CoglibIcon isActive={false} size='2em' />
-          <span className='page-title'>cogwork librarian</span>
-        </h1>
+        <div className='row'>
+          <h1 className='row'>
+            <CoglibIcon isActive={false} size='2em' />
+            <span className='page-title'>cogwork librarian</span>
+          </h1>
+
+          <ExampleGallery setQueries={setQueries} />
+
+          <SyntaxDocs />
+
+          <AppInfo />
+        </div>
+
 
         <QueryForm
           status={queryRunner.status}

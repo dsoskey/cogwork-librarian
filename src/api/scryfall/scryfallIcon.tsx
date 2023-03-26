@@ -1,10 +1,10 @@
 import React from 'react'
 
 export interface SourceIconProps {
-  isActive: boolean
+  isActive?: boolean
   size: number | string
 }
-export const ScryfallIcon = ({ isActive, size }: SourceIconProps) => (
+export const ScryfallIcon = ({ isActive = false, size }: SourceIconProps) => (
   <svg
     focusable='false'
     aria-hidden='true'

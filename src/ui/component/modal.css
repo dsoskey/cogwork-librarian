@@ -8,6 +8,10 @@
   overflow-y: scroll;
 }
 
+.info-modal .modal {
+  width: 40%;
+}
+
 .modal::backdrop {
   background: rgba(0, 0, 0, 0.75);
 }
