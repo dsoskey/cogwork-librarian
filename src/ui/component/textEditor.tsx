@@ -53,7 +53,6 @@ export const TextEditor = ({
   const separator = '\n'
   const value = queries.join(separator)
   const controller = useRef<HTMLTextAreaElement>()
-  const brown = useRef<HTMLDivElement | undefined>()
   const faker = useRef<HTMLPreElement>()
   const linker = useRef<HTMLPreElement>()
   const [revealLinks, setRevealLinks] = useState<boolean>(false)
@@ -65,7 +64,7 @@ export const TextEditor = ({
       setRevealLinks(true)
     }
 
-    if (event.metaKey && event.key == "Enter") {
+    if ((event.metaKey || event.ctrlKey) && event.key == "Enter") {
       onSubmit?.()
     }
   }
@@ -90,7 +89,6 @@ export const TextEditor = ({
     // Reset height - important to shrink on delete
     controller.current.style.height = 'inherit'
     faker.current.style.height = 'inherit'
-    if (brown.current) brown.current.style.height = 'inherit'
     linker.current.style.height = 'inherit'
     // Set height
     const newHeight = `${Math.max(
@@ -99,7 +97,6 @@ export const TextEditor = ({
     )}px`
     controller.current.style.height = newHeight
     faker.current.style.height = newHeight
-    if (brown.current) brown.current.style.height = newHeight
     linker.current.style.height = newHeight
     onScroll({ target: controller.current })
   }, [value])
@@ -113,7 +110,6 @@ export const TextEditor = ({
       {renderQueryInfo !== undefined && (
         <pre tabIndex={-1} className='language-none labels'>
           {lineInfo.map((line, index) => <code key={index} onClick={() => {
-            console.log("clicko!")
             const query = queries[index]
             const mindex = queries.slice(0, index).map(it => it.length)
               // the 1 accounts for \n

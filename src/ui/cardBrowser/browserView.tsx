@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { CardView } from './cardView'
 import { PAGE_SIZE } from './constants'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
@@ -73,6 +73,9 @@ export const BrowserView = React.memo(
     const [page, setPage] = useState(0)
     const lowerBound = page * pageSize + 1
     const upperBound = (page + 1) * pageSize
+    useEffect(() => {
+      setPage(0)
+    }, [result])
 
     const currentPage = useMemo(
       () => activeCards.slice(lowerBound - 1, upperBound),
