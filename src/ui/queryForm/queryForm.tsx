@@ -6,6 +6,7 @@ import { DataSource, Setter, TaskStatus } from '../../types'
 import { ScryfallIcon } from '../../api/scryfall/scryfallIcon'
 import { CoglibIcon } from '../../api/memory/coglibIcon'
 import { InfoModal } from '../component/infoModal'
+import { DatabaseSettings } from './databaseSettings'
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -47,7 +48,6 @@ export interface QueryFormProps {
   source: DataSource
   setSource: Setter<DataSource>
   // slot to put database settings in
-  dbSettings: React.ReactNode
 }
 
 export const QueryForm = ({
@@ -60,7 +60,6 @@ export const QueryForm = ({
   setOptions,
   source,
   setSource,
-  dbSettings,
 }: QueryFormProps) => {
   const iconSize = 30
   return (
@@ -120,11 +119,14 @@ export const QueryForm = ({
               />
             </div>
             <label htmlFor={`source-local`}>local</label>
-            {dbSettings}
-              <InfoModal title={<h2 className='row'>
-                <CoglibIcon
-                  size={iconSize}
-                /><span>data source: local</span></h2>} info={description['local']} />
+            {<DatabaseSettings />}
+            <InfoModal
+              title={<h2 className='row'>
+                <CoglibIcon size={iconSize} />
+                <span>data source: local</span>
+              </h2>}
+              info={description['local']}
+            />
           </div>
         </div>
 

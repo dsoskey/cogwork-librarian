@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, Manifest, toManifest } from './db'
 import { downloadCards, putFile } from './populate'
@@ -14,6 +14,23 @@ export interface CogDB {
   setManifest: Setter<Manifest>
   saveToDB: () => Promise<void>
 }
+
+const defaultDB: CogDB = {
+  dbStatus: 'unstarted',
+  memStatus: 'unstarted',
+  memory: [],
+  setMemory: () => console.error("CogDB.setMemory called without a provider!"),
+  manifest: {
+    id: '',
+    name: '',
+    type: '',
+    lastUpdated: new Date(),
+  },
+  setManifest: () => console.error("CogDB.setManifest called without a provider!"),
+  saveToDB: () => Promise.reject("CogDB.saveToDB called without a provider!"),
+}
+
+export const CogDBContext = createContext(defaultDB)
 
 export const useCogDB = (): CogDB => {
   const [dbStatus, setDbStatus] = useState<TaskStatus>('unstarted')
@@ -40,8 +57,9 @@ export const useCogDB = (): CogDB => {
     const inner = async () => {
       setMemStatus('loading')
       let res: NormedCard[] = []
-      console.debug(`loading mem ${new Date()}`)
+      console.time(`loading mem`)
       const count = await cogDB.collection.count()
+      console.timeLog(`loading mem`)
       console.debug(`counted ${count} collections!`)
       if (count === 0) {
         setDbStatus('loading')
@@ -59,13 +77,20 @@ export const useCogDB = (): CogDB => {
           setDbStatus('error')
         }
       } else {
-        const { blob, ...manifest } = (
+        console.timeLog(`loading mem`)
+        console.debug("pulling collection")
+        const result = (
           await cogDB.collection.limit(1).toArray()
         )[0]
-        res = JSON.parse(await blob.text())
-        setManifest(manifest)
+        console.timeLog(`loading mem`)
+        console.debug("extracting text from blob")
+        const text = await result.blob.text()
+        console.timeLog(`loading mem`)
+        console.debug("parsing text")
+        res = JSON.parse(text)
+        setManifest(result)
       }
-      console.debug(`loaded res ${new Date()}`)
+      console.timeEnd(`loading mem`)
 
       setMemory(res)
       setMemStatus('success')
