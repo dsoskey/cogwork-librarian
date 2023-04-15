@@ -11,7 +11,7 @@ import {
 } from './api/queryRunnerCommon'
 import { useLocalStorage } from './api/local/useLocalStorage'
 import { useMemoryQueryRunner } from './api/memory/useQueryRunner'
-import { useProject } from './api/useProject'
+import { useProject, ProjectContext } from './api/useProject'
 import { Footer } from './ui/footer'
 import { useViewportListener } from './viewport'
 import { SavedCards } from './ui/savedCards'
@@ -29,8 +29,8 @@ export const App = () => {
   const viewport = useViewportListener()
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
 
-  const { addIgnoredId, ignoredIds, addCard, setSavedCards, savedCards } =
-    useProject()
+  const project = useProject()
+  const { addIgnoredId, ignoredIds, addCard, setSavedCards, savedCards } = project
 
   const { queries, setQueries, options, setOptions } = useQueryForm({
     example: () => queryExamples[_random(queryExamples.length - 1)],
@@ -54,50 +54,51 @@ export const App = () => {
   return (
     <CogDBContext.Provider value={cogDB}>
       <ListImporterContext.Provider value={listImporter}>
-        <div className='root'>
-          <div className='input-column'>
-            <div className='row'>
-              <h1 className='row'>
-                <CoglibIcon isActive={false} size='2em' />
-                <span className='page-title'>cogwork librarian</span>
-              </h1>
+        <ProjectContext.Provider value={project}>
+          <div className='root'>
+            <div className='input-column'>
+              <div className='row'>
+                <h1 className='row'>
+                  <CoglibIcon isActive={false} size='2em' />
+                  <span className='page-title'>cogwork librarian</span>
+                </h1>
 
-              <ExampleGallery setQueries={setQueries} />
+                <ExampleGallery setQueries={setQueries} />
 
-              <SyntaxDocs />
+                <SyntaxDocs />
 
-              <AppInfo />
+                <AppInfo />
+              </div>
+
+              <QueryForm
+                status={queryRunner.status}
+                canRunQuery={source === 'scryfall' || cogDB.memStatus === 'success'}
+                execute={execute}
+                queries={queries}
+                setQueries={setQueries}
+                options={options}
+                setOptions={setOptions}
+                source={source}
+                setSource={setSource}
+              />
+
+              <SavedCards savedCards={savedCards} setSavedCards={setSavedCards} />
+              {viewport.desktop && <Footer />}
             </div>
 
-
-            <QueryForm
+            <BrowserView
+              report={queryRunner.report}
+              result={queryRunner.result}
               status={queryRunner.status}
-              canRunQuery={source === 'scryfall' || cogDB.memStatus === 'success'}
-              execute={execute}
-              queries={queries}
-              setQueries={setQueries}
-              options={options}
-              setOptions={setOptions}
+              errors={queryRunner.errors}
+              addCard={addCard}
+              addIgnoredId={addIgnoredId}
+              ignoredIds={ignoredIds}
               source={source}
-              setSource={setSource}
             />
-
-            <SavedCards savedCards={savedCards} setSavedCards={setSavedCards} />
-            {viewport.desktop && <Footer />}
+            {viewport.mobile && <Footer />}
           </div>
-
-          <BrowserView
-            report={queryRunner.report}
-            result={queryRunner.result}
-            status={queryRunner.status}
-            errors={queryRunner.errors}
-            addCard={addCard}
-            addIgnoredId={addIgnoredId}
-            ignoredIds={ignoredIds}
-            source={source}
-          />
-          {viewport.mobile && <Footer />}
-        </div>
+        </ProjectContext.Provider>
       </ListImporterContext.Provider>
     </CogDBContext.Provider>
 

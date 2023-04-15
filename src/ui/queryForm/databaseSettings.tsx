@@ -1,13 +1,26 @@
 import React, { useContext } from 'react'
 import { useState } from 'react'
 import { Modal } from '../component/modal'
-import { TaskStatus } from '../../types'
+import { ObjectValues, TaskStatus } from '../../types'
 import { FileImporter } from './fileImporter'
 import { ScryfallImporter } from './scryfallImporter'
 import { CogDBContext } from '../../api/local/useCogDB'
+import { ListImporter } from './listImporter'
 
 const LAST_UPDATE = new Date('2023-03-10')
 
+export const IMPORT_SOURCE = {
+  scryfall: 'scryfall',
+  file: 'file',
+  text: 'text',
+} as const
+export type ImportSource = ObjectValues<typeof IMPORT_SOURCE>
+
+const sourceToLabel: Record<ImportSource, string> = {
+  scryfall: 'scryfall',
+  file: 'a file',
+  text: 'a text list',
+}
 export interface DatabaseSettingsProps {}
 export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
   const { dbStatus, saveToDB, manifest } = useContext(CogDBContext)
@@ -15,6 +28,7 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
   const [dbDirty, setDbDirty] = useState<boolean>(false)
   const [dbImportStatus, setDbImportStatus] = useState<TaskStatus>('unstarted')
   const outOfDate = manifest.lastUpdated < LAST_UPDATE
+  const [importType, setImportType] = useState<ImportSource>("scryfall")
 
   const onModalClose = () => setModalOpen(false)
   const saveMemoryToDB = () => {
@@ -73,17 +87,35 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
             {/*TODO<button>export to file</button>*/}
           </div>
 
-          <div className='row db-import'>
-            <ScryfallImporter
+          <div className='db-import'>
+            <h3>
+              import from{" "}
+              {Object.keys(IMPORT_SOURCE).map(source => (<>
+                <input
+                  id={`import-${source}`}
+                  type='radio'
+                  value={source}
+                  checked={source === importType}
+                  onChange={() => setImportType(source as ImportSource)}
+                />
+                <label htmlFor={`import-${source}`}>{sourceToLabel[source]}</label>
+              </>))}
+            </h3>
+            {importType === "scryfall" && <ScryfallImporter
               dbImportStatus={dbImportStatus}
               setDbImportStatus={setDbImportStatus}
               setDbDirty={setDbDirty}
-            />
-            <FileImporter
+            />}
+            {importType === "file" && <FileImporter
               dbImportStatus={dbImportStatus}
               setDbImportStatus={setDbImportStatus}
               setDbDirty={setDbDirty}
-            />
+            />}
+            {importType === "text" && <ListImporter
+              setDbDirty={setDbDirty}
+              dbImportStatus={dbImportStatus}
+              setDbImportStatus={setDbImportStatus}
+            />}
           </div>
         </div>
       </Modal>

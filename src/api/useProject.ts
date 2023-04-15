@@ -1,6 +1,6 @@
 import { Setter } from '../types'
 import { useLocalStorage } from './local/useLocalStorage'
-import { useCallback } from 'react'
+import { createContext, useCallback } from 'react'
 
 interface Project {
   savedCards: string[]
@@ -12,6 +12,17 @@ interface Project {
   addIgnoredId: (id: string) => void
   reset: () => void
 }
+
+const defaultProject: Project = {
+  savedCards: [],
+  setSavedCards: () => console.error("Project.setSavedCards called without a provider!"),
+  addCard: () => console.error("Project.addCard called without a provider!"),
+  ignoredIds: [],
+  addIgnoredId: () => console.error("Project.addIgnoredId called without a provider!"),
+  reset: () => console.error("Project.reset called without a provider!"),
+}
+
+export const ProjectContext = createContext(defaultProject)
 
 export const useProject = (): Project => {
   const [savedCards, setSavedCards] = useLocalStorage<string[]>(

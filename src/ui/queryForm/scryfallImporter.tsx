@@ -46,7 +46,6 @@ export const ScryfallImporter = ({
   }
 
   return <div className='scryfall-import'>
-    <h3>import from scryfall</h3>
     {bulkDataDefinitions.map((it) => (
       <div key={it.uri} className='scryfall-option'>
         <input

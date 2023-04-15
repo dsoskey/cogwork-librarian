@@ -10,7 +10,7 @@ interface ListImporterProps {
   memory: NormedCard[]
 }
 interface ListImporter {
-  attemptImport: (rawCards: string[]) => Promise<NormedCard[]>
+  attemptImport: (rawCards: string[], restart: boolean) => Promise<NormedCard[]>
   result: NormedCard[]
   missing: string[]
   setMissing: Setter<string[]>
@@ -36,12 +36,12 @@ export const useListImporter = ({ memory }: ListImporterProps): ListImporter => 
 
   const rawData = useRef<{ [name: string]: NormedCard }>({})
 
-  const run = (rawCards: string[]) => new Promise<NormedCard[]>((resolve, reject) => {
+  const run = (rawCards: string[], restart: boolean = false) => new Promise<NormedCard[]>((resolve, reject) => {
     const foundCards: NormedCard[] = []
     const cardsToQueryAPI: string[] = []
     const missingNames: string[] = []
     const onDone = () => {
-      setResult(foundCards)
+      setResult(restart ? foundCards : (prev) => [...prev, ...foundCards])
       setMissing(missingNames)
       report.markTimepoint("end")
 
@@ -50,7 +50,7 @@ export const useListImporter = ({ memory }: ListImporterProps): ListImporter => 
         reject()
       } else {
         setStatus("success")
-        resolve(foundCards)
+        resolve(restart ? foundCards : [...result, ...foundCards])
       }
     }
 

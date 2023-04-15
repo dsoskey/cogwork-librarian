@@ -5,7 +5,6 @@ import { Card } from 'scryfall-sdk'
 import { Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { ListImporterContext } from '../../api/local/useListImporter'
-import { TextEditor } from '../component/textEditor'
 import { Manifest } from '../../api/local/db'
 
 const JSONMIME = "application/json"
@@ -44,7 +43,7 @@ export const FileImporter = ({
         cards = normCardList(JSON.parse(content).map(Card.construct))
         break
       case TEXTMIME:
-        cards = await listImporter.attemptImport(content.split(/[\r\n]+/))
+        cards = await listImporter.attemptImport(content.split(/[\r\n]+/), true)
         break
       default:
         throw Error(`unrecognized file type ${file.type}`)
@@ -64,7 +63,7 @@ export const FileImporter = ({
   }
 
   const retrySearch = () => {
-    listImporter.attemptImport(listImporter.missing)
+    listImporter.attemptImport(listImporter.missing, false)
       .then(() => {
         moveImportToMemory()
       })
@@ -75,7 +74,6 @@ export const FileImporter = ({
   }
 
   return <div className='file-import'>
-    <h3>import from a file</h3>
     {listImporter.status === "loading" && (
       <Loader
         label="cards found"
@@ -85,12 +83,23 @@ export const FileImporter = ({
       />
     )}
     {dbImportStatus === "error" && (<>
-      <p>the importer failed to find some of your card names. make any edits you need before retrying card search</p>
-      <TextEditor setQueries={listImporter.setMissing} queries={listImporter.missing} />
-      <button onClick={moveImportToMemory}>import found cards</button>
-      <button onClick={retrySearch}>retry search</button>
+      {/* todo: extract to common component? */}
+      <p>the importer failed to find {listImporter.missing.length} card name{listImporter.missing.length === 1 ? "":"s"}. make any edits you need before retrying card search, or import the {listImporter.result.length} found card{listImporter.result.length === 1 ? "": "s"} as is</p>
+      <textarea
+        className='cards-to-import coglib-prism-theme'
+        value={listImporter.missing.join('\n')}
+        spellCheck={false}
+        rows={9}
+        onChange={(event) => {
+          listImporter.setMissing(event.target.value.split('\n'))
+        }}
+      />
+      <div>
+        <button onClick={retrySearch}>retry search</button>
+        <button onClick={moveImportToMemory}>import found cards</button>
+      </div>
     </>)}
-    {listImporter.status !== "loading" &&
+    {dbImportStatus !== "loading" && dbImportStatus !== "error" &&
       <>
         <p>valid formats are a json list of scryfall cards or a text list of exact card names</p>
         <div className='file'>
@@ -104,7 +113,6 @@ export const FileImporter = ({
             </div>
           </label>
           <input
-            disabled={dbImportStatus === 'loading'}
             id='file-import'
             type='file'
             accept='.json,.txt'

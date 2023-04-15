@@ -315,12 +315,11 @@ p {
 }
 
 .db-import {
-  height: 369px;
+  height: 350px;
   align-items: flex-start;
 }
 .db-import > * {
   flex: 1;
-  margin-top: 8px;
 }
 
 .db-import .scryfall-option {
@@ -359,6 +358,21 @@ p {
   text-align: center;
   align-items: center;
   justify-content: center;
+}
+
+.list-import, .file-import {
+  display: flex;
+  flex-direction: column;
+}
+
+.cards-to-import {
+  background: var(--darker-color);
+  color: #ccc;
+  resize: none;
+}
+
+.cards-to-import::placeholder {
+  color: var(--blue);
 }
 
 @media (min-width: 1024px) {
