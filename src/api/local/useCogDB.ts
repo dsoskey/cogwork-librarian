@@ -53,49 +53,50 @@ export const useCogDB = (): CogDB => {
     }
   }
 
-  useEffect(() => {
-    const inner = async () => {
-      setMemStatus('loading')
-      let res: NormedCard[] = []
-      console.time(`loading mem`)
-      const count = await cogDB.collection.count()
-      console.timeLog(`loading mem`)
-      console.debug(`counted ${count} collections!`)
-      if (count === 0) {
-        setDbStatus('loading')
-        console.debug('refreshing db')
-        try {
-          const bulkDataDefinition = await Scry.BulkData.definitionByType(
-            'default_cards'
-          )
-          const newManifest = toManifest(bulkDataDefinition)
-          setManifest(newManifest)
-          res = await downloadCards(bulkDataDefinition)
-          await putFile(newManifest, res)
-          setDbStatus('success')
-        } catch (_) {
-          setDbStatus('error')
-        }
-      } else {
-        console.timeLog(`loading mem`)
-        console.debug("pulling collection")
-        const result = (
-          await cogDB.collection.limit(1).toArray()
-        )[0]
-        console.timeLog(`loading mem`)
-        console.debug("extracting text from blob")
-        const text = await result.blob.text()
-        console.timeLog(`loading mem`)
-        console.debug("parsing text")
-        res = JSON.parse(text)
-        setManifest(result)
+  const loadDB = async () => {
+    setMemStatus('loading')
+    let res: NormedCard[] = []
+    console.time(`loading mem`)
+    const count = await cogDB.collection.count()
+    console.timeLog(`loading mem`)
+    console.debug(`counted ${count} collections!`)
+    if (count === 0) {
+      setDbStatus('loading')
+      console.debug('refreshing db')
+      try {
+        const bulkDataDefinition = await Scry.BulkData.definitionByType(
+          'default_cards'
+        )
+        const newManifest = toManifest(bulkDataDefinition)
+        setManifest(newManifest)
+        res = await downloadCards(bulkDataDefinition)
+        await putFile(newManifest, res)
+        setDbStatus('success')
+      } catch (_) {
+        setDbStatus('error')
       }
-      console.timeEnd(`loading mem`)
-
-      setMemory(res)
-      setMemStatus('success')
+    } else {
+      console.timeLog(`loading mem`)
+      console.debug("pulling collection")
+      const result = (
+        await cogDB.collection.limit(1).toArray()
+      )[0]
+      console.timeLog(`loading mem`)
+      console.debug("extracting text from blob")
+      const text = await result.blob.text()
+      console.timeLog(`loading mem`)
+      console.debug("parsing text")
+      res = JSON.parse(text)
+      setManifest(result)
     }
-    inner().catch(() => setMemStatus('error'))
+    console.timeEnd(`loading mem`)
+
+    setMemory(res)
+    setMemStatus('success')
+  }
+
+  useEffect(() => {
+    loadDB().catch(() => setMemStatus('error'))
   }, [])
 
   return {

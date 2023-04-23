@@ -49,7 +49,7 @@ export const SyntaxDocs = () => {
 
           <h3 className='todo-unsupported-color'>unsupported keywords</h3>
           <p>
-            these keywords haven't been created yet, but that doesn't mean they
+            these keywords aren't supported yet, but that doesn't mean they
             won't exist in the future!
           </p>
           <ul>

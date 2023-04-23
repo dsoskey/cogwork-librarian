@@ -1,5 +1,5 @@
 import React from 'react'
-import { SourceIconProps } from '../scryfall/scryfallIcon'
+import { SourceIconProps } from './scryfallIcon'
 
 export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
   const highlightColor = isActive ? 'var(--blue)' : '#fff'
