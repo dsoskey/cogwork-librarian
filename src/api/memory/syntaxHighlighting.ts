@@ -8,6 +8,7 @@ export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
 const keywordRegex = Object.values(keywords).join('|')
 const toImplementRegex = Object.values(keywordsToImplement).join('|')
 
+console.debug(`local supports ${Object.values(keywords).length} keywords`)
 console.debug(
   `${Object.values(keywordsToImplement).length} keywords to add to local syntax`
 )

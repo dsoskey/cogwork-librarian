@@ -39,6 +39,7 @@ condition -> (
     colorCondition |
     colorIdentityCondition |
     manaCostCondition |
+    exactNameCondition |
     nameCondition |
     nameRegexCondition |
     oracleCondition |
@@ -82,6 +83,12 @@ cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
         filtersUsed: ["cmc"],
         filterFunc: oracleFilters.defaultOperation('cmc', operator, value),
     }) %}
+
+exactNameCondition -> "!" stringValue
+    {% ([op, value]) => ({
+        filtersUsed: ["exact"],
+        filterFunc: oracleFilters.exactMatch('name', value)
+    })%}
 
 nameCondition -> ("name"i) (":" | "=") stringValue
     {% ([_, [_op], value]) => ({

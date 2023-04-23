@@ -118,6 +118,12 @@ const powTouTotalOperation = (
   },
 })
 
+const exactMatch =
+  (field: OracleKeys, value: string): Filter<NormedCard> =>
+  (card: NormedCard) => {
+    return card[field].toString().toLowerCase() === value
+  }
+
 const textMatch =
   (field: OracleKeys, value: string): Filter<NormedCard> =>
   (card: NormedCard) => {
@@ -584,6 +590,7 @@ export const oracleFilters = {
   defaultOperation,
   powTouOperation,
   powTouTotalOperation,
+  exactMatch,
   textMatch,
   noReminderTextMatch,
   regexMatch,

@@ -37,6 +37,7 @@ condition -> (
     colorCondition |
     colorIdentityCondition |
     manaCostCondition |
+    exactNameCondition |
     nameCondition |
     nameRegexCondition |
     oracleCondition |
@@ -76,10 +77,11 @@ condition -> (
 ) {% ([[condition]]) => condition %}
 
 cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
+exactNameCondition -> "!" stringValue
 nameCondition -> ("name"i) (":" | "=") stringValue | stringValue
 nameRegexCondition -> ("name"i) (":" | "=") regexString | regexString
 colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
-colorIdentityCondition -> ("ci"i | "identity"i | "id"i) anyOperator colorCombinationValue
+colorIdentityCondition -> ("ci"i | "commander"i | "identity"i | "id"i) anyOperator colorCombinationValue
 manaCostCondition -> ("mana"i | "m"i) anyOperator manaCostValue
 oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue
 oracleRegexCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") regexString

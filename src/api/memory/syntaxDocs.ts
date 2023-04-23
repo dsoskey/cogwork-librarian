@@ -1,6 +1,7 @@
 import { ObjectValues } from '../../types'
 
 export const keywords = {
+  '!': '!',
   a: 'a',
   artist: 'artist',
   banned: 'banned',
@@ -59,7 +60,6 @@ export const keywords = {
 } as const
 
 export const keywordsToImplement = {
-  '!': '!',
   // Requires tagging data
   art: 'art', arttag: 'arttag', atag: 'atag',
   function: 'function', oracletag: 'oracletag', otag: 'otag',

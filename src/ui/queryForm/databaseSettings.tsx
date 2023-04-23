@@ -90,7 +90,7 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
           <div className='db-import'>
             <h3>
               import from{" "}
-              {Object.keys(IMPORT_SOURCE).map(source => (<>
+              {Object.keys(IMPORT_SOURCE).map(source => (<React.Fragment key={source}>
                 <input
                   id={`import-${source}`}
                   type='radio'
@@ -99,7 +99,7 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
                   onChange={() => setImportType(source as ImportSource)}
                 />
                 <label htmlFor={`import-${source}`}>{sourceToLabel[source]}</label>
-              </>))}
+              </React.Fragment>))}
             </h3>
             {importType === "scryfall" && <ScryfallImporter
               dbImportStatus={dbImportStatus}
