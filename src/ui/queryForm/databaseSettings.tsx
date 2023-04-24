@@ -24,7 +24,7 @@ const sourceToLabel: Record<ImportSource, string> = {
 }
 export interface DatabaseSettingsProps {}
 export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
-  const { dbStatus, saveToDB, manifest } = useContext(CogDBContext)
+  const { dbStatus, memStatus, manifest, saveToDB, resetDB } = useContext(CogDBContext)
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [dbDirty, setDbDirty] = useState<boolean>(false)
   const [dbImportStatus, setDbImportStatus] = useState<TaskStatus>('unstarted')
@@ -34,6 +34,9 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
   const onModalClose = () => setModalOpen(false)
   const saveMemoryToDB = () => {
     saveToDB().then(() => setDbDirty(false))
+  }
+  const loadDBIntoMemory = () => {
+    resetDB().then(() => setDbDirty(false))
   }
   return (
     <div>
@@ -76,15 +79,23 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
               </div>
             )}
             <button
-              disabled={dbStatus === 'loading' || !dbDirty}
+              disabled={dbStatus === 'loading' || memStatus === 'loading' || !dbDirty}
               onClick={saveMemoryToDB}
             >
-              {dbStatus !== 'loading' && !dbDirty
+              {dbStatus !== 'loading' && memStatus !== 'loading' && !dbDirty
                 ? 'database in sync'
                 : `sav${
-                    dbStatus === 'loading' ? 'ing' : 'e'
+                    dbStatus === 'loading' || memStatus === 'loading' ? 'ing' : 'e'
                   } to local database`}
             </button>
+            {dbDirty && <button
+              disabled={memStatus === 'loading'}
+              onClick={loadDBIntoMemory}
+            >
+              {`reload${
+                dbStatus === 'loading' || memStatus === 'loading' ? 'ing' : ''
+              } local database`}
+            </button>}
           </section>
 
           <CubeImporter />

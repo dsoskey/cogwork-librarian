@@ -13,6 +13,7 @@ export interface CogDB {
   manifest: Manifest
   setManifest: Setter<Manifest>
   saveToDB: () => Promise<void>
+  resetDB: () => Promise<void>
 }
 
 const defaultDB: CogDB = {
@@ -28,6 +29,7 @@ const defaultDB: CogDB = {
   },
   setManifest: () => console.error("CogDB.setManifest called without a provider!"),
   saveToDB: () => Promise.reject("CogDB.saveToDB called without a provider!"),
+  resetDB: () => Promise.reject("CogDB.resetDB called without a provider!"),
 }
 
 export const CogDBContext = createContext(defaultDB)
@@ -95,9 +97,15 @@ export const useCogDB = (): CogDB => {
     setMemStatus('success')
   }
 
-  useEffect(() => {
-    loadDB().catch(() => setMemStatus('error'))
-  }, [])
+  const resetDB = async () => {
+    try {
+      await loadDB()
+    } catch (e) {
+      setMemStatus('error')
+    }
+  }
+
+  useEffect(() => { resetDB() }, [])
 
   return {
     dbStatus,
@@ -107,5 +115,6 @@ export const useCogDB = (): CogDB => {
     setManifest,
     memory,
     setMemory,
+    resetDB
   }
 }

@@ -70,7 +70,7 @@ export const useListImporter = ({ memory }: ListImporterProps): ListImporter => 
     }
 
     console.log("process raws")
-    rawCards.forEach(rawCard => {
+    rawCards.filter(it => it.length > 0).forEach(rawCard => {
       const maybeCard = rawData.current[rawCard.toLowerCase()]
       if (maybeCard !== undefined) {
         foundCards.push(maybeCard)
