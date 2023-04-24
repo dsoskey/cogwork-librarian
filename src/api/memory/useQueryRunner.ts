@@ -73,11 +73,12 @@ export const useMemoryQueryRunner = ({
       }
     } catch (error) {
       const { message } = error as NearlyError
-      console.log(message)
+      const isNearlyError = error.offset !== undefined
+      console.debug(message)
       return err({
         query,
         debugMessage: message,
-        displayMessage: displayMessage(query, index, error),
+        displayMessage: isNearlyError ? displayMessage(query, index, error) : message,
       })
     }
 

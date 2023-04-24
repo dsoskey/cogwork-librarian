@@ -11,6 +11,7 @@ export const keywords = {
   ci: 'ci',
   commander: 'commander',
   cmc: 'cmc',
+  cube: 'cube',
   color: 'color',
   date: 'date',
   e: 'e',
@@ -65,8 +66,6 @@ export const keywordsToImplement = {
   function: 'function', oracletag: 'oracletag', otag: 'otag',
   // Requires set data
   b: 'b', block: 'block',
-  // Could be cool for loading a custom cube list
-  cube: 'cube',
   devotion: 'devotion',
   // Requires sort parser??
   direction: 'direction',

@@ -6,6 +6,7 @@ import { FileImporter } from './fileImporter'
 import { ScryfallImporter } from './scryfallImporter'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { ListImporter } from './listImporter'
+import { CubeImporter } from './cubeImporter'
 
 const LAST_UPDATE = new Date('2023-03-10')
 
@@ -47,8 +48,8 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
         title={<h2>database settings</h2>}
         onClose={onModalClose}
       >
-        <div>
-          <div>
+        <>
+          <section className='in-memory'>
             <h3>in memory {dbImportStatus === 'loading' && '(importing...)'}</h3>
             <div>
               <strong>source:</strong> <code>{manifest.name}</code>
@@ -84,10 +85,11 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
                     dbStatus === 'loading' ? 'ing' : 'e'
                   } to local database`}
             </button>
-            {/*TODO<button>export to file</button>*/}
-          </div>
+          </section>
 
-          <div className='db-import'>
+          <CubeImporter />
+
+          <section className='db-import'>
             <h3>
               import from{" "}
               {Object.keys(IMPORT_SOURCE).map(source => (<React.Fragment key={source}>
@@ -116,8 +118,8 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
               dbImportStatus={dbImportStatus}
               setDbImportStatus={setDbImportStatus}
             />}
-          </div>
-        </div>
+          </section>
+        </>
       </Modal>
     </div>
   )

@@ -57,7 +57,8 @@ condition -> (
     restrictedCondition |
     isCondition |
     notCondition |
-    inCondition
+    inCondition |
+    cubeCondition
 ) {% () => printFilters.oracleFilter() %} | (
     rarityCondition |
     setCondition |
@@ -101,6 +102,7 @@ restrictedCondition -> "restricted"i equalityOperator formatValue
 isCondition -> "is"i ":" isValue
 notCondition -> "not"i ":" isValue
 inCondition -> "in"i ":" stringValue
+cubeCondition -> "cube"i equalityOperator stringValue
 
 # print-specific
 rarityCondition ->  ("r"i | "rarity"i) anyOperator rarityValue

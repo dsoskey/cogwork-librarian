@@ -39,7 +39,9 @@ button:disabled {
 
 input {
   color: #ccc;
-  background-color: #2d2d2d;
+  background: var(--darker-color);
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  border: none;
 }
 
 fieldset {
@@ -312,6 +314,17 @@ p {
 .alert {
   color: var(--red);
   font-weight: bold;
+}
+
+.modal section:not(:first-of-type) {
+  margin-top: 2em;
+}
+.cube-import ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.cube-import .submit {
+  margin-top: 4px;
 }
 
 .db-import {

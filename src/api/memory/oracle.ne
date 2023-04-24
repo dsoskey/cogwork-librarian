@@ -74,7 +74,8 @@ condition -> (
     languageCondition |
     priceCondition |
     stampCondition |
-    watermarkCondition
+    watermarkCondition |
+    cubeCondition
 ) {% ([[condition]]) => condition %}
 
 
@@ -272,5 +273,8 @@ stampCondition -> "stamp"i equalityOperator stringValue
 
 watermarkCondition -> ("wm"i | "watermark"i) equalityOperator stringValue
     {% ([_, [_op], value]) => oracleFilters.watermarkFilter(value) %}
+
+cubeCondition -> "cube"i equalityOperator stringValue
+    {% ([_, [_op], value]) => oracleFilters.cubeFilter(value) %}
 
 @include "./values.ne"

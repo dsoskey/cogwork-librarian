@@ -582,6 +582,21 @@ const stampFilter = (value: string) =>
 const watermarkFilter = (value: string) =>
   handlePrint(['watermark'], printFilters.watermarkFilter(value))
 
+const cubeFilter = (cubeKey: string): FilterRes<NormedCard> => {
+  const rawCards = localStorage.getItem(`${cubeKey}.cube.coglib.sosk.watch`)
+  if (rawCards === null) {
+    console.warn(`Unknown cube key (${cubeKey})`) // todo: tokenize noQuoteString
+  }
+  const cardSet = new Set<string>(rawCards === null ? [] : JSON.parse(rawCards))
+  return {
+    filtersUsed: ['cube'],
+    filterFunc: (card: NormedCard) => {
+      if (rawCards === null) throw Error(`Unknown cube key (${cubeKey})`)
+      return cardSet.has(card.oracle_id)
+    }
+  }
+}
+
 export const oracleFilters = {
   identity: identityRes,
   and: andRes,
@@ -617,4 +632,5 @@ export const oracleFilters = {
   languageFilter,
   stampFilter,
   watermarkFilter,
+  cubeFilter,
 }
