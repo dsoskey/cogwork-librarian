@@ -12,7 +12,7 @@ export interface ExampleGalleryProps {
 
 export const ExampleGallery = ({ setQueries }: ExampleGalleryProps) => {
   const [exampleOpen, setExampleOpen] = useState<boolean>(false)
-  const { showDebugInfo } = useContext(FlagContext)
+  const { showDebugInfo } = useContext(FlagContext).flags
 
   return (
     <>

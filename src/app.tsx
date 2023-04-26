@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { BrowserView } from './ui/cardBrowser/browserView'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { QueryForm } from './ui/queryForm/queryForm'
@@ -22,8 +22,11 @@ import { ExampleGallery } from './ui/queryForm/exampleGallery'
 import { SyntaxDocs } from './ui/queryForm/syntaxDocs'
 import { AppInfo } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
+import { FlagContext } from './flags'
+import { AdminPanel } from './ui/adminPanel'
 
 export const App = () => {
+  const { adminMode } = useContext(FlagContext).flags
   const cogDB = useCogDB()
   const listImporter = useListImporter({memory: cogDB.memory})
   const viewport = useViewportListener()
@@ -59,7 +62,7 @@ export const App = () => {
             <div className='input-column'>
               <div className='row'>
                 <h1 className='row'>
-                  <CoglibIcon isActive={false} size='2em' />
+                  <CoglibIcon isActive={adminMode} size='2em' />
                   <span className='page-title'>cogwork librarian</span>
                 </h1>
 
@@ -68,6 +71,8 @@ export const App = () => {
                 <SyntaxDocs />
 
                 <AppInfo />
+
+                {adminMode && <AdminPanel />}
               </div>
 
               <QueryForm

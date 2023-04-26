@@ -33,7 +33,7 @@ export const CardView = ({
   revealDetails,
   visibleDetails,
 }: CardViewProps) => {
-  const { showDebugInfo } = useContext(FlagContext)
+  const { showDebugInfo } = useContext(FlagContext).flags
   const [flipped, setFlipped] = useState(false)
   const [clipboardStatus, setClipboardStatus] =
     useState<TaskStatus>('unstarted')

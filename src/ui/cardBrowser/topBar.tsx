@@ -48,7 +48,7 @@ export const TopBar = ({
   source,
   errors,
 }: TopBarProps) => {
-  const { showDebugInfo } = useContext(FlagContext)
+  const { showDebugInfo } = useContext(FlagContext).flags
   const numErrors = Object.keys(errors ?? {}).length
   const errorText = useMemo(
     () => errors.map((it) => `- ${it.displayMessage}`).join('\n\n'),

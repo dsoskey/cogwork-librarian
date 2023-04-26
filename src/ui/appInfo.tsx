@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Modal } from './component/modal'
 import { queryExamples } from '../api/example'
 import {
@@ -7,19 +7,43 @@ import {
   weightAlgorithms,
 } from '../api/queryRunnerCommon'
 import { rankInfo, renderQueryInfo } from './component/textEditor'
+import { FlagContext } from '../flags'
 
 const EXAMPLE = queryExamples[0]
 const injectPrefix = _injectPrefix(EXAMPLE.prefix)
 
 export const AppInfo = () => {
+  const { setFlag } = useContext(FlagContext)
   const [open, setOpen] = useState(false)
+  const [pin1, setPin1] = useState(false)
+  const [pin2, setPin2] = useState(false)
+
+  const tryLock = () => {
+    if (pin1) {
+      if (pin2) {
+        localStorage.setItem("admin.coglib.sosk.watch", "~")
+        setPin2(false)
+      }
+      setFlag('adminMode', true)
+      setPin1(false)
+    } else {
+      setFlag('adminMode', false)
+      localStorage.removeItem("admin.coglib.sosk.watch")
+    }
+  }
+
+  const clickPin2 = () => {
+    if (pin1) {
+      setPin2(true)
+    }
+  }
 
   return (
     <>
       <button onClick={() => setOpen(true)}>about me</button>
       <Modal
         open={open}
-        title={<h2>what is this thing???</h2>}
+        title={<h2>what is this thing<span onClick={tryLock}>???</span></h2>}
         onClose={() => setOpen(false)}
       >
         <p>
@@ -54,7 +78,7 @@ export const AppInfo = () => {
             the in-memory query processor allows cogwork librarian to run
             offline after the initial database download. this also makes the
             search orders of magnitude faster than communicating with scryfall
-            directly. why wait for answers?
+            directly. why wait for answers<span onClick={() => setPin1(true)}>?</span>
           </li>
           <li>
             cogwork librarian works with any scryfall-compatible list of cards,
@@ -151,7 +175,7 @@ export const AppInfo = () => {
           <li>shareable search links</li>
         </ul>
 
-        <h3>this looks cool! how can i contribute?</h3>
+        <h3>this looks cool<span onClick={clickPin2}>!</span> how can i contribute?</h3>
         <p>
           at the moment, i need people to test cogwork librarian. try it out for
           your next cube project and see if it helps you level up your queries.{' '}
