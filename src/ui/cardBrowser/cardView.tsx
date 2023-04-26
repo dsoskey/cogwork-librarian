@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Card, ImageUris } from 'scryfall-sdk'
 import { EnrichedCard, SCORE_PRECISION } from '../../api/queryRunnerCommon'
 import { WEIGHT, QUERIES } from './constants'
 import { DOUBLE_FACED_LAYOUTS } from '../../api/card'
+import { TaskStatus } from '../../types'
+import { FlagContext } from '../../flags'
 
 export interface CardViewProps {
   card: EnrichedCard
@@ -18,6 +20,12 @@ const getBackImageURI = (card: Card, version: keyof ImageUris) => {
     : card.card_faces[1].image_uris[version] ?? ''
 }
 
+const copyText = {
+  unstarted: '📑',
+  success: '✅',
+  error: '🚨',
+}
+
 export const CardView = ({
   onAdd,
   onIgnore,
@@ -25,12 +33,29 @@ export const CardView = ({
   revealDetails,
   visibleDetails,
 }: CardViewProps) => {
+  const { showDebugInfo } = useContext(FlagContext)
   const [flipped, setFlipped] = useState(false)
+  const [clipboardStatus, setClipboardStatus] =
+    useState<TaskStatus>('unstarted')
   const _card = card.data
   const version = 'normal'
   const imageSource = flipped
     ? getBackImageURI(_card, version)
     : _card.image_uris?.normal ?? _card.getFrontImageURI(version)
+
+  const copyToJson = () => {
+    navigator.clipboard
+      .writeText(JSON.stringify(card, undefined, 2))
+      .then(() => {
+        setClipboardStatus('success')
+        setTimeout(() => {
+          setClipboardStatus('unstarted')
+        }, 3000)
+      })
+      .catch(() => {
+        setClipboardStatus('error')
+      })
+  }
 
   return (
     <div className='card-view'>
@@ -53,10 +78,13 @@ export const CardView = ({
         {DOUBLE_FACED_LAYOUTS.includes(card.data.layout) && (
           <button onClick={() => setFlipped((prev) => !prev)}>flip</button>
         )}
+        {showDebugInfo && <button onClick={copyToJson}>
+          {copyText[clipboardStatus]}
+        </button>}
         <button onClick={onIgnore}>ignore</button>
         <button onClick={onAdd}>add to list</button>
       </div>
-      {revealDetails && (
+      {showDebugInfo && revealDetails && (
         <div className='detail'>
           <div>{card.data.name}</div>
           {visibleDetails.includes('oracle') && (

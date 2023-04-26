@@ -12,7 +12,7 @@ export interface ExampleGalleryProps {
 
 export const ExampleGallery = ({ setQueries }: ExampleGalleryProps) => {
   const [exampleOpen, setExampleOpen] = useState<boolean>(false)
-  const { debug } = useContext(FlagContext)
+  const { showDebugInfo } = useContext(FlagContext)
 
   return (
     <>
@@ -54,7 +54,7 @@ export const ExampleGallery = ({ setQueries }: ExampleGalleryProps) => {
               </div>
             </div>
           ))}
-          {debug && (
+          {showDebugInfo && (
             <pre className='language-scryfall-extended'>
               <code>{testQueries.join('\n')}</code>
             </pre>

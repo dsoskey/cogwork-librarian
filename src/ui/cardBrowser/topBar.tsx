@@ -1,11 +1,12 @@
 import { Loader } from '../component/loader'
 import { QUERIES, WEIGHT } from './constants'
 import { PageControl } from './pageControl'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import { DataSource, Setter, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/memory/syntaxHighlighting'
+import { FlagContext } from '../../flags'
 
 interface TopBarProps {
   // report metadata
@@ -47,6 +48,7 @@ export const TopBar = ({
   source,
   errors,
 }: TopBarProps) => {
+  const { showDebugInfo } = useContext(FlagContext)
   const numErrors = Object.keys(errors ?? {}).length
   const errorText = useMemo(
     () => errors.map((it) => `- ${it.displayMessage}`).join('\n\n'),
@@ -128,7 +130,7 @@ export const TopBar = ({
                 seconds
               </div>
             )}
-            <div>
+            {showDebugInfo && <div>
               <input
                 id='show-details'
                 type='checkbox'
@@ -158,7 +160,7 @@ export const TopBar = ({
                   </div>
                 </div>
               )}
-            </div>
+            </div>}
           </>
         )}
       </div>

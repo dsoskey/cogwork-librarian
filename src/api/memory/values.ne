@@ -25,7 +25,23 @@ isValue -> (
   | "vanilla"i | "modal"i | "fullart"i | "foil"i | "nonfoil"i | "etched"i | "token"i
   | "bikeland"i | "cycleland"i | "bicycleland"i | "bounceland"i | "karoo"i | "canopyland"i | "canland"i | "fetchland"i
   | "checkland"i | "dual"i | "fastland"i | "filterland"i | "gainland"i | "painland"i | "scryland"i | "shadowland"i | "snarl"i
-  | "slowland"i | "shockland"i | "storageland"i | "creatureland"i | "manland"i | "triland"i | "triome"i | "tangoland"i | "battleland"i
+  | "slowland"i | "shockland"i | "storageland"i | "creatureland"i | "manland"i
+  | "triland"i | "triome"i | "trikeland"i | "tricycleland"i
+  | "tangoland"i | "battleland"i
+  # pulled these from advanced tab in scryfall
+  | "adventure"i | "arenaid"i | "artseries"i | "artist"i | "artistmisprint"i | "belzenlok"i
+  | "lights"i | "augmentation"i | "back"i | "bear"i | "booster"i | "brawlcommander"i | "buyabox"i
+  | "cardmarket"i | "class"i | "ci"i | "colorshifted"i | "companion"i | "contentwarning"i
+  | "covered"i | "datestamped"i | "doublesided"i | "duelcommander"i | "etb"i
+  | "englishart"i | "etch"i | "extended"i | "flavorname"i | "flavor"i
+  | "fbb"i | "fwb"i | "frenchvanilla"i | "funny"i | "future"i | "gameday"i
+  | "halo"i | "hires"i | "splitmana"i | "illustration"i | "intropack"i | "invitational"i
+  | "localizedname"i | "mtgoid"i | "masterpiece"i
+  | "modern"i | "multiverse"i | "new"i | "oathbreaker"i | "old"i | "oversized"i | "paperart"i
+  | "party"i | "phyrexia"i | "planar"i | "planeswalkerdeck"i | "prerelease"i | "printedtext"i
+  | "related"i | "release"i | "reserved"i | "reversible"i | "stamp"i | "showcase"i
+  | "spellbook"i | "spikey"i | "stamped"i | "starterdeck"i | "story"i | "tcgplayer"i | "textless"i
+  | "tombstone"i | "onlyprint"i | "variation"i | "watermark"i
 ) {% ([[category]]) => category.toLowerCase() %}
 
 # anything that isn't a special character and isn't "and" or "or"

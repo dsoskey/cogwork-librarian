@@ -2,12 +2,12 @@ import React, { createContext } from 'react'
 import { ObjectValues } from './types'
 
 const FLAG_NAMES = {
-  debug: 'debug',
+  showDebugInfo: 'showDebugInfo',
 } as const
 type Flag = ObjectValues<typeof FLAG_NAMES>
 
 export const INITIAL_FLAGS = {
-  debug: false,
+  showDebugInfo: false,
 }
 
 export const FlagContext = createContext<Record<Flag, boolean>>(INITIAL_FLAGS)

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { CardView } from './cardView'
 import { PAGE_SIZE } from './constants'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
@@ -45,6 +45,7 @@ export const BrowserView = React.memo(
     const viewport = useViewportListener()
     const [width, setWidth] = useState<number>(viewport.width * .5)
     const [displayType, setDisplayType] = useState<'cards' | 'json'>('cards')
+    const toppa = useRef<HTMLDivElement>()
 
     // TODO: Add collection switching
     const [activeCollection, setActiveCollection] =
@@ -71,12 +72,18 @@ export const BrowserView = React.memo(
     // TODO make configurable
     const [pageSize] = useLocalStorage('page-size', PAGE_SIZE)
     const [page, setPage] = useState(0)
+    const onPageChange = (n: number) => {
+      setPage(n)
+      setTimeout(() => {
+        // this doesn't quite work for mobile. idk why
+        toppa.current?.scrollTo(0,0)
+      }, 100)
+    }
     const lowerBound = page * pageSize + 1
     const upperBound = (page + 1) * pageSize
     useEffect(() => {
-      setPage(0)
+      onPageChange(0)
     }, [result])
-
     const currentPage = useMemo(
       () => activeCards.slice(lowerBound - 1, upperBound),
       [activeCards, lowerBound, upperBound]
@@ -113,12 +120,12 @@ export const BrowserView = React.memo(
             lowerBound={lowerBound}
             upperBound={upperBound}
             page={page}
-            setPage={setPage}
+            setPage={onPageChange}
             pageSize={pageSize}
           />
 
           {showCards && (
-            <div className='result-container'>
+            <div ref={toppa} className='result-container'>
               {displayType === 'cards' &&
                 currentPage.map((card) => (
                   <CardView
@@ -146,7 +153,7 @@ export const BrowserView = React.memo(
         </div>
       </div>
     ) : (
-      <div className='results'>
+      <div ref={toppa} className='results'>
         <div className='column content'>
           <TopBar
             errors={errors}
@@ -163,7 +170,7 @@ export const BrowserView = React.memo(
             lowerBound={lowerBound}
             upperBound={upperBound}
             page={page}
-            setPage={setPage}
+            setPage={onPageChange}
             pageSize={pageSize}
           />
 
@@ -195,7 +202,7 @@ export const BrowserView = React.memo(
               <div className='bottom-page-control'>
                 <PageControl
                   page={page}
-                  setPage={setPage}
+                  setPage={onPageChange}
                   pageSize={pageSize}
                   upperBound={upperBound}
                   cardCount={activeCards.length}

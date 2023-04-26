@@ -299,26 +299,90 @@ const manaCostMatch =
 const formatMatch = (legality: Legality, value: Format) => (card: NormedCard) =>
   card.legalities[value] === (legality as unknown as string)
 
-const unimplemented = false
+const unimplemented = (value: string) => {
+  console.warn(`is:${value} is unimplemented`)
+  return false
+}
 const isVal =
   (value: IsValue): Filter<NormedCard> =>
   (card: NormedCard) => {
     switch (value) {
+      case 'duelcommander':
+      case 'halo':
+      case 'variation':
+      case 'artseries':
+      case 'doublesided':
+      case 'hires':
+      case 'localizedname':
+      case 'watermark':
+      case 'multiverse':
+      case 'planar':
+      case 'old':
+      case 'fbb':
+      case 'reserved':
+      case 'englishart':
+      case 'artist':
+      case 'stamp':
+      case 'stamped':
+      case 'booster':
+      case 'extended':
+      case 'frenchvanilla':
+      case 'tcgplayer':
+      case 'modern':
+      case 'cardmarket':
+      case 'lights':
+      case 'flavorname':
+      case 'funny':
+      case 'tombstone':
+      case 'ci':
+      case 'artistmisprint':
+      case 'oversized':
+      case 'future':
+      case 'colorshifted':
+      case 'showcase':
+      case 'illustration':
+      case 'story':
+      case 'oathbreaker':
+      case 'etb':
+      case 'spellbook':
+      case 'bear':
+      case 'new': // new frame
+      case 'spikey':
+      case 'flavor':
+      case 'fwb':
+      case 'covered':
+      case 'printedtext':
+      case 'back':
+      case 'brawlcommander':
+      case 'class':
+      case 'paperart':
+      case 'contentwarning':
+      case 'textless':
+      case 'masterpiece':
+        return unimplemented(value)
+      // not found on card json
+      case 'invitational':
+      case 'belzenlok':
+        return unimplemented(value)
+      case 'augmentation':
+        return card.layout === "augment" || card.layout === "host"
+      case 'companion':
+        return card.keywords.includes("Companion")
+      case 'reversible':
+        return card.layout.toLowerCase() === "reversible_card"
+      case 'related':
+        return card.all_parts !== undefined && card.all_parts.length > 0
+      case 'onlyprint':
+        return card.printings.length === 1
       case 'gold':
         return (card.colors?.length ?? 0) >= 2
+      case 'splitmana': // has hybrid or twobrid mana
       case 'hybrid':
+        return unimplemented(value)
+      case 'phyrexia':
       case 'phyrexian':
-        return unimplemented
-      case 'promo':
-        return card.printings.find((it) => it.promo) !== undefined
-      case 'reprint':
-        return card.printings.find((it) => it.reprint) !== undefined
-      case 'firstprint':
-      case 'firstprinting':
-        return unimplemented // Add when processing multiple prints
-      case 'digital':
-        return card.printings.find((it) => it.digital) !== undefined
-      case 'dfc':
+        return unimplemented(value)
+     case 'dfc':
         return DOUBLE_FACED_LAYOUTS.includes(card.layout)
       case 'mdfc':
         return card.layout === 'modal_dfc'
@@ -333,6 +397,10 @@ const isVal =
         return card.layout === 'flip'
       case 'leveler':
         return card.layout === 'leveler'
+      case 'adventure':
+        return card.layout === 'adventure'
+
+      // TODO: check any face for types
       case 'commander':
         return (
           card.type_line.toLowerCase().includes('legendary creature') ||
@@ -348,16 +416,21 @@ const isVal =
             card.type_line.toLowerCase().includes(type)
           ).length === 0
         )
+      case 'party':
+        return ['cleric', 'rogue', 'warrior', 'wizard'].filter((type) =>
+          textMatch('type_line', type)(card)
+          || textMatch("oracle_text", "changeling")
+        ).length > 0
       case 'permanent':
         return (
           ['instant', 'sorcery'].filter((type) =>
-            card.type_line.toLowerCase().includes(type)
+            textMatch('type_line', type)(card)
           ).length === 0
         )
       case 'historic':
         return (
           ['legendary', 'artifact', 'saga'].filter((type) =>
-            card.type_line.toLowerCase().includes(type)
+            textMatch('type_line', type)(card)
           ).length > 0
         )
       case 'vanilla':
@@ -369,11 +442,6 @@ const isVal =
         return /chooses? (\S* or \S*|(up to )?(one|two|three|four|five))( or (more|both)| that hasn't been chosen)?( —|\.)/.test(
           card.oracle_text?.toLowerCase()
         )
-      case 'fullart':
-      case 'foil':
-      case 'nonfoil':
-      case 'etched':
-        return unimplemented // Add when processing multiple prints
       case 'token':
         return card.layout === 'token' || card.type_line.includes('Token')
       case 'bikeland':
@@ -481,6 +549,8 @@ const isVal =
           hasNumLandTypes(card, 0) &&
           /\{T}: Add {.}, \{.}, or {.}\./.test(card.oracle_text)
         )
+      case 'trikeland':
+      case 'tricycleland':
       case 'triome':
         return (
           card.type_line.includes('Land') &&
@@ -503,10 +573,44 @@ const isVal =
             card.oracle_text
           )
         )
+
+      // TODO: handle print filters
+      case 'fullart':
+      case 'foil':
+      case 'nonfoil':
+      case 'firstprint':
+      case 'firstprinting':
+        return unimplemented(value) // Add when processing multiple prints
+      case 'etch':
+      case 'etched':
+        return unimplemented(value)
+      case 'promo':
+        return card.printings.find((it) => it.promo) !== undefined
+      case 'reprint':
+        return card.printings.find((it) => it.reprint) !== undefined
+      case 'digital':
+        return card.printings.find((it) => it.digital) !== undefined
+      case 'mtgoid':
+        return card.printings.find(it => it.mtgo_id !== null && it.mtgo_id !== undefined) !== undefined
+      case 'arenaid':
+        return card.printings.find(it => it.arena_id !== null && it.arena_id !== undefined) !== undefined
+      case 'starterdeck':
+      case 'buyabox':
+      case 'prerelease':
+      case 'gameday':
+      case 'datestamped':
+      case 'intropack':
+      case 'release':
+      case 'planeswalkerdeck':
+        return card.printings.find(it => it.promo_types?.includes(value)) !== undefined
       case 'extra':
-        return unimplemented
+        return card.layout === 'art_series' ||
+          card.layout === 'token' ||
+          card.layout === 'double_faced_token' ||
+          card.layout === 'emblem'
+          // card.set_type !== 'memorabilia'
       default:
-        return unimplemented
+        return unimplemented(value)
     }
   }
 
