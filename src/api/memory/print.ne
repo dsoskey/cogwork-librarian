@@ -99,7 +99,7 @@ layoutCondition -> ("layout"i) equalityOperator stringValue
 formatCondition -> ("format"i | "f"i) equalityOperator formatValue
 bannedCondition -> "banned"i equalityOperator formatValue
 restrictedCondition -> "restricted"i equalityOperator formatValue
-isCondition -> "is"i ":" isValue
+isCondition -> ("is"i | "has"i) ":" isValue
 notCondition -> "not"i ":" isValue
 inCondition -> "in"i ":" stringValue
 cubeCondition -> "cube"i equalityOperator stringValue

@@ -79,14 +79,16 @@ export const testQueries = [
   'wm:orzhov',
   'year=2020',
   'lang:any',
+  'is:companion',
+  'is:historic',
+  'is:party',
+  'cube:april',
 ]
 
 const unimplementedQueries = [
   't:plane', // this currently gets planeswalkers too, but scryfall only shows planes
   'pow>tou',
   'is:frenchvanilla',
-  'is:party',
-  'is:historic',
   'include:extras', // this one seems to be processed separately?
   'in:rare',
   'st:funny',
@@ -109,7 +111,6 @@ const unimplementedQueries = [
   'is:set_promo',
   'is:commander',
   'is:brawler',
-  'is:companion',
   'has:watermark',
   'is:reprint',
   'is:foil',
@@ -129,11 +130,10 @@ const unimplementedQueries = [
   'in:ru',
   'new:language',
   'is:colorshifted',
+  'is:hires',
 ]
 
 const notGonnaImplementQueries = [
-  'cube:april',
-  'is:hires',
   'art|atag|arttag|function|otag|oracletag'
 ] // custom regex, display keywords
 

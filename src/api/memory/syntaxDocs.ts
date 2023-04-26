@@ -26,6 +26,7 @@ export const keywords = {
   id: 'id',
   identity: 'identity',
   is: 'is',
+  has: 'has', // alias for is
   in: 'in',
   keyword: 'keyword',
   lang: 'lang', language: 'language',
@@ -69,10 +70,9 @@ export const keywordsToImplement = {
   devotion: 'devotion',
   // Requires sort parser??
   direction: 'direction',
-  new: 'new',
   order: 'order',
-  has: 'has', // has:indicator has:watermark
-  include: 'include', // include:extras
+  new: 'new',
+  include: 'include', // is include:extras needed outside scryfall.com?
   prefer: 'prefer',
   produces: 'produces',
   unique: 'unique',

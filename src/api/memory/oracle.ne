@@ -208,7 +208,7 @@ restrictedCondition -> "restricted"i equalityOperator formatValue
         filterFunc: oracleFilters.formatMatch('restricted', value),
     }) %}
 
-isCondition -> "is"i ":" isValue
+isCondition -> ("is"i | "has"i) ":" isValue
     {% ([_, [_op], value]) => ({
         filtersUsed: ["is"],
         filterFunc: oracleFilters.isVal(value),
