@@ -11,15 +11,26 @@ export const downloadCards = async (
 
   return normCardList(results)
 }
-
 export const putFile = async (manifest: Manifest, data: NormedCard[]) => {
-  try {
+  const toSave = data.filter(card => {
+    if (card.oracle_id === undefined) {
+      console.warn(`card with no oracle_id: ${card.name}`)
+      console.debug(card)
+      return false
+    } else if (card.name === undefined) {
+      console.warn(`card with no name: ${card.oracle_id}`)
+      return false
+    } else {
+      return true
+    }
+  })
+
+  await cogDB.transaction("rw", cogDB.collection, cogDB.card, async () => {
     await cogDB.collection.put({
       ...manifest,
       id: 'the_one',
-      blob: new Blob([JSON.stringify(data)]),
+      blob: new Blob([]),
     })
-  } catch (e) {
-    console.info(e)
-  }
+    await cogDB.card.bulkPut(toSave)
+  })
 }

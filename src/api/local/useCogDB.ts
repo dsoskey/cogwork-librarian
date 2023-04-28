@@ -1,13 +1,14 @@
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useRef, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
-import { cogDB, Manifest, toManifest } from './db'
-import { downloadCards, putFile } from './populate'
+import { cogDB, Manifest } from './db'
+import { putFile } from './populate'
 import { NormedCard } from './normedCard'
-import * as Scry from 'scryfall-sdk'
+import { QueryReport, useReporter } from '../useReporter'
 
 export interface CogDB {
   dbStatus: TaskStatus
   memStatus: TaskStatus
+  dbReport: QueryReport
   memory: NormedCard[]
   setMemory: Setter<NormedCard[]>
   manifest: Manifest
@@ -20,6 +21,7 @@ const defaultDB: CogDB = {
   dbStatus: 'unstarted',
   memStatus: 'unstarted',
   memory: [],
+  dbReport: null,
   setMemory: () => console.error("CogDB.setMemory called without a provider!"),
   manifest: {
     id: '',
@@ -35,8 +37,9 @@ const defaultDB: CogDB = {
 export const CogDBContext = createContext(defaultDB)
 
 export const useCogDB = (): CogDB => {
+  const dbReport = useReporter()
   const [dbStatus, setDbStatus] = useState<TaskStatus>('unstarted')
-  const [memStatus, setMemStatus] = useState<TaskStatus>('unstarted')
+  const [memStatus, setMemStatus] = useState<TaskStatus>('loading')
   const [memory, setMemory] = useState<NormedCard[]>([])
   const [manifest, setManifest] = useState<Manifest>({
     id: 'loading',
@@ -45,62 +48,82 @@ export const useCogDB = (): CogDB => {
     lastUpdated: new Date(),
   })
 
+  const rezzy = useRef<NormedCard[]>([])
+  const onWorkerMessage = (event: MessageEvent): any => {
+    const {type, data} = event.data
+    switch (type) {
+      case 'count':
+        const value = data as number
+        dbReport.setTotalCards(value)
+        break
+      case 'card':
+        const { card, index } = data
+        // console.log(index)
+        rezzy.current.push(card)
+        if (index % 1000 === 0)
+          dbReport.addCardCount(1000)
+        break
+      case 'manifest':
+        setManifest(data)
+        break
+      case 'end':
+        setMemory(rezzy.current)
+        setMemStatus('success')
+        setDbStatus('success')
+        console.timeEnd(`loading mem`)
+        dbReport.markTimepoint('end')
+        break
+      case 'error':
+        console.error('waaaaaa', data)
+        // dbReport.markTimepoint('end')
+        break
+      default:
+        console.error('unknown message from db worker')
+        break
+    }
+  }
+
   const saveToDB = async () => {
     setDbStatus('loading')
     try {
       await putFile(manifest, memory)
       setDbStatus('success')
     } catch (e) {
+      console.error(e)
       setDbStatus('error')
     }
   }
 
-  const loadDB = async () => {
+  const newLoadDB = async () => {
+    console.debug("starting worker")
+    // @ts-ignore
+    const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
+    rezzy.current = []
+    dbReport.reset(0)
     setMemStatus('loading')
-    let res: NormedCard[] = []
     console.time(`loading mem`)
+
+    console.debug("configuring worker")
+    // @ts-ignore
+    worker.onmessage = onWorkerMessage
     const count = await cogDB.collection.count()
-    console.timeLog(`loading mem`)
     console.debug(`counted ${count} collections!`)
     if (count === 0) {
       setDbStatus('loading')
       console.debug('refreshing db')
-      try {
-        const bulkDataDefinition = await Scry.BulkData.definitionByType(
-          'default_cards'
-        )
-        const newManifest = toManifest(bulkDataDefinition)
-        setManifest(newManifest)
-        res = await downloadCards(bulkDataDefinition)
-        await putFile(newManifest, res)
-        setDbStatus('success')
-      } catch (_) {
-        setDbStatus('error')
-      }
+      worker.postMessage({ type: 'init' })
     } else {
-      console.timeLog(`loading mem`)
-      console.debug("pulling collection")
-      const result = (
-        await cogDB.collection.limit(1).toArray()
-      )[0]
-      console.timeLog(`loading mem`)
-      console.debug("extracting text from blob")
-      const text = await result.blob.text()
-      console.timeLog(`loading mem`)
-      console.debug("parsing text")
-      res = JSON.parse(text)
-      setManifest(result)
+      console.debug("posting start message to worker")
+      worker.postMessage({ type: 'load' })
     }
-    console.timeEnd(`loading mem`)
 
-    setMemory(res)
-    setMemStatus('success')
   }
 
   const resetDB = async () => {
     try {
-      await loadDB()
+      await newLoadDB()
     } catch (e) {
+      console.error(e)
       setMemStatus('error')
     }
   }
@@ -115,6 +138,7 @@ export const useCogDB = (): CogDB => {
     setManifest,
     memory,
     setMemory,
-    resetDB
+    resetDB,
+    dbReport
   }
 }

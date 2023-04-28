@@ -7,8 +7,8 @@ import { ScryfallImporter } from './scryfallImporter'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { ListImporter } from './listImporter'
 import { CubeImporter } from './cubeImporter'
+import { cogDB } from '../../api/local/db'
 
-const LAST_UPDATE = new Date('2023-03-10')
 
 export const IMPORT_SOURCE = {
   scryfall: 'scryfall',
@@ -22,13 +22,15 @@ const sourceToLabel: Record<ImportSource, string> = {
   file: 'a file',
   text: 'a text list',
 }
+
+const EPOCH = new Date(1970, 1, 1)
 export interface DatabaseSettingsProps {}
 export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
   const { dbStatus, memStatus, manifest, saveToDB, resetDB } = useContext(CogDBContext)
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [dbDirty, setDbDirty] = useState<boolean>(false)
   const [dbImportStatus, setDbImportStatus] = useState<TaskStatus>('unstarted')
-  const outOfDate = manifest.lastUpdated < LAST_UPDATE
+  const outOfDate = (manifest?.lastUpdated ?? EPOCH) < cogDB.LAST_UPDATE
   const [importType, setImportType] = useState<ImportSource>("scryfall")
 
   const onModalClose = () => setModalOpen(false)
@@ -89,7 +91,7 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
                   } to local database`}
             </button>
             {dbDirty && <button
-              disabled={memStatus === 'loading'}
+              disabled={dbStatus === 'loading' || memStatus === 'loading'}
               onClick={loadDBIntoMemory}
             >
               {`reload${

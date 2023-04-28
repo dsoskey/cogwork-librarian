@@ -1,5 +1,6 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
+import { NormedCard } from './normedCard'
 export interface Collection {
   id: string
   name: string
@@ -18,7 +19,11 @@ export const toManifest = (
 })
 
 export class TypedDexie extends Dexie {
+  LAST_UPDATE = new Date('2023-04-28')
+
   collection!: Table<Collection>
+
+  card!: Table<NormedCard>
 
   constructor() {
     super('cogwork-librarian')
@@ -33,6 +38,11 @@ export class TypedDexie extends Dexie {
       collection: 'id, name, last_updated',
       card: null,
       manifest: null,
+    })
+
+    this.version(3).stores({
+      collection: 'id, name, last_updated',
+      card: 'oracle_id, name',
     })
   }
 }

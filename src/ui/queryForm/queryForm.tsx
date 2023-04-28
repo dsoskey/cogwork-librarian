@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash'
-import React from 'react'
+import React, { useContext } from 'react'
 import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
 import { renderQueryInfo, TextEditor } from '../component/textEditor'
 import { DataSource, Setter, TaskStatus } from '../../types'
@@ -7,6 +7,8 @@ import { ScryfallIcon } from '../component/scryfallIcon'
 import { CoglibIcon } from '../component/coglibIcon'
 import { InfoModal } from '../component/infoModal'
 import { DatabaseSettings } from './databaseSettings'
+import { Loader } from '../component/loader'
+import { CogDBContext } from '../../api/local/useCogDB'
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -61,6 +63,7 @@ export const QueryForm = ({
   source,
   setSource,
 }: QueryFormProps) => {
+  const { dbReport } = useContext(CogDBContext)
   const iconSize = 30
   return (
     <>
@@ -173,15 +176,18 @@ export const QueryForm = ({
               ))}
           </select>
         </span>
-
-        <button
-          disabled={!canRunQuery || status === 'loading'}
-          onClick={execute}
-        >
-          {canRunQuery &&
-            `scour${status === 'loading' ? 'ing' : ''} the library`}
-          {!canRunQuery && `preparing the library`}
-        </button>
+        <div className='scour-button-holder'>
+          <button
+            disabled={!canRunQuery || status === 'loading'}
+            onClick={execute}
+            title='From query editor, press Ctrl/CMD+Enter to submit'
+          >
+            {canRunQuery &&
+              `scour${status === 'loading' ? 'ing' : ''} the library`}
+            {!canRunQuery && `preparing the library`}
+          </button>
+          {!canRunQuery && dbReport.totalCards > 0 && <Loader width={750} count={dbReport.cardCount} total={dbReport.totalCards} />}
+        </div>
       </div>
     </>
   )

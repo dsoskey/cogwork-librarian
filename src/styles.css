@@ -266,6 +266,11 @@ p {
   margin-bottom: 4px;
 }
 
+.scour-button-holder {
+  display:flex;
+  flex-direction: column;
+}
+
 .source-option {
   border: var(--dark-color) inset 2px;
   padding: 4px;

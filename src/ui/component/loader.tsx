@@ -1,7 +1,7 @@
 import React from 'react'
 
 export interface LoaderProps {
-  label: string
+  label?: string
   width: number
   count: number
   total: number
@@ -31,9 +31,9 @@ export const Loader = ({ width, count, total, label }: LoaderProps) => {
         height={height}
       />
 
-      <text x={4} y={height / 1.4} style={{ font: `14px monospace` }}>
+      {label && <text x={4} y={height / 1.4} style={{ font: `14px monospace` }}>
         {count} / {total} {label}
-      </text>
+      </text>}
     </svg>
   )
 }
