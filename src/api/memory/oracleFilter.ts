@@ -186,7 +186,7 @@ const colorMatch =
             (it) => it.match.length === value.size && it.not.length === 0
           ).length > 0
         )
-      case '!=':
+      case '!=': // ????? This looks wrong
         return faceMatchMap.filter((it) => it.match.length === 0).length > 0
       case '<':
         return (
@@ -251,6 +251,58 @@ const colorIdentityMatch =
     }
   }
 
+const producesMatch =
+  (operator: Operator, value: Set<string>): Filter<NormedCard> =>
+  (card: NormedCard) => {
+    if (card.produced_mana === undefined) return false
+
+    const lower = card.produced_mana.map(it => it.toLowerCase())
+    const match = lower.filter(color => value.has(color))
+    const matchnt = lower.filter(color => !value.has(color))
+    if (card.name === 'Abandoned Outpost') {
+      console.log(`match: ${match} not: ${matchnt}`)
+    }
+
+    switch (operator) {
+      case '=':
+        return match.length === value.size && matchnt.length === 0
+      case '!=':
+        return match.length !== value.size || matchnt.length > 0
+      case '<':
+        return matchnt.length === 0 && match.length < value.size
+      case '<=':
+        return matchnt.length === 0 && match.length <= value.size
+      case '>':
+        return matchnt.length > 0 && match.length === value.size
+      // Scryfall adapts ":" to the context. in this context it acts as >=
+      case ':':
+      case '>=':
+        return match.length === value.size
+    }
+  }
+
+const producesMatchCount =
+  (operator: Operator, count: number): Filter<NormedCard> =>
+  (card: NormedCard) => {
+    const cardCount = card.produced_mana?.length ?? 0
+
+    switch (operator) {
+      case '=':
+        return cardCount === count
+      case '!=':
+        return cardCount !== count
+      case '<':
+        return cardCount < count
+      case '<=':
+        return cardCount <= count
+      case '>':
+        return cardCount === count
+      // Scryfall adapts ":" to the context. in this context it acts as >=
+      case ':':
+      case '>=':
+        return cardCount === count
+    }
+  }
 const manaCostMatch =
   (operator: Operator, value: string[]): Filter<NormedCard> =>
   (card: NormedCard) => {
@@ -737,4 +789,6 @@ export const oracleFilters = {
   stampFilter,
   watermarkFilter,
   cubeFilter,
+  producesMatch,
+  producesMatchCount,
 }

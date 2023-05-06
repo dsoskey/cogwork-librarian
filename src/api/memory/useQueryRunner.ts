@@ -11,11 +11,10 @@ import { sortBy } from 'lodash'
 import { Sort } from 'scryfall-sdk'
 import { parsePowTou } from './oracleFilter'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { allPrintings, findPrinting, NormedCard } from '../local/normedCard'
+import { chooseFilterFunc, NormedCard } from '../local/normedCard'
 import { err, errAsync, ok, okAsync, Result } from 'neverthrow'
 import { CogError, displayMessage, NearlyError } from '../../error'
 import { FilterRes } from './filterBase'
-import { showAllFilter } from './printFilter'
 import { useContext } from 'react'
 import { FlagContext } from '../../flags'
 
@@ -88,7 +87,13 @@ export const useMemoryQueryRunner = ({
     // filter normedCards
     const { filterFunc, filtersUsed } = parser
       .results[0] as FilterRes<NormedCard>
-    const filtered = corpus.filter(filterFunc)
+    const filtered = []
+    for (const card of corpus) {
+      if (filterFunc(card)) {
+        filtered.push(card)
+      }
+    }
+    // const filtered = corpus.filter(filterFunc)
 
     // parse print logic
     const printParser = printingParser()
@@ -103,10 +108,7 @@ export const useMemoryQueryRunner = ({
         displayMessage: displayMessage(query, index, error),
       })
     }
-    const printFilterFunc = filtersUsed
-      .filter((it) => showAllFilter.has(it)).length
-      ? allPrintings
-      : findPrinting
+    const printFilterFunc = chooseFilterFunc(filtersUsed)
 
     // filter prints
     const printFiltered: Card[] = filtered

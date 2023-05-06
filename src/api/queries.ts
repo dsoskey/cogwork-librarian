@@ -131,6 +131,7 @@ const unimplementedQueries = [
   'new:language',
   'is:colorshifted',
   'is:hires',
+  'name:/^A\\-/',
 ]
 
 const notGonnaImplementQueries = [

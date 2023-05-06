@@ -4,6 +4,7 @@
 
 @{%
 const { oracleFilters } = require('./oracleFilter')
+const { identity } = require('./filterBase')
 %}
 
 main -> filterStart {% id %}
@@ -75,7 +76,9 @@ condition -> (
     priceCondition |
     stampCondition |
     watermarkCondition |
-    cubeCondition
+    cubeCondition |
+    producesCondition |
+    uniqueCondition
 ) {% ([[condition]]) => condition %}
 
 
@@ -226,6 +229,24 @@ inCondition -> "in"i ":" stringValue
         filterFunc: oracleFilters.inFilter(value),
     }) %}
 
+producesCondition ->
+    "produces"i anyOperator producesCombinationValue
+        {% ([_, [operator], value]) => ({
+            filtersUsed: ["produces"],
+            filterFunc: oracleFilters.producesMatch(operator, new Set(value)),
+        }) %} |
+    "produces"i anyOperator integerValue
+        {% ([_, [operator], value]) => ({
+            filtersUsed: ["produces"],
+            filterFunc: oracleFilters.producesMatchCount(operator, value),
+        }) %}
+
+uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
+    {% ([_, [operator], value]) => ({
+        filtersUsed: [`unique:${value}`],
+        filterFunc: identity(),
+        inverseFunc: identity(),
+    }) %}
 
 # print-matters
 # todo: oracleFilter defines the object structure that's returned

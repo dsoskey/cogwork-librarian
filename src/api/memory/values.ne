@@ -77,6 +77,14 @@ comb4[A, B, C, D] -> null {% () => [] %}
     | $D comb3[$A, $B, $C]
     ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
 
+comb5[A, B, C, D, E] -> null {% () => [] %}
+  | ( $A comb4[$B, $C, $D, $E]
+    | $B comb4[$A, $C, $D, $E]
+    | $C comb4[$A, $B, $D, $E]
+    | $D comb4[$A, $B, $C, $E]
+    | $E comb4[$A, $B, $C, $D]
+    ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
+
 comb5NonEmpty[A, B, C, D, E] -> (
     $A comb4[$B, $C, $D, $E]
   | $B comb4[$A, $C, $D, $E]
@@ -85,9 +93,17 @@ comb5NonEmpty[A, B, C, D, E] -> (
   | $E comb4[$A, $B, $C, $D]
 ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
 
-colorCombinationValue ->
-    ("c"i | "brown"i | "colorless"i) {% () => [] %}
-  | "white"i {% () => ['w'] %}
+comb6NonEmpty[A, B, C, D, E, F] -> (
+    $A comb5[$B, $C, $D, $E, $F]
+  | $B comb5[$A, $C, $D, $E, $F]
+  | $C comb5[$A, $B, $D, $E, $F]
+  | $D comb5[$A, $B, $C, $E, $F]
+  | $E comb5[$A, $B, $C, $D, $F]
+  | $F comb5[$A, $B, $C, $D, $E]
+) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
+
+colorCombinationKeyword ->
+    "white"i {% () => ['w'] %}
   | "blue"i {% () => ['u'] %}
   | "black"i {% () => ['b'] %}
   | "red"i {% () => ['r'] %}
@@ -118,7 +134,16 @@ colorCombinationValue ->
   | "growth"i {% () => ['b','g','w','u'] %}
   | "artifice"i {% () => ['b','w','r','u'] %}
   | ("rainbow"i | "fivecolor"i) {% () => ['w', 'u', 'b', 'r', 'g'] %}
+
+colorCombinationValue ->
+    ("c"i | "brown"i | "colorless"i) {% () => [] %}
+  | colorCombinationKeyword {% id %}
   | comb5NonEmpty["w"i, "u"i, "b"i, "r"i, "g"i] {% ([comb]) => comb.map((c) => c.toLowerCase()) %}
+
+producesCombinationValue ->
+    ("c"i | "brown"i | "colorless"i) {% () => ['c'] %}
+  | colorCombinationKeyword {% id %}
+  | comb6NonEmpty["w"i, "u"i, "b"i, "r"i, "g"i, "c"i] {% ([comb]) => comb.map((c) => c.toLowerCase()) %}
 
 manaCostValue -> manaSymbol:+ {% id %}
 

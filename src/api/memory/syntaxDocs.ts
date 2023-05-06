@@ -43,6 +43,7 @@ export const keywords = {
   o: 'o', oracle: 'oracle',
   pow: 'pow', power: 'power',
   powtou: 'powtou', pt: 'pt',
+  produces: 'produces',
   r: 'r',
   rarity: 'rarity',
   restricted: 'restricted',
@@ -57,6 +58,7 @@ export const keywords = {
   toughness: 'toughness',
   type: 'type',
   usd: 'usd',
+  unique: 'unique',
   watermark: 'watermark', wm: 'wm',
   year: 'year',
 } as const
@@ -67,15 +69,13 @@ export const keywordsToImplement = {
   function: 'function', oracletag: 'oracletag', otag: 'otag',
   // Requires set data
   b: 'b', block: 'block',
-  devotion: 'devotion',
+  devotion: 'devotion', // !Devotion can only match single color or hybrid mana. No two-brid either1
   // Requires sort parser??
   direction: 'direction',
   order: 'order',
   new: 'new',
   include: 'include', // is include:extras needed outside scryfall.com?
   prefer: 'prefer',
-  produces: 'produces',
-  unique: 'unique',
 } as const
 
 const all = {

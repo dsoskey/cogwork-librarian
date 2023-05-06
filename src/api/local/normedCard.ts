@@ -5,6 +5,7 @@ import _pick from 'lodash/pick'
 import _omit from 'lodash/omit'
 import { Filter } from '../memory/filterBase'
 import { CardFace } from 'scryfall-sdk/out/api/Cards'
+import { showAllFilter } from '../memory/printFilter'
 
 const PRINT_KEYS = {
   arena_id: 'arena_id',
@@ -103,3 +104,46 @@ export const allPrintings =
       })
     )
   }
+
+export const uniqueArts =
+  (filterFunc: Filter<Printing>) =>
+    ({ printings, ...rest }: NormedCard): Card[] => {
+      const filteredPrints = printings.filter(filterFunc)
+      const foundArtIds: Set<string> = new Set<string>()
+      const returnedPrints: Printing[] = []
+      for (const print of filteredPrints) {
+        if (print.illustration_id !== undefined && !foundArtIds.has(print.illustration_id)) {
+          foundArtIds.add(print.illustration_id)
+          returnedPrints.push(print)
+        }
+      }
+      return returnedPrints.map((it) =>
+        Card.construct(<Card>{
+          ...rest,
+          ...it,
+        })
+      )
+    }
+
+
+export const chooseFilterFunc = (filtersUsed: string[]) => {
+  const firstUnique = filtersUsed.find(filter => filter.startsWith('unique:'))
+  if (firstUnique !== undefined) {
+    const funcKey = firstUnique.replace('unique:', '')
+    switch (funcKey) {
+      case 'prints':
+        return allPrintings
+      case 'art':
+        return uniqueArts
+      case 'cards':
+        return findPrinting
+      default:
+        throw Error(`unknown print filter function ${funcKey}`)
+    }
+  }
+
+  return filtersUsed
+    .filter((it) => showAllFilter.has(it)).length
+    ? allPrintings
+    : findPrinting
+}

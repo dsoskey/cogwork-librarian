@@ -58,7 +58,9 @@ condition -> (
     isCondition |
     notCondition |
     inCondition |
-    cubeCondition
+    cubeCondition |
+    producesCondition |
+    uniqueCondition
 ) {% () => printFilters.oracleFilter() %} | (
     rarityCondition |
     setCondition |
@@ -103,6 +105,8 @@ isCondition -> ("is"i | "has"i) ":" isValue
 notCondition -> "not"i ":" isValue
 inCondition -> "in"i ":" stringValue
 cubeCondition -> "cube"i equalityOperator stringValue
+producesCondition -> "produces"i anyOperator (producesCombinationValue | integerValue)
+uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
 
 # print-specific
 rarityCondition ->  ("r"i | "rarity"i) anyOperator rarityValue
