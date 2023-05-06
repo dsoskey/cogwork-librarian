@@ -168,3 +168,6 @@ rarityValue ->
     ("r"i | "rare"i) {% () => "rare" %} |
     ("u"i | "uncommon"i) {% () => "uncommon" %} |
     ("c"i | "common"i) {% () => "common" %}
+
+orderValue -> ("artist"i | "cmc"i | "power"i | "toughness"i | "set"i | "name"i | "usd"i | "tix"i | "eur"i | "rarity"i | "color"i | "released"i | "spoiled"i | "edhrec"i | "penny"i | "review"i)
+    {% id %}

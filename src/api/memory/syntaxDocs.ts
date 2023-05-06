@@ -45,6 +45,7 @@ export const keywords = {
   pow: 'pow', power: 'power',
   powtou: 'powtou', pt: 'pt',
   produces: 'produces',
+  order: 'order',
   r: 'r',
   rarity: 'rarity',
   restricted: 'restricted',
@@ -71,10 +72,9 @@ export const keywordsToImplement = {
   // Requires set data
   b: 'b', block: 'block',
   devotion: 'devotion', // !Devotion can only match single color or hybrid mana. No two-brid either1
-  // Requires sort parser??
-  order: 'order',
   new: 'new',
   include: 'include', // is include:extras needed outside scryfall.com?
+  // display: 'display', is display needed?
   prefer: 'prefer',
 } as const
 

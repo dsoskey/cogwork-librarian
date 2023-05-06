@@ -8,8 +8,6 @@ import {
   weightAlgorithms,
 } from '../queryRunnerCommon'
 import { sortBy } from 'lodash'
-import { Sort } from 'scryfall-sdk'
-import { parsePowTou } from './oracleFilter'
 import { useQueryCoordinator } from '../useQueryCoordinator'
 import { chooseFilterFunc, NormedCard } from '../local/normedCard'
 import { err, errAsync, ok, okAsync, Result } from 'neverthrow'
@@ -17,26 +15,14 @@ import { CogError, displayMessage, NearlyError } from '../../error'
 import { FilterRes } from './filterBase'
 import { useContext } from 'react'
 import { FlagContext } from '../../flags'
+import { SortOrder, sortFunc } from '../card/sort'
 
-const sortFunc = (key: keyof typeof Sort): any => {
-  switch (key) {
-    case 'name':
-    case 'set':
-    case 'released':
-    case 'rarity':
-    case 'color':
-    case 'artist':
-      return key
-    case 'usd':
-    case 'tix':
-    case 'eur':
-    case 'cmc':
-    case 'edhrec':
-      return (card: Card) => Number.parseFloat(card[key] ?? 0)
-    case 'power':
-    case 'toughness':
-      return (card: Card) => parsePowTou(card[key])
+const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
+  const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
+  if (sortFilter !== undefined) {
+    return sortFilter.replace('order:', '') as SortOrder
   }
+  return options.order
 }
 
 const getDirection = (filtersUsed: string[], options: SearchOptions) => {
@@ -123,12 +109,14 @@ export const useMemoryQueryRunner = ({
       .filter(it => it !== undefined)
 
     // sort
-    const sorted = sortBy(printFiltered, [sortFunc(options.order), 'name']) as Card[]
+    const order: SortOrder = getOrder(filtersUsed, options)
+    const sorted = sortBy(printFiltered, [...sortFunc(order), 'name']) as Card[]
 
     // direction
     const direction = getDirection(filtersUsed, options)
     if (direction === 'auto') {
-      switch (options.order) {
+      switch (order) {
+        case 'rarity':
         case 'usd':
         case 'tix':
         case 'eur':

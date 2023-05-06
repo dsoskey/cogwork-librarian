@@ -79,6 +79,7 @@ condition -> (
     cubeCondition |
     producesCondition |
     uniqueCondition |
+    orderCondition |
     directionCondition
 ) {% ([[condition]]) => condition %}
 
@@ -245,6 +246,13 @@ producesCondition ->
 uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
     {% ([_, [operator], value]) => ({
         filtersUsed: [`unique:${value}`],
+        filterFunc: identity(),
+        inverseFunc: identity(),
+    }) %}
+
+orderCondition -> "order"i ":" orderValue
+    {% ([_, [operator], value]) => ({
+        filtersUsed: [`order:${value}`],
         filterFunc: identity(),
         inverseFunc: identity(),
     }) %}
