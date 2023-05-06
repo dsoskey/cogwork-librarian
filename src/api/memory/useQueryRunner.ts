@@ -39,6 +39,14 @@ const sortFunc = (key: keyof typeof Sort): any => {
   }
 }
 
+const getDirection = (filtersUsed: string[], options: SearchOptions) => {
+  const dirFilter = filtersUsed.find(it => it.startsWith('direction:'))
+  if (dirFilter !== undefined) {
+    return dirFilter.replace("direction:", "")
+  }
+  return options.dir ?? 'auto'
+}
+
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]
 }
@@ -93,7 +101,6 @@ export const useMemoryQueryRunner = ({
         filtered.push(card)
       }
     }
-    // const filtered = corpus.filter(filterFunc)
 
     // parse print logic
     const printParser = printingParser()
@@ -117,7 +124,10 @@ export const useMemoryQueryRunner = ({
 
     // sort
     const sorted = sortBy(printFiltered, [sortFunc(options.order), 'name']) as Card[]
-    if (options.dir === 'auto') {
+
+    // direction
+    const direction = getDirection(filtersUsed, options)
+    if (direction === 'auto') {
       switch (options.order) {
         case 'usd':
         case 'tix':
@@ -129,7 +139,7 @@ export const useMemoryQueryRunner = ({
         default:
           break
       }
-    } else if (options.dir === 'desc') {
+    } else if (direction === 'desc') {
       sorted.reverse()
     }
 

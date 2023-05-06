@@ -14,6 +14,7 @@ export const keywords = {
   cube: 'cube',
   color: 'color',
   date: 'date',
+  direction: 'direction',
   e: 'e',
   edition: 'edition',
   eur: 'eur',
@@ -71,7 +72,6 @@ export const keywordsToImplement = {
   b: 'b', block: 'block',
   devotion: 'devotion', // !Devotion can only match single color or hybrid mana. No two-brid either1
   // Requires sort parser??
-  direction: 'direction',
   order: 'order',
   new: 'new',
   include: 'include', // is include:extras needed outside scryfall.com?

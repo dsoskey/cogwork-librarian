@@ -78,7 +78,8 @@ condition -> (
     watermarkCondition |
     cubeCondition |
     producesCondition |
-    uniqueCondition
+    uniqueCondition |
+    directionCondition
 ) {% ([[condition]]) => condition %}
 
 
@@ -244,6 +245,13 @@ producesCondition ->
 uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
     {% ([_, [operator], value]) => ({
         filtersUsed: [`unique:${value}`],
+        filterFunc: identity(),
+        inverseFunc: identity(),
+    }) %}
+
+directionCondition -> "direction"i ":" ("asc"i | "desc"i)
+    {% ([_, [operator], value]) => ({
+        filtersUsed: [`direction:${value}`],
         filterFunc: identity(),
         inverseFunc: identity(),
     }) %}

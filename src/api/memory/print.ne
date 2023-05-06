@@ -60,7 +60,8 @@ condition -> (
     inCondition |
     cubeCondition |
     producesCondition |
-    uniqueCondition
+    uniqueCondition |
+    directionCondition
 ) {% () => printFilters.oracleFilter() %} | (
     rarityCondition |
     setCondition |
@@ -107,6 +108,7 @@ inCondition -> "in"i ":" stringValue
 cubeCondition -> "cube"i equalityOperator stringValue
 producesCondition -> "produces"i anyOperator (producesCombinationValue | integerValue)
 uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
+directionCondition -> "direction"i ":" ("asc"i | "desc"i)
 
 # print-specific
 rarityCondition ->  ("r"i | "rarity"i) anyOperator rarityValue
