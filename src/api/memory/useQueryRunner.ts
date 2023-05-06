@@ -16,6 +16,8 @@ import { err, errAsync, ok, okAsync, Result } from 'neverthrow'
 import { CogError, displayMessage, NearlyError } from '../../error'
 import { FilterRes } from './filterBase'
 import { showAllFilter } from './printFilter'
+import { useContext } from 'react'
+import { FlagContext } from '../../flags'
 
 const sortFunc = (key: keyof typeof Sort): any => {
   switch (key) {
@@ -48,6 +50,7 @@ export const useMemoryQueryRunner = ({
 }: MemoryQueryRunnerProps): QueryRunner => {
   const { status, report, cache, result, rawData, execute, errors } =
     useQueryCoordinator()
+  const { disableCache } = useContext(FlagContext).flags
 
   const getCards = (
     query: string,
@@ -136,11 +139,15 @@ export const useMemoryQueryRunner = ({
     index: number,
     options: SearchOptions
   ) => {
+    if (corpus.length === 0) {
+      console.warn(`ran query against an empty corpus: ${query}`)
+      return
+    }
     const weight = getWeight(index)
     const preparedQuery = injectPrefix(query)
     const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
     rawData.current[preparedQuery] = []
-    if (cache.current[_cacheKey] === undefined) {
+    if (cache.current[_cacheKey] === undefined || disableCache) {
       // TODO: remove try catch when getCards no longer can throw
       try {
         const cardResult = getCards(preparedQuery, index, options)
@@ -149,14 +156,19 @@ export const useMemoryQueryRunner = ({
           return errAsync(cardResult.error)
         }
 
-        cache.current[_cacheKey] = []
+        // This smells. should the cache manage its own disability?
+        if (!disableCache) {
+          cache.current[_cacheKey] = []
+        }
         const cards = cardResult.value.map((card: Card) => ({
           data: card,
           weight,
           matchedQueries: [query],
         }))
         rawData.current[preparedQuery] = cloneDeep(cards)
-        cache.current[_cacheKey] = cards
+        if (!disableCache) {
+          cache.current[_cacheKey] = cards
+        }
         report.addCardCount(cards.length)
         report.addComplete()
       } catch (error) {

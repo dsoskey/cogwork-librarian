@@ -78,7 +78,7 @@ export const queryExamples: QueryExample[] = [
       <>
         this query shows how comments work. as written, this ignores the morph
         subquery. remove the{' '}
-        <code className='language-scryfall-extended'>#</code>
+        <code className='language-scryfall-extended'>#</code>{" "}
         from the first query to include them at the front of the search. the two
         blink queries are separated to rank immediate blinks from end of turn
         blinks.

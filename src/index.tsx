@@ -11,6 +11,7 @@ import {
 import './prism-cogwork.css'
 import './styles.css'
 import { FlagContextProvider } from './flags'
+import { BrowserRouter } from 'react-router-dom'
 
 Prism.languages['scryfall'] = scryfall
 Prism.languages['scryfall-extended'] = scryfallExtended
@@ -21,7 +22,9 @@ Scry.setTimeout(50)
 
 render(
   <FlagContextProvider>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </FlagContextProvider>,
   document.getElementById('app')
 )

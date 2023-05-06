@@ -5,12 +5,14 @@ import _cloneDeep from 'lodash/cloneDeep'
 export const FLAG_NAMES = {
   adminMode: 'adminMode',
   showDebugInfo: 'showDebugInfo',
+  disableCache: 'disableCache',
 } as const
 export type Flag = ObjectValues<typeof FLAG_NAMES>
 
 export const INITIAL_FLAGS = {
   showDebugInfo: false,
   adminMode: false,
+  disableCache: false,
 }
 
 interface FlagManager {

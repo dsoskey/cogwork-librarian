@@ -14,7 +14,7 @@
   --blue-mid-alpha: hsla(180, 100%, 69%, 75%);
   --green: hsl(96, 100%, 69%);
   --red: hsl(0, 100%, 37%);
-  --card-radius: 12px;
+  --card-radius: 4.75% / 3.5%;
   background-color: var(--light-color);
   color: var(--dark-color);
 }

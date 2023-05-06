@@ -83,7 +83,7 @@ const all = {
   ...keywordsToImplement,
 } as const
 
-type Keyword = ObjectValues<typeof all>
+export type Keyword = ObjectValues<typeof all>
 export const syntaxDocs: Record<Keyword, string> = {
   '!': 'https://scryfall.com/docs/syntax#exact',
   a: 'https://scryfall.com/docs/syntax#flavor',
