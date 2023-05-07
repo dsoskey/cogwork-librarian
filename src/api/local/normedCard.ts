@@ -66,12 +66,14 @@ export type Printing = Pick<Card, PrintKeys>
 export type OracleKeys = keyof Omit<Card, PrintKeys>
 export interface NormedCard extends Omit<Card, PrintKeys> {
   printings: Printing[]
+  // there are oracle and print fields on card faces, so the normed card holds a reference to one for oracle filters
   card_faces: CardFace[]
 }
 
 export const normCardList = (cardList: Card[]): NormedCard[] => {
   const cardsByOracle = _groupBy(cardList, 'oracle_id')
 
+  // optimization opportunity
   return Object.values(cardsByOracle).map((cards) => ({
     ...(_omit(cards[0], Object.keys(PRINT_KEYS)) as Omit<Card, PrintKeys>),
     printings: cards.map(

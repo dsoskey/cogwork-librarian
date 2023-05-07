@@ -80,7 +80,8 @@ condition -> (
     producesCondition |
     uniqueCondition |
     orderCondition |
-    directionCondition
+    directionCondition |
+    devotionCondition
 ) {% ([[condition]]) => condition %}
 
 
@@ -214,10 +215,7 @@ restrictedCondition -> "restricted"i equalityOperator formatValue
     }) %}
 
 isCondition -> ("is"i | "has"i) ":" isValue
-    {% ([_, [_op], value]) => ({
-        filtersUsed: ["is"],
-        filterFunc: oracleFilters.isVal(value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.isVal(value) %}
 
 notCondition -> "not"i ":" isValue
     {% ([_, [_op], value]) => oracleFilters.not({
@@ -242,6 +240,9 @@ producesCondition ->
             filtersUsed: ["produces"],
             filterFunc: oracleFilters.producesMatchCount(operator, value),
         }) %}
+
+devotionCondition -> "devotion"i anyOperator devotionValue
+    {% ([_, [operator], [pips]]) => oracleFilters.devotionOperation(operator, pips) %}
 
 uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
     {% ([_, [operator], value]) => ({

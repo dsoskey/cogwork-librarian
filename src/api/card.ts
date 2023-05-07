@@ -275,9 +275,13 @@ export const manaAliases: Record<ManaSymbol, ManaSymbol> = {
   s: 's',
 }
 
-export const toManaCost = (rawCost: string[]): ManaCost => {
+export const replaceNamePlaceholder = (text: string, name: string): string => {
+  return text.replace(/~/g, name).toLowerCase()
+}
+
+export const toManaCost = (splitCost: string[]): ManaCost => {
   const result: ManaCost = cloneDeep(emptyCost)
-  rawCost.forEach((rawSymbol) => {
+  for (const rawSymbol of splitCost) {
     // hybrids are considered NaN
     const asNum = rawSymbol.includes('/') ? NaN : Number.parseInt(rawSymbol, 10)
     if (Number.isNaN(asNum)) {
@@ -285,9 +289,15 @@ export const toManaCost = (rawCost: string[]): ManaCost => {
     } else {
       result.generic += asNum
     }
-  })
+  }
   return result
 }
+
+export const toSplitCost = (cost: string): string[] =>
+  cost.toLowerCase()
+    .slice(1, cost.length - 1)
+    .split('}{')
+    .sort()
 
 export const isDual = (card: Card | NormedCard) =>
   card.type_line.includes('Land') && /Add \{.} or \{.}\./.test(card.oracle_text)

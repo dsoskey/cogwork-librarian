@@ -66,16 +66,19 @@ export const keywords = {
 } as const
 
 export const keywordsToImplement = {
+  devotion: 'devotion', // !Devotion can only match single color or hybrid mana. No two-brid either
+  // https://discord.com/channels/291498816459243521/361685936179904513/1104796430830411777
+  new: 'new', // rarity, flavor, art, artist, frame, language, game, paper, mtgo, arena, nonfoil, foil
+  // its not: etched, masterpiece, promo, border, stamp
+  prefer: 'prefer',
   // Requires tagging data
   art: 'art', arttag: 'arttag', atag: 'atag',
   function: 'function', oracletag: 'oracletag', otag: 'otag',
   // Requires set data
   b: 'b', block: 'block',
-  devotion: 'devotion', // !Devotion can only match single color or hybrid mana. No two-brid either1
-  new: 'new',
-  include: 'include', // is include:extras needed outside scryfall.com?
+  // these affect scryfall's UI behavior. are they needed here?
+  include: 'include', // maybe this one overrides a similar scryfall default?
   // display: 'display', is display needed?
-  prefer: 'prefer',
 } as const
 
 const all = {

@@ -161,6 +161,11 @@ innerManaSymbol -> [0-9]:+ {% ([digits]) => digits.join('') %}
     | "g"i "/" ("2"i | "p"i | "w"i | "u"i | "b"i | "r"i)
     ) {% ([[color, , [secondColor]]]) => color + "/" + secondColor %}
 
+# todo finish
+devotionValue -> "w"i:+ | "u"i:+ | "b"i:+ | "r"i:+ | "g"i:+ {% id %}
+  | "w"i:+ | "u"i:+ | "b"i:+ | "r"i:+ | "g"i:+
+
+
 rarityValue ->
     ("b"i | "bonus"i) {% () => "bonus" %} |
     ("m"i | "mythic"i) {% () => "mythic" %} |

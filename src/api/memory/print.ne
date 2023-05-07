@@ -62,7 +62,8 @@ condition -> (
     producesCondition |
     uniqueCondition |
     orderCondition |
-    directionCondition
+    directionCondition |
+    devotionCondition
 ) {% () => printFilters.oracleFilter() %} | (
     rarityCondition |
     setCondition |
@@ -111,6 +112,7 @@ producesCondition -> "produces"i anyOperator (producesCombinationValue | integer
 uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
 orderCondition -> "order"i ":" orderValue
 directionCondition -> "direction"i ":" ("asc"i | "desc"i)
+devotionCondition -> "devotion"i anyOperator devotionValue
 
 # print-specific
 rarityCondition ->  ("r"i | "rarity"i) anyOperator rarityValue
