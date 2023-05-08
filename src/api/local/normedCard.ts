@@ -7,6 +7,8 @@ import { Filter } from '../memory/filterBase'
 import { CardFace } from 'scryfall-sdk/out/api/Cards'
 import { showAllFilter } from '../memory/printFilter'
 
+export const DEFAULT_CARD_BACK_ID = "0aeebaf5-8c7d-4636-9e82-8c27447861f7"
+
 const PRINT_KEYS = {
   arena_id: 'arena_id',
   artist: 'artist',
@@ -14,11 +16,14 @@ const PRINT_KEYS = {
   border_color: 'border_color',
   card_faces: 'card_faces',
   cardmarket_id: 'cardmarket_id',
+  card_back_id: 'card_back_id',
   collector_number: 'collector_number',
   digital: 'digital',
   finishes: 'finishes',
+  flavor_name: 'flavor_name',
   flavor_text: 'flavor_text',
   frame: 'frame',
+  frame_effects: "frame_effects",
   games: 'games',
   highres_image: 'highres_image',
   id: 'id',
@@ -34,6 +39,7 @@ const PRINT_KEYS = {
   prices: 'prices',
   promo: 'promo',
   promo_types: 'promo_types',
+  printed_name: "printed_name",
   rarity: 'rarity',
   related_uris: 'related_uris',
 

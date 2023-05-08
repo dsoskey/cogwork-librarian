@@ -11,6 +11,8 @@ import {
 import { Printing } from '../local/normedCard'
 import { Operator } from './oracleFilter'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'
+import { isPrintPrefix, isPrintVal, printMatters } from './filters/is'
+import { IsValue } from '../card'
 
 export const showAllFilter = new Set([
   'date',
@@ -158,6 +160,20 @@ const watermarkFilter =
   (it) =>
     it.watermark === value
 
+const isVal = (value: IsValue): FilterRes<Printing> => {
+  if (printMatters(value)) {
+    return {
+      filtersUsed: [`${isPrintPrefix}${value}`],
+      filterFunc: isPrintVal(value),
+    }
+  }
+  return {
+    filtersUsed: ['is'],
+    filterFunc: identity(),
+    inverseFunc: identity(),
+  }
+}
+
 export const printFilters = {
   identity: identityRes,
   and: andRes,
@@ -179,4 +195,5 @@ export const printFilters = {
   languageFilter,
   stampFilter,
   watermarkFilter,
+  isVal,
 }

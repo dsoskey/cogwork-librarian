@@ -55,7 +55,6 @@ condition -> (
     formatCondition |
     bannedCondition |
     restrictedCondition |
-    isCondition |
     notCondition |
     inCondition |
     cubeCondition |
@@ -73,6 +72,7 @@ condition -> (
     collectorNumberCondition |
     dateCondition |
     frameCondition |
+    isCondition |
 #    flavorRegexCondition |
     flavorCondition |
     gameCondition |
@@ -104,7 +104,6 @@ layoutCondition -> ("layout"i) equalityOperator stringValue
 formatCondition -> ("format"i | "f"i) equalityOperator formatValue
 bannedCondition -> "banned"i equalityOperator formatValue
 restrictedCondition -> "restricted"i equalityOperator formatValue
-isCondition -> ("is"i | "has"i) ":" isValue
 notCondition -> "not"i ":" isValue
 inCondition -> "in"i ":" stringValue
 cubeCondition -> "cube"i equalityOperator stringValue
@@ -115,6 +114,9 @@ directionCondition -> "direction"i ":" ("asc"i | "desc"i)
 devotionCondition -> "devotion"i anyOperator devotionValue
 
 # print-specific
+isCondition -> ("is"i | "has"i) ":" isValue
+    {% ([_, [_op], value]) => printFilters.isVal(value) %}
+
 rarityCondition ->  ("r"i | "rarity"i) anyOperator rarityValue
     {% ([_, [operator], value]) => ({
         filtersUsed: [],

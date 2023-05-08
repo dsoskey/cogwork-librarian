@@ -19,7 +19,7 @@ export const toManifest = (
 })
 
 export class TypedDexie extends Dexie {
-  LAST_UPDATE = new Date('2023-04-28')
+  LAST_UPDATE = new Date('2023-05-07')
 
   collection!: Table<Collection>
 
