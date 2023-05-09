@@ -277,6 +277,11 @@ export const manaAliases: Record<ManaSymbol, ManaSymbol> = {
   s: 's',
 }
 
+export const parsePowTou = (value: any) =>
+  value !== undefined
+    ? Number.parseInt(value.toString().replace('*', '0'), 10)
+    : 0
+
 export const replaceNamePlaceholder = (text: string, name: string): string => {
   return text.replace(/~/g, name).toLowerCase()
 }
@@ -332,5 +337,6 @@ export const anyFaceRegexMatch = (
       ? regex.test(fieldTransform(face[field].toString().toLowerCase()))
       : false
   ).length > 0
+
 export const noReminderText = (text: string): string =>
   text.replace(/\(.*\)/gi, '')

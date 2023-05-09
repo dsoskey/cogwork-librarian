@@ -171,25 +171,16 @@ typeRegexCondition -> ("t"i | "type"i) (":" | "=") regexString
     }) %}
 
 powerCondition -> ("pow"i | "power"i) anyOperator integerValue
-    {% ([_, [operator], value]) => ({
-        filtersUsed: ["pow"],
-        filterFunc: oracleFilters.powTouOperation('power', operator, value),
-    }) %}
+    {% ([_, [operator], value]) => oracleFilters.combatOperation('power', operator, value) %}
 
 toughCondition -> ("tou"i | "toughness"i) anyOperator integerValue
-    {% ([_, [operator], value]) => ({
-        filtersUsed: ["tou"],
-        filterFunc: oracleFilters.powTouOperation('toughness', operator, value),
-    }) %}
+    {% ([_, [operator], value]) => oracleFilters.combatOperation('toughness', operator, value)  %}
 
 powTouCondition -> ("pt"i | "powtou"i) anyOperator integerValue
     {% ([_, [operator], value]) => oracleFilters.powTouTotalOperation(operator, value) %}
 
 loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
-    {% ([_, [operator], value]) => ({
-        filtersUsed: ["loyalty"],
-        filterFunc: oracleFilters.powTouOperation('loyalty', operator, value),
-    }) %}
+    {% ([_, [operator], value]) => oracleFilters.combatOperation('loyalty', operator, value) %}
 
 layoutCondition -> ("layout"i) equalityOperator stringValue
     {% ([_, [operator], value]) => ({

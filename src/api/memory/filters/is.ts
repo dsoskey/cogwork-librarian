@@ -11,7 +11,7 @@ import { DEFAULT_CARD_BACK_ID, NormedCard, Printing } from '../types/normedCard'
 import { FilterNode } from './base'
 import { handlePrint } from './oracle'
 import { textMatch } from './text'
-import { parsePowTou } from '../oracleFilter'
+import { parsePowTou } from '../types/card'
 
 export const isPrintPrefix = `is-print:`
 

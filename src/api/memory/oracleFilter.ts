@@ -5,7 +5,7 @@ import {
   noReminderText,
   replaceNamePlaceholder,
   toManaCost,
-  toSplitCost,
+  toSplitCost
 } from './types/card'
 import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
 import { NormedCard, OracleKeys } from './types/normedCard'
@@ -17,13 +17,13 @@ import {
   orNode,
   notNode,
   FilterNode,
-  defaultCompare,
 } from './filters/base'
 import { printFilters } from './printFilter'
 import { defaultOperation, handlePrint } from './filters/oracle'
 import { textMatch } from './filters/text'
 import { isVal } from './filters/is'
 import { devotionOperation } from './filters/devotion'
+import { combatOperation, powTouTotalOperation } from './filters/combat'
 
 export const EQ_OPERATORS = {
   ':': ':',
@@ -41,70 +41,6 @@ export const OPERATORS = {
   '>=': '>=',
 } as const
 export type Operator = ObjectValues<typeof OPERATORS>
-
-// these should go on the card object itself
-export const parsePowTou = (value: any) =>
-  value !== undefined
-    ? Number.parseInt(value.toString().replace('*', '0'), 10)
-    : 0
-
-const powTouOperation =
-  (
-    field: OracleKeys,
-    operator: Operator,
-    targetValue: number
-  ): Filter<NormedCard> =>
-  (card: NormedCard) => {
-    const cardValue = card[field]
-    if (cardValue === undefined) return false
-
-    const valueToTest = parsePowTou(cardValue)
-    switch (operator) {
-      case ':':
-      case '=':
-        return valueToTest === targetValue
-      case '!=':
-      case '<>':
-        return valueToTest !== targetValue
-      case '<':
-        return valueToTest < targetValue
-      case '<=':
-        return valueToTest <= targetValue
-      case '>':
-        return valueToTest > targetValue
-      case '>=':
-        return valueToTest >= targetValue
-    }
-  }
-
-const powTouTotalOperation = (
-  operator: Operator,
-  targetValue: number
-): FilterNode<NormedCard> => ({
-  filtersUsed: ['powtou'],
-  filterFunc: (card) => {
-    const faces = [
-      {
-        power: card.power,
-        toughness: card.toughness,
-      },
-      ...card.card_faces.map((jt) => ({
-        power: jt.power,
-        toughness: jt.toughness,
-      })),
-    ]
-
-    return (
-      faces
-        .filter((it) => it.toughness !== undefined && it.power !== undefined)
-        .map(
-          ({ power, toughness }) => parsePowTou(power) + parsePowTou(toughness)
-        )
-        .filter((faceValue) => defaultCompare(faceValue, operator, targetValue))
-        .length > 0
-    )
-  },
-})
 
 const exactMatch =
   (field: OracleKeys, value: string): Filter<NormedCard> =>
@@ -405,7 +341,7 @@ export const oracleFilters = {
   or: orNode,
   not: notNode,
   defaultOperation,
-  powTouOperation,
+  combatOperation,
   powTouTotalOperation,
   exactMatch,
   textMatch,

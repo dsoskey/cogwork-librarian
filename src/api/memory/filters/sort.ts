@@ -1,7 +1,7 @@
 import { ObjectValues } from '../../../types'
 import { Card } from 'scryfall-sdk'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'
-import { parsePowTou } from '../oracleFilter'
+import { parsePowTou } from '../types/card'
 
 const SORT_ORDERS = {
   artist: 'artist',
