@@ -4,6 +4,9 @@ import oracle from './oracle.ne'
 // @ts-ignore
 import print from './print.ne'
 
-export const queryParser = () => new Parser(Grammar.fromCompiled(oracle))
+// TODO: combine these before extracting?
+const oracleGrammar = Grammar.fromCompiled(oracle)
+export const queryParser = () => new Parser(oracleGrammar)
 
-export const printingParser = () => new Parser(Grammar.fromCompiled(print))
+const printGrammar = Grammar.fromCompiled(print)
+export const printingParser = () => new Parser(printGrammar)

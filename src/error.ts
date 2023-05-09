@@ -17,19 +17,19 @@ const opsFirstLetter = Object.values(OPERATORS).map((it) => it[0])
 export const displayMessage = (
   query: string,
   index: number,
-  e: NearlyError
+  offset: number,
 ) => {
   let baseMessage = `syntax error for query ${index + 1} at col ${
-    e.offset + 1
+    offset + 1
   }.`
-  if (e.offset > 0 && opsFirstLetter.includes(query[e.offset])) {
+  if (offset > 0 && opsFirstLetter.includes(query[offset])) {
     const badKeyword = query
-      .substring(0, e.offset)
+      .substring(0, offset)
       .split(/([ (])/)
       .pop()
     baseMessage = `unknown keyword "${badKeyword}" in query ${index + 1}`
   }
-  const columnShower = `\n\t${query}\n\t${' '.repeat(e.offset)}^`
+  const columnShower = `\n\t${query}\n\t${' '.repeat(offset)}^`
 
   return baseMessage + columnShower
 }

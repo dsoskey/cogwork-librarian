@@ -1,37 +1,18 @@
 import { Card, SearchOptions } from 'scryfall-sdk/out/api/Cards'
 import cloneDeep from 'lodash/cloneDeep'
-import { printingParser, queryParser } from './parser'
 import {
-  QueryRunner,
+  QueryRunner as CoglibQueryRunner,
   QueryRunnerFunc,
   QueryRunnerProps,
   weightAlgorithms,
 } from '../queryRunnerCommon'
-import { sortBy } from 'lodash'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { chooseFilterFunc, NormedCard } from '../local/normedCard'
-import { err, errAsync, ok, okAsync, Result } from 'neverthrow'
-import { CogError, displayMessage, NearlyError } from '../../error'
-import { FilterRes } from './filterBase'
+import { NormedCard } from '../local/normedCard'
+import { errAsync, okAsync } from 'neverthrow'
+import { displayMessage } from '../../error'
 import { useContext } from 'react'
 import { FlagContext } from '../../flags'
-import { SortOrder, sortFunc } from '../card/sort'
-
-const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
-  const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
-  if (sortFilter !== undefined) {
-    return sortFilter.replace('order:', '') as SortOrder
-  }
-  return options.order
-}
-
-const getDirection = (filtersUsed: string[], options: SearchOptions) => {
-  const dirFilter = filtersUsed.find(it => it.startsWith('direction:'))
-  if (dirFilter !== undefined) {
-    return dirFilter.replace("direction:", "")
-  }
-  return options.dir ?? 'auto'
-}
+import { QueryRunner } from './queryRunner'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]
@@ -40,99 +21,11 @@ export const useMemoryQueryRunner = ({
   getWeight = weightAlgorithms.uniform,
   injectPrefix,
   corpus,
-}: MemoryQueryRunnerProps): QueryRunner => {
+}: MemoryQueryRunnerProps): CoglibQueryRunner => {
   const { status, report, cache, result, rawData, execute, errors } =
     useQueryCoordinator()
   const { disableCache } = useContext(FlagContext).flags
-
-  const getCards = (
-    query: string,
-    index: number,
-    options: SearchOptions
-  ): Result<Card[], CogError> => {
-    // parse query
-    const parser = queryParser()
-    try {
-      console.debug(`feeding ${query}`)
-      parser.feed(query)
-      console.debug(`parsed`)
-      console.debug(parser.results)
-      if (parser.results.length > 1) {
-        const uniqueParses = new Set<string>(
-          parser.results.map((it) => {
-            return it.filtersUsed.toString()
-          })
-        )
-        if (uniqueParses.size > 1) {
-          console.warn('ambiguous parse!')
-        }
-      }
-    } catch (error) {
-      const { message } = error as NearlyError
-      const isNearlyError = error.offset !== undefined
-      console.debug(message)
-      return err({
-        query,
-        debugMessage: message,
-        displayMessage: isNearlyError ? displayMessage(query, index, error) : message,
-      })
-    }
-
-    // filter normedCards
-    const { filterFunc, filtersUsed } = parser
-      .results[0] as FilterRes<NormedCard>
-    const filtered = []
-    for (const card of corpus) {
-      if (filterFunc(card)) {
-        filtered.push(card)
-      }
-    }
-
-    // parse print logic
-    const printParser = printingParser()
-    try {
-      console.debug(`feeding ${query} to print parser`)
-      printParser.feed(query)
-    } catch (error) {
-      const { message } = error as NearlyError
-      return err({
-        query,
-        debugMessage: message,
-        displayMessage: displayMessage(query, index, error),
-      })
-    }
-    const printFilterFunc = chooseFilterFunc(filtersUsed)
-
-    // filter prints
-    const printFiltered: Card[] = filtered
-      .flatMap(printFilterFunc(printParser.results[0].filterFunc))
-      .filter(it => it !== undefined)
-
-    // sort
-    const order: SortOrder = getOrder(filtersUsed, options)
-    const sorted = sortBy(printFiltered, [...sortFunc(order), 'name']) as Card[]
-
-    // direction
-    const direction = getDirection(filtersUsed, options)
-    if (direction === 'auto') {
-      switch (order) {
-        case 'rarity':
-        case 'usd':
-        case 'tix':
-        case 'eur':
-        case 'edhrec':
-          sorted.reverse()
-          break
-        case 'released':
-        default:
-          break
-      }
-    } else if (direction === 'desc') {
-      sorted.reverse()
-    }
-
-    return ok(sorted)
-  }
+  const getCards = QueryRunner.generateSearchFunction(corpus)
 
   const runQuery: QueryRunnerFunc = (
     query: string,
@@ -148,12 +41,16 @@ export const useMemoryQueryRunner = ({
     const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
     rawData.current[preparedQuery] = []
     if (cache.current[_cacheKey] === undefined || disableCache) {
-      // TODO: remove try catch when getCards no longer can throw
       try {
-        const cardResult = getCards(preparedQuery, index, options)
+        const cardResult = getCards(preparedQuery, options)
         if (cardResult.isErr()) {
           report.addError()
-          return errAsync(cardResult.error)
+          const { query, errorOffset, message } = cardResult.error
+          return errAsync({
+            query,
+            debugMessage: message,
+            displayMessage: displayMessage(query, index, errorOffset),
+          })
         }
 
         // This smells. should the cache manage its own disability?

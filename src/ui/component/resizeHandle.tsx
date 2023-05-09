@@ -39,7 +39,6 @@ export const ResizeHandle = ({
     const onMouseMove = (event) => {
       if (dragging) {
         const newWidth = viewport.width - event.pageX
-        console.log(newWidth)
         window.cancelAnimationFrame(frame)
         frame = window.requestAnimationFrame(() => {
           onChange(Math.max(min, Math.min(max, newWidth)))
