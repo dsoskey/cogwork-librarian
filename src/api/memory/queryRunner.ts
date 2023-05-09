@@ -3,7 +3,7 @@ import { Card, SearchOptions } from 'scryfall-sdk/out/api/Cards'
 import { err, ok, Result } from 'neverthrow'
 import { NearlyError } from '../../error'
 import { printingParser, queryParser } from './parser'
-import { FilterRes } from './filters/base'
+import { FilterNode } from './filters/base'
 import { normCardList, NormedCard } from './types/normedCard'
 import { sortFunc, SortOrder } from './filters/sort'
 import { chooseFilterFunc } from './filters/print'
@@ -75,7 +75,7 @@ export class QueryRunner {
 
     // filter normedCards
     const { filterFunc, filtersUsed } = parser
-      .results[0] as FilterRes<NormedCard>
+      .results[0] as FilterNode<NormedCard>
     const filtered = []
     for (const card of corpus) {
       if (filterFunc(card)) {

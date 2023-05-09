@@ -1,11 +1,11 @@
 import {
   identity,
   Filter,
-  FilterRes,
-  identityRes,
-  andRes,
-  orRes,
-  notRes,
+  FilterNode,
+  identityNode,
+  andNode,
+  orNode,
+  notNode,
   defaultCompare,
 } from './filters/base'
 import { Printing } from './types/normedCard'
@@ -28,8 +28,8 @@ export const showAllFilter = new Set([
   'year',
 ])
 
-const oracleFilter = (): FilterRes<Printing> => ({
-  ...identityRes(),
+const oracleFilter = (): FilterNode<Printing> => ({
+  ...identityNode(),
   inverseFunc: identity(),
 })
 
@@ -160,7 +160,7 @@ const watermarkFilter =
   (it) =>
     it.watermark === value
 
-const isVal = (value: IsValue): FilterRes<Printing> => {
+const isVal = (value: IsValue): FilterNode<Printing> => {
   if (printMatters(value)) {
     return {
       filtersUsed: [`${isPrintPrefix}${value}`],
@@ -175,10 +175,10 @@ const isVal = (value: IsValue): FilterRes<Printing> => {
 }
 
 export const printFilters = {
-  identity: identityRes,
-  and: andRes,
-  or: orRes,
-  not: notRes,
+  identity: identityNode,
+  and: andNode,
+  or: orNode,
+  not: notNode,
   rarityFilter,
   setFilter,
   setTypeFilter,

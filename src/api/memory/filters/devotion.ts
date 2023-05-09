@@ -1,11 +1,11 @@
-import { FilterRes } from './base'
+import { FilterNode } from './base'
 import { NormedCard } from '../types/normedCard'
 import { ManaSymbol, toManaCost, toSplitCost } from '../types/card'
 import { isVal } from './is'
 import { Operator } from '../oracleFilter'
 
 
-export const devotionOperation = (operator: Operator, pips: string[]): FilterRes<NormedCard> => {
+export const devotionOperation = (operator: Operator, pips: string[]): FilterNode<NormedCard> => {
   return {
     filtersUsed: ['devotion'],
     filterFunc: (card: NormedCard) => {

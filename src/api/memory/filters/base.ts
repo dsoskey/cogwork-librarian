@@ -2,10 +2,12 @@ import { Operator } from '../oracleFilter'
 
 export type Filter<T> = (it: T) => boolean
 
-export interface FilterRes<T> {
+export interface FilterNode<T> {
   filtersUsed: string[]
   filterFunc: Filter<T>
   inverseFunc?: Filter<T>
+  clause1?: FilterNode<T>
+  clause2?: FilterNode<T>
 }
 
 export const identity =
@@ -13,7 +15,7 @@ export const identity =
   (_) =>
     true
 
-export const identityRes = <T>(): FilterRes<T> => ({
+export const identityNode = <T>(): FilterNode<T> => ({
   filtersUsed: ['identity'],
   filterFunc: identity(),
 })
@@ -22,10 +24,10 @@ export const and = <T>(clause1: Filter<T>, clause2: Filter<T>): Filter<T> => {
   return (c: T) => clause1(c) && clause2(c)
 }
 
-export const andRes = <T>(
-  clause1: FilterRes<T>,
-  clause2: FilterRes<T>
-): FilterRes<T> => {
+export const andNode = <T>(
+  clause1: FilterNode<T>,
+  clause2: FilterNode<T>
+): FilterNode<T> => {
   return {
     filtersUsed: [
       '(',
@@ -35,6 +37,8 @@ export const andRes = <T>(
       ')',
     ],
     filterFunc: and(clause1.filterFunc, clause2.filterFunc),
+    clause1,
+    clause2,
   }
 }
 
@@ -42,10 +46,10 @@ export const or = <T>(clause1: Filter<T>, clause2: Filter<T>): Filter<T> => {
   return (c: T) => clause1(c) || clause2(c)
 }
 
-export const orRes = <T>(
-  clause1: FilterRes<T>,
-  clause2: FilterRes<T>
-): FilterRes<T> => {
+export const orNode = <T>(
+  clause1: FilterNode<T>,
+  clause2: FilterNode<T>
+): FilterNode<T> => {
   return {
     filtersUsed: [
       '(',
@@ -55,6 +59,8 @@ export const orRes = <T>(
       ')',
     ],
     filterFunc: or(clause1.filterFunc, clause2.filterFunc),
+    clause1,
+    clause2,
   }
 }
 
@@ -62,17 +68,19 @@ export const not = <T>(clause: Filter<T>): Filter<T> => {
   return (c: T) => !clause(c)
 }
 
-export const notRes = <T>(clause: FilterRes<T>): FilterRes<T> => {
+export const notNode = <T>(clause: FilterNode<T>): FilterNode<T> => {
   if (clause.inverseFunc !== undefined) {
     return {
       filtersUsed: ['(', 'not', ...clause.filtersUsed, ')'],
       filterFunc: clause.inverseFunc,
       inverseFunc: clause.filterFunc,
+      clause1: clause,
     }
   }
   return {
     filtersUsed: ['(', 'not', ...clause.filtersUsed, ')'],
     filterFunc: (c: T) => !clause.filterFunc(c),
+    clause1: clause,
   }
 }
 

@@ -1,4 +1,4 @@
-import { defaultCompare, Filter, FilterRes, not } from './base'
+import { defaultCompare, Filter, FilterNode, not } from './base'
 import { NormedCard, OracleKeys, Printing } from '../types/normedCard'
 import { Operator } from '../oracleFilter'
 
@@ -13,7 +13,7 @@ export const defaultOperation =
 export const handlePrint = (
   filtersUsed: string[],
   printFilter: Filter<Printing>
-): FilterRes<NormedCard> => ({
+): FilterNode<NormedCard> => ({
   filtersUsed,
   filterFunc: (it) => it.printings.find(printFilter) !== undefined,
   inverseFunc: (it) => it.printings.find(not(printFilter)) !== undefined,

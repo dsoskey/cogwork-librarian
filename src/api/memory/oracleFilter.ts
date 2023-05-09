@@ -12,11 +12,11 @@ import { NormedCard, OracleKeys } from './types/normedCard'
 import { ObjectValues } from '../../types'
 import {
   Filter,
-  andRes,
-  identityRes,
-  orRes,
-  notRes,
-  FilterRes,
+  andNode,
+  identityNode,
+  orNode,
+  notNode,
+  FilterNode,
   defaultCompare,
 } from './filters/base'
 import { printFilters } from './printFilter'
@@ -80,7 +80,7 @@ const powTouOperation =
 const powTouTotalOperation = (
   operator: Operator,
   targetValue: number
-): FilterRes<NormedCard> => ({
+): FilterNode<NormedCard> => ({
   filtersUsed: ['powtou'],
   filterFunc: (card) => {
     const faces = [
@@ -329,47 +329,47 @@ const inFilter =
 const rarityFilter = (
   operator: Operator,
   value: string
-): FilterRes<NormedCard> =>
+): FilterNode<NormedCard> =>
   handlePrint(['rarity'], printFilters.rarityFilter(operator, value))
 
-const setFilter = (value: string): FilterRes<NormedCard> =>
+const setFilter = (value: string): FilterNode<NormedCard> =>
   handlePrint(['set'], printFilters.setFilter(value))
 
-const setTypeFilter = (value: string): FilterRes<NormedCard> =>
+const setTypeFilter = (value: string): FilterNode<NormedCard> =>
   handlePrint(['set-type'], printFilters.setTypeFilter(value))
 
-const artistFilter = (value: string): FilterRes<NormedCard> =>
+const artistFilter = (value: string): FilterNode<NormedCard> =>
   handlePrint(['artist'], printFilters.artistFilter(value))
 
 const collectorNumberFilter = (
   operator: Operator,
   value: number
-): FilterRes<NormedCard> =>
+): FilterNode<NormedCard> =>
   handlePrint(
     ['collector-number'],
     printFilters.collectorNumberFilter(operator, value)
   )
 
-const borderFilter = (value: string): FilterRes<NormedCard> =>
+const borderFilter = (value: string): FilterNode<NormedCard> =>
   handlePrint(['border'], printFilters.borderFilter(value))
 
-const dateFilter = (operator: Operator, value: string): FilterRes<NormedCard> =>
+const dateFilter = (operator: Operator, value: string): FilterNode<NormedCard> =>
   handlePrint(['date'], printFilters.dateFilter(operator, value))
 
 const priceFilter = (
   unit: string,
   operator: Operator,
   value: number
-): FilterRes<NormedCard> =>
+): FilterNode<NormedCard> =>
   handlePrint([unit], printFilters.priceFilter(unit, operator, value))
 
-const frameFilter = (value: string): FilterRes<NormedCard> =>
+const frameFilter = (value: string): FilterNode<NormedCard> =>
   handlePrint(['flavor'], printFilters.frameFilter(value))
 
-const flavorMatch = (value: string): FilterRes<NormedCard> =>
+const flavorMatch = (value: string): FilterNode<NormedCard> =>
   handlePrint(['flavor'], printFilters.flavorMatch(value))
 
-const flavorRegex = (value: string): FilterRes<NormedCard> =>
+const flavorRegex = (value: string): FilterNode<NormedCard> =>
   handlePrint(['flavor'], printFilters.flavorRegex(value))
 
 const gameFilter = (value: string) =>
@@ -384,7 +384,7 @@ const stampFilter = (value: string) =>
 const watermarkFilter = (value: string) =>
   handlePrint(['watermark'], printFilters.watermarkFilter(value))
 
-const cubeFilter = (cubeKey: string): FilterRes<NormedCard> => {
+const cubeFilter = (cubeKey: string): FilterNode<NormedCard> => {
   const rawCards = localStorage.getItem(`${cubeKey}.cube.coglib.sosk.watch`)
   if (rawCards === null) {
     console.warn(`Unknown cube key (${cubeKey})`) // todo: tokenize noQuoteString
@@ -400,10 +400,10 @@ const cubeFilter = (cubeKey: string): FilterRes<NormedCard> => {
 }
 
 export const oracleFilters = {
-  identity: identityRes,
-  and: andRes,
-  or: orRes,
-  not: notRes,
+  identity: identityNode,
+  and: andNode,
+  or: orNode,
+  not: notNode,
   defaultOperation,
   powTouOperation,
   powTouTotalOperation,

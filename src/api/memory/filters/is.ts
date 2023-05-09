@@ -8,7 +8,7 @@ import {
   SHOCKLAND_REGEX
 } from '../types/card'
 import { DEFAULT_CARD_BACK_ID, NormedCard, Printing } from '../types/normedCard'
-import { FilterRes } from './base'
+import { FilterNode } from './base'
 import { handlePrint } from './oracle'
 import { textMatch } from './text'
 import { parsePowTou } from '../oracleFilter'
@@ -451,7 +451,7 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
   }
 }
 
-export const isVal = (value: IsValue): FilterRes<NormedCard> => {
+export const isVal = (value: IsValue): FilterNode<NormedCard> => {
   const _printMatters = printMatters(value)
 
   if (_printMatters) {
