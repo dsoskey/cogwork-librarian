@@ -1,8 +1,8 @@
 import { Card } from 'scryfall-sdk'
-import { ObjectValues } from '../types'
+import { ObjectValues } from '../../../types'
 import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
-import { NormedCard, OracleKeys } from './local/normedCard'
+import { NormedCard, OracleKeys } from './normedCard'
 
 export const DOUBLE_FACED_LAYOUTS = [
   'transform',

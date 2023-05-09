@@ -6,8 +6,8 @@ import {
   IsValue,
   noReminderText,
   SHOCKLAND_REGEX
-} from '../../card'
-import { DEFAULT_CARD_BACK_ID, NormedCard, Printing } from '../../local/normedCard'
+} from '../types/card'
+import { DEFAULT_CARD_BACK_ID, NormedCard, Printing } from '../types/normedCard'
 import { FilterRes } from '../filterBase'
 import { handlePrint } from './oracle'
 import { textMatch } from './text'

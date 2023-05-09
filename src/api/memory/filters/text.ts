@@ -1,6 +1,6 @@
-import { NormedCard, OracleKeys } from '../../local/normedCard'
+import { NormedCard, OracleKeys } from '../types/normedCard'
 import { Filter } from '../filterBase'
-import { anyFaceContains, replaceNamePlaceholder } from '../../card'
+import { anyFaceContains, replaceNamePlaceholder } from '../types/card'
 
 export const textMatch =
   (field: OracleKeys, value: string): Filter<NormedCard> =>

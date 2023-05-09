@@ -1,4 +1,4 @@
-import { isValues } from './card'
+import { isValues } from './memory/types/card'
 
 export const displayQueries = [
   'o=/whenever ~ deals/',
@@ -61,7 +61,6 @@ export const testQueries = [
   'format:pioneer',
   'banned:modern',
   'restricted:vintage',
-  'is:spell',
   'r:rare',
   'rarity:r',
   'set:m11',
@@ -79,9 +78,6 @@ export const testQueries = [
   'wm:orzhov',
   'year=2020',
   'lang:any',
-  'is:companion',
-  'is:historic',
-  'is:party',
   'cube:april',
 ]
 
@@ -92,7 +88,7 @@ const unimplementedQueries = [
   'include:extras', // this one seems to be processed separately?
   'in:rare',
   'st:funny',
-  'is:booster or is:planeswalker_deck',
+  'is:planeswalker_deck',
   'is:league',
   'is:etched',
   'is:buyabox',
@@ -109,14 +105,9 @@ const unimplementedQueries = [
   'is:instore',
   'is:convention',
   'is:set_promo',
-  'is:commander',
   'is:brawler',
-  'has:watermark',
-  'is:reprint',
-  'is:foil',
   'is:spotlight',
   'new:flavor',
-  'has:indicator',
   'new:art',
   'new:artist',
   'border:white',
@@ -129,8 +120,6 @@ const unimplementedQueries = [
   'language:japanese',
   'in:ru',
   'new:language',
-  'is:colorshifted',
-  'is:hires',
   'name:/^A\\-/',
 ]
 

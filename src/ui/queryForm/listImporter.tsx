@@ -5,7 +5,7 @@ import { Setter, TaskStatus } from '../../types'
 import { Manifest } from '../../api/local/db'
 import { Loader } from '../component/loader'
 import { ProjectContext } from '../../api/useProject'
-import { NormedCard } from '../../api/local/normedCard'
+import { NormedCard } from '../../api/memory/types/normedCard'
 
 export interface ListImporterProps {
   setDbDirty: Setter<boolean>

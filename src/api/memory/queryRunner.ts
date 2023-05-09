@@ -3,7 +3,7 @@ import { err, ok, Result } from 'neverthrow'
 import { NearlyError } from '../../error'
 import { printingParser, queryParser } from './parser'
 import { FilterRes } from './filterBase'
-import { chooseFilterFunc, normCardList, NormedCard } from '../local/normedCard'
+import { chooseFilterFunc, normCardList, NormedCard } from './types/normedCard'
 import { sortFunc, SortOrder } from '../card/sort'
 import { sortBy } from 'lodash'
 

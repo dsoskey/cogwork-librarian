@@ -1,6 +1,6 @@
 import { printFilters } from '../../../src/api/memory/printFilter'
 import { aridmesa } from '../../res/data'
-import { Printing } from '../../../src/api/local/normedCard'
+import { Printing } from '../../../src/api/memory/types/normedCard'
 
 describe('dateFilter', function () {
   it('works for YYYY-MM-DD', () => {

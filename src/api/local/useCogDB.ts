@@ -2,7 +2,7 @@ import { createContext, useEffect, useRef, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, Manifest } from './db'
 import { putFile } from './populate'
-import { NormedCard } from './normedCard'
+import { NormedCard } from '../memory/types/normedCard'
 import { QueryReport, useReporter } from '../useReporter'
 
 export interface CogDB {

@@ -8,11 +8,11 @@ import {
   notRes,
   defaultCompare,
 } from './filterBase'
-import { Printing } from '../local/normedCard'
+import { Printing } from './types/normedCard'
 import { Operator } from './oracleFilter'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'
 import { isPrintPrefix, isPrintVal, printMatters } from './filters/is'
-import { IsValue } from '../card'
+import { IsValue } from './types/card'
 
 export const showAllFilter = new Set([
   'date',

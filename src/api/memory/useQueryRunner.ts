@@ -7,7 +7,7 @@ import {
   weightAlgorithms,
 } from '../queryRunnerCommon'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { NormedCard } from '../local/normedCard'
+import { NormedCard } from './types/normedCard'
 import { errAsync, okAsync } from 'neverthrow'
 import { displayMessage } from '../../error'
 import { useContext } from 'react'

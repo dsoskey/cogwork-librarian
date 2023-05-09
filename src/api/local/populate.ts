@@ -1,6 +1,6 @@
 import { Card } from 'scryfall-sdk'
 import { cogDB, Manifest } from './db'
-import { normCardList, NormedCard } from './normedCard'
+import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 export const downloadCards = async (
   manifest: BulkDataDefinition

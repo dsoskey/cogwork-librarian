@@ -1,6 +1,6 @@
 import { FilterRes } from '../filterBase'
-import { NormedCard } from '../../local/normedCard'
-import { ManaSymbol, toManaCost, toSplitCost } from '../../card'
+import { NormedCard } from '../types/normedCard'
+import { ManaSymbol, toManaCost, toSplitCost } from '../types/card'
 import { isVal } from './is'
 import { Operator } from '../oracleFilter'
 

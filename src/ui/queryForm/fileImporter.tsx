@@ -1,6 +1,6 @@
 import { Loader } from '../component/loader'
 import React, { useContext, useRef } from 'react'
-import { normCardList, NormedCard } from '../../api/local/normedCard'
+import { normCardList, NormedCard } from '../../api/memory/types/normedCard'
 import { Card } from 'scryfall-sdk'
 import { Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'

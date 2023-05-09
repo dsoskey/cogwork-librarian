@@ -1,5 +1,5 @@
 import { Filter, FilterRes, not } from '../filterBase'
-import { NormedCard, Printing } from '../../local/normedCard'
+import { NormedCard, Printing } from '../types/normedCard'
 
 export const handlePrint = (
   filtersUsed: string[],

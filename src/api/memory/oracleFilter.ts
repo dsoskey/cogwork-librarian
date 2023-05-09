@@ -6,9 +6,9 @@ import {
   replaceNamePlaceholder,
   toManaCost,
   toSplitCost,
-} from '../card'
+} from './types/card'
 import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
-import { NormedCard, OracleKeys } from '../local/normedCard'
+import { NormedCard, OracleKeys } from './types/normedCard'
 import { ObjectValues } from '../../types'
 import {
   Filter,

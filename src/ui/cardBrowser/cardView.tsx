@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import { Card, ImageUris } from 'scryfall-sdk'
 import { EnrichedCard, SCORE_PRECISION } from '../../api/queryRunnerCommon'
 import { WEIGHT, QUERIES } from './constants'
-import { DOUBLE_FACED_LAYOUTS } from '../../api/card'
+import { DOUBLE_FACED_LAYOUTS } from '../../api/memory/types/card'
 import { TaskStatus } from '../../types'
 import { FlagContext } from '../../flags'
 

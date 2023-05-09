@@ -1,6 +1,6 @@
 import { QueryReport, useReporter } from '../useReporter'
 import { createContext, useRef, useState } from 'react'
-import { normCardList, NormedCard } from './normedCard'
+import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { Setter, TaskStatus } from '../../types'
 import isEqual from 'lodash/isEqual'
 import * as Scry from 'scryfall-sdk'

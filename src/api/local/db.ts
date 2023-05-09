@@ -1,6 +1,6 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import { NormedCard } from './normedCard'
+import { NormedCard } from '../memory/types/normedCard'
 export interface Collection {
   id: string
   name: string
