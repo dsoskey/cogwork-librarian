@@ -1,4 +1,4 @@
-import { Operator } from './oracleFilter'
+import { Operator } from '../oracleFilter'
 
 export type Filter<T> = (it: T) => boolean
 

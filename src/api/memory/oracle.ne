@@ -4,7 +4,7 @@
 
 @{%
 const { oracleFilters } = require('./oracleFilter')
-const { identity } = require('./filterBase')
+const { identity } = require('./filters/base')
 %}
 
 main -> filterStart {% id %}
@@ -19,6 +19,7 @@ filter ->
       filter __ connector clause {% ([clause1, _, connectorFunc, clause2]) => {
         return connectorFunc(clause1, clause2)
       } %}
+      # is this where i put the plain text search?
     | clause {% id %}
 
 clause -> "-":? (

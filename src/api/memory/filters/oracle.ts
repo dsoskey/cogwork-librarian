@@ -1,5 +1,14 @@
-import { Filter, FilterRes, not } from '../filterBase'
-import { NormedCard, Printing } from '../types/normedCard'
+import { defaultCompare, Filter, FilterRes, not } from './base'
+import { NormedCard, OracleKeys, Printing } from '../types/normedCard'
+import { Operator } from '../oracleFilter'
+
+export const defaultOperation =
+  (field: OracleKeys, operator: Operator, value: any): Filter<NormedCard> =>
+    (card: NormedCard) => {
+      const cardValue = card[field]
+      if (cardValue === undefined) return false
+      return defaultCompare(cardValue, operator, value)
+    }
 
 export const handlePrint = (
   filtersUsed: string[],

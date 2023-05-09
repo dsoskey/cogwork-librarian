@@ -7,7 +7,7 @@ import {
   orRes,
   notRes,
   defaultCompare,
-} from './filterBase'
+} from './filters/base'
 import { Printing } from './types/normedCard'
 import { Operator } from './oracleFilter'
 import { Rarity } from 'scryfall-sdk/out/api/Cards'

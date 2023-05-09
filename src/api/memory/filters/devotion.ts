@@ -1,4 +1,4 @@
-import { FilterRes } from '../filterBase'
+import { FilterRes } from './base'
 import { NormedCard } from '../types/normedCard'
 import { ManaSymbol, toManaCost, toSplitCost } from '../types/card'
 import { isVal } from './is'

@@ -1,5 +1,5 @@
 import { NormedCard, OracleKeys } from '../types/normedCard'
-import { Filter } from '../filterBase'
+import { Filter } from './base'
 import { anyFaceContains, replaceNamePlaceholder } from '../types/card'
 
 export const textMatch =

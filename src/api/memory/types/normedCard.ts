@@ -3,7 +3,7 @@ import { ObjectValues } from '../../../types'
 import _groupBy from 'lodash/groupBy'
 import _pick from 'lodash/pick'
 import _omit from 'lodash/omit'
-import { Filter } from '../filterBase'
+import { Filter } from '../filters/base'
 import { CardFace } from 'scryfall-sdk/out/api/Cards'
 import { showAllFilter } from '../printFilter'
 
@@ -70,6 +70,7 @@ type PrintKeys = ObjectValues<typeof PRINT_KEYS>
 export type Printing = Pick<Card, PrintKeys>
 
 export type OracleKeys = keyof Omit<Card, PrintKeys>
+
 export interface NormedCard extends Omit<Card, PrintKeys> {
   printings: Printing[]
   // there are oracle and print fields on card faces, so the normed card holds a reference to one for oracle filters

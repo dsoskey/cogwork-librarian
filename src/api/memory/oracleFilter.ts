@@ -18,9 +18,9 @@ import {
   notRes,
   FilterRes,
   defaultCompare,
-} from './filterBase'
+} from './filters/base'
 import { printFilters } from './printFilter'
-import { handlePrint } from './filters/oracle'
+import { defaultOperation, handlePrint } from './filters/oracle'
 import { textMatch } from './filters/text'
 import { isVal } from './filters/is'
 import { devotionOperation } from './filters/devotion'
@@ -47,14 +47,6 @@ export const parsePowTou = (value: any) =>
   value !== undefined
     ? Number.parseInt(value.toString().replace('*', '0'), 10)
     : 0
-
-const defaultOperation =
-  (field: OracleKeys, operator: Operator, value: any): Filter<NormedCard> =>
-  (card: NormedCard) => {
-    const cardValue = card[field]
-    if (cardValue === undefined) return false
-    return defaultCompare(cardValue, operator, value)
-  }
 
 const powTouOperation =
   (

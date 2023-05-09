@@ -2,9 +2,9 @@ import { Card, SearchOptions } from 'scryfall-sdk/out/api/Cards'
 import { err, ok, Result } from 'neverthrow'
 import { NearlyError } from '../../error'
 import { printingParser, queryParser } from './parser'
-import { FilterRes } from './filterBase'
+import { FilterRes } from './filters/base'
 import { chooseFilterFunc, normCardList, NormedCard } from './types/normedCard'
-import { sortFunc, SortOrder } from '../card/sort'
+import { sortFunc, SortOrder } from './filters/sort'
 import { sortBy } from 'lodash'
 
 export const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {

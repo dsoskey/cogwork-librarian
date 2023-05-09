@@ -8,7 +8,7 @@ import {
   SHOCKLAND_REGEX
 } from '../types/card'
 import { DEFAULT_CARD_BACK_ID, NormedCard, Printing } from '../types/normedCard'
-import { FilterRes } from '../filterBase'
+import { FilterRes } from './base'
 import { handlePrint } from './oracle'
 import { textMatch } from './text'
 import { parsePowTou } from '../oracleFilter'
