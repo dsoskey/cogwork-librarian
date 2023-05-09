@@ -1,11 +1,12 @@
+import sortBy from 'lodash/sortBy'
 import { Card, SearchOptions } from 'scryfall-sdk/out/api/Cards'
 import { err, ok, Result } from 'neverthrow'
 import { NearlyError } from '../../error'
 import { printingParser, queryParser } from './parser'
 import { FilterRes } from './filters/base'
-import { chooseFilterFunc, normCardList, NormedCard } from './types/normedCard'
+import { normCardList, NormedCard } from './types/normedCard'
 import { sortFunc, SortOrder } from './filters/sort'
-import { sortBy } from 'lodash'
+import { chooseFilterFunc } from './filters/print'
 
 export const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
   const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
