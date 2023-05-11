@@ -111,22 +111,13 @@ nameRegexCondition -> ("name"i) (":" | "=") regexString
     })%}
 
 colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
-    {% ([_, [operator], value]) => ({
-        filtersUsed: ["color"],
-        filterFunc: oracleFilters.colorMatch(operator, new Set(value)),
-    }) %}
+    {% ([_, [operator], value]) => oracleFilters.colorMatch(operator, new Set(value)) %}
 
 colorIdentityCondition -> ("ci"i | "commander"i | "identity"i | "id"i) anyOperator colorCombinationValue
-    {% ([_, [operator], value]) => ({
-        filtersUsed: ["identity"],
-        filterFunc: oracleFilters.colorIdentityMatch(operator, new Set(value)),
-    }) %}
+    {% ([_, [operator], value]) => oracleFilters.colorIdentityMatch(operator, new Set(value)) %}
 
 manaCostCondition -> ("mana"i | "m"i) anyOperator manaCostValue
-    {% ([_, [operator], value]) => ({
-        filtersUsed: ["mana"],
-        filterFunc: oracleFilters.manaCostMatch(operator, value),
-    }) %}
+    {% ([_, [operator], value]) => oracleFilters.manaCostMatch(operator, value) %}
 
 oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue
     {% ([_, [_op], value]) => ({
@@ -153,10 +144,7 @@ fullOracleRegexCondition -> ("fo"i) (":" | "=") regexString
     }) %}
 
 keywordCondition -> "keyword"i (":" | "=") stringValue
-    {% ([_, [_op], value]) => ({
-        filtersUsed: ["full-oracle"],
-        filterFunc: oracleFilters.keywordMatch(value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.keywordMatch(value) %}
 
 typeCondition -> ("t"i | "type"i) (":" | "=") stringValue
     {% ([_, [_op], value]) => ({
@@ -189,37 +177,22 @@ layoutCondition -> ("layout"i) equalityOperator stringValue
     }) %}
 
 formatCondition -> ("format"i | "f"i) equalityOperator formatValue
-    {% ([_, [_op], value]) => ({
-        filtersUsed: ["format"],
-        filterFunc: oracleFilters.formatMatch('legal', value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.formatMatch('legal', value) %}
 
 bannedCondition -> "banned"i equalityOperator formatValue
-    {% ([_, [_op], value]) => ({
-        filtersUsed: ["banned"],
-        filterFunc: oracleFilters.formatMatch('banned', value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.formatMatch('banned', value) %}
 
 restrictedCondition -> "restricted"i equalityOperator formatValue
-    {% ([_, [_op], value]) => ({
-        filtersUsed: ["restricted"],
-        filterFunc: oracleFilters.formatMatch('restricted', value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.formatMatch('restricted', value) %}
 
 isCondition -> ("is"i | "has"i) ":" isValue
     {% ([_, [_op], value]) => oracleFilters.isVal(value) %}
 
 notCondition -> "not"i ":" isValue
-    {% ([_, [_op], value]) => oracleFilters.not({
-        filtersUsed: ["is"],
-        filterFunc: oracleFilters.isVal(value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.not(oracleFilters.isVal(value)) %}
 
 inCondition -> "in"i ":" stringValue
-    {% ([_, [_op], value]) => ({
-        filtersUsed: ["in"],
-        filterFunc: oracleFilters.inFilter(value),
-    }) %}
+    {% ([_, [_op], value]) => oracleFilters.inFilter(value) %}
 
 producesCondition ->
     "produces"i anyOperator producesCombinationValue

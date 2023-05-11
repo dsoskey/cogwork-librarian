@@ -1,4 +1,21 @@
-import { Operator } from '../oracleFilter'
+import { ObjectValues } from '../../../types'
+import { NormedCard, Printing } from '../types/normedCard'
+export const EQ_OPERATORS = {
+  ':': ':',
+  '=': '=',
+} as const
+export type EqualityOperator = ObjectValues<typeof EQ_OPERATORS>
+
+export const OPERATORS = {
+  ...EQ_OPERATORS,
+  '!=': '!=',
+  '<>': '<>',
+  '<': '<',
+  '<=': '<=',
+  '>': '>',
+  '>=': '>=',
+} as const
+export type Operator = ObjectValues<typeof OPERATORS>
 
 export type Filter<T> = (it: T) => boolean
 
@@ -8,6 +25,16 @@ export interface FilterNode<T> {
   inverseFunc?: Filter<T>
   clause1?: FilterNode<T>
   clause2?: FilterNode<T>
+}
+
+export interface CombinedFilterNode {
+  filtersUsed: string[]
+  filterFunc: Filter<NormedCard>
+  inverseFunc?: Filter<NormedCard>
+  printFilter: Filter<Printing>
+  printInverse?: Filter<Printing>
+  clause1?: CombinedFilterNode
+  clause2?: CombinedFilterNode
 }
 
 export const identity =

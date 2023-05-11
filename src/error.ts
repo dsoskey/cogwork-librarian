@@ -1,4 +1,4 @@
-import { OPERATORS } from './api/memory/oracleFilter'
+import { OPERATORS } from './api/memory/filters/base'
 
 export interface CogError {
   // query that caused the error

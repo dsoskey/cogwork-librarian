@@ -2,7 +2,7 @@ import React from 'react'
 import Prism, { Environment, Grammar } from 'prismjs'
 import 'prismjs/components/prism-regex.js'
 import { keywords, keywordsToImplement, syntaxDocs } from './syntaxDocs'
-import { OPERATORS } from './oracleFilter'
+import { OPERATORS } from './filters/base'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
 const keywordRegex = Object.values(keywords).join('|')

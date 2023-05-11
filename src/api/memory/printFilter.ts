@@ -6,13 +6,13 @@ import {
   andNode,
   orNode,
   notNode,
-  defaultCompare,
+  defaultCompare, Operator
 } from './filters/base'
 import { Printing } from './types/normedCard'
-import { Operator } from './oracleFilter'
-import { Rarity } from 'scryfall-sdk/out/api/Cards'
 import { isPrintPrefix, isPrintVal, printMatters } from './filters/is'
 import { IsValue } from './types/card'
+import { rarityFilter } from './filters/rarity'
+import { oracleFilter } from './filters/oracle'
 
 export const showAllFilter = new Set([
   'date',
@@ -27,32 +27,6 @@ export const showAllFilter = new Set([
   'watermark',
   'year',
 ])
-
-const oracleFilter = (): FilterNode<Printing> => ({
-  ...identityNode(),
-  inverseFunc: identity(),
-})
-
-const rarityFilter =
-  (operator: Operator, value: string): Filter<Printing> =>
-  (it: Printing) => {
-    switch (operator) {
-      case '=':
-      case ':':
-        return it.rarity === value
-      case '!=':
-      case '<>':
-        return it.rarity !== value
-      case '>':
-        return Rarity[it.rarity] > Rarity[value]
-      case '>=':
-        return Rarity[it.rarity] >= Rarity[value]
-      case '<':
-        return Rarity[it.rarity] < Rarity[value]
-      case '<=':
-        return Rarity[it.rarity] <= Rarity[value]
-    }
-  }
 
 const setFilter =
   (value: string): Filter<Printing> =>
