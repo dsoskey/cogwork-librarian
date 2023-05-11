@@ -1,8 +1,20 @@
 import { Filter } from './base'
 import { Card } from 'scryfall-sdk'
-import { showAllFilter } from '../printFilter'
 import { NormedCard, Printing } from '../types/normedCard'
 
+const showAllFilter = new Set([
+  'date',
+  'frame',
+  'set',
+  'setType',
+  'usd',
+  'eur',
+  'tix',
+  'language',
+  'stamp',
+  'watermark',
+  'year',
+])
 
 export const findPrinting =
   (filterFunc: Filter<Printing>) =>

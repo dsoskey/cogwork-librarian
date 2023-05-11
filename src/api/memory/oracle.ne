@@ -3,7 +3,7 @@
 @builtin "string.ne"
 
 @{%
-const { oracleFilters } = require('./oracleFilter')
+const { filters } = require('./filters')
 const { identity } = require('./filters/base')
 const { oracleNode } = require('./filters/oracle')
 %}
@@ -11,7 +11,7 @@ const { oracleNode } = require('./filters/oracle')
 main -> filterStart {% id %}
 
 filterStart ->
-      _ {% () => oracleFilters.identity() %}
+      _ {% () => filters.identity() %}
     | _ filter _ {% ([, filter]) => {
         return filter
     } %}
@@ -28,14 +28,14 @@ clause -> "-":? (
     | condition
 ) {% ([negation, [inner]]) => {
     if (negation) {
-        return oracleFilters.not(inner)
+        return filters.not(inner)
     }
     return inner
 } %}
 
 connector ->
-      (null | "and"i __) {% () => oracleFilters.and %}
-    | "or"i __           {% () => oracleFilters.or %}
+      (null | "and"i __) {% () => filters.and %}
+    | "or"i __           {% () => filters.or %}
 
 condition -> (
     cmcCondition |
@@ -90,125 +90,125 @@ condition -> (
 cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
     {% ([_, [operator], value]) => oracleNode({
         filtersUsed: ["cmc"],
-        filterFunc: oracleFilters.defaultOperation('cmc', operator, value),
+        filterFunc: filters.defaultOperation('cmc', operator, value),
     }) %}
 
 exactNameCondition -> "!" stringValue
     {% ([op, value]) => oracleNode({
         filtersUsed: ["exact"],
-        filterFunc: oracleFilters.exactMatch('name', value)
+        filterFunc: filters.exactMatch('name', value)
     })%}
 
 nameCondition -> ("name"i) (":" | "=") stringValue
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["name"],
-        filterFunc: oracleFilters.textMatch('name', value)
+        filterFunc: filters.textMatch('name', value)
     })%}
 
 nameRegexCondition -> ("name"i) (":" | "=") regexString
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["name"],
-        filterFunc: oracleFilters.regexMatch('name', value)
+        filterFunc: filters.regexMatch('name', value)
     })%}
 
 colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
-    {% ([_, [operator], value]) => oracleFilters.colorMatch(operator, new Set(value)) %}
+    {% ([_, [operator], value]) => filters.colorMatch(operator, new Set(value)) %}
 
 colorIdentityCondition -> ("ci"i | "commander"i | "identity"i | "id"i) anyOperator colorCombinationValue
-    {% ([_, [operator], value]) => oracleFilters.colorIdentityMatch(operator, new Set(value)) %}
+    {% ([_, [operator], value]) => filters.colorIdentityMatch(operator, new Set(value)) %}
 
 manaCostCondition -> ("mana"i | "m"i) anyOperator manaCostValue
-    {% ([_, [operator], value]) => oracleFilters.manaCostMatch(operator, value) %}
+    {% ([_, [operator], value]) => filters.manaCostMatch(operator, value) %}
 
 oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["oracle"],
-        filterFunc: oracleFilters.noReminderTextMatch('oracle_text', value),
+        filterFunc: filters.noReminderTextMatch('oracle_text', value),
     }) %}
 
 oracleRegexCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") regexString
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["oracle"],
-        filterFunc: oracleFilters.noReminderRegexMatch('oracle_text', value),
+        filterFunc: filters.noReminderRegexMatch('oracle_text', value),
     }) %}
 
 fullOracleCondition -> ("fo"i) (":" | "=") stringValue
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["full-oracle"],
-        filterFunc: oracleFilters.textMatch('oracle_text', value),
+        filterFunc: filters.textMatch('oracle_text', value),
     }) %}
 
 fullOracleRegexCondition -> ("fo"i) (":" | "=") regexString
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["full-oracle"],
-        filterFunc: oracleFilters.regexMatch('oracle_text', value),
+        filterFunc: filters.regexMatch('oracle_text', value),
     }) %}
 
 keywordCondition -> "keyword"i (":" | "=") stringValue
-    {% ([_, [_op], value]) => oracleFilters.keywordMatch(value) %}
+    {% ([_, [_op], value]) => filters.keywordMatch(value) %}
 
 typeCondition -> ("t"i | "type"i) (":" | "=") stringValue
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["type"],
-        filterFunc: oracleFilters.textMatch('type_line', value),
+        filterFunc: filters.textMatch('type_line', value),
     }) %}
 
 typeRegexCondition -> ("t"i | "type"i) (":" | "=") regexString
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["type"],
-        filterFunc: oracleFilters.regexMatch('type_line', value),
+        filterFunc: filters.regexMatch('type_line', value),
     }) %}
 
 powerCondition -> ("pow"i | "power"i) anyOperator integerValue
-    {% ([_, [operator], value]) => oracleFilters.combatOperation('power', operator, value) %}
+    {% ([_, [operator], value]) => filters.combatOperation('power', operator, value) %}
 
 toughCondition -> ("tou"i | "toughness"i) anyOperator integerValue
-    {% ([_, [operator], value]) => oracleFilters.combatOperation('toughness', operator, value)  %}
+    {% ([_, [operator], value]) => filters.combatOperation('toughness', operator, value)  %}
 
 powTouCondition -> ("pt"i | "powtou"i) anyOperator integerValue
-    {% ([_, [operator], value]) => oracleFilters.powTouTotalOperation(operator, value) %}
+    {% ([_, [operator], value]) => filters.powTouTotalOperation(operator, value) %}
 
 loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
-    {% ([_, [operator], value]) => oracleFilters.combatOperation('loyalty', operator, value) %}
+    {% ([_, [operator], value]) => filters.combatOperation('loyalty', operator, value) %}
 
 layoutCondition -> ("layout"i) equalityOperator stringValue
     {% ([_, [operator], value]) => oracleNode({
         filtersUsed: ["layout"],
-        filterFunc: oracleFilters.defaultOperation('layout', operator, value),
+        filterFunc: filters.defaultOperation('layout', operator, value),
     }) %}
 
 formatCondition -> ("format"i | "f"i) equalityOperator formatValue
-    {% ([_, [_op], value]) => oracleFilters.formatMatch('legal', value) %}
+    {% ([_, [_op], value]) => filters.formatMatch('legal', value) %}
 
 bannedCondition -> "banned"i equalityOperator formatValue
-    {% ([_, [_op], value]) => oracleFilters.formatMatch('banned', value) %}
+    {% ([_, [_op], value]) => filters.formatMatch('banned', value) %}
 
 restrictedCondition -> "restricted"i equalityOperator formatValue
-    {% ([_, [_op], value]) => oracleFilters.formatMatch('restricted', value) %}
+    {% ([_, [_op], value]) => filters.formatMatch('restricted', value) %}
 
 isCondition -> ("is"i | "has"i) ":" isValue
-    {% ([_, [_op], value]) => oracleFilters.isVal(value) %}
+    {% ([_, [_op], value]) => filters.isVal(value) %}
 
 notCondition -> "not"i ":" isValue
-    {% ([_, [_op], value]) => oracleFilters.not(oracleFilters.isVal(value)) %}
+    {% ([_, [_op], value]) => filters.not(filters.isVal(value)) %}
 
 inCondition -> "in"i ":" stringValue
-    {% ([_, [_op], value]) => oracleFilters.inFilter(value) %}
+    {% ([_, [_op], value]) => filters.inFilter(value) %}
 
 producesCondition ->
     "produces"i anyOperator producesCombinationValue
         {% ([_, [operator], value]) => oracleNode({
             filtersUsed: ["produces"],
-            filterFunc: oracleFilters.producesMatch(operator, new Set(value)),
+            filterFunc: filters.producesMatch(operator, new Set(value)),
         }) %} |
     "produces"i anyOperator integerValue
         {% ([_, [operator], value]) => oracleNode({
             filtersUsed: ["produces"],
-            filterFunc: oracleFilters.producesMatchCount(operator, value),
+            filterFunc: filters.producesMatchCount(operator, value),
         }) %}
 
 devotionCondition -> "devotion"i anyOperator devotionValue
-    {% ([_, [operator], [pips]]) => oracleFilters.devotionOperation(operator, pips) %}
+    {% ([_, [operator], [pips]]) => filters.devotionOperation(operator, pips) %}
 
 uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
     {% ([_, [operator], value]) => oracleNode({
@@ -234,52 +234,52 @@ directionCondition -> "direction"i ":" ("asc"i | "desc"i)
 # print-matters
 # todo: oracleFilter defines the object structure that's returned
 rarityCondition -> ("r"i | "rarity"i) anyOperator rarityValue
-    {% ([_, [operator], value]) => oracleFilters.rarityFilter(operator, value) %}
+    {% ([_, [operator], value]) => filters.rarityFilter(operator, value) %}
 
 setCondition -> ("s"i | "set"i| "e"i | "edition"i) equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.setFilter(value) %}
+    {% ([_, [_op], value]) => filters.setFilter(value) %}
 
 setTypeCondition -> "st"i equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.setTypeFilter(value) %}
+    {% ([_, [_op], value]) => filters.setTypeFilter(value) %}
 
 artistCondition -> ("a"i | "artist"i) equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.artistFilter(value) %}
+    {% ([_, [_op], value]) => filters.artistFilter(value) %}
 
 collectorNumberCondition -> ("cn"i | "number"i) anyOperator integerValue
-    {% ([_, [operator], value]) => oracleFilters.collectorNumberFilter(operator, value) %}
+    {% ([_, [operator], value]) => filters.collectorNumberFilter(operator, value) %}
 
 borderCondition -> "border"i equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.borderFilter(value) %}
+    {% ([_, [_op], value]) => filters.borderFilter(value) %}
 
 dateCondition -> ("date"i | "year"i) anyOperator stringValue
-    {% ([_, [operator], value]) => oracleFilters.dateFilter(operator, value) %}
+    {% ([_, [operator], value]) => filters.dateFilter(operator, value) %}
 
 priceCondition -> ("usd"i | "eur"i | "tix"i) anyOperator numberValue
-    {% ([unit, [operator], value]) => oracleFilters.priceFilter(unit, operator, value) %}
+    {% ([unit, [operator], value]) => filters.priceFilter(unit, operator, value) %}
 
 frameCondition -> "frame"i equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.frameFilter(value) %}
+    {% ([_, [_op], value]) => filters.frameFilter(value) %}
 
 flavorCondition -> ("flavor"i | "ft"i) equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.flavorMatch(value) %}
+    {% ([_, [_op], value]) => filters.flavorMatch(value) %}
 
 flavorRegexCondition -> ("flavor"i | "ft"i) equalityOperator regexString
-    {% ([_, [_op], value]) => oracleFilters.flavorRegex(value) %}
+    {% ([_, [_op], value]) => filters.flavorRegex(value) %}
 
 gameCondition -> "game"i equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.gameFilter(value) %}
+    {% ([_, [_op], value]) => filters.gameFilter(value) %}
 
 languageCondition -> ("lang"i | "language"i) equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.languageFilter(value) %}
+    {% ([_, [_op], value]) => filters.languageFilter(value) %}
 
 stampCondition -> "stamp"i equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.stampFilter(value) %}
+    {% ([_, [_op], value]) => filters.stampFilter(value) %}
 
 watermarkCondition -> ("wm"i | "watermark"i) equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.watermarkFilter(value) %}
+    {% ([_, [_op], value]) => filters.watermarkFilter(value) %}
 
 cubeCondition -> "cube"i equalityOperator stringValue
-    {% ([_, [_op], value]) => oracleFilters.cubeFilter(value) %}
+    {% ([_, [_op], value]) => filters.cubeFilter(value) %}
 
 # Values
 stringValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value.toLowerCase() %}

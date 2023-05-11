@@ -4,7 +4,7 @@ import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { Setter, TaskStatus } from '../../types'
 import isEqual from 'lodash/isEqual'
 import * as Scry from 'scryfall-sdk'
-import { oracleFilters } from '../memory/oracleFilter'
+import { filters } from '../memory/filters'
 
 interface ListImporterProps {
   memory: NormedCard[]
@@ -61,7 +61,7 @@ export const useListImporter = ({ memory }: ListImporterProps): ListImporter => 
 
     if (isEqual(rawData.current, {})) {
       // Idea: store cards in memory like this
-      const isToken = oracleFilters.textMatch("type_line", "Token")
+      const isToken = filters.textMatch("type_line", "Token")
         memory.forEach(cardInMemory => {
         if (!isToken(cardInMemory)) {
           rawData.current[cardInMemory.name.toLowerCase()] = cardInMemory

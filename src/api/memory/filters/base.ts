@@ -80,20 +80,21 @@ export const not = <T>(clause: Filter<T>): Filter<T> => {
 }
 
 export const notNode = (clause: FilterNode): FilterNode => {
-  if (clause.inverseFunc !== undefined) {
-    return {
-      filtersUsed: ['(', 'not', ...clause.filtersUsed, ')'],
-      filterFunc: clause.inverseFunc,
-      inverseFunc: clause.filterFunc,
-      printFilter: clause.printInverse,
-      printInverse: clause.printFilter,
-      clause1: clause,
-    }
-  }
+  const filterFunc = clause.inverseFunc !== undefined ?
+    clause.inverseFunc : (c) => !clause.filterFunc(c)
+  const inverseFunc = clause.inverseFunc !== undefined ?
+    clause.filterFunc : undefined
+  const printFilter = clause.printInverse !== undefined ?
+    clause.printInverse : (p) => !clause.printFilter(p)
+  const printInverse = clause.printInverse !== undefined ?
+    clause.printFilter : undefined
+
   return {
     filtersUsed: ['(', 'not', ...clause.filtersUsed, ')'],
-    filterFunc: (c) => !clause.filterFunc(c),
-    printFilter: (p) => !clause.printFilter(p),
+    filterFunc,
+    inverseFunc,
+    printFilter,
+    printInverse,
     clause1: clause,
   }
 }
