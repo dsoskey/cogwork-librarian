@@ -1,8 +1,9 @@
 import { FilterNode, Operator } from './base'
 import { NormedCard } from '../types/normedCard'
+import { oracleNode } from './oracle'
 
 export const colorIdentityMatch =
-  (operator: Operator, value: Set<string>): FilterNode<NormedCard> => ({
+  (operator: Operator, value: Set<string>): FilterNode => oracleNode({
     filtersUsed: ['identity'],
     filterFunc: (card: NormedCard) => {
       const colors = card.color_identity.map((it) => it.toLowerCase())

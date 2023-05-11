@@ -12,7 +12,6 @@ import { Printing } from './types/normedCard'
 import { isPrintPrefix, isPrintVal, printMatters } from './filters/is'
 import { IsValue } from './types/card'
 import { rarityFilter } from './filters/rarity'
-import { oracleFilter } from './filters/oracle'
 
 export const showAllFilter = new Set([
   'date',
@@ -157,7 +156,6 @@ export const printFilters = {
   setFilter,
   setTypeFilter,
   artistFilter,
-  oracleFilter,
   collectorNumberFilter,
   borderFilter,
   dateFilter,

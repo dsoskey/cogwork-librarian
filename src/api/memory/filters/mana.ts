@@ -2,10 +2,11 @@ import { FilterNode, Operator } from './base'
 import { NormedCard } from '../types/normedCard'
 import { toManaCost, toSplitCost } from '../types/card'
 import isEqual from 'lodash/isEqual'
+import { oracleNode } from './oracle'
 
 // optimization opportunity
 export const manaCostMatch =
-  (operator: Operator, value: string[]): FilterNode<NormedCard> => ({
+  (operator: Operator, value: string[]): FilterNode => oracleNode({
     filtersUsed: ['mana'],
     filterFunc: (card: NormedCard) => {
       const targetCost = toManaCost(value)

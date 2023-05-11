@@ -1,12 +1,12 @@
-import { FilterNode } from './base'
+import { FilterNode, Operator } from './base'
 import { NormedCard } from '../types/normedCard'
 import { ManaSymbol, toManaCost, toSplitCost } from '../types/card'
 import { isVal } from './is'
-import { Operator } from '../oracleFilter'
+import { oracleNode } from './oracle'
 
 
-export const devotionOperation = (operator: Operator, pips: string[]): FilterNode<NormedCard> => {
-  return {
+export const devotionOperation = (operator: Operator, pips: string[]): FilterNode =>
+  oracleNode({
     filtersUsed: ['devotion'],
     filterFunc: (card: NormedCard) => {
       const pip: ManaSymbol = pips[0].toLowerCase() as ManaSymbol
@@ -39,5 +39,4 @@ export const devotionOperation = (operator: Operator, pips: string[]): FilterNod
         })
       return cardCosts.length > 0
     }
-  }
-}
+  })

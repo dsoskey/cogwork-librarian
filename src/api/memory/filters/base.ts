@@ -19,22 +19,14 @@ export type Operator = ObjectValues<typeof OPERATORS>
 
 export type Filter<T> = (it: T) => boolean
 
-export interface FilterNode<T> {
-  filtersUsed: string[]
-  filterFunc: Filter<T>
-  inverseFunc?: Filter<T>
-  clause1?: FilterNode<T>
-  clause2?: FilterNode<T>
-}
-
-export interface CombinedFilterNode {
+export interface FilterNode {
   filtersUsed: string[]
   filterFunc: Filter<NormedCard>
   inverseFunc?: Filter<NormedCard>
   printFilter: Filter<Printing>
   printInverse?: Filter<Printing>
-  clause1?: CombinedFilterNode
-  clause2?: CombinedFilterNode
+  clause1?: FilterNode
+  clause2?: FilterNode
 }
 
 export const identity =
@@ -42,50 +34,42 @@ export const identity =
   (_) =>
     true
 
-export const identityNode = <T>(): FilterNode<T> => ({
+export const identityNode = (): FilterNode => ({
   filtersUsed: ['identity'],
   filterFunc: identity(),
+  printFilter: identity(),
+  printInverse: identity(),
 })
 
-export const and = <T>(clause1: Filter<T>, clause2: Filter<T>): Filter<T> => {
-  return (c: T) => clause1(c) && clause2(c)
-}
+export const and = <T>(clause1: Filter<T>, clause2: Filter<T>): Filter<T> =>
+  (c: T) => clause1(c) && clause2(c)
 
-export const andNode = <T>(
-  clause1: FilterNode<T>,
-  clause2: FilterNode<T>
-): FilterNode<T> => {
+
+export const or = <T>(clause1: Filter<T>, clause2: Filter<T>): Filter<T> =>
+  (c: T) => clause1(c) || clause2(c)
+
+
+export const andNode = (
+  clause1: FilterNode,
+  clause2: FilterNode
+): FilterNode => {
   return {
-    filtersUsed: [
-      '(',
-      ...clause1.filtersUsed,
-      'and',
-      ...clause2.filtersUsed,
-      ')',
-    ],
+    filtersUsed: ['(', ...clause1.filtersUsed, 'and', ...clause2.filtersUsed, ')'],
     filterFunc: and(clause1.filterFunc, clause2.filterFunc),
+    printFilter: and(clause1.printFilter, clause2.printFilter),
     clause1,
     clause2,
   }
 }
 
-export const or = <T>(clause1: Filter<T>, clause2: Filter<T>): Filter<T> => {
-  return (c: T) => clause1(c) || clause2(c)
-}
-
-export const orNode = <T>(
-  clause1: FilterNode<T>,
-  clause2: FilterNode<T>
-): FilterNode<T> => {
+export const orNode = (
+  clause1: FilterNode,
+  clause2: FilterNode
+): FilterNode => {
   return {
-    filtersUsed: [
-      '(',
-      ...clause1.filtersUsed,
-      'or',
-      ...clause2.filtersUsed,
-      ')',
-    ],
+    filtersUsed: ['(', ...clause1.filtersUsed, 'or', ...clause2.filtersUsed, ')',],
     filterFunc: or(clause1.filterFunc, clause2.filterFunc),
+    printFilter: or(clause1.printFilter, clause2.printFilter),
     clause1,
     clause2,
   }
@@ -95,18 +79,21 @@ export const not = <T>(clause: Filter<T>): Filter<T> => {
   return (c: T) => !clause(c)
 }
 
-export const notNode = <T>(clause: FilterNode<T>): FilterNode<T> => {
+export const notNode = (clause: FilterNode): FilterNode => {
   if (clause.inverseFunc !== undefined) {
     return {
       filtersUsed: ['(', 'not', ...clause.filtersUsed, ')'],
       filterFunc: clause.inverseFunc,
       inverseFunc: clause.filterFunc,
+      printFilter: clause.printInverse,
+      printInverse: clause.printFilter,
       clause1: clause,
     }
   }
   return {
     filtersUsed: ['(', 'not', ...clause.filtersUsed, ')'],
-    filterFunc: (c: T) => !clause.filterFunc(c),
+    filterFunc: (c) => !clause.filterFunc(c),
+    printFilter: (p) => !clause.printFilter(p),
     clause1: clause,
   }
 }

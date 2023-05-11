@@ -1,13 +1,13 @@
-import { CombinedFilterNode, defaultCompare, Filter, FilterNode, identity, identityNode, not, Operator } from './base'
+import { FilterNode, defaultCompare, Filter, identity, not, Operator } from './base'
 import { NormedCard, OracleKeys, Printing } from '../types/normedCard'
 
-export const oracleFilter = (): FilterNode<Printing> => ({
-  ...identityNode(),
-  inverseFunc: identity(),
-})
-
+export interface OracleFilter {
+  filtersUsed: string[]
+  filterFunc: Filter<NormedCard>
+  inverseFunc?: Filter<NormedCard>
+}
 export const oracleNode =
-  ({ filtersUsed, filterFunc, inverseFunc }: FilterNode<NormedCard>): CombinedFilterNode => ({
+  ({ filtersUsed, filterFunc, inverseFunc }: OracleFilter): FilterNode => ({
     filtersUsed,
     filterFunc,
     inverseFunc,
@@ -15,24 +15,14 @@ export const oracleNode =
     printInverse: identity(),
   })
 
-
-export const handlePrint = (
-  filtersUsed: string[],
-  printFilter: Filter<Printing>
-): FilterNode<NormedCard> => ({
-  filtersUsed,
-  filterFunc: (it) => it.printings.find(printFilter) !== undefined,
-  inverseFunc: (it) => it.printings.find(not(printFilter)) !== undefined,
-})
 export const printNode = (
   filtersUsed: string[],
   printFilter: Filter<Printing>,
-): CombinedFilterNode => {
-  const { filterFunc, inverseFunc } = handlePrint(filtersUsed, printFilter)
+): FilterNode => {
   return {
     filtersUsed,
-    filterFunc,
-    inverseFunc,
+    filterFunc: (it) => it.printings.find(printFilter) !== undefined,
+    inverseFunc: (it) => it.printings.find(not(printFilter)) !== undefined,
     printFilter,
   }
 }

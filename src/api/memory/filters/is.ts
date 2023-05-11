@@ -9,7 +9,7 @@ import {
 } from '../types/card'
 import { DEFAULT_CARD_BACK_ID, NormedCard, Printing } from '../types/normedCard'
 import { FilterNode } from './base'
-import { handlePrint } from './oracle'
+import { oracleNode, printNode } from './oracle'
 import { textMatch } from './text'
 import { parsePowTou } from '../types/card'
 
@@ -451,15 +451,15 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
   }
 }
 
-export const isVal = (value: IsValue): FilterNode<NormedCard> => {
+export const isVal = (value: IsValue): FilterNode => {
   const _printMatters = printMatters(value)
 
   if (_printMatters) {
-    return handlePrint([`${isPrintPrefix}${value}`], isPrintVal(value))
+    return printNode([`${isPrintPrefix}${value}`], isPrintVal(value))
   }
 
-  return {
+  return oracleNode({
     filtersUsed: ['is'],
     filterFunc: isOracleVal(value),
-  }
+  })
 }

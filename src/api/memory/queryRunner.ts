@@ -2,7 +2,7 @@ import sortBy from 'lodash/sortBy'
 import { Card, SearchOptions } from 'scryfall-sdk/out/api/Cards'
 import { err, ok, Result } from 'neverthrow'
 import { NearlyError } from '../../error'
-import { printingParser, queryParser } from './parser'
+import { queryParser } from './parser'
 import { FilterNode } from './filters/base'
 import { normCardList, NormedCard } from './types/normedCard'
 import { sortFunc, SortOrder } from './filters/sort'
@@ -74,8 +74,8 @@ export class QueryRunner {
     }
 
     // filter normedCards
-    const { filterFunc, filtersUsed } = parser
-      .results[0] as FilterNode<NormedCard>
+    const { filterFunc, filtersUsed, printFilter } = parser
+      .results[0] as FilterNode
     const filtered = []
     for (const card of corpus) {
       if (filterFunc(card)) {
@@ -83,24 +83,11 @@ export class QueryRunner {
       }
     }
 
-    // parse print logic
-    const printParser = printingParser()
-    try {
-      console.debug(`feeding ${query} to print parser`)
-      printParser.feed(query)
-    } catch (error) {
-      const { message } = error as NearlyError
-      return err({
-        query,
-        errorOffset: error.offset ?? 0,
-        message,
-      })
-    }
     const printFilterFunc = chooseFilterFunc(filtersUsed)
 
     // filter prints
     const printFiltered: Card[] = filtered
-      .flatMap(printFilterFunc(printParser.results[0].filterFunc))
+      .flatMap(printFilterFunc(printFilter))
       .filter(it => it !== undefined)
 
     // sort

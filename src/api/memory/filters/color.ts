@@ -1,7 +1,8 @@
 import { FilterNode, Operator } from './base'
 import { NormedCard } from '../types/normedCard'
+import { oracleNode } from './oracle'
 
-export const colorMatch = (operator: Operator, value: Set<string>): FilterNode<NormedCard> => ({
+export const colorMatch = (operator: Operator, value: Set<string>): FilterNode => oracleNode({
   filtersUsed: ['color'],
   filterFunc: (card: NormedCard) => {
       const faceMatchMap = [
@@ -48,7 +49,7 @@ export const colorMatch = (operator: Operator, value: Set<string>): FilterNode<N
             faceMatchMap.filter((it) => it.match.length === value.size).length > 0
           )
         case '<>':
-          throw 'throw something better please!'
+          throw Error('throw something better please!')
       }
     },
 })

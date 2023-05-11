@@ -1,14 +1,13 @@
 import { NormedCard, OracleKeys } from '../types/normedCard'
-import { defaultCompare, FilterNode } from './base'
-import { Operator } from '../oracleFilter'
+import { FilterNode, defaultCompare, Operator } from './base'
 import { parsePowTou } from '../types/card'
+import { oracleNode } from './oracle'
 
-export const combatOperation =
-  (
-    field: OracleKeys,
-    operator: Operator,
-    targetValue: number
-  ): FilterNode<NormedCard> => ({
+export const combatOperation = (
+  field: OracleKeys,
+  operator: Operator,
+  targetValue: number
+): FilterNode => oracleNode({
     filtersUsed: [field],
     filterFunc: (card: NormedCard) => {
       const cardValue = card[field]
@@ -23,7 +22,7 @@ export const combatOperation =
 export const powTouTotalOperation = (
   operator: Operator,
   targetValue: number
-): FilterNode<NormedCard> => ({
+): FilterNode => oracleNode({
   filtersUsed: ['powtou'],
   filterFunc: (card) => {
     const faces = [
