@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Viewport } from '../../viewport'
 
-const cheeseSS = (dragging: boolean) => ({
+const cheeseSS = (dragging: boolean): React.CSSProperties => ({
   position: 'relative',
   top: 0,
   bottom: 0,

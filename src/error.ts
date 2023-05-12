@@ -9,10 +9,6 @@ export interface CogError {
   debugMessage: string
 }
 
-export interface NearlyError extends Error {
-  offset: number
-}
-
 const opsFirstLetter = Object.values(OPERATORS).map((it) => it[0])
 export const displayMessage = (
   query: string,

@@ -1,11 +1,11 @@
 import {
-  syntaxDocs,
   keywords,
   keywordsToImplement,
-} from '../../api/memory/syntaxDocs'
+} from '../../api/memory/types/filterKeyword'
 import { useState } from 'react'
 import { Modal } from '../component/modal'
 import React from 'react'
+import { syntaxDocs } from '../../api/local/syntaxDocs'
 
 export const SyntaxDocs = () => {
   const [open, setOpen] = useState<boolean>(false)

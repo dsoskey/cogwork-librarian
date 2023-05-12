@@ -10,7 +10,7 @@ import {
   injectPrefix as _injectPrefix,
 } from './api/queryRunnerCommon'
 import { useLocalStorage } from './api/local/useLocalStorage'
-import { useMemoryQueryRunner } from './api/memory/useQueryRunner'
+import { useMemoryQueryRunner } from './api/local/useQueryRunner'
 import { useProject, ProjectContext } from './api/useProject'
 import { Footer } from './ui/footer'
 import { useViewportListener } from './viewport'

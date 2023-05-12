@@ -7,7 +7,7 @@ import {
   linkWrap,
   scryfall,
   scryfallExtended,
-} from './api/memory/syntaxHighlighting'
+} from './api/local/syntaxHighlighting'
 import './prism-cogwork.css'
 import './styles.css'
 import { FlagContextProvider } from './flags'

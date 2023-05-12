@@ -1,6 +1,6 @@
 import Prism from 'prismjs'
 import React, { useEffect, useRef, useState } from 'react'
-import { Language } from '../../api/memory/syntaxHighlighting'
+import { Language } from '../../api/local/syntaxHighlighting'
 import { SCORE_PRECISION, weightAlgorithms } from '../../api/queryRunnerCommon'
 
 const MIN_TEXTAREA_HEIGHT = 32

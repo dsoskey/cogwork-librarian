@@ -11,7 +11,7 @@ import { ResizeHandle } from '../component/resizeHandle'
 import { TopBar } from './topBar'
 import { useDebugDetails } from './useDebugDetails'
 import { CogError } from '../../error'
-import { useHighlightPrism } from '../../api/memory/syntaxHighlighting'
+import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 
 interface BrowserViewProps {
   status: TaskStatus

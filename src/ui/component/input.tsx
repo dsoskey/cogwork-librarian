@@ -2,7 +2,7 @@ import React, { ChangeEventHandler, useEffect, useRef, useState } from 'react'
 import {
   Language,
   useHighlightPrism,
-} from '../../api/memory/syntaxHighlighting'
+} from '../../api/local/syntaxHighlighting'
 
 export interface InputProps {
   value: string

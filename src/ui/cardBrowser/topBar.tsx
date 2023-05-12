@@ -5,7 +5,7 @@ import React, { useCallback, useContext, useMemo } from 'react'
 import { DataSource, Setter, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { CogError } from '../../error'
-import { useHighlightPrism } from '../../api/memory/syntaxHighlighting'
+import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { FlagContext } from '../../flags'
 
 interface TopBarProps {

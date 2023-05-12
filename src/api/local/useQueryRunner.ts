@@ -7,12 +7,12 @@ import {
   weightAlgorithms,
 } from '../queryRunnerCommon'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { NormedCard } from './types/normedCard'
+import { NormedCard } from '../memory/types/normedCard'
 import { errAsync, okAsync } from 'neverthrow'
 import { displayMessage } from '../../error'
 import { useContext } from 'react'
 import { FlagContext } from '../../flags'
-import { QueryRunner } from './queryRunner'
+import { QueryRunner } from '../memory/queryRunner'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]
