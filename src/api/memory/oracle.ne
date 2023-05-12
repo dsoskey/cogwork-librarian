@@ -159,17 +159,17 @@ typeRegexCondition -> ("t"i | "type"i) (":" | "=") regexString
         filterFunc: filters.regexMatch('type_line', value),
     }) %}
 
-powerCondition -> ("pow"i | "power"i) anyOperator integerValue
-    {% ([_, [operator], value]) => filters.combatOperation('power', operator, value) %}
+powerCondition -> ("pow"i | "power"i) anyOperator (integerValue | "tou"i | "toughness"i)
+    {% ([_, [operator], [value]]) => filters.combatToCombatNode('power', operator, value) %}
 
-toughCondition -> ("tou"i | "toughness"i) anyOperator integerValue
-    {% ([_, [operator], value]) => filters.combatOperation('toughness', operator, value)  %}
+toughCondition -> ("tou"i | "toughness"i) anyOperator (integerValue | "pow"i | "power"i)
+    {% ([_, [operator], [value]]) => filters.combatToCombatNode('toughness', operator, value)  %}
 
 powTouCondition -> ("pt"i | "powtou"i) anyOperator integerValue
     {% ([_, [operator], value]) => filters.powTouTotalOperation(operator, value) %}
 
 loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
-    {% ([_, [operator], value]) => filters.combatOperation('loyalty', operator, value) %}
+    {% ([_, [operator], value]) => filters.combatToCombatNode('loyalty', operator, value) %}
 
 layoutCondition -> ("layout"i) equalityOperator stringValue
     {% ([_, [operator], value]) => oracleNode({

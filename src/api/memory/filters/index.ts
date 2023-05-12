@@ -8,7 +8,7 @@ import { defaultOperation } from './oracle'
 import { exactMatch, noReminderRegexMatch, noReminderTextMatch, regexMatch, textMatch } from './text'
 import { isVal } from './is'
 import { devotionOperation } from './devotion'
-import { combatOperation, powTouTotalOperation } from './combat'
+import { combatToCombatNode, powTouTotalOperation } from './combat'
 import { colorMatch } from './color'
 import { colorIdentityMatch } from './identity'
 import { producesMatch, producesMatchCount } from './produces'
@@ -36,7 +36,7 @@ export const filters = {
   or: orNode,
   not: notNode,
   defaultOperation,
-  combatOperation,
+  combatToCombatNode,
   powTouTotalOperation,
   exactMatch,
   textMatch,
