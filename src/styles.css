@@ -430,61 +430,25 @@ p {
 
 @media (min-width: 1024px) {
   .result-container {
+    /* here be something wacky. */
     overflow-y: scroll;
     height: 91vh;
   }
 }
 .result-container {
   padding-top: 8px;
+  margin-bottom: 24px;
   background-color: var(--darker-color);
   /*overflow-y: scroll;*/
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: start;
-}
-
-.result-container > :last-child {
-  margin-bottom: 24px;
+  align-content: flex-start;
 }
 
 .bottom-page-control {
   align-self: end;
-}
-
-.card-view {
-  margin-left: 0.75%;
-  padding-bottom: 4px;
-  display: flex;
-  flex-direction: column;
-}
-@media (min-width: 1024px) {
-  .card-view {
-    width: 24%;
-  }
-}
-@media (max-width: 1024px) and (min-width: 768px) {
-  .card-view {
-    width: 32%;
-  }
-}
-@media (max-width: 768px) {
-  .card-view {
-    width: 49%;
-  }
-}
-
-.card-view img {
-  clip-path: inset(0 0 0 0 round var(--card-radius));
-  box-shadow: 4px var(--gray-68);
-}
-
-.card-view .add-button {
-  align-self: center;
-}
-
-.card-view .detail {
-  margin-top: 4px;
 }
 
 .detail-controls {

@@ -28,9 +28,11 @@ export const putFile = async (manifest: Manifest, data: NormedCard[]) => {
   await cogDB.transaction("rw", cogDB.collection, cogDB.card, async () => {
     await cogDB.collection.put({
       ...manifest,
+      lastUpdated: new Date(),
       id: 'the_one',
       blob: new Blob([]),
     })
+    await cogDB.card.clear()
     await cogDB.card.bulkPut(toSave)
   })
 }

@@ -1,0 +1,79 @@
+.card-view {
+    position: relative;
+    margin-left: 0.75%;
+    padding-bottom: 4px;
+}
+
+@media (min-width: 1024px) {
+    .card-view {
+        width: 24%;
+    }
+}
+@media (max-width: 1024px) and (min-width: 768px) {
+    .card-view {
+        width: 32%;
+    }
+}
+@media (max-width: 768px) {
+    .card-view {
+        width: 49%;
+    }
+}
+
+.card-view .detail {
+    margin-top: 4px;
+}
+
+.card-view img {
+    clip-path: inset(0 0 0 0 round var(--card-radius));
+    box-shadow: 4px var(--gray-68);
+    position: relative;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+.card-view .flip-button {
+    position: absolute;
+    z-index: 2;
+    top: 11%;
+    right: 8%;
+    background-color: transparent;
+    border-color: transparent;
+    font-size: 1.75em;
+    cursor: pointer;
+}
+
+.card-view .flip-button:hover {
+    color: whitesmoke;
+}
+
+.card-view .hover-actions {
+    position: absolute;
+    z-index: 2;
+    bottom: 5%;
+    left: 4%;
+    display: flex;
+    flex-direction: row;
+    /*background-color: transparent;*/
+}
+
+.card-view .hover-actions button {
+    height: 1.75em;
+    width: 1.75em;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    /*background-color: var(--blue-low-alpha);*/
+    /*border-color: var(--blue-mid-alpha);*/
+    padding: 0;
+}
+
+.card-view .add-icon {
+    font-weight: bold;
+    font-size: 1.5em;
+    background-color: transparent;
+}

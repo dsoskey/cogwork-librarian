@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { CardView } from './cardView'
+import { CardImageView } from './cardViews/cardImageView'
 import { PAGE_SIZE } from './constants'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { EnrichedCard } from '../../api/queryRunnerCommon'
@@ -12,6 +12,7 @@ import { TopBar } from './topBar'
 import { useDebugDetails } from './useDebugDetails'
 import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
+import { CardJsonView } from './cardViews/cardJsonView'
 
 interface BrowserViewProps {
   status: TaskStatus
@@ -44,8 +45,8 @@ export const BrowserView = React.memo(
   }: BrowserViewProps) => {
     const viewport = useViewportListener()
     const [width, setWidth] = useState<number>(viewport.width * .5)
-    const [displayType, setDisplayType] = useState<'cards' | 'json'>('cards')
-    const toppa = useRef<HTMLDivElement>()
+    const [displayType, setDisplayType] = useState<'cards' | 'list' | 'json'>('cards')
+    const topOfResults = useRef<HTMLDivElement>()
 
     // TODO: Add collection switching
     const [activeCollection, setActiveCollection] =
@@ -76,7 +77,7 @@ export const BrowserView = React.memo(
       setPage(n)
       setTimeout(() => {
         // this doesn't quite work for mobile. idk why
-        toppa.current?.scrollTo(0,0)
+        topOfResults.current?.scrollTo(0,0)
       }, 100)
     }
     const lowerBound = page * pageSize + 1
@@ -125,10 +126,10 @@ export const BrowserView = React.memo(
           />
 
           {showCards && (
-            <div ref={toppa} className='result-container'>
+            <div ref={topOfResults} className='result-container'>
               {displayType === 'cards' &&
                 currentPage.map((card) => (
-                  <CardView
+                  <CardImageView
                     onAdd={() => addCard(card.data.name)}
                     onIgnore={() => addIgnoredId(card.data.oracle_id)}
                     key={card.data.id}
@@ -137,23 +138,14 @@ export const BrowserView = React.memo(
                     visibleDetails={visibleDetails}
                   />
                 ))}
-              {displayType === 'json' && (
-                <pre>
-                  <code>
-                    {JSON.stringify(
-                      result.map((it) => it.data),
-                      null,
-                      4
-                    )}
-                  </code>
-                </pre>
-              )}
+              {displayType === 'json' && <CardJsonView result={result} />}
             </div>
           )}
         </div>
       </div>
     ) : (
-      <div ref={toppa} className='results'>
+      <div className='results'>
+        <div ref={topOfResults}/>
         <div className='column content'>
           <TopBar
             errors={errors}
@@ -178,7 +170,7 @@ export const BrowserView = React.memo(
             <>
               <div className='result-container'>
                 {currentPage.map((card) => (
-                  <CardView
+                  <CardImageView
                     onAdd={() => addCard(card.data.name)}
                     onIgnore={() => addIgnoredId(card.data.oracle_id)}
                     key={card.data.id}
@@ -187,17 +179,7 @@ export const BrowserView = React.memo(
                     visibleDetails={visibleDetails}
                   />
                 ))}
-                {displayType === 'json' && (
-                  <pre>
-                    <code>
-                      {JSON.stringify(
-                        result.map((it) => it.data),
-                        null,
-                        4
-                      )}
-                    </code>
-                  </pre>
-                )}
+                {displayType === 'json' && <CardJsonView result={result} />}
               </div>
               <div className='bottom-page-control'>
                 <PageControl

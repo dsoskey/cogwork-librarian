@@ -9,7 +9,7 @@ export const FLAG_NAMES = {
 } as const
 export type Flag = ObjectValues<typeof FLAG_NAMES>
 
-export const INITIAL_FLAGS = {
+export const INITIAL_FLAGS: Record<Flag, boolean> = {
   showDebugInfo: false,
   adminMode: false,
   disableCache: false,
