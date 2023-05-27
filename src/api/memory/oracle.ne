@@ -93,10 +93,10 @@ cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
         filterFunc: filters.defaultOperation('cmc', operator, value),
     }) %}
 
-exactNameCondition -> "!" stringValue
+exactNameCondition -> "!":? stringValue
     {% ([op, value]) => oracleNode({
-        filtersUsed: ["exact"],
-        filterFunc: filters.exactMatch('name', value)
+        filtersUsed: [op === "!" ? "exact" : "name"],
+        filterFunc: op === "!" ? filters.exactMatch('name', value) : filters.textMatch('name', value)
     })%}
 
 nameCondition -> ("name"i) (":" | "=") stringValue
