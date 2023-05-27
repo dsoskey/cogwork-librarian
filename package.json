@@ -61,6 +61,7 @@
   "dependencies": {
     "dexie": "^3.2.2",
     "lodash": "^4.17.21",
+    "mana-font": "^1.15.4",
     "moo": "^0.5.2",
     "nearley": "^2.20.1",
     "neverthrow": "^6.0.0",

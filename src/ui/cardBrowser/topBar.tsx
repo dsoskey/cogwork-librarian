@@ -7,6 +7,12 @@ import { QueryReport } from '../../api/useReporter'
 import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { FlagContext } from '../../flags'
+import { ActiveCollection, activeCollections, DisplayType } from './types'
+
+const collectionOptions: Record<ActiveCollection, string> = {
+  search: 'results',
+  ignore: 'ignored'
+}
 
 interface TopBarProps {
   // report metadata
@@ -28,6 +34,10 @@ interface TopBarProps {
   page: number
   setPage: Setter<number>
   pageSize: number
+  displayType: DisplayType,
+  setDisplayType: Setter<DisplayType>
+  activeCollection: ActiveCollection
+  setActiveCollection: Setter<ActiveCollection>
 }
 
 export const TopBar = ({
@@ -47,8 +57,12 @@ export const TopBar = ({
   upperBound,
   source,
   errors,
+  displayType,
+  setDisplayType,
+  activeCollection,
+  setActiveCollection,
 }: TopBarProps) => {
-  const { showDebugInfo } = useContext(FlagContext).flags
+  const { showDebugInfo, displayTypes } = useContext(FlagContext).flags
   const numErrors = Object.keys(errors ?? {}).length
   const errorText = useMemo(
     () => errors.map((it) => `- ${it.displayMessage}`).join('\n\n'),
@@ -70,8 +84,8 @@ export const TopBar = ({
   const toggleQueries = useCallback(toggleBase(QUERIES), [setVisibleDetails])
 
   return (
-    <div className='result-controls'>
-      <div>
+    <div className='topbar'>
+      <div className='result-info'>
         {status === 'loading' && (
           <>
             <h2>running queries against {source}. please be patient...</h2>
@@ -164,15 +178,29 @@ export const TopBar = ({
           </>
         )}
       </div>
-      {status !== 'error' && activeCount > 0 && (
-        <PageControl
-          page={page}
-          setPage={setPage}
-          pageSize={pageSize}
-          upperBound={upperBound}
-          cardCount={activeCount}
-        />
-      )}
+      <div className='result-controls'>
+        {status !== 'error' && activeCount > 0 && (
+          <PageControl
+            page={page}
+            setPage={setPage}
+            pageSize={pageSize}
+            upperBound={upperBound}
+            cardCount={activeCount}
+          />
+        )}
+        {displayTypes && <label className='display-type'>
+          <span>show{" "}</span>
+          <select value={activeCollection} onChange={event => setActiveCollection(event.target.value as ActiveCollection)}>
+            {Object.values(activeCollections).map(it => <option key={it} value={it}>{collectionOptions[it]}</option>)}
+          </select>
+          <span>{" "}as:{" "}</span>
+          <select value={displayType} onChange={event => setDisplayType(event.target.value as DisplayType)}>
+            <option>cards</option>
+            <option>list</option>
+            {showDebugInfo && <option>json</option>}
+          </select>
+        </label>}
+      </div>
     </div>
   )
 }

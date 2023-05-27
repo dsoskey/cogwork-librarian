@@ -3,16 +3,18 @@ import { CardImageView } from './cardViews/cardImageView'
 import { PAGE_SIZE } from './constants'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { EnrichedCard } from '../../api/queryRunnerCommon'
-import { DataSource, ObjectValues, TaskStatus } from '../../types'
+import { DataSource, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { PageControl } from './pageControl'
 import { useViewportListener } from '../../viewport'
 import { ResizeHandle } from '../component/resizeHandle'
 import { TopBar } from './topBar'
+import { ActiveCollection, DisplayType } from './types'
 import { useDebugDetails } from './useDebugDetails'
 import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { CardJsonView } from './cardViews/cardJsonView'
+import { CardListView } from './cardViews/cardListView'
 
 interface BrowserViewProps {
   status: TaskStatus
@@ -24,12 +26,6 @@ interface BrowserViewProps {
   ignoredIds: string[]
   errors: CogError[]
 }
-
-const activeCollections = {
-  search: 'search',
-  ignore: 'ignore',
-} as const
-type ActiveCollection = ObjectValues<typeof activeCollections>
 
 const MAX_INPUT_WIDTH = 1024
 export const BrowserView = React.memo(
@@ -45,12 +41,10 @@ export const BrowserView = React.memo(
   }: BrowserViewProps) => {
     const viewport = useViewportListener()
     const [width, setWidth] = useState<number>(viewport.width * .5)
-    const [displayType, setDisplayType] = useState<'cards' | 'list' | 'json'>('cards')
+    const [activeCollection, setActiveCollection] = useState<ActiveCollection>('search')
+    const [displayType, setDisplayType] = useLocalStorage<DisplayType>('display-type', 'cards')
     const topOfResults = useRef<HTMLDivElement>()
 
-    // TODO: Add collection switching
-    const [activeCollection, setActiveCollection] =
-      useState<ActiveCollection>('search')
     const cards: Record<ActiveCollection, EnrichedCard[]> = useMemo(() => {
       const ignoredIdSet = new Set(ignoredIds)
       return {
@@ -123,6 +117,10 @@ export const BrowserView = React.memo(
             page={page}
             setPage={onPageChange}
             pageSize={pageSize}
+            displayType={displayType}
+            setDisplayType={setDisplayType}
+            activeCollection={activeCollection}
+            setActiveCollection={setActiveCollection}
           />
 
           {showCards && (
@@ -138,7 +136,8 @@ export const BrowserView = React.memo(
                     visibleDetails={visibleDetails}
                   />
                 ))}
-              {displayType === 'json' && <CardJsonView result={result} />}
+              {displayType === 'json' && <CardJsonView result={currentPage} />}
+              {displayType === 'list' && <CardListView result={currentPage} />}
             </div>
           )}
         </div>
@@ -164,6 +163,10 @@ export const BrowserView = React.memo(
             page={page}
             setPage={onPageChange}
             pageSize={pageSize}
+            displayType={displayType}
+            setDisplayType={setDisplayType}
+            activeCollection={activeCollection}
+            setActiveCollection={setActiveCollection}
           />
 
           {showCards && (
@@ -179,7 +182,6 @@ export const BrowserView = React.memo(
                     visibleDetails={visibleDetails}
                   />
                 ))}
-                {displayType === 'json' && <CardJsonView result={result} />}
               </div>
               <div className='bottom-page-control'>
                 <PageControl
