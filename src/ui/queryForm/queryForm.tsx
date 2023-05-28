@@ -1,6 +1,5 @@
-import { cloneDeep } from 'lodash'
 import React, { useContext } from 'react'
-import { SearchOptions, Sort, SortDirection } from 'scryfall-sdk'
+import { SearchOptions, Sort } from 'scryfall-sdk'
 import { renderQueryInfo, TextEditor } from '../component/textEditor'
 import { DataSource, Setter, TaskStatus } from '../../types'
 import { ScryfallIcon } from '../component/scryfallIcon'
@@ -9,6 +8,7 @@ import { InfoModal } from '../component/infoModal'
 import { DatabaseSettings } from './databaseSettings'
 import { Loader } from '../component/loader'
 import { CogDBContext } from '../../api/local/useCogDB'
+import "../component/tooltip.css"
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -16,22 +16,6 @@ const description: Record<DataSource, String> = {
   local:
     'processes queries against a local database of oracle cards. syntax support is incomplete, but it runs an order of magnitude faster than communicating with scryfall',
 }
-
-const sortOptions: Array<keyof typeof Sort> = [
-  'name',
-  // 'set',
-  // 'released',
-  // 'rarity',
-  // 'color', TODO: handle color sort
-  // 'usd',
-  // 'tix',
-  // 'eur',
-  'cmc',
-  'power',
-  'toughness',
-  // 'edhrec',
-  // 'artist',
-]
 
 const ScryfallLink = () => (
   <a href='https://scryfall.com/docs/syntax' rel='noreferrer' target='_blank'>
@@ -58,8 +42,6 @@ export const QueryForm = ({
   execute,
   queries,
   setQueries,
-  options,
-  setOptions,
   source,
   setSource,
 }: QueryFormProps) => {
@@ -102,9 +84,10 @@ export const QueryForm = ({
               />
             </div>
             <label htmlFor={`source-scryfall`}>scryfall</label>
-            <InfoModal title={<h2 className='row'><ScryfallIcon
-              size={iconSize}
-            /><span>data source: scryfall</span></h2>} info={description['scryfall']} />
+            <InfoModal title={<h2 className='row'>
+              <ScryfallIcon size={iconSize} />
+              <span>data source: scryfall</span>
+            </h2>} info={description['scryfall']} />
           </div>
 
           <div className={`source-option row ${source === 'local' ? 'selected' : ''}`}>
@@ -132,59 +115,15 @@ export const QueryForm = ({
             />
           </div>
         </div>
-
-        <span>
-          <label htmlFor='sort'>sort by: </label>
-          <select
-            name='sort'
-            value={options.order}
-            onChange={(event) => {
-              setOptions((prev) => {
-                const newVal = cloneDeep(prev)
-                newVal.order = event.target.value as keyof typeof Sort
-                return newVal
-              })
-            }}
-          >
-            {sortOptions.map((it) => (
-              <option key={it} value={it}>
-                {it}
-              </option>
-            ))}
-          </select>
-        </span>
-
-        <span>
-          <label htmlFor='dir'>direction: </label>
-          <select
-            name='dir'
-            value={options.dir}
-            onChange={(event) => {
-              setOptions((prev) => {
-                const newVal = cloneDeep(prev)
-                newVal.dir = event.target.value as keyof typeof SortDirection
-                return newVal
-              })
-            }}
-          >
-            {Object.keys(SortDirection)
-              .filter((it) => Number.isNaN(Number.parseInt(it)))
-              .map((it) => (
-                <option key={it} value={it}>
-                  {it}
-                </option>
-              ))}
-          </select>
-        </span>
         <div className='scour-button-holder'>
           <button
             disabled={!canRunQuery || status === 'loading'}
             onClick={execute}
-            title='From query editor, press Ctrl/CMD+Enter to submit'
           >
             {canRunQuery &&
               `scour${status === 'loading' ? 'ing' : ''} the library`}
             {!canRunQuery && `preparing the library`}
+            <tool-tip inert role='tooltip' tip-position="bottom">From query editor, press Ctrl/CMD+Enter to submit</tool-tip>
           </button>
           {!canRunQuery && dbReport.totalCards > 0 && <Loader width={750} count={dbReport.cardCount} total={dbReport.totalCards} />}
         </div>

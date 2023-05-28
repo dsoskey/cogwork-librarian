@@ -7,7 +7,6 @@ import { DataSource, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { PageControl } from './pageControl'
 import { useViewportListener } from '../../viewport'
-import { ResizeHandle } from '../component/resizeHandle'
 import { TopBar } from './topBar'
 import { ActiveCollection, DisplayType } from './types'
 import { useDebugDetails } from './useDebugDetails'
@@ -27,7 +26,6 @@ interface BrowserViewProps {
   errors: CogError[]
 }
 
-const MAX_INPUT_WIDTH = 1024
 export const BrowserView = React.memo(
   ({
     addCard,
@@ -40,7 +38,6 @@ export const BrowserView = React.memo(
     errors,
   }: BrowserViewProps) => {
     const viewport = useViewportListener()
-    const [width, setWidth] = useState<number>(viewport.width * .5)
     const [activeCollection, setActiveCollection] = useState<ActiveCollection>('search')
     const [displayType, setDisplayType] = useLocalStorage<DisplayType>('display-type', 'cards')
     const topOfResults = useRef<HTMLDivElement>()
@@ -64,7 +61,6 @@ export const BrowserView = React.memo(
       setRevealDetails,
     } = useDebugDetails()
 
-    // TODO make configurable
     const [pageSize] = useLocalStorage('page-size', PAGE_SIZE)
     const [page, setPage] = useState(0)
     const onPageChange = (n: number) => {
@@ -88,17 +84,11 @@ export const BrowserView = React.memo(
     useHighlightPrism([result, revealDetails, visibleDetails])
 
     if (status == 'unstarted') {
-      return null
+      return <div className='void'/>
     }
 
     return viewport.desktop ? (
-      <div className='results' style={{ width }}>
-        <ResizeHandle
-          onChange={setWidth}
-          min={viewport.width - MAX_INPUT_WIDTH}
-          max={viewport.width * 0.8}
-          viewport={viewport}
-        />
+      <div className='results'>
         <div className='column content'>
           <TopBar
             errors={errors}

@@ -8,6 +8,7 @@ import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { FlagContext } from '../../flags'
 import { ActiveCollection, activeCollections, DisplayType } from './types'
+import './topBar.css'
 
 const collectionOptions: Record<ActiveCollection, string> = {
   search: 'results',

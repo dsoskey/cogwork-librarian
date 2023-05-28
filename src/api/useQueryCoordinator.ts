@@ -15,7 +15,7 @@ type QueryStore<T> = MutableRefObject<{ [query: string]: Array<T> }>
 export interface QueryExecutor extends QueryHandler {
   execute: (
     funk: QueryRunnerFunc
-  ) => (queries: string[], options: SearchOptions) => void
+  ) => (queries: string[], options: SearchOptions) => Promise<void>
   cache: QueryStore<EnrichedCard>
   rawData: QueryStore<EnrichedCard>
 }
@@ -32,7 +32,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
   // should this be async/await so app can autoscroll on mobile when execute is done ?
   const execute =
     (runQuery: QueryRunnerFunc) =>
-    (queries: string[], options: SearchOptions) => {
+    async (queries: string[], options: SearchOptions) => {
       setStatus('loading')
       const filteredQueries = queries.filter(
         (q) => q.trim().length > 0 && q.trim().charAt(0) !== '#'

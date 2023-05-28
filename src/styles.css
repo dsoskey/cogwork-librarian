@@ -19,6 +19,13 @@
   --spacing-200: 2px;
   background-color: var(--light-color);
   color: var(--dark-color);
+
+  --coglib-width: 50vw;
+  --coglib-closed-width: 2.5vw;
+}
+
+body {
+  margin: 0;
 }
 
 *:focus-visible {
@@ -68,18 +75,38 @@ p {
 
 /* classnames */
 
-.root {
-  margin: -8px;
-}
-
 @media (min-width: 1024px) {
   .root {
-    flex-direction: row;
+    flex-direction: column;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
     display: flex;
-    flex-wrap: wrap;
   }
+
+  .void {
+    flex: 1;
+    background-color: var(--darker-color);
+  }
+}
+
+.cogwork-librarian {
+  position: absolute;
+  top: 0;
+  z-index: 5;
+  width: var(--coglib-width);
+  transition-property: left, background-color;
+  transition-delay: 25ms;
+  transition-duration: 200ms;
+  transition-timing-function: ease-out;
+}
+
+.cogwork-librarian.show {
+  left: 0;
+  background-color: var(--light-color);
+}
+.cogwork-librarian.hide {
+  left: calc(var(--coglib-closed-width) - var(--coglib-width));
+  background-color: transparent;
 }
 
 .column {
@@ -97,37 +124,33 @@ p {
   margin-left: 4px;
 }
 
+.masthead {
+  margin: 4px;
+  align-items: start;
+}
+
+.masthead button {
+  margin-top: .5em;
+}
+.masthead .toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-right: .5em;
+}
+
 .page-title {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.page-subhead {
+  margin-top: 0;
   margin-left: 1em;
+  margin-bottom: 0;
 }
-
-.footer {
-  margin-left: -8px;
-  margin-right: -8px;
-  max-width: 100% !important;
-  padding: 16px 8px;
-  background: var(--darkest-color);
+.page-subhead.empty {
   color: var(--light-color);
-  font-size: 0.8em;
-}
-.footer .links {
-  display: flex;
-  flex-direction: row;
-  margin-left: 4px;
-}
-.footer a,
-.footer a:visited {
-  color: var(--light-color);
-}
-
-@media (max-width: 1024px) {
-  .footer {
-    padding-left: 8px;
-  }
-}
-
-.footer > :not(:first-child) {
-  padding-left: 4px;
+  user-select: none;
 }
 
 .coglib-prism-theme {
@@ -147,12 +170,9 @@ p {
 }
 
 .input-column {
-  flex: 2;
   display: flex;
   flex-direction: column;
-  height: 100%;
   padding: 8px;
-  overflow-y: auto;
 }
 
 .example-query {
@@ -167,10 +187,6 @@ p {
 
 .example-content button {
   height: unset;
-}
-
-.input-column > * {
-  max-width: 1024px;
 }
 
 .input-column input {
@@ -323,9 +339,6 @@ p {
   font-weight: bold;
 }
 
-.modal section:not(:first-of-type) {
-  margin-top: 2em;
-}
 .cube-import ul {
   margin-top: 0;
   margin-bottom: 0;
@@ -395,19 +408,12 @@ p {
   color: var(--blue);
 }
 
-@media (min-width: 1024px) {
-  .results {
-    max-width: 80%;
-  }
-}
 .results {
   background-color: var(--dark-color);
-  border: 2px solid var(--gray-42);
-  border-right-color: var(--dark-color);
-  border-bottom-color: var(--dark-color);
   color: var(--light-color);
   display: flex;
   flex-direction: row;
+  flex: 1;
 }
 
 .results * {
@@ -418,42 +424,13 @@ p {
   flex: 1;
 }
 
-.topbar {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 8px;
-  border-bottom: solid 1px var(--gray-68);
-  box-shadow: 0 2px 2px 0 var(--gray-68-shadow);
-  z-index: 2;
-  position: relative;
-  top: 0;
+.result-info {
+  margin-left: var(--coglib-closed-width);
 }
 
-.topbar .result-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: end;
-}
-
-.topbar .display-type {
-  margin-top: var(--spacing-200);
-}
-
-.topbar select {
-  color: var(--light-color);
-}
-
-@media (min-width: 1024px) {
-  .result-container {
-    /* here be something wacky. */
-    overflow-y: scroll;
-    height: 91vh;
-  }
-}
 .result-container {
   padding-top: 8px;
-  margin-bottom: 24px;
+  /*margin-bottom: 24px;*/
   background-color: var(--darker-color);
   /*overflow-y: scroll;*/
   display: flex;

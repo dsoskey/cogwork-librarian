@@ -1,8 +1,9 @@
 import React from 'react'
+import "./footer.css"
 
 export const Footer = () => {
   return (
-    <div className='footer'>
+    <footer className='footer'>
       <div className='links'>
         <div>
           <a
@@ -61,6 +62,6 @@ export const Footer = () => {
           .
         </p>
       </div>
-    </div>
+    </footer>
   )
 }

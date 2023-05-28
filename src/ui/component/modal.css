@@ -8,6 +8,10 @@
   overflow-y: scroll;
 }
 
+.modal section:not(:first-of-type) {
+  margin-top: 2em;
+}
+
 .info-modal .modal {
   width: 40%;
 }

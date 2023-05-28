@@ -1,0 +1,29 @@
+.footer {
+    margin-left: -8px;
+    margin-right: -8px;
+    max-width: 100% !important;
+    padding: 16px 8px;
+    background: var(--darkest-color);
+    color: var(--light-color);
+    font-size: 0.8em;
+    bottom: 0;
+}
+.footer .links {
+    display: flex;
+    flex-direction: row;
+    margin-left: 4px;
+}
+.footer a,
+.footer a:visited {
+    color: var(--light-color);
+}
+
+@media (max-width: 1024px) {
+    .footer {
+        padding-left: 8px;
+    }
+}
+
+.footer > :not(:first-child) {
+    padding-left: 4px;
+}

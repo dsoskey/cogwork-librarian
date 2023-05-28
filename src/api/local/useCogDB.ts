@@ -12,6 +12,7 @@ export interface CogDB {
   memory: NormedCard[]
   setMemory: Setter<NormedCard[]>
   manifest: Manifest
+  outOfDate: boolean
   setManifest: Setter<Manifest>
   saveToDB: () => Promise<void>
   resetDB: () => Promise<void>
@@ -32,7 +33,10 @@ const defaultDB: CogDB = {
   setManifest: () => console.error("CogDB.setManifest called without a provider!"),
   saveToDB: () => Promise.reject("CogDB.saveToDB called without a provider!"),
   resetDB: () => Promise.reject("CogDB.resetDB called without a provider!"),
+  outOfDate: false,
 }
+
+const EPOCH = new Date(1970, 1, 1)
 
 export const CogDBContext = createContext(defaultDB)
 
@@ -139,6 +143,7 @@ export const useCogDB = (): CogDB => {
     memory,
     setMemory,
     resetDB,
-    dbReport
+    dbReport,
+    outOfDate: (manifest?.lastUpdated ?? EPOCH) < cogDB.LAST_UPDATE
   }
 }

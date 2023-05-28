@@ -31,7 +31,7 @@ export interface QueryHandler {
 }
 
 export interface QueryRunner extends QueryHandler {
-  run: (queries: string[], options: SearchOptions) => void
+  run: (queries: string[], options: SearchOptions) => Promise<void>
   result: Array<EnrichedCard>
   status: TaskStatus
   report: QueryReport
