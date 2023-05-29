@@ -8,7 +8,6 @@ import { InfoModal } from '../component/infoModal'
 import { DatabaseSettings } from './databaseSettings'
 import { Loader } from '../component/loader'
 import { CogDBContext } from '../../api/local/useCogDB'
-import "../component/tooltip.css"
 
 const description: Record<DataSource, String> = {
   scryfall:
