@@ -1,6 +1,7 @@
 import { TextEditor } from './component/textEditor'
 import React, { useState } from 'react'
 import { Setter, TaskStatus } from '../types'
+import "./savedCards.css"
 
 export interface SavedCardsProps {
   savedCards: string[]
@@ -16,10 +17,9 @@ export const SavedCards = ({ savedCards, setSavedCards }: SavedCardsProps) => {
   const [clipboardStatus, setClipboardStatus] =
     useState<TaskStatus>('unstarted')
   return (
-    <>
-      <div className='row'>
-        <h2>saved cards</h2>
+    <div className='saved-cards-root'>
         <button
+          className='copy-text'
           disabled={clipboardStatus !== 'unstarted'}
           onClick={() => {
             navigator.clipboard
@@ -37,13 +37,12 @@ export const SavedCards = ({ savedCards, setSavedCards }: SavedCardsProps) => {
         >
           {buttonText[clipboardStatus]}
         </button>
-      </div>
 
       <TextEditor
         queries={savedCards}
         setQueries={setSavedCards}
         placeholder='add one card per line'
       />
-    </>
+    </div>
   )
 }

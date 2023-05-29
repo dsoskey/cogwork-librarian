@@ -1,0 +1,11 @@
+.saved-cards-root {
+    margin: var(--spacing-300);
+    position: relative;
+}
+
+.saved-cards-root .copy-text {
+    position: absolute;
+    z-index: 10;
+    top: 0;
+    right: 0;
+}

@@ -12,6 +12,7 @@ export interface QueryInputProps {
   renderQueryInfo?: (queries: string[]) => string[]
   placeholder?: string | undefined
   language?: Language
+  disabled?: boolean
 }
 export const scoreInfo = (count: number) =>
   weightAlgorithms.zipf(count - 1).toPrecision(SCORE_PRECISION)
@@ -49,6 +50,7 @@ export const TextEditor = ({
   renderQueryInfo,
   placeholder,
   language,
+  disabled,
 }: QueryInputProps) => {
   const separator = '\n'
   const value = queries.join(separator)
@@ -132,6 +134,7 @@ export const TextEditor = ({
         <code className='match-braces'>{value}</code>
       </pre>
       <textarea
+        disabled={disabled}
         ref={controller}
         className='controller coglib-prism-theme'
         value={value}

@@ -33,7 +33,6 @@ export interface QueryFormProps {
   setOptions: Setter<SearchOptions>
   source: DataSource
   setSource: Setter<DataSource>
-  // slot to put database settings in
 }
 
 export const QueryForm = ({

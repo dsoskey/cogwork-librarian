@@ -10,6 +10,9 @@ import { FlagContext } from '../../flags'
 import { ActiveCollection, activeCollections, DisplayType } from './types'
 import './topBar.css'
 import { SearchError } from '../component/searchError'
+import { useViewportListener } from '../../viewport'
+import { AdminPanel } from '../adminPanel'
+import { CoglibIcon } from '../component/coglibIcon'
 
 const collectionOptions: Record<ActiveCollection, string> = {
   search: 'results',
@@ -40,6 +43,7 @@ interface TopBarProps {
   setDisplayType: Setter<DisplayType>
   activeCollection: ActiveCollection
   setActiveCollection: Setter<ActiveCollection>
+  openCoglib: () => void
 }
 
 export const TopBar = ({
@@ -63,8 +67,10 @@ export const TopBar = ({
   setDisplayType,
   activeCollection,
   setActiveCollection,
+  openCoglib
 }: TopBarProps) => {
-  const { showDebugInfo, displayTypes } = useContext(FlagContext).flags
+  const { showDebugInfo, displayTypes, adminMode } = useContext(FlagContext).flags
+  const viewport = useViewportListener()
   const errorText = useMemo(
     () => errors.map((it) => `- ${it.displayMessage}`).join('\n\n'),
     [errors]
@@ -86,9 +92,15 @@ export const TopBar = ({
 
   return (
     <div className='topbar'>
+      {viewport.desktop && <div className='row'>
+        {adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
+        {!adminMode && <CoglibIcon size='3em' />}
+
+        <button className='open-cogwork' onClick={openCoglib}>{">>"}</button>
+      </div>}
+
       <div className='result-info'>
-        {status === 'loading' && (
-          <>
+        {status === 'loading' && (<>
             <h2>running queries against {source}. please be patient...</h2>
             <div className='loader-holder'>
               {report.start &&
@@ -110,11 +122,9 @@ export const TopBar = ({
                 />
               )}
             </div>
-          </>
-        )}
+          </>)}
         {status === 'error' && <SearchError report={report} source={source} errors={errors}/>}
-        {status === 'success' && (
-          <>
+        {status === 'success' && (<>
             <div>
               {searchCount > 0 &&
                 `${lowerBound} – ${Math.min(

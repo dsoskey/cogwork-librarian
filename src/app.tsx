@@ -29,6 +29,7 @@ import { Link } from 'react-router-dom'
 import { subHeader } from './ui/router'
 import { DatabaseLink } from './ui/queryForm/databaseSettings'
 import { SearchError } from './ui/component/searchError'
+import { SavedCards } from './ui/savedCards'
 
 export const App = () => {
   const { adminMode } = useContext(FlagContext).flags
@@ -89,9 +90,11 @@ export const App = () => {
 
                     <Link to='/'>search</Link>
 
-                    <AppInfoLink />
+                    <Link to='/saved'>saved cards</Link>
 
                     <DatabaseLink />
+
+                    <AppInfoLink />
 
                     <ExampleGalleryLink />
 
@@ -103,6 +106,7 @@ export const App = () => {
                   className='toggle'
                   onClick={() => setShowCogLib(prev => !prev)}
                   title={`${showCogLib ? "close":"open"} controls`}
+                  disabled={!showCogLib}
                 >
                   {showCogLib ? "<<":">>"}
                 </button>}
@@ -111,6 +115,9 @@ export const App = () => {
               {showCogLib && <Switch>
                 <Route path='/data' exact>
                   <DataView />
+                </Route>
+                <Route path='/saved' exact>
+                  <SavedCards savedCards={project.savedCards} setSavedCards={project.setSavedCards} />
                 </Route>
                 <Route path='/about-me' exact>
                   <AppInfo />
@@ -140,8 +147,6 @@ export const App = () => {
                       source={source}
                       errors={queryRunner.errors}
                     />}
-
-                    {/*<SavedCards savedCards={savedCards} setSavedCards={setSavedCards} />*/}
                   </div>
                 </Route>
               </Switch>}
@@ -155,6 +160,7 @@ export const App = () => {
               addIgnoredId={addIgnoredId}
               ignoredIds={ignoredIds}
               source={source}
+              openCoglib={() => setShowCogLib(true)}
             />
             <Footer />
           </div>

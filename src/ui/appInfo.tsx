@@ -156,7 +156,7 @@ export const AppInfo = () => {
 
       <h3>
         okay all of those are great but it's not enough for me yet. what else
-        is will cogwork librarian do in the future?
+        will cogwork librarian do in the future?
       </h3>
       <p>
         while nothing on this list is a guarantee, here are some features i'm

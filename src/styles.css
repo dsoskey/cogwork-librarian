@@ -97,6 +97,10 @@ p {
     flex: 1;
     background-color: var(--darker-color);
   }
+
+  .void .coglib-icon {
+    margin: var(--spacing-200);
+  }
 }
 
 .cogwork-librarian {
@@ -133,7 +137,7 @@ p {
 }
 
 .cogwork-librarian.hide {
-  left: calc(var(--coglib-closed-width) - var(--coglib-width));
+  left: calc(0px - var(--coglib-width));
   background-color: transparent;
   /*width: var(--coglib-width);*/
 }
@@ -196,8 +200,8 @@ p {
   position: absolute;
   top: 0;
   right: 0;
-  margin-top: .5em;
-  margin-right: .5em;
+  margin-top: var(--spacing-200);
+  margin-right: var(--spacing-200);
 }
 .coglib-prism-theme {
   /* copies prism theme */
@@ -218,7 +222,7 @@ p {
 .search-root {
   display: flex;
   flex-direction: column;
-  padding: 8px;
+  margin: var(--spacing-300);
 }
 
 .example-query {
@@ -467,23 +471,13 @@ p {
   flex: 1;
 }
 
-.results * {
-  background-color: inherit;
-}
-
 .results .content {
   flex: 1;
 }
 
-.result-info {
-  margin-left: var(--coglib-closed-width);
-}
-
 .result-container {
-  padding-top: 8px;
-  /*margin-bottom: 24px;*/
+  padding-top: var(--spacing-300);
   background-color: var(--darker-color);
-  /*overflow-y: scroll;*/
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
@@ -504,7 +498,7 @@ p {
 }
 
 .loader .background {
-  fill: var(--light-color);
+  fill: var(--dark-color);
 }
 
 .loader .foreground {

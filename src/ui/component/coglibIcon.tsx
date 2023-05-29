@@ -10,6 +10,7 @@ export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
       width={size}
       height={size}
       viewBox='0 0 460 460'
+      className='coglib-icon'
     >
       <path
         id='shadow'

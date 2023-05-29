@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { CardImageView } from './cardViews/cardImageView'
 import { PAGE_SIZE } from './constants'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
@@ -14,6 +14,9 @@ import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { CardJsonView } from './cardViews/cardJsonView'
 import { CardListView } from './cardViews/cardListView'
+import { AdminPanel } from '../adminPanel'
+import { CoglibIcon } from '../component/coglibIcon'
+import { FlagContext } from '../../flags'
 
 interface BrowserViewProps {
   status: TaskStatus
@@ -24,6 +27,7 @@ interface BrowserViewProps {
   addIgnoredId: (id: string) => void
   ignoredIds: string[]
   errors: CogError[]
+  openCoglib: () => void
 }
 
 export const BrowserView = React.memo(
@@ -36,7 +40,9 @@ export const BrowserView = React.memo(
     source,
     report,
     errors,
+    openCoglib,
   }: BrowserViewProps) => {
+    const { adminMode } = useContext(FlagContext).flags
     const viewport = useViewportListener()
     const [activeCollection, setActiveCollection] = useState<ActiveCollection>('search')
     const [displayType, setDisplayType] = useLocalStorage<DisplayType>('display-type', 'cards')
@@ -84,7 +90,10 @@ export const BrowserView = React.memo(
     useHighlightPrism([result, revealDetails, visibleDetails])
 
     if (status === 'unstarted') {
-      return <div className='void'/>
+      return <div className='void'>
+        {viewport.desktop && adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
+        {viewport.desktop && !adminMode && <CoglibIcon size='3em' />}
+      </div>
     }
 
     return <div className='results'>
@@ -110,6 +119,7 @@ export const BrowserView = React.memo(
             setDisplayType={setDisplayType}
             activeCollection={activeCollection}
             setActiveCollection={setActiveCollection}
+            openCoglib={openCoglib}
           />
 
           {showCards && <>

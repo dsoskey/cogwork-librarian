@@ -6,6 +6,7 @@ export const ROUTES = {
   '/examples': '/examples',
   '/about-me': '/about-me',
   "/user-guide": "/user-guide",
+  "/saved": "/saved",
   "/": "/"
 } as const
 export type CogLibRoute = ObjectValues<typeof ROUTES>
@@ -15,5 +16,6 @@ export const subHeader:Record<CogLibRoute, React.ReactNode> = {
   "/": "cogwork librarian",
   "/examples": "example queries",
   "/about-me": "what is this thing???",
-  "/user-guide": "user guide"
+  "/user-guide": "user guide",
+  "/saved": "saved cards",
 }
