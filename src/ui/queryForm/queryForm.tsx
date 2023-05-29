@@ -121,7 +121,6 @@ export const QueryForm = ({
             {canRunQuery &&
               `scour${status === 'loading' ? 'ing' : ''} the library`}
             {!canRunQuery && `preparing the library`}
-            <tool-tip inert role='tooltip' tip-position="bottom">From query editor, press Ctrl/CMD+Enter to submit</tool-tip>
           </button>
           {!canRunQuery && dbReport.totalCards > 0 && <Loader width={750} count={dbReport.cardCount} total={dbReport.totalCards} />}
         </div>
