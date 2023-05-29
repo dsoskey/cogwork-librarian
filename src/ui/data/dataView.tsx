@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { CardDataView } from './cardDataView'
 import { CubeImporter } from './cubeImporter'
+import "./dataView.css"
 
 export const DataView = () => {
   const [dataTarget, setDataTarget] = useState<'card'| 'cube'>('card')
-  return <div className='root-data-view'>
+  return <div className='data-view-root'>
     <section>
       <h3>i want to manage{" "}
       <label htmlFor='manage-card'>

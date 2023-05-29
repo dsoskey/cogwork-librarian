@@ -83,7 +83,7 @@ export const BrowserView = React.memo(
 
     useHighlightPrism([result, revealDetails, visibleDetails])
 
-    if (status == 'unstarted') {
+    if (status === 'unstarted') {
       return <div className='void'/>
     }
 

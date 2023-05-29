@@ -3,6 +3,13 @@ import { Link } from 'react-router-dom'
 import { CogDBContext } from '../../api/local/useCogDB'
 
 export interface DatabaseSettingsProps {}
+
+export const DatabaseLink = () => {
+  const { outOfDate } = useContext(CogDBContext)
+  return <Link to='/data'>settings {outOfDate && <span className='alert'>!!</span>}</Link>
+
+}
+
 export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
   const { outOfDate } = useContext(CogDBContext)
   return (

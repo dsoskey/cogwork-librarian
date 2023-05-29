@@ -13,15 +13,25 @@
   --blue-low-alpha: hsla(180, 100%, 69%, 50%);
   --blue-mid-alpha: hsla(180, 100%, 69%, 75%);
   --green: hsl(96, 100%, 69%);
+  --light-red: hsl(0, 100%, 55%);
   --red: hsl(0, 100%, 37%);
   --card-radius: 4.75% / 3.5%;
 
-  --spacing-200: 2px;
-  background-color: var(--light-color);
-  color: var(--dark-color);
+  --spacing-100: 2px;
+  --spacing-200: 4px;
+  --spacing-300: 8px;
+  --spacing-400: 16px;
 
+  background-color: var(--dark-color);
+  color: var(--light-color);
+
+  --monospace-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   --coglib-width: 50vw;
   --coglib-closed-width: 2.5vw;
+}
+
+a {
+  color: var(--light-color);
 }
 
 body {
@@ -49,7 +59,7 @@ button:disabled {
 input {
   color: #ccc;
   background: var(--darker-color);
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-family: var(--monospace-family);
   border: none;
 }
 
@@ -97,16 +107,26 @@ p {
   transition-property: left, background-color;
   transition-delay: 25ms;
   transition-duration: 200ms;
-  transition-timing-function: ease-out;
+  transition-timing-function: ease-in-out;
 }
 
 .cogwork-librarian.show {
   left: 0;
-  background-color: var(--light-color);
+  background-color: var(--dark-color);
+  box-shadow: 2px 2px 4px 0 var(--gray-68-shadow);
 }
+
 .cogwork-librarian.hide {
   left: calc(var(--coglib-closed-width) - var(--coglib-width));
   background-color: transparent;
+  /*width: var(--coglib-width);*/
+}
+
+.cogwork-librarian.show.examples,
+.cogwork-librarian.show.about-me,
+.cogwork-librarian.show.user-guide,
+.cogwork-librarian.show.data {
+  width: 100vw;
 }
 
 .column {
@@ -125,37 +145,47 @@ p {
 }
 
 .masthead {
-  margin: 4px;
+  margin: var(--spacing-200);
   align-items: start;
 }
 
-.masthead button {
-  margin-top: .5em;
+.masthead .page-title {
+  margin-left: var(--spacing-200);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.masthead a {
+  color: var(--blue-mid-alpha);
+  text-decoration: none;
+  padding: var(--spacing-100) var(--spacing-200);
+  transition-property: color, background-color;
+  transition-duration: 100ms;
+  transition-timing-function: ease-out;
+  border-radius: 2px;
+}
+
+.masthead a:focus-visible,
+.masthead a:hover {
+  color: var(--dark-color);
+  background-color: var(--blue);
+  border-color: var(--blue-mid-alpha) inset;
+}
+
+
+.cogwork-librarian.hide .masthead .toggle {
+  margin-right: 0;
 }
 .masthead .toggle {
   position: absolute;
   top: 0;
   right: 0;
+  margin-top: .5em;
   margin-right: .5em;
 }
-
-.page-title {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-.page-subhead {
-  margin-top: 0;
-  margin-left: 1em;
-  margin-bottom: 0;
-}
-.page-subhead.empty {
-  color: var(--light-color);
-  user-select: none;
-}
-
 .coglib-prism-theme {
   /* copies prism theme */
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-family: var(--monospace-family);
   font-size: 1em;
   text-align: left;
   white-space: pre;
@@ -178,13 +208,16 @@ p {
 .example-query {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  /*align-items: center;*/
 }
 
 .example-query > :last-child {
   flex: 1;
 }
 
+.example-content {
+  margin: var(--spacing-300);
+}
 .example-content button {
   height: unset;
 }
@@ -195,8 +228,8 @@ p {
 }
 
 .query-editor {
-  margin-top: 4px;
-  margin-bottom: 4px;
+  margin-top: var(--spacing-200);
+  margin-bottom: var(--spacing-200);
   height: max-content;
   display: grid;
   grid-template-columns: auto auto 1fr;
@@ -281,7 +314,7 @@ p {
  flex-wrap: wrap;
 }
 .execute-controls > * {
-  margin-bottom: 4px;
+  margin-bottom: var(--spacing-200);
 }
 
 .scour-button-holder {
@@ -291,7 +324,7 @@ p {
 
 .source-option {
   border: var(--dark-color) inset 2px;
-  padding: 4px;
+  padding: var(--spacing-200);
 }
 
 .source-option .radio-button-holder {
@@ -315,9 +348,10 @@ p {
 .source-option.selected {
   border: var(--blue) inset 2px;
   background-color: var(--blue);
+  color: var(--dark-color);
 }
 .source-option .db-settings {
-  margin-left: 4px;
+  margin-left: var(--spacing-200);
 }
 
 .expander {
@@ -331,11 +365,11 @@ p {
 }
 
 .expander-child {
-  margin: 4px;
+  margin: var(--spacing-200);
 }
 
 .alert {
-  color: var(--red);
+  color: var(--light-red);
   font-weight: bold;
 }
 
@@ -344,7 +378,7 @@ p {
   margin-bottom: 0;
 }
 .cube-import .submit {
-  margin-top: 4px;
+  margin-top: var(--spacing-200);
 }
 
 .db-import {
@@ -356,11 +390,11 @@ p {
 }
 
 .db-import .scryfall-option {
-  padding: 4px;
+  padding: var(--spacing-200);
 }
 
 .db-import .scryfall-option .size {
-  margin-left: 4px;
+  margin-left: var(--spacing-200);
 }
 
 .db-import .file {
@@ -388,6 +422,7 @@ p {
   display: inline-block;
   grid-area: overlap;
   background: var(--blue);
+  color: var(--dark-color);
   text-align: center;
   align-items: center;
   justify-content: center;

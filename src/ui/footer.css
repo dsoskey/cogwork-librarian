@@ -11,7 +11,7 @@
 .footer .links {
     display: flex;
     flex-direction: row;
-    margin-left: 4px;
+    margin-left: var(--spacing-200);
 }
 .footer a,
 .footer a:visited {
@@ -25,5 +25,5 @@
 }
 
 .footer > :not(:first-child) {
-    padding-left: 4px;
+    padding-left: var(--spacing-200);
 }

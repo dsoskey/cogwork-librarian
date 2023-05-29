@@ -9,6 +9,7 @@ import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { FlagContext } from '../../flags'
 import { ActiveCollection, activeCollections, DisplayType } from './types'
 import './topBar.css'
+import { SearchError } from '../component/searchError'
 
 const collectionOptions: Record<ActiveCollection, string> = {
   search: 'results',
@@ -64,7 +65,6 @@ export const TopBar = ({
   setActiveCollection,
 }: TopBarProps) => {
   const { showDebugInfo, displayTypes } = useContext(FlagContext).flags
-  const numErrors = Object.keys(errors ?? {}).length
   const errorText = useMemo(
     () => errors.map((it) => `- ${it.displayMessage}`).join('\n\n'),
     [errors]
@@ -112,22 +112,7 @@ export const TopBar = ({
             </div>
           </>
         )}
-        {status === 'error' && (
-          <div>
-            {report.start && report.end && (
-              <>
-                {source} query ran in {(report.end - report.start) / 1000}{' '}
-                seconds and returned {numErrors} error
-                {numErrors !== 1 ? 's' : ''}
-              </>
-            )}
-            {
-              <pre>
-                <code className='language-scryfall'>{errorText}</code>
-              </pre>
-            }
-          </div>
-        )}
+        {status === 'error' && <SearchError report={report} source={source} errors={errors}/>}
         {status === 'success' && (
           <>
             <div>

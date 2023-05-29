@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { BrowserView } from './ui/cardBrowser/browserView'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { QueryForm } from './ui/queryForm/queryForm'
@@ -17,9 +17,9 @@ import { useViewportListener } from './viewport'
 import { CoglibIcon } from './ui/component/coglibIcon'
 import { queryExamples } from './api/example'
 import _random from 'lodash/random'
-import { ExampleGallery } from './ui/queryForm/exampleGallery'
-import { SyntaxDocs } from './ui/docs/syntaxDocs'
-import { AppInfo } from './ui/appInfo'
+import { ExampleGallery, ExampleGalleryLink } from './ui/queryForm/exampleGallery'
+import { SyntaxDocs, SyntaxDocsLink } from './ui/docs/syntaxDocs'
+import { AppInfo, AppInfoLink } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
 import { FlagContext } from './flags'
 import { AdminPanel } from './ui/adminPanel'
@@ -27,6 +27,8 @@ import { Route, Switch, useLocation } from 'react-router'
 import { DataView } from './ui/data/dataView'
 import { Link } from 'react-router-dom'
 import { subHeader } from './ui/router'
+import { DatabaseLink } from './ui/queryForm/databaseSettings'
+import { SearchError } from './ui/component/searchError'
 
 export const App = () => {
   const { adminMode } = useContext(FlagContext).flags
@@ -58,7 +60,18 @@ export const App = () => {
   }[source]
 
   const [showCogLib, setShowCogLib] = useState<boolean>(true)
-  const execute = () => queryRunner.run(subQueries, options).then(() => setShowCogLib(false))
+  const execute = () => queryRunner.run(subQueries, options)
+    .then(() => setShowCogLib(false))
+
+  const listener = event => {
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'o') {
+      setShowCogLib(prev => !prev)
+    }
+  }
+  useEffect(() => {
+    document.addEventListener('keydown', listener)
+    return () => document.removeEventListener('keydown', listener)
+  }, [])
 
   return (
     <CogDBContext.Provider value={cogDB}>
@@ -66,39 +79,51 @@ export const App = () => {
         <ProjectContext.Provider value={project}>
           <div className='root'>
 
-            <div className={`cogwork-librarian ${showCogLib ? "show":"hide"}`}>
+            <div className={`cogwork-librarian ${pathname.replace("/","")} ${showCogLib ? "show":"hide"}`}>
               <div className={`row masthead`}>
-                <Link to='/'><CoglibIcon isActive={adminMode} size='3em' /></Link>
+                {adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
+                {!adminMode && <CoglibIcon size='3em' />}
 
                 <div className='column'>
                   <h1 className='page-title'>{subHeader[pathname]}</h1>
                   <div className='row'>
 
-                    <AppInfo />
+                    <Link to='/'>search</Link>
 
-                    <ExampleGallery setQueries={setQueries} />
+                    <AppInfoLink />
 
-                    <SyntaxDocs />
+                    <DatabaseLink />
 
-                    {adminMode && <AdminPanel />}
+                    <ExampleGalleryLink />
+
+                    <SyntaxDocsLink />
+
                   </div>
                 </div>
-                  <button
-                    className='toggle'
-                    onClick={() => setShowCogLib(prev => !prev)}
-                    title={`${showCogLib ? "close":"open"} controls`}
-                  >
-                    {showCogLib ? "<<":">>"}
-                  </button>
+                {queryRunner.status !== 'unstarted' && <button
+                  className='toggle'
+                  onClick={() => setShowCogLib(prev => !prev)}
+                  title={`${showCogLib ? "close":"open"} controls`}
+                >
+                  {showCogLib ? "<<":">>"}
+                </button>}
               </div>
 
               {showCogLib && <Switch>
                 <Route path='/data' exact>
                   <DataView />
                 </Route>
+                <Route path='/about-me' exact>
+                  <AppInfo />
+                </Route>
+                <Route path='/examples' exact>
+                  <ExampleGallery setQueries={setQueries} />
+                </Route>
+                <Route path='/user-guide' exact>
+                  <SyntaxDocs />
+                </Route>
                 <Route>
                   <div className='input-column'>
-
                     <QueryForm
                       status={queryRunner.status}
                       canRunQuery={source === 'scryfall' || cogDB.memStatus === 'success'}
@@ -110,6 +135,12 @@ export const App = () => {
                       source={source}
                       setSource={setSource}
                     />
+
+                    {queryRunner.status === 'error' && <SearchError
+                      report={queryRunner.report}
+                      source={source}
+                      errors={queryRunner.errors}
+                    />}
 
                     {/*<SavedCards savedCards={savedCards} setSavedCards={setSavedCards} />*/}
                   </div>

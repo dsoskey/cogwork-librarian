@@ -32,7 +32,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
   // should this be async/await so app can autoscroll on mobile when execute is done ?
   const execute =
     (runQuery: QueryRunnerFunc) =>
-    async (queries: string[], options: SearchOptions) => {
+    (queries: string[], options: SearchOptions) => new Promise<void>((resolve, reject) => {
       setStatus('loading')
       const filteredQueries = queries.filter(
         (q) => q.trim().length > 0 && q.trim().charAt(0) !== '#'
@@ -73,8 +73,13 @@ export const useQueryCoordinator = (): QueryExecutor => {
         setStatus(errors.length ? 'error' : 'success')
         report.markTimepoint('end')
         setResult(sorted)
+        if (errors.length) {
+          reject("error thrown")
+        } else {
+          resolve()
+        }
       })
-    }
+    })
 
   return {
     status,

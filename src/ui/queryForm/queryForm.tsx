@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { SearchOptions, Sort } from 'scryfall-sdk'
+import { SearchOptions } from 'scryfall-sdk'
 import { renderQueryInfo, TextEditor } from '../component/textEditor'
 import { DataSource, Setter, TaskStatus } from '../../types'
 import { ScryfallIcon } from '../component/scryfallIcon'
