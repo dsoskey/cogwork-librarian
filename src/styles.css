@@ -26,8 +26,8 @@
   color: var(--light-color);
 
   --monospace-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  --coglib-width: 50vw;
-  --coglib-closed-width: 2.5vw;
+  --coglib-width: 50%;
+  --coglib-closed-width: 2.5%;
 }
 
 a {
@@ -85,7 +85,7 @@ p {
 
 /* classnames */
 
-@media (min-width: 1024px) {
+@media (min-width: 769px) {
   .root {
     flex-direction: column;
     height: 100vh;
@@ -110,6 +110,22 @@ p {
   transition-timing-function: ease-in-out;
 }
 
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cogwork-librarian.show {
+    width: 66%;
+  }
+}
+
+@media (max-width: 768px) {
+  .cogwork-librarian {
+    position: static;
+    width: 100%;
+  }
+  .cogwork-librarian.hide {
+    left: 0;
+  }
+}
+
 .cogwork-librarian.show {
   left: 0;
   background-color: var(--dark-color);
@@ -126,7 +142,7 @@ p {
 .cogwork-librarian.show.about-me,
 .cogwork-librarian.show.user-guide,
 .cogwork-librarian.show.data {
-  width: 100vw;
+  width: 100%;
 }
 
 .column {
@@ -199,7 +215,7 @@ p {
   border: none;
 }
 
-.input-column {
+.search-root {
   display: flex;
   flex-direction: column;
   padding: 8px;
@@ -222,7 +238,7 @@ p {
   height: unset;
 }
 
-.input-column input {
+.search-root input {
   box-sizing: border-box;
   caret-color: var(--blue);
 }
@@ -292,7 +308,7 @@ p {
 }
 
 .query-editor .controller::selection,
-.input-column input::selection {
+.search-root input::selection {
   background-color: var(--blue-low-alpha);
 }
 

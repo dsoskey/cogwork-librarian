@@ -87,8 +87,7 @@ export const BrowserView = React.memo(
       return <div className='void'/>
     }
 
-    return viewport.desktop ? (
-      <div className='results'>
+    return <div className='results'>
         <div className='column content'>
           <TopBar
             errors={errors}
@@ -113,7 +112,7 @@ export const BrowserView = React.memo(
             setActiveCollection={setActiveCollection}
           />
 
-          {showCards && (
+          {showCards && <>
             <div ref={topOfResults} className='result-container'>
               {displayType === 'cards' &&
                 currentPage.map((card) => (
@@ -129,63 +128,17 @@ export const BrowserView = React.memo(
               {displayType === 'json' && <CardJsonView result={currentPage} />}
               {displayType === 'list' && <CardListView result={currentPage} />}
             </div>
-          )}
+            {viewport.mobile && <div className='bottom-page-control'>
+              <PageControl
+                page={page}
+                setPage={onPageChange}
+                pageSize={pageSize}
+                upperBound={upperBound}
+                cardCount={activeCards.length}
+              />
+            </div>}
+          </>}
         </div>
       </div>
-    ) : (
-      <div className='results'>
-        <div ref={topOfResults}/>
-        <div className='column content'>
-          <TopBar
-            errors={errors}
-            source={source}
-            status={status}
-            report={report}
-            activeCount={activeCards.length}
-            searchCount={cards.search.length}
-            ignoreCount={cards.ignore.length}
-            visibleDetails={visibleDetails}
-            setVisibleDetails={setVisibleDetails}
-            revealDetails={revealDetails}
-            setRevealDetails={setRevealDetails}
-            lowerBound={lowerBound}
-            upperBound={upperBound}
-            page={page}
-            setPage={onPageChange}
-            pageSize={pageSize}
-            displayType={displayType}
-            setDisplayType={setDisplayType}
-            activeCollection={activeCollection}
-            setActiveCollection={setActiveCollection}
-          />
-
-          {showCards && (
-            <>
-              <div className='result-container'>
-                {currentPage.map((card) => (
-                  <CardImageView
-                    onAdd={() => addCard(card.data.name)}
-                    onIgnore={() => addIgnoredId(card.data.oracle_id)}
-                    key={card.data.id}
-                    card={card}
-                    revealDetails={revealDetails}
-                    visibleDetails={visibleDetails}
-                  />
-                ))}
-              </div>
-              <div className='bottom-page-control'>
-                <PageControl
-                  page={page}
-                  setPage={onPageChange}
-                  pageSize={pageSize}
-                  upperBound={upperBound}
-                  cardCount={activeCards.length}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    )
   }
 )

@@ -16,8 +16,8 @@ export interface Viewport {
 export const useViewportListener = (): Viewport => {
   const [width, setWidth] = useState(calcWidth)
   const [height, setHeight] = useState(calcHeight)
-  const desktop = width >= 1024
-  const mobile = width < 1024
+  const desktop = width > 768
+  const mobile = width <= 768
   const listener = () => {
     setWidth(calcWidth)
     setHeight(calcHeight)

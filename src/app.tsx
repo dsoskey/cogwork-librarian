@@ -78,13 +78,12 @@ export const App = () => {
       <ListImporterContext.Provider value={listImporter}>
         <ProjectContext.Provider value={project}>
           <div className='root'>
-
             <div className={`cogwork-librarian ${pathname.replace("/","")} ${showCogLib ? "show":"hide"}`}>
               <div className={`row masthead`}>
-                {adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
-                {!adminMode && <CoglibIcon size='3em' />}
+                {(showCogLib || viewport.mobile) && adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
+                {(showCogLib || viewport.mobile) && !adminMode && <CoglibIcon size='3em' />}
 
-                <div className='column'>
+                {(showCogLib || viewport.mobile) && <div className='column'>
                   <h1 className='page-title'>{subHeader[pathname]}</h1>
                   <div className='row'>
 
@@ -99,7 +98,7 @@ export const App = () => {
                     <SyntaxDocsLink />
 
                   </div>
-                </div>
+                </div>}
                 {queryRunner.status !== 'unstarted' && <button
                   className='toggle'
                   onClick={() => setShowCogLib(prev => !prev)}
@@ -123,7 +122,7 @@ export const App = () => {
                   <SyntaxDocs />
                 </Route>
                 <Route>
-                  <div className='input-column'>
+                  <div className='search-root'>
                     <QueryForm
                       status={queryRunner.status}
                       canRunQuery={source === 'scryfall' || cogDB.memStatus === 'success'}
@@ -157,7 +156,7 @@ export const App = () => {
               ignoredIds={ignoredIds}
               source={source}
             />
-            {viewport.desktop && <Footer />}
+            <Footer />
           </div>
         </ProjectContext.Provider>
       </ListImporterContext.Provider>
