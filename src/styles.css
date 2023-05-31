@@ -198,11 +198,10 @@ p {
 }
 .masthead .toggle {
   position: absolute;
-  top: 0;
-  right: 0;
-  margin-top: var(--spacing-200);
-  margin-right: var(--spacing-200);
+  top: var(--spacing-200);
+  right: var(--spacing-200);
 }
+
 .coglib-prism-theme {
   /* copies prism theme */
   font-family: var(--monospace-family);

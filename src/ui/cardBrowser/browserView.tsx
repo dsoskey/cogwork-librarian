@@ -27,6 +27,7 @@ interface BrowserViewProps {
   addIgnoredId: (id: string) => void
   ignoredIds: string[]
   errors: CogError[]
+  lockCoglib: boolean
   openCoglib: () => void
 }
 
@@ -41,6 +42,7 @@ export const BrowserView = React.memo(
     report,
     errors,
     openCoglib,
+    lockCoglib,
   }: BrowserViewProps) => {
     const { adminMode } = useContext(FlagContext).flags
     const viewport = useViewportListener()
@@ -124,8 +126,12 @@ export const BrowserView = React.memo(
 
           {showCards && <>
             <div ref={topOfResults} className='result-container'>
-              {displayType === 'cards' &&
-                currentPage.map((card) => (
+              {displayType === 'cards' && <>
+                {lockCoglib && viewport.desktop && <>
+                  <div className="card-view"/>
+                  <div className="card-view"/>
+                </>}
+                {currentPage.map((card) => (
                   <CardImageView
                     onAdd={() => addCard(card.data.name)}
                     onIgnore={() => addIgnoredId(card.data.oracle_id)}
@@ -135,6 +141,7 @@ export const BrowserView = React.memo(
                     visibleDetails={visibleDetails}
                   />
                 ))}
+              </>}
               {displayType === 'json' && <CardJsonView result={currentPage} />}
               {displayType === 'list' && <CardListView result={currentPage} />}
             </div>

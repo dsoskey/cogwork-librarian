@@ -61,14 +61,21 @@ export const App = () => {
   }[source]
 
   const [showCogLib, setShowCogLib] = useState<boolean>(true)
-  const execute = () => queryRunner.run(subQueries, options)
-    .then(() => setShowCogLib(false))
+  const [lockCoglib, setLockCogLib] = useLocalStorage<boolean>('lock-coglib', false)
 
-  const listener = event => {
-    if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'o') {
+  const execute = () => queryRunner.run(subQueries, options)
+    .then(() => {
+      if (!lockCoglib) {
+        setShowCogLib(false)
+      }
+    })
+
+  const listener = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'z') {
       setShowCogLib(prev => !prev)
     }
   }
+
   useEffect(() => {
     document.addEventListener('keydown', listener)
     return () => document.removeEventListener('keydown', listener)
@@ -102,14 +109,18 @@ export const App = () => {
 
                   </div>
                 </div>}
-                {queryRunner.status !== 'unstarted' && <button
-                  className='toggle'
-                  onClick={() => setShowCogLib(prev => !prev)}
-                  title={`${showCogLib ? "close":"open"} controls`}
-                  disabled={!showCogLib}
-                >
-                  {showCogLib ? "<<":">>"}
-                </button>}
+                <div className='toggle'>
+                  <button
+                    onClick={() => setLockCogLib(prev => !prev)}
+                    title={`${lockCoglib ? "unlock":"lock"} controls`}>{lockCoglib ? "🔒":"🔓"}
+                  </button>
+                  {queryRunner.status !== 'unstarted' && <button
+                    onClick={() => setShowCogLib(prev => !prev)}
+                    title={`${showCogLib ? "close":"open"} controls`}
+                  >
+                    {viewport.mobile ? (showCogLib ? "^" : "v") : (showCogLib ? "<<":">>")}
+                  </button>}
+                </div>
               </div>
 
               {showCogLib && <Switch>
@@ -160,6 +171,7 @@ export const App = () => {
               addIgnoredId={addIgnoredId}
               ignoredIds={ignoredIds}
               source={source}
+              lockCoglib={lockCoglib}
               openCoglib={() => setShowCogLib(true)}
             />
             <Footer />
