@@ -54,11 +54,6 @@ export const AppInfo = () => {
         syntax.
       </p>
 
-      <p>
-        cogwork librarian is in the alpha stage of development, so expect
-        things to change and grow alongside our understanding of the tool.
-      </p>
-
       <h3>
         why should i use cogwork librarian? why not use scryfall directly?
       </h3>
