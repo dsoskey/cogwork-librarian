@@ -11,27 +11,28 @@ export const combatToCombatNode = (
   return oracleNode({
     filtersUsed: [field],
     filterFunc: (card: NormedCard) => {
-      const cardValue = card[field]
-      let targetValue: number
-      switch (rawTarget) {
-        case 'pow':
-        case 'power':
-          targetValue = parsePowTou(card.power)
-          break
-        case 'toughness':
-        case 'tou':
-          targetValue = parsePowTou(card.toughness)
-          break
-        default:
-          targetValue = rawTarget
-      }
-      if (card.name === "Swooping Lookout") {
-        console.log(card)
-      }
-      if (cardValue === undefined || targetValue === undefined) {
-        return false
-      }
-      return defaultCompare(parsePowTou(cardValue), operator, targetValue)
+      const faces = [card, ...card.card_faces]
+      const matchedFaces = faces.filter(it => {
+        const cardValue = it[field]
+        let targetValue: number
+        switch (rawTarget) {
+          case 'pow':
+          case 'power':
+            targetValue = parsePowTou(it.power)
+            break
+          case 'toughness':
+          case 'tou':
+            targetValue = parsePowTou(it.toughness)
+            break
+          default:
+            targetValue = rawTarget
+        }
+        if (cardValue === undefined || targetValue === undefined) {
+          return false
+        }
+        return defaultCompare(parsePowTou(cardValue), operator, targetValue)
+      })
+      return matchedFaces.length > 0
     }
   })
 }

@@ -1,5 +1,5 @@
 import sortBy from 'lodash/sortBy'
-import { Card, SearchOptions } from 'scryfall-sdk/out/api/Cards'
+import { Card } from 'scryfall-sdk'
 import { err, ok, Result } from 'neverthrow'
 import { NearlyError } from './types/error'
 import { queryParser } from './parser'
@@ -8,6 +8,7 @@ import { normCardList, NormedCard } from './types/normedCard'
 import { sortFunc, SortOrder } from './filters/sort'
 import { chooseFilterFunc } from './filters/print'
 import { Parser } from 'nearley'
+import { SearchOptions } from './types/searchOptions'
 
 export const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
   const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
@@ -34,17 +35,24 @@ interface SearchError {
 type ParserProducer = () => Parser
 export class QueryRunner {
   private readonly corpus: NormedCard[]
+  private readonly defaultOptions: SearchOptions
 
   private readonly getParser: ParserProducer
 
-  constructor(corpus: Card[], getParser: () => Parser = queryParser) {
+  constructor(
+    corpus: Card[],
+    defaultOptions: SearchOptions = { order: "name" },
+    getParser: () => Parser = queryParser
+  ) {
     this.corpus = normCardList(corpus)
     this.getParser = getParser
+    this.defaultOptions = defaultOptions
   }
 
-  search = (query: string, options: SearchOptions): Result<Card[], SearchError> => {
+  search = (query: string, options?: SearchOptions): Result<Card[], SearchError> => {
     // parse query
-    return QueryRunner.generateSearchFunction(this.corpus, this.getParser)(query, options)
+    const func = QueryRunner.generateSearchFunction(this.corpus, this.getParser)
+    return func(query, options ?? this.defaultOptions)
   }
 
   static generateSearchFunction = (corpus: NormedCard[], getParser: ParserProducer = queryParser) => (

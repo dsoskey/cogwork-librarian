@@ -1,4 +1,4 @@
-import { Card, SearchOptions } from 'scryfall-sdk/out/api/Cards'
+import { Card } from 'scryfall-sdk/out/api/Cards'
 import cloneDeep from 'lodash/cloneDeep'
 import {
   QueryRunner as CoglibQueryRunner,
@@ -13,6 +13,7 @@ import { displayMessage } from '../../error'
 import { useContext } from 'react'
 import { FlagContext } from '../../flags'
 import { QueryRunner } from '../memory/queryRunner'
+import { SearchOptions } from '../memory/types/searchOptions'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]

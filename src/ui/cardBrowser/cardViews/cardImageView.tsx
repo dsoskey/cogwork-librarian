@@ -54,7 +54,7 @@ export const CardImageView = ({
 
   const copyToJson = () => {
     navigator.clipboard
-      .writeText(JSON.stringify(card, undefined, 2))
+      .writeText(JSON.stringify(card.data, undefined, 2))
       .then(() => {
         setClipboardStatus('success')
         setTimeout(() => {

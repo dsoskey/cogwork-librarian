@@ -49,7 +49,7 @@ export const colorMatch = (operator: Operator, value: Set<string>): FilterNode =
             faceMatchMap.filter((it) => it.match.length === value.size).length > 0
           )
         case '<>':
-          throw Error('throw something better please!')
+          throw Error('<> is not a valid operator for color filter')
       }
     },
 })
