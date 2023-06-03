@@ -215,7 +215,18 @@ uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
         filtersUsed: [`unique:${value}`],
         filterFunc: identity(),
         inverseFunc: identity(),
+    }) %} |
+    "++" {% (_) => oracleNode({
+        filtersUsed: [`unique:prints`],
+        filterFunc: identity(),
+        inverseFunc: identity(),
+    }) %} |
+    "@@" {% (_) => oracleNode({
+        filtersUsed: [`unique:art`],
+        filterFunc: identity(),
+        inverseFunc: identity(),
     }) %}
+
 
 orderCondition -> "order"i ":" orderValue
     {% ([_, [operator], value]) => oracleNode({
@@ -329,7 +340,7 @@ isValue -> (
 # anything that isn't a special character and isn't "and" or "or"
 noQuoteStringValue ->
   ("a"i | "an"i | "o"i) {% ([[value]]) => value.toLowerCase() %}
-  | ([^aAoO\- \t\n"'\\\/=<>:!]
+  | ([^aAoO\- \t\n"'\\\/=<>:!\+@]
     | "a"i [^nN \t\n"'\\=<>:]
     | "an"i [^dD \t\n"'\\=<>:]
     | "and"i [^ \t\n"'\\=<>:]
