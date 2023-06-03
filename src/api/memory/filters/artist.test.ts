@@ -9,10 +9,9 @@ describe('artist filter', function() {
 
   ["a", 'artist'].forEach(filterKeyword => {
     it(`${filterKeyword} gets parsed properly`, () => {
-      const result = queryRunner.search(`${filterKeyword}:"Rebecca Guay"`)
-      console.log(result)
+      const result = queryRunner.search(`${filterKeyword}:"Rebecca Guay"`)._unsafeUnwrap()
 
-      expect(result._unsafeUnwrap()[0].id).toEqual(animateLand.id)
+      expect(result[0].id).toEqual(animateLand.id)
     })
 
   })

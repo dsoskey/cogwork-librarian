@@ -4,14 +4,12 @@ import { NormedCard } from '../types/normedCard'
 export const producesMatch =
   (operator: Operator, value: Set<string>): Filter<NormedCard> =>
     (card: NormedCard) => {
+      // scryfall includes these cards in when operator is != for some reason
       if (card.produced_mana === undefined) return false
 
       const lower = card.produced_mana.map(it => it.toLowerCase())
       const match = lower.filter(color => value.has(color))
       const matchnt = lower.filter(color => !value.has(color))
-      if (card.name === 'Abandoned Outpost') {
-        console.log(`match: ${match} not: ${matchnt}`)
-      }
 
       switch (operator) {
         case '=':

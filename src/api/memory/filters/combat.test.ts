@@ -5,12 +5,14 @@ import { delverOfSecrets } from './testData/delverOfSecrets'
 import { defaultOptions } from './testData/_options'
 import { norinTheWary } from './testData/norinTheWary'
 import { tarmogoyf } from './testData/tarmogoyf'
+import { preordain } from './testData/preordain'
 
 describe('combat filters', function() {
   const corpus = [
     phantomBeast,
     kroxaTitanOfDeathsHunger,
     norinTheWary,
+    preordain,
   ]
   const queryRunner = new QueryRunner(corpus, defaultOptions)
 

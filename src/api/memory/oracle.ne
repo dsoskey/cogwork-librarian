@@ -155,7 +155,7 @@ typeCondition -> ("t"i | "type"i) (":" | "=") stringValue
 
 typeRegexCondition -> ("t"i | "type"i) (":" | "=") regexString
     {% ([_, [_op], value]) => oracleNode({
-        filtersUsed: ["type"],
+        filtersUsed: ["type-regex"],
         filterFunc: filters.regexMatch('type_line', value),
     }) %}
 
@@ -329,7 +329,7 @@ isValue -> (
 # anything that isn't a special character and isn't "and" or "or"
 noQuoteStringValue ->
   ("a"i | "an"i | "o"i) {% ([[value]]) => value.toLowerCase() %}
-  | ([^aAoO\- \t\n"'\\=<>:]
+  | ([^aAoO\- \t\n"'\\\/=<>:!]
     | "a"i [^nN \t\n"'\\=<>:]
     | "an"i [^dD \t\n"'\\=<>:]
     | "and"i [^ \t\n"'\\=<>:]

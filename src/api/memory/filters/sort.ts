@@ -29,7 +29,7 @@ export const sortFunc = (key: SortOrder): any[] => {
     case 'artist':
     case 'cmc':
       return [key]
-    case 'set': // this does a sort by set then collector number
+    case 'set':
       return ['set', byCollectorNumber]
     case 'spoiled':
       return [bySpoiled]
