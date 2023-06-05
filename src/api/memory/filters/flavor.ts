@@ -13,7 +13,7 @@ export const flavorMatch = (value: string): FilterNode =>
   })
 
 export const flavorRegex = (value: string): FilterNode =>
-  printNode(['flavor'], (it) => {
+  printNode(['flavor-regex'], (it) => {
     const regexp = new RegExp(value)
     return (
       regexp.test(it.flavor_text) ||

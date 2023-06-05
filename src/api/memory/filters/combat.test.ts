@@ -109,8 +109,8 @@ describe('combat filters', function() {
     })
 
     it("should handle stars", () => {
-      const goyfQueryRunner = new QueryRunner([tarmogoyf])
-      const result = goyfQueryRunner.search(  'pow=0 name:tarmogoyf')._unsafeUnwrap()
+      const goyfQueryRunner = new QueryRunner([tarmogoyf], defaultOptions)
+      const result = goyfQueryRunner.search('pow=0 name:tarmogoyf')._unsafeUnwrap()
 
       expect(result.length).toEqual(1)
       expect(result[0].id).toEqual(tarmogoyf.id)

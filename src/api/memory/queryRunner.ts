@@ -90,11 +90,20 @@ export class QueryRunner {
     const { filterFunc, filtersUsed, printFilter } = parser
       .results[0] as FilterNode
     const filtered = []
-    for (const card of corpus) {
-      if (filterFunc(card)) {
-        filtered.push(card)
+    try {
+      for (const card of corpus) {
+        if (filterFunc(card)) {
+          filtered.push(card)
+        }
       }
+    } catch (e) {
+      return err({
+        query,
+        errorOffset: 0, // how do i manage this??
+        message: `Filter error: ${e.message}`,
+      })
     }
+
 
     const printFilterFunc = chooseFilterFunc(filtersUsed)
 

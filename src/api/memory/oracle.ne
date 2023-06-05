@@ -243,7 +243,6 @@ directionCondition -> "direction"i ":" ("asc"i | "desc"i)
     }) %}
 
 # print-matters
-# todo: oracleFilter defines the object structure that's returned
 rarityCondition -> ("r"i | "rarity"i) anyOperator rarityValue
     {% ([_, [operator], value]) => filters.rarityFilter(operator, value) %}
 
@@ -266,7 +265,7 @@ dateCondition -> ("date"i | "year"i) anyOperator stringValue
     {% ([_, [operator], value]) => filters.dateFilter(operator, value) %}
 
 priceCondition -> ("usd"i | "eur"i | "tix"i) anyOperator numberValue
-    {% ([unit, [operator], value]) => filters.priceFilter(unit, operator, value) %}
+    {% ([[unit], [operator], value]) => filters.priceFilter(unit, operator, value) %}
 
 frameCondition -> "frame"i equalityOperator stringValue
     {% ([_, [_op], value]) => filters.frameFilter(value) %}
@@ -307,7 +306,7 @@ anyOperator -> ":" | "=" | "!=" | "<>" | "<=" | "<" | ">=" | ">" {% id %}
 equalityOperator -> ":" | "=" | "!=" | "<>" {% id %}
 
 formatValue -> (
-    "standard"i | "future"i | "historic"i | "pioneer"i | "modern"i | "legacy"i |
+    "standard"i | "future"i | "historic"i | "pioneer"i | "modern"i | "legacy"i | "paupercommander"i |
     "pauper"i |"vintage"i | "penny"i | "commander"i | "brawl"i | "duel"i | "oldschool"i
 ) {% ([[format]]) => format.toLowerCase() %}
 

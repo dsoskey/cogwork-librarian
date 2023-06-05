@@ -8,13 +8,17 @@ export const dateFilter = (operator: Operator, value: string): Filter<Printing> 
   return (it) => {
     const printDate = new Date(it.released_at)
     if (isNaN(valueDate.getTime())) {
-      throw `${value} must fit date format yyyy-MM-dd`
+      throw Error(`${value} must fit date format yyyy or yyyy-MM-dd`)
     }
     if (isNaN(printDate.getTime())) {
-      throw `printing ${it.id} has a malformed released_at date. check your database for corruption.`
+      throw Error(`printing ${it.id} has a malformed released_at date. check your database for corruption.`)
     }
 
-    return defaultCompare(printDate, operator, valueDate)
+    // assume yyyy
+    if (value.length === 4) {
+      return defaultCompare(printDate.getUTCFullYear(), operator, valueDate.getUTCFullYear())
+    }
+    return defaultCompare(printDate.getTime(), operator, valueDate.getTime())
   }
 }
 
