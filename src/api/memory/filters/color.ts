@@ -1,4 +1,4 @@
-import { FilterNode, Operator } from './base'
+import { defaultCompare, FilterNode, Operator } from './base'
 import { NormedCard } from '../types/normedCard'
 import { oracleNode } from './oracle'
 
@@ -52,4 +52,20 @@ export const colorMatch = (operator: Operator, value: Set<string>): FilterNode =
           throw Error('<> is not a valid operator for color filter')
       }
     },
+})
+
+// c=1 takes ~5s
+export const colorCount = (operator: Operator, count: number): FilterNode => oracleNode({
+  filtersUsed: ['color-count'],
+  filterFunc: (it) => {
+    const colorSet: Set<String> = new Set(it.colors ?? [])
+    for (const face of it.card_faces) {
+      for (const color of (face.colors ?? [])) {
+        colorSet.add(color)
+      }
+    }
+    const colorCount = colorSet.size
+
+    return defaultCompare(colorCount, operator, count)
+  }
 })

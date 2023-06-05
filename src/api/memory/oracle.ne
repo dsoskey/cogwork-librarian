@@ -111,8 +111,11 @@ nameRegexCondition -> ("name"i) (":" | "=") regexString
         filterFunc: filters.regexMatch('name', value)
     })%}
 
-colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
-    {% ([_, [operator], value]) => filters.colorMatch(operator, new Set(value)) %}
+colorCondition ->
+    ("c"i | "color"i) anyOperator colorCombinationValue
+        {% ([_, [operator], value]) => filters.colorMatch(operator, new Set(value)) %} |
+    ("c"i | "color"i) anyOperator integerValue
+        {% ([_, [operator], value]) => filters.colorCount(operator, value) %}
 
 colorIdentityCondition ->
     ("ci"i | "commander"i | "identity"i | "id"i) anyOperator colorCombinationValue

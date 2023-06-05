@@ -9,7 +9,7 @@ import { exactMatch, noReminderRegexMatch, noReminderTextMatch, regexMatch, text
 import { isVal } from './is'
 import { devotionOperation } from './devotion'
 import { combatToCombatNode, powTouTotalOperation } from './combat'
-import { colorMatch } from './color'
+import { colorCount, colorMatch } from './color'
 import { colorIdentityCount, colorIdentityMatch } from './identity'
 import { producesMatch, producesMatchCount } from './produces'
 import { keywordMatch } from './keyword'
@@ -45,6 +45,7 @@ export const filters = {
   noReminderRegexMatch,
   keywordMatch,
   colorMatch,
+  colorCount,
   colorIdentityMatch,
   colorIdentityCount,
   manaCostMatch,
