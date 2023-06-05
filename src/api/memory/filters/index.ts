@@ -10,7 +10,7 @@ import { isVal } from './is'
 import { devotionOperation } from './devotion'
 import { combatToCombatNode, powTouTotalOperation } from './combat'
 import { colorMatch } from './color'
-import { colorIdentityMatch } from './identity'
+import { colorIdentityCount, colorIdentityMatch } from './identity'
 import { producesMatch, producesMatchCount } from './produces'
 import { keywordMatch } from './keyword'
 import { manaCostMatch } from './mana'
@@ -20,8 +20,8 @@ import { cubeFilter } from './cube'
 import { rarityFilterNode } from './rarity'
 import { watermarkFilter } from './watermark'
 import { stampFilter } from './stamp'
-import { languageFilter } from './language'
-import { gameFilter } from './game'
+import { languageNode } from './language'
+import { gameNode } from './game'
 import { flavorMatch, flavorRegex } from './flavor'
 import { dateNode } from './date'
 import { setNode, setTypeNode } from './set'
@@ -46,6 +46,7 @@ export const filters = {
   keywordMatch,
   colorMatch,
   colorIdentityMatch,
+  colorIdentityCount,
   manaCostMatch,
   formatMatch,
   isVal,
@@ -61,8 +62,8 @@ export const filters = {
   priceFilter: priceNode,
   flavorMatch,
   flavorRegex,
-  gameFilter,
-  languageFilter,
+  gameNode,
+  languageNode,
   stampFilter,
   watermarkFilter,
   cubeFilter,

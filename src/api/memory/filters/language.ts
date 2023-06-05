@@ -1,10 +1,14 @@
-import { FilterNode } from './base'
+import { Filter, FilterNode } from './base'
 import { printNode } from './oracle'
+import { Printing } from '../types/normedCard'
 
-export const languageFilter = (value: string): FilterNode =>
-  printNode(['language'], (it) => {
+export const languageFilter = (value: string): Filter<Printing> =>
+  (it) => {
     if (value === 'any') {
       return true
     }
     return it.lang === value
-  })
+  }
+
+export const languageNode = (value: string): FilterNode =>
+  printNode(['language'], languageFilter(value))

@@ -11,18 +11,18 @@ describe('game filter', function() {
     const result = queryRunner.search("game:arena")._unsafeUnwrap()
 
     expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(asymmetrySage.id)
+    expect(result[0]).toEqual(asymmetrySage)
   })
 it("includes cards present in paper", function() {
     const result = queryRunner.search("game:paper")._unsafeUnwrap()
 
     expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(barrysLand.id)
+    expect(result[0]).toEqual(barrysLand)
   })
 it("includes cards present in mtgo", function() {
     const result = queryRunner.search("game:mtgo")._unsafeUnwrap()
 
     expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(zodiacDragonMtgo.id)
+    expect(result[0]).toEqual(zodiacDragonMtgo)
   })
 })

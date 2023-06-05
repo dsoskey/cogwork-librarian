@@ -78,7 +78,7 @@ export class QueryRunner {
       }
     } catch (error) {
       const { message } = error as NearlyError
-      console.debug(message)
+      console.error(message)
       return err({
         query,
         errorOffset: error.offset ?? 0,
@@ -97,13 +97,13 @@ export class QueryRunner {
         }
       }
     } catch (e) {
+      console.error(e)
       return err({
         query,
         errorOffset: 0, // how do i manage this??
         message: `Filter error: ${e.message}`,
       })
     }
-
 
     const printFilterFunc = chooseFilterFunc(filtersUsed)
 

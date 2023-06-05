@@ -114,8 +114,11 @@ nameRegexCondition -> ("name"i) (":" | "=") regexString
 colorCondition -> ("c"i | "color"i) anyOperator colorCombinationValue
     {% ([_, [operator], value]) => filters.colorMatch(operator, new Set(value)) %}
 
-colorIdentityCondition -> ("ci"i | "commander"i | "identity"i | "id"i) anyOperator colorCombinationValue
-    {% ([_, [operator], value]) => filters.colorIdentityMatch(operator, new Set(value)) %}
+colorIdentityCondition ->
+    ("ci"i | "commander"i | "identity"i | "id"i) anyOperator colorCombinationValue
+        {% ([_, [operator], value]) => filters.colorIdentityMatch(operator, new Set(value)) %} |
+    ("ci"i | "commander"i | "identity"i | "id"i) anyOperator integerValue
+        {% ([_, [operator], value]) => filters.colorIdentityCount(operator, value) %}
 
 manaCostCondition -> ("mana"i | "m"i) anyOperator manaCostValue
     {% ([_, [operator], value]) => filters.manaCostMatch(operator, value) %}
@@ -277,10 +280,10 @@ flavorRegexCondition -> ("flavor"i | "ft"i) equalityOperator regexString
     {% ([_, [_op], value]) => filters.flavorRegex(value) %}
 
 gameCondition -> "game"i equalityOperator stringValue
-    {% ([_, [_op], value]) => filters.gameFilter(value) %}
+    {% ([_, [_op], value]) => filters.gameNode(value) %}
 
 languageCondition -> ("lang"i | "language"i) equalityOperator stringValue
-    {% ([_, [_op], value]) => filters.languageFilter(value) %}
+    {% ([_, [_op], value]) => filters.languageNode(value) %}
 
 stampCondition -> "stamp"i equalityOperator stringValue
     {% ([_, [_op], value]) => filters.stampFilter(value) %}

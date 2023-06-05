@@ -8,5 +8,8 @@ export const setFilter = (value: string): Filter<Printing> =>
 export const setNode = (value: string): FilterNode =>
   printNode(['set'], setFilter(value))
 
+export const setTypeFilter = (value: string): Filter<Printing> =>
+(it) => it.set_type === value
+
 export const setTypeNode = (value: string): FilterNode =>
-  printNode(['set-type'],(it) => it.set_type === value)
+  printNode(['set-type'], setTypeFilter(value))
