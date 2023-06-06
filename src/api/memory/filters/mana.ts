@@ -26,19 +26,30 @@ export const manaCostMatch =
               return !isEqual(cost, targetCost)
             case '<':
               return (
-                entries.filter(([key, val]) => cost[key] < val).length > 0 &&
-                entries.filter(([key, val]) => cost[key] > val).length === 0
+                // 1. for all of target's mana counts, cost has less than or equal than target
+                entries.filter(([key, val]) => (cost[key] ?? 0) <= val).length === entries.length &&
+                // 2. at least one mana count is less than the target count
+                entries.find(([key, val]) => (cost[key] ?? 0) < val) !== undefined &&
+                // 3. cost doesn't have any extra keys
+                Object.keys(cost).find(it => targetCost[it] === undefined) === undefined
               )
             case '<=':
-              return entries.filter(([key, val]) => cost[key] > val).length === 0
+              return (
+                // 1. for all of target's mana counts, cost has less than or equal than target
+                entries.filter(([key, val]) => (cost[key] ?? 0) <= val).length === entries.length &&
+                // 2. cost doesn't have any extra keys
+                Object.keys(cost).find(it => targetCost[it] === undefined) === undefined
+              )
             case '>':
               return (
-                entries.filter(([key, val]) => cost[key] > val).length > 0 &&
-                entries.filter(([key, val]) => cost[key] < val).length === 0
+                // 1. for all of target's mana counts, face has at least that many of the same mana count
+                entries.filter(([key, val]) => cost[key] !== undefined && cost[key] >= val).length === entries.length &&
+                // 2. either face has additional keys OR more of any of target's mana
+                Object.keys(cost).find(key => targetCost[key] === undefined || cost[key] > targetCost[key]) !== undefined
               )
             case ':':
             case '>=':
-              return entries.filter(([key, val]) => cost[key] < val).length === 0
+              return entries.filter(([key, val]) => (cost[key] ?? 0) >= val).length === entries.length
           }
         })
       return cardCosts.length > 0

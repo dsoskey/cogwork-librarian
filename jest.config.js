@@ -1,7 +1,7 @@
 module.exports = {
   setupFilesAfterEnv: ['./test/setup.ts'],
   testEnvironment: 'jsdom',
-  testMatch: ["**/src/**/*.test.[jt]s"],
+  testMatch: ["**/src/**/*.test.[jt]s", '**/test/**/*.test.[jt]s'],
   // collectCoverage: true,
   transform: {
     'tsx?$': ['@swc/jest'],

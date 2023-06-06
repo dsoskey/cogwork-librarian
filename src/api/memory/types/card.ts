@@ -1,7 +1,5 @@
 import { Card } from 'scryfall-sdk'
 import { ObjectValues } from '../../../types'
-import mapValues from 'lodash/mapValues'
-import cloneDeep from 'lodash/cloneDeep'
 import { NormedCard, OracleKeys } from './normedCard'
 
 export const DOUBLE_FACED_LAYOUTS = [
@@ -221,8 +219,7 @@ const MANA_SYMBOLS = {
 export type ManaSymbol = ObjectValues<typeof MANA_SYMBOLS>
 
 // manaSymbol -> total count of that type of mana
-export type ManaCost = Record<ManaSymbol, number>
-export const emptyCost: ManaCost = mapValues(MANA_SYMBOLS, () => 0)
+export type ManaCost = Partial<Record<ManaSymbol, number>>
 
 export const manaAliases: Record<ManaSymbol, ManaSymbol> = {
   '2/b': '2/b',
@@ -267,6 +264,8 @@ export const manaAliases: Record<ManaSymbol, ManaSymbol> = {
   'w/u': 'w/u',
   x: 'x',
   y: 'y',
+  // ts-ignore
+  z: 'z',
   generic: 'generic',
   w: 'w',
   u: 'u',
@@ -287,13 +286,19 @@ export const replaceNamePlaceholder = (text: string, name: string): string => {
 }
 
 export const toManaCost = (splitCost: string[]): ManaCost => {
-  const result: ManaCost = cloneDeep(emptyCost)
+  const result: ManaCost = {}
   for (const rawSymbol of splitCost) {
     // hybrids are considered NaN
     const asNum = rawSymbol.includes('/') ? NaN : Number.parseInt(rawSymbol, 10)
     if (Number.isNaN(asNum)) {
+      if (result[manaAliases[rawSymbol]] === undefined) {
+        result[manaAliases[rawSymbol]] = 0
+      }
       result[manaAliases[rawSymbol]] += 1
     } else {
+      if (result.generic === undefined) {
+        result.generic = 0
+      }
       result.generic += asNum
     }
   }

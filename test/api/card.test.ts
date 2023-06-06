@@ -1,4 +1,4 @@
-import { emptyCost, ManaCost, toManaCost } from '../../src/api/memory/types/card'
+import { ManaCost, toManaCost } from '../../src/api/memory/types/card'
 
 describe('toManaCost', function () {
   interface TestCase {
@@ -8,23 +8,23 @@ describe('toManaCost', function () {
   const cases: TestCase[] = [
     {
       input: ['4'],
-      expected: { ...emptyCost, generic: 4 },
+      expected: { generic: 4 },
     },
     {
       input: ['5', '5'],
-      expected: { ...emptyCost, generic: 10 },
+      expected: { generic: 10 },
     },
     {
       input: ['4', 'x', 'y', 'z'],
-      expected: { ...emptyCost, generic: 4 },
+      expected: { generic: 4, x: 1, y: 1, z: 1 },
     },
     {
       input: ['w', 'u', 'b', 'r', 'g', 'c', 's'],
-      expected: { ...emptyCost, w: 1, u: 1, b: 1, r: 1, g: 1, c: 1, s: 1 },
+      expected: { w: 1, u: 1, b: 1, r: 1, g: 1, c: 1, s: 1 },
     },
     {
       input: ['b', 'b'],
-      expected: { ...emptyCost, b: 2 },
+      expected: { b: 2 },
     },
   ]
 
