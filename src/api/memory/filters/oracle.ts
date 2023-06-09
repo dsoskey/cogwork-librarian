@@ -1,5 +1,5 @@
-import { FilterNode, defaultCompare, Filter, identity, not, Operator } from './base'
-import { NormedCard, OracleKeys, Printing } from '../types/normedCard'
+import { FilterNode, Filter, identity } from './base'
+import { NormedCard } from '../types/normedCard'
 // TODO: reorg with base/oracle/print
 export interface OracleFilter {
   filtersUsed: string[]
@@ -14,23 +14,3 @@ export const oracleNode =
     printFilter: identity(),
     printInverse: identity(),
   })
-
-export const printNode = (
-  filtersUsed: string[],
-  printFilter: Filter<Printing>,
-): FilterNode => {
-  return {
-    filtersUsed,
-    filterFunc: (it) => it.printings.find(printFilter) !== undefined,
-    inverseFunc: (it) => it.printings.find(not(printFilter)) !== undefined,
-    printFilter,
-  }
-}
-
-export const defaultOperation =
-  (field: OracleKeys, operator: Operator, value: any): Filter<NormedCard> =>
-    (card: NormedCard) => {
-      const cardValue = card[field]
-      if (cardValue === undefined) return false
-      return defaultCompare(cardValue, operator, value)
-    }

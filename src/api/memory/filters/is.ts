@@ -9,9 +9,10 @@ import {
 } from '../types/card'
 import { DEFAULT_CARD_BACK_ID, NormedCard, Printing } from '../types/normedCard'
 import { FilterNode } from './base'
-import { oracleNode, printNode } from './oracle'
+import { oracleNode } from './oracle'
 import { textMatch } from './text'
 import { parsePowTou } from '../types/card'
+import { printNode } from './print'
 
 export const isPrintPrefix = `is-print:`
 

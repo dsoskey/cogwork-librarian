@@ -26,9 +26,7 @@ describe('text filters', function() {
     it("should do a name search when no keyword is present", () => {
       const result = queryRunner.search("orda")._unsafeUnwrap()
 
-      expect(result.length).toEqual(2)
-      expect(result[0].id).toEqual(concordantCrossroads.id)
-      expect(result[1].id).toEqual(preordain.id)
+      expect(result).toEqual([concordantCrossroads, preordain])
     })
     it("should do a name search for a keywordless string", () => {
       const result = queryRunner.search(`"spinerock"`)._unsafeUnwrap()

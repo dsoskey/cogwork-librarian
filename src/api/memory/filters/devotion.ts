@@ -20,21 +20,22 @@ export const devotionOperation = (operator: Operator, pips: string[]): FilterNod
         .filter((it) => it !== undefined)
         .filter((rawCost) => {
           const cost = toManaCost(toSplitCost(rawCost))
+          const compareValue = cost[pip] ?? 0
           switch (operator) {
             case '<=':
-              return cost[pip] <= count
+              return compareValue <= count
             case '<':
-              return cost[pip] < count
+              return compareValue < count
             case '>':
-              return cost[pip] > count
+              return compareValue > count
             case ':':
             case '>=':
-              return cost[pip] >= count
+              return compareValue >= count
             case '=':
-              return cost[pip] === count
+              return compareValue === count
             case '!=':
             case '<>':
-              return cost[pip] !== count
+              return compareValue !== count
           }
         })
       return cardCosts.length > 0

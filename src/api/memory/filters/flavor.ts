@@ -1,5 +1,5 @@
 import { FilterNode } from './base'
-import { printNode } from './oracle'
+import { printNode } from './print'
 
 // TODO; deal with multi-face print-specific on everything that's relevant
 export const flavorMatch = (value: string): FilterNode =>

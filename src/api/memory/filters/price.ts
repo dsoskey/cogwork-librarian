@@ -1,5 +1,5 @@
 import { defaultCompare, FilterNode, Operator } from './base'
-import { printNode } from './oracle'
+import { printNode } from './print'
 import { Prices } from 'scryfall-sdk/out/api/Cards'
 
 export const priceNode = (unit: keyof Prices, operator: Operator, value: number): FilterNode =>

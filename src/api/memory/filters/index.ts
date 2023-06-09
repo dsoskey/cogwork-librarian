@@ -1,10 +1,10 @@
 import {
   andNode,
+  defaultOperation,
   identityNode,
   orNode,
   notNode,
 } from './base'
-import { defaultOperation } from './oracle'
 import { exactMatch, noReminderRegexMatch, noReminderTextMatch, regexMatch, textMatch } from './text'
 import { isVal } from './is'
 import { devotionOperation } from './devotion'

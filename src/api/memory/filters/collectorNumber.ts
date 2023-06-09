@@ -1,5 +1,5 @@
 import { defaultCompare, FilterNode, Operator } from './base'
-import { printNode } from './oracle'
+import { printNode } from './print'
 
 export const collectorNumberNode = (operator: Operator, value: number): FilterNode =>
   printNode(['collector-number'], (it) => {

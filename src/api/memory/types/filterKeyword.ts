@@ -14,6 +14,7 @@ export const keywords = {
   cube: 'cube',
   color: 'color',
   date: 'date',
+  devotion: 'devotion', // !Devotion can only match single color or hybrid mana. No two-brid either
   direction: 'direction',
   e: 'e',
   edition: 'edition',
@@ -66,7 +67,6 @@ export const keywords = {
 } as const
 
 export const keywordsToImplement = {
-  devotion: 'devotion', // !Devotion can only match single color or hybrid mana. No two-brid either
   // https://discord.com/channels/291498816459243521/361685936179904513/1104796430830411777
   new: 'new', // rarity, flavor, art, artist, frame, language, game, paper, mtgo, arena, nonfoil, foil
   // its not: etched, masterpiece, promo, border, stamp

@@ -1,5 +1,5 @@
 import { Filter, FilterNode } from './base'
-import { printNode } from './oracle'
+import { printNode } from './print'
 import { Printing } from '../types/normedCard'
 
 export const languageFilter = (value: string): Filter<Printing> =>

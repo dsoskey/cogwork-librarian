@@ -1,5 +1,5 @@
 import { defaultCompare, Filter, FilterNode, Operator } from './base'
-import { printNode } from './oracle'
+import { printNode } from './print'
 import { Printing } from '../types/normedCard'
 
 export const dateFilter = (operator: Operator, value: string): Filter<Printing> => {

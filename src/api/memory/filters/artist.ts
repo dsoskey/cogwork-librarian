@@ -1,5 +1,5 @@
 import { FilterNode } from './base'
-import { printNode } from './oracle'
+import { printNode } from './print'
 
 /**
  * @param value - lower-cased artist substring.

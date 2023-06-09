@@ -1,6 +1,18 @@
-import { Filter } from './base'
+import { Filter, FilterNode, not } from './base'
 import { Card } from 'scryfall-sdk'
 import { NormedCard, Printing } from '../types/normedCard'
+
+export const printNode = (
+  filtersUsed: string[],
+  printFilter: Filter<Printing>,
+): FilterNode => {
+  return {
+    filtersUsed,
+    filterFunc: (it) => it.printings.find(printFilter) !== undefined,
+    inverseFunc: (it) => it.printings.find(not(printFilter)) !== undefined,
+    printFilter,
+  }
+}
 
 const showAllFilter = new Set([
   'date',

@@ -1,5 +1,5 @@
 import { FilterNode } from './base'
-import { printNode } from './oracle'
+import { printNode } from './print'
 
 export const stampFilter = (value: string): FilterNode =>
   printNode(['stamp'], (it) =>

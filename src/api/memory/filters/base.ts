@@ -1,5 +1,5 @@
 import { ObjectValues } from '../../../types'
-import { NormedCard, Printing } from '../types/normedCard'
+import { NormedCard, OracleKeys, Printing } from '../types/normedCard'
 export const EQ_OPERATORS = {
   ':': ':',
   '=': '=',
@@ -98,6 +98,14 @@ export const notNode = (clause: FilterNode): FilterNode => {
     clause1: clause,
   }
 }
+
+export const defaultOperation =
+  (field: OracleKeys, operator: Operator, value: any): Filter<NormedCard> =>
+    (card: NormedCard) => {
+      const cardValue = card[field]
+      if (cardValue === undefined) return false
+      return defaultCompare(cardValue, operator, value)
+    }
 
 /**
  * left and right must be comparable using builtin operators
