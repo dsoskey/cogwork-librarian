@@ -17,6 +17,7 @@ import { CardListView } from './cardViews/cardListView'
 import { AdminPanel } from '../adminPanel'
 import { CoglibIcon } from '../component/coglibIcon'
 import { FlagContext } from '../../flags'
+import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 
 interface BrowserViewProps {
   status: TaskStatus
@@ -45,6 +46,7 @@ export const BrowserView = React.memo(
     lockCoglib,
   }: BrowserViewProps) => {
     const { adminMode } = useContext(FlagContext).flags
+    const { addMessage, dismissMessage } = useContext(ToasterContext)
     const viewport = useViewportListener()
     const [activeCollection, setActiveCollection] = useState<ActiveCollection>('search')
     const [displayType, setDisplayType] = useLocalStorage<DisplayType>('display-type', 'cards')
@@ -133,8 +135,20 @@ export const BrowserView = React.memo(
                 </>}
                 {currentPage.map((card) => (
                   <CardImageView
-                    onAdd={() => addCard(card.data.name)}
-                    onIgnore={() => addIgnoredId(card.data.oracle_id)}
+                    onAdd={() => {
+                      addCard(card.data.name)
+                      const id = addMessage(`Added ${card.data.name} to saved cards`, false)
+                      setTimeout(() => {
+                        dismissMessage(id)
+                      }, DISMISS_TIMEOUT_MS)
+                    }}
+                    onIgnore={() => {
+                      addIgnoredId(card.data.oracle_id)
+                      const id = addMessage(`Ignored ${card.data.name} from future searches`, false)
+                      setTimeout(() => {
+                        dismissMessage(id)
+                      }, DISMISS_TIMEOUT_MS)
+                    }}
                     key={card.data.id}
                     card={card}
                     revealDetails={revealDetails}

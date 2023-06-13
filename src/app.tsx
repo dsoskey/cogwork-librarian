@@ -30,6 +30,8 @@ import { subHeader } from './ui/router'
 import { DatabaseLink } from './ui/queryForm/databaseSettings'
 import { SearchError } from './ui/component/searchError'
 import { SavedCards } from './ui/savedCards'
+import { ToasterMessage, Toaster, ToasterContext } from './ui/component/toaster'
+import { v4 as uuidv4 } from 'uuid';
 
 export const App = () => {
   const { adminMode } = useContext(FlagContext).flags
@@ -63,6 +65,16 @@ export const App = () => {
   const [showCogLib, setShowCogLib] = useState<boolean>(true)
   const [lockCoglib, setLockCogLib] = useLocalStorage<boolean>('lock-coglib', false)
 
+  const [messages, setMessages] = useState<ToasterMessage[]>([])
+  const addMessage = (text: string, dismissible: boolean) => {
+    const message: ToasterMessage = { id: uuidv4() ,text, dismissible }
+    setMessages(prev => [...prev, message])
+    return message.id
+  }
+  const dismissMessage = (messageId: string) => {
+    setMessages(prev => prev.filter(it => it.id !== messageId))
+  }
+
   const execute = () => queryRunner.run(subQueries, options)
     .then(() => {
       if (!lockCoglib) {
@@ -85,97 +97,100 @@ export const App = () => {
     <CogDBContext.Provider value={cogDB}>
       <ListImporterContext.Provider value={listImporter}>
         <ProjectContext.Provider value={project}>
-          <div className='root'>
-            <div className={`cogwork-librarian ${pathname.replace("/","")} ${showCogLib ? "show":"hide"}`}>
-              <div className={`row masthead`}>
-                {(showCogLib || viewport.mobile) && adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
-                {(showCogLib || viewport.mobile) && !adminMode && <CoglibIcon size='3em' />}
+          <ToasterContext.Provider value={{ messages, addMessage, dismissMessage }}>
+            <div className='root'>
+              <div className={`cogwork-librarian ${pathname.replace("/","")} ${showCogLib ? "show":"hide"}`}>
+                <div className={`row masthead`}>
+                  {(showCogLib || viewport.mobile) && adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
+                  {(showCogLib || viewport.mobile) && !adminMode && <CoglibIcon size='3em' />}
 
-                {(showCogLib || viewport.mobile) && <div className='column'>
-                  <h1 className='page-title'>{subHeader[pathname]}</h1>
-                  <div className='row'>
+                  {(showCogLib || viewport.mobile) && <div className='column'>
+                    <h1 className='page-title'>{subHeader[pathname]}</h1>
+                    <div className='row'>
 
-                    <Link to='/'>search</Link>
+                      <Link to='/'>search</Link>
 
-                    <Link to='/saved'>saved cards</Link>
+                      <Link to='/saved'>saved cards</Link>
 
-                    <DatabaseLink />
+                      <DatabaseLink />
 
-                    <AppInfoLink />
+                      <AppInfoLink />
 
-                    <ExampleGalleryLink />
+                      <ExampleGalleryLink />
 
-                    <SyntaxDocsLink />
+                      <SyntaxDocsLink />
 
+                    </div>
+                  </div>}
+                  <div className='toggle'>
+                    <button
+                      onClick={() => setLockCogLib(prev => !prev)}
+                      title={`${lockCoglib ? "unlock":"lock"} controls`}>{lockCoglib ? "🔒":"🔓"}
+                    </button>
+                    {queryRunner.status !== 'unstarted' && <button
+                      onClick={() => setShowCogLib(prev => !prev)}
+                      title={`${showCogLib ? "close":"open"} controls`}
+                    >
+                      {viewport.mobile ? (showCogLib ? "^" : "v") : (showCogLib ? "<<":">>")}
+                    </button>}
                   </div>
-                </div>}
-                <div className='toggle'>
-                  <button
-                    onClick={() => setLockCogLib(prev => !prev)}
-                    title={`${lockCoglib ? "unlock":"lock"} controls`}>{lockCoglib ? "🔒":"🔓"}
-                  </button>
-                  {queryRunner.status !== 'unstarted' && <button
-                    onClick={() => setShowCogLib(prev => !prev)}
-                    title={`${showCogLib ? "close":"open"} controls`}
-                  >
-                    {viewport.mobile ? (showCogLib ? "^" : "v") : (showCogLib ? "<<":">>")}
-                  </button>}
                 </div>
+
+                {showCogLib && <Switch>
+                  <Route path='/data' exact>
+                    <DataView />
+                  </Route>
+                  <Route path='/saved' exact>
+                    <SavedCards savedCards={project.savedCards} setSavedCards={project.setSavedCards} />
+                  </Route>
+                  <Route path='/about-me' exact>
+                    <AppInfo />
+                  </Route>
+                  <Route path='/examples' exact>
+                    <ExampleGallery setQueries={setQueries} />
+                  </Route>
+                  <Route path='/user-guide' exact>
+                    <SyntaxDocs />
+                  </Route>
+                  <Route>
+                    <div className='search-root'>
+                      <QueryForm
+                        status={queryRunner.status}
+                        canRunQuery={source === 'scryfall' || cogDB.memStatus === 'success'}
+                        execute={execute}
+                        queries={queries}
+                        setQueries={setQueries}
+                        options={options}
+                        setOptions={setOptions}
+                        source={source}
+                        setSource={setSource}
+                      />
+
+                      {queryRunner.status === 'error' && <SearchError
+                        report={queryRunner.report}
+                        source={source}
+                        errors={queryRunner.errors}
+                      />}
+                    </div>
+                  </Route>
+                </Switch>}
               </div>
-
-              {showCogLib && <Switch>
-                <Route path='/data' exact>
-                  <DataView />
-                </Route>
-                <Route path='/saved' exact>
-                  <SavedCards savedCards={project.savedCards} setSavedCards={project.setSavedCards} />
-                </Route>
-                <Route path='/about-me' exact>
-                  <AppInfo />
-                </Route>
-                <Route path='/examples' exact>
-                  <ExampleGallery setQueries={setQueries} />
-                </Route>
-                <Route path='/user-guide' exact>
-                  <SyntaxDocs />
-                </Route>
-                <Route>
-                  <div className='search-root'>
-                    <QueryForm
-                      status={queryRunner.status}
-                      canRunQuery={source === 'scryfall' || cogDB.memStatus === 'success'}
-                      execute={execute}
-                      queries={queries}
-                      setQueries={setQueries}
-                      options={options}
-                      setOptions={setOptions}
-                      source={source}
-                      setSource={setSource}
-                    />
-
-                    {queryRunner.status === 'error' && <SearchError
-                      report={queryRunner.report}
-                      source={source}
-                      errors={queryRunner.errors}
-                    />}
-                  </div>
-                </Route>
-              </Switch>}
+              <BrowserView
+                report={queryRunner.report}
+                result={queryRunner.result}
+                status={queryRunner.status}
+                errors={queryRunner.errors}
+                addCard={addCard}
+                addIgnoredId={addIgnoredId}
+                ignoredIds={ignoredIds}
+                source={source}
+                lockCoglib={lockCoglib}
+                openCoglib={() => setShowCogLib(true)}
+              />
+              <Footer />
+              <Toaster />
             </div>
-            <BrowserView
-              report={queryRunner.report}
-              result={queryRunner.result}
-              status={queryRunner.status}
-              errors={queryRunner.errors}
-              addCard={addCard}
-              addIgnoredId={addIgnoredId}
-              ignoredIds={ignoredIds}
-              source={source}
-              lockCoglib={lockCoglib}
-              openCoglib={() => setShowCogLib(true)}
-            />
-            <Footer />
-          </div>
+          </ToasterContext.Provider>
         </ProjectContext.Provider>
       </ListImporterContext.Provider>
     </CogDBContext.Provider>
