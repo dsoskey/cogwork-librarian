@@ -105,7 +105,7 @@ export const TextEditor = ({
 
   useEffect(() => {
     controller.current.addEventListener('scroll', onScroll)
-    return () => controller.current.removeEventListener('scroll', onScroll)
+    return () => controller.current?.removeEventListener('scroll', onScroll)
   }, [])
   return (
     <div className='query-editor' onKeyDown={showLinks} onKeyUp={hideLinks}>

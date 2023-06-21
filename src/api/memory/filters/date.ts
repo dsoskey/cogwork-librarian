@@ -1,17 +1,17 @@
 import { defaultCompare, Filter, FilterNode, Operator } from './base'
 import { printNode } from './print'
-import { Printing } from '../types/normedCard'
+import { PrintingFilterTuple } from '../types/normedCard'
 
-export const dateFilter = (operator: Operator, value: string): Filter<Printing> => {
+export const dateFilter = (operator: Operator, value: string): Filter<PrintingFilterTuple> => {
   const valueDate = new Date(value)
 
-  return (it) => {
-    const printDate = new Date(it.released_at)
+  return ({ printing }) => {
+    const printDate = new Date(printing.released_at)
     if (isNaN(valueDate.getTime())) {
       throw Error(`${value} must fit date format yyyy or yyyy-MM-dd`)
     }
     if (isNaN(printDate.getTime())) {
-      throw Error(`printing ${it.id} has a malformed released_at date. check your database for corruption.`)
+      throw Error(`printing ${printing.id} has a malformed released_at date. check your database for corruption.`)
     }
 
     // assume yyyy

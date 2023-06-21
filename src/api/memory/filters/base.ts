@@ -1,5 +1,5 @@
 import { ObjectValues } from '../../../types'
-import { NormedCard, OracleKeys, Printing } from '../types/normedCard'
+import { NormedCard, OracleKeys, PrintingFilterTuple } from '../types/normedCard'
 export const EQ_OPERATORS = {
   ':': ':',
   '=': '=',
@@ -23,8 +23,8 @@ export interface FilterNode {
   filtersUsed: string[]
   filterFunc: Filter<NormedCard>
   inverseFunc?: Filter<NormedCard>
-  printFilter: Filter<Printing>
-  printInverse?: Filter<Printing>
+  printFilter: Filter<PrintingFilterTuple>
+  printInverse?: Filter<PrintingFilterTuple>
   clause1?: FilterNode
   clause2?: FilterNode
 }

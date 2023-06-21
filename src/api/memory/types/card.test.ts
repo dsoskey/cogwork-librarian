@@ -1,4 +1,4 @@
-import { ManaCost, toManaCost } from '../../src/api/memory/types/card'
+import { ManaCost, toManaCost } from './card'
 
 describe('toManaCost', function () {
   interface TestCase {

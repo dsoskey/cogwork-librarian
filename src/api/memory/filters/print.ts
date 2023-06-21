@@ -1,15 +1,15 @@
 import { Filter, FilterNode, not } from './base'
 import { Card } from 'scryfall-sdk'
-import { NormedCard, Printing } from '../types/normedCard'
+import { NormedCard, Printing, PrintingFilterTuple } from '../types/normedCard'
 
 export const printNode = (
   filtersUsed: string[],
-  printFilter: Filter<Printing>,
+  printFilter: Filter<PrintingFilterTuple>,
 ): FilterNode => {
   return {
     filtersUsed,
-    filterFunc: (it) => it.printings.find(printFilter) !== undefined,
-    inverseFunc: (it) => it.printings.find(not(printFilter)) !== undefined,
+    filterFunc: (card) => card.printings.find(printing => printFilter({printing, card})) !== undefined,
+    inverseFunc: (card) => card.printings.find(printing => not(printFilter)({printing, card})) !== undefined,
     printFilter,
   }
 }
@@ -29,9 +29,10 @@ const showAllFilter = new Set([
 ])
 
 export const findPrinting =
-  (filterFunc: Filter<Printing>) =>
-    ({ printings, ...rest }: NormedCard): Card | undefined => {
-      const maybePrint = printings.find(filterFunc)
+  (filterFunc: Filter<PrintingFilterTuple>) =>
+    (card: NormedCard): Card | undefined => {
+      const { printings, ...rest } = card
+      const maybePrint = printings.find(printing => filterFunc({ printing, card }))
       if (maybePrint !== undefined) {
         return Card.construct(<Card>{
           ...rest,
@@ -42,20 +43,33 @@ export const findPrinting =
     }
 
 export const allPrintings =
-  (filterFunc: Filter<Printing>) =>
-    ({ printings, ...rest }: NormedCard): Card[] => {
-      return printings.filter(filterFunc).map((it) =>
-        Card.construct(<Card>{
-          ...rest,
-          ...it,
-        })
-      )
+  (filterFunc: Filter<PrintingFilterTuple>) =>
+    (card: NormedCard): Card[] => {
+      const { printings, ...rest } = card
+      const filteredPrints: Card[] = []
+      for (const printing of printings) {
+        if (filterFunc({ printing, card })) {
+          filteredPrints.push(Card.construct(<Card>{
+            ...rest,
+            ...printing,
+          }))
+        }
+      }
+
+      return filteredPrints
     }
 
 export const uniqueArts =
-  (filterFunc: Filter<Printing>) =>
-    ({ printings, ...rest }: NormedCard): Card[] => {
-      const filteredPrints = printings.filter(filterFunc)
+  (filterFunc: Filter<PrintingFilterTuple>) =>
+    (card: NormedCard): Card[] => {
+      const { printings, ...rest } = card
+      const filteredPrints: Printing[] = []
+      for (const printing of printings) {
+        if (filterFunc({ printing, card })) {
+          filteredPrints.push(printing)
+        }
+      }
+
       const foundArtIds: Set<string> = new Set<string>()
       const returnedPrints: Printing[] = []
       for (const print of filteredPrints) {

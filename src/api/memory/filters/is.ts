@@ -7,7 +7,7 @@ import {
   noReminderText,
   SHOCKLAND_REGEX
 } from '../types/card'
-import { DEFAULT_CARD_BACK_ID, NormedCard, Printing } from '../types/normedCard'
+import { DEFAULT_CARD_BACK_ID, NormedCard, PrintingFilterTuple } from '../types/normedCard'
 import { FilterNode } from './base'
 import { oracleNode } from './oracle'
 import { textMatch } from './text'
@@ -48,7 +48,7 @@ const printMattersFields = new Set<IsValue>([
   'intropack',
   'release',
   'planeswalkerdeck',
-  // 'extra',
+  'extra',
   'watermark',
   'extended',
   'colorshifted',
@@ -82,31 +82,31 @@ function unimplemented(value: string): boolean {
   return false
 }
 
-export const isPrintVal = (value: IsValue) => (print: Printing): boolean => {
+export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilterTuple): boolean => {
   switch (value) {
     case 'illustration':
-      return print.illustration_id !== undefined
+      return printing.illustration_id !== undefined
     case 'multiverse':
-      return print.multiverse_ids?.length > 0
+      return printing.multiverse_ids?.length > 0
     case 'cardmarket':
-      return print.cardmarket_id !== undefined
+      return printing.cardmarket_id !== undefined
     case 'tcgplayer':
-      return print.tcgplayer_id !== undefined
+      return printing.tcgplayer_id !== undefined
     case 'fbb':
-      return print.lang !== 'en' && print.border_color === 'black'
+      return printing.lang !== 'en' && printing.border_color === 'black'
     case 'fwb':
-      return print.lang !== 'en' && print.border_color === 'white'
+      return printing.lang !== 'en' && printing.border_color === 'white'
     case 'localizedname':
-      return print.printed_name !== undefined
+      return printing.printed_name !== undefined
     case 'flavorname':
-      return print.flavor_name !== undefined
+      return printing.flavor_name !== undefined
     case 'foil':
-      return print.finishes.includes('foil')
+      return printing.finishes.includes('foil')
     case 'nonfoil':
-      return print.finishes.includes('nonfoil')
+      return printing.finishes.includes('nonfoil')
     case 'etch':
     case 'etched':
-      return print.finishes.includes('etched')
+      return printing.finishes.includes('etched')
     case 'contentwarning':
       return unimplemented(value)
     // return card.content_warning // todo: this should be on prints
@@ -117,42 +117,42 @@ export const isPrintVal = (value: IsValue) => (print: Printing): boolean => {
     case 'oversized':
     case 'textless':
     case 'digital':
-      return print[value]
+      return printing[value]
     case 'hires':
-      return print.highres_image
+      return printing.highres_image
     case 'mtgoid':
-      return print.mtgo_id !== null && print.mtgo_id !== undefined
+      return printing.mtgo_id !== null && printing.mtgo_id !== undefined
     case 'arenaid':
-      return print.arena_id !== null && print.arena_id !== undefined
+      return printing.arena_id !== null && printing.arena_id !== undefined
     case 'fullart':
-      return print.full_art
+      return printing.full_art
     case 'story':
-      return print.story_spotlight
+      return printing.story_spotlight
     case 'watermark':
-      return print.watermark !== undefined
+      return printing.watermark !== undefined
     case 'stamp':
     case 'stamped':
-      return print.security_stamp?.length > 0
+      return printing.security_stamp?.length > 0
     case 'artist':
-      return print.artist?.length > 0
+      return printing.artist?.length > 0
     case 'flavor':
-      return print.flavor_text !== undefined
-        || print.card_faces.find(it => it.flavor_text !== undefined) !== undefined
+      return printing.flavor_text !== undefined
+        || printing.card_faces.find(it => it.flavor_text !== undefined) !== undefined
     case 'firstprint':
     case 'firstprinting':
-      return !print.reprint
+      return !printing.reprint
     case 'tombstone':
     case 'showcase':
-      return print.frame_effects?.includes(value)
+      return printing.frame_effects?.includes(value)
     case 'extended':
-      return print.frame_effects?.includes('extendedart')
+      return printing.frame_effects?.includes('extendedart')
     case 'colorshifted':
-      return print.frame_effects?.includes('colorshifted')
+      return printing.frame_effects?.includes('colorshifted')
     case 'lights':
       return unimplemented(value) // TODO: check for scryfall-sdk update
-      // return print.attraction_lights?.length > 0
+      // return printing.attraction_lights?.length > 0
     case 'back':
-      return print.card_back_id !== DEFAULT_CARD_BACK_ID
+      return printing.card_back_id !== DEFAULT_CARD_BACK_ID
     case 'starterdeck':
     case 'buyabox':
     case 'prerelease':
@@ -161,31 +161,49 @@ export const isPrintVal = (value: IsValue) => (print: Printing): boolean => {
     case 'intropack':
     case 'release':
     case 'planeswalkerdeck':
-      return print.promo_types?.includes(value)
+      return printing.promo_types?.includes(value)
     case 'halo':
       // @ts-ignore
-      return print.promo_types?.includes('halofoil')
+      return printing.promo_types?.includes('halofoil')
     // frames
     case 'old':
-      return ['1993', '1997'].includes(print.frame)
+      return ['1993', '1997'].includes(printing.frame)
     case 'modern':
-      return print.frame === '2003'
+      return printing.frame === '2003'
     case 'new':
-      return ['2003', '2015'].includes(print.frame)
+      return ['2003', '2015'].includes(printing.frame)
     case 'future':
-      return print.frame.toLowerCase() === 'future'
+      return printing.frame.toLowerCase() === 'future'
     case 'masterpiece':
     case 'expansion':
     case 'core':
     case 'funny':
-      return print.set_type === value
+      return printing.set_type === value
     case 'extra':
-      return unimplemented(value)
+      // this doesn't work: this filters out cards that matched the oracle filter
+      return isOracleVal('extra')(card) ||
+        printing.set_type === 'memorabilia' ||
+        printing.border_color === 'gold' ||
+        (printing.border_color === 'silver' && printing.set_type === "promo") ||
+        printing.oversized ||
+        printing.set === "uplist" ||
+        printing.set === "hho" ||
+        printing.set === "ptg" ||
+        printing.set === "h17" ||
+        printing.set_type === 'token' ||
+        // @ts-ignore
+        printing.promo_types?.includes("thick") ||
+        // @ts-ignore
+        printing.games.includes("astral") ||
+        // @ts-ignore
+        printing.games.includes("sega") ||
+        printing.set_name.includes("Heroes of the Realm") ||
+        printing.set_name.includes("Playtest Cards")
     // return card.layout === 'art_series' ||
     //   card.layout === 'token' ||
     //   card.layout === 'double_faced_token' ||
     //   card.layout === 'emblem'
-    // card.set_type !== 'memorabilia' handle with prints
+    //  handle with prints
     default:
       return unimplemented(value)
   }
@@ -263,6 +281,10 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
         )
       )
     case 'oathbreaker':
+      if (card.type_line === null || card.type_line === undefined) {
+        console.warn(`Found card with no type: ${card.name}`)
+        console.warn(card)
+      }
       // @ts-ignore TODO: upgrade scryfall-sdk
       return card.type_line.split('//')[0].includes('Planeswalker') && card.legalities.oathbreaker === 'legal'
     case 'duelcommander':
@@ -434,10 +456,25 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
       )
     case 'extra':
       // TODO: handle memorabilia
+      /*
+       gold border,/
+       oversized,/
+       thicc,/
+       plane,/
+       test card,/
+       scheme/
+       vanguard/
+       // these aren't accounted for
+       specialized
+       cards only found from alchemy spellbooks
+       */
       return card.layout === 'art_series' ||
         card.layout === 'token' ||
         card.layout === 'double_faced_token' ||
-        card.layout === 'emblem'
+        card.layout === 'emblem' ||
+        card.layout === 'planar' ||
+        card.type_line.includes("Vanguard") ||
+        card.type_line.includes("Scheme")
     // not found on/derived from card json
     case 'frenchvanilla': // this is gonna be a big parse :(((((((((((((((((((((
     case 'spikey':

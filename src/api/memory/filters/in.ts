@@ -7,11 +7,11 @@ import { languageFilter } from './language'
 export const inFilter = (value: string): FilterNode =>
   oracleNode({
     filtersUsed: ["in"],
-    filterFunc: (it) =>
-      it.printings.filter(
-        print => setFilter(value)(print) ||
-          setTypeFilter(value)(print) ||
-          gameFilter(value)(print) ||
-          languageFilter(value)(print)
+    filterFunc: (card) =>
+      card.printings.filter(
+        printing => setFilter(value)({ printing, card }) ||
+          setTypeFilter(value)({ printing, card }) ||
+          gameFilter(value)({ printing, card }) ||
+          languageFilter(value)({ printing, card })
         ).length > 0
   })

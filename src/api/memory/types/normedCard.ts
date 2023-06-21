@@ -39,23 +39,24 @@ const PRINT_KEYS = {
   promo_types: 'promo_types',
   printed_name: "printed_name",
   rarity: 'rarity',
-  related_uris: 'related_uris',
+  // related_uris: 'related_uris',
 
   released_at: 'released_at',
   reprint: 'reprint',
-  rulings_uri: 'rulings_uri',
+  // rulings_uri: 'rulings_uri',
   // "artist_ids"|
-  scryfall_set_uri: 'scryfall_set_uri',
+  // scryfall_set_uri: 'scryfall_set_uri',
   scryfall_uri: 'scryfall_uri',
   security_stamp: 'security_stamp',
   set: 'set',
   set_id: 'set_id',
   set_name: 'set_name',
-  set_search_uri: 'set_search_uri',
+  // set_search_uri: 'set_search_uri',
   set_type: 'set_type',
-  set_uri: 'set_uri',
+  // set_uri: 'set_uri',
   tcgplayer_id: 'tcgplayer_id',
-  uri: 'uri',
+  tcgplayer_etched_id: 'tcgplayer_etched_id',
+  // uri: 'uri',
   watermark: 'watermark',
   oversized: 'oversized',
   variation: 'variation',
@@ -67,7 +68,23 @@ type PrintKeys = ObjectValues<typeof PRINT_KEYS>
 
 export type Printing = Pick<Card, PrintKeys>
 
+export interface PrintingFilterTuple {
+  printing: Printing
+  card: NormedCard
+}
+
 export type OracleKeys = keyof Omit<Card, PrintKeys>
+
+const IGNORE_KEYS = {
+  prints_search_uri: "prints_search_uri",
+  related_uris: "related_uris",
+  rulings_uri: "rulings_uri",
+  scryfall_set_uri: "scryfall_set_uri",
+  set_search_uri: "set_search_uri",
+  set_uri: "set_uri",
+  uri: "uri",
+}
+export type IgnoreKeys = ObjectValues<typeof IGNORE_KEYS>
 
 export interface NormedCard extends Omit<Card, PrintKeys> {
   printings: Printing[]
@@ -75,15 +92,22 @@ export interface NormedCard extends Omit<Card, PrintKeys> {
   card_faces: CardFace[]
 }
 
+const ignorePaths = [...Object.keys(PRINT_KEYS)]// todo: turn this back on when i have a better testing strategy, ...Object.keys(IGNORE_KEYS)]
+const printPaths = Object.keys(PRINT_KEYS)
+
 export const normCardList = (cardList: Card[]): NormedCard[] => {
   const cardsByOracle = _groupBy(cardList, 'oracle_id')
+  const result: NormedCard[] = []
 
-  // optimization opportunity
-  return Object.values(cardsByOracle).map((cards) => ({
-    ...(_omit(cards[0], Object.keys(PRINT_KEYS)) as Omit<Card, PrintKeys>),
-    printings: cards.map(
-      (it) => _pick(it, Object.keys(PRINT_KEYS)) as Printing
-    ),
-    card_faces: cards[0].card_faces,
-  }))
+  for (const oracleId in cardsByOracle) {
+    const cards = cardsByOracle[oracleId]
+    const normed = {
+      ...(_omit(cards[0], ignorePaths)) as Omit<Card, PrintKeys>,
+      printings: cards.map((it) => _pick(it, printPaths) as Printing
+      ),
+      card_faces: cards[0].card_faces,
+    }
+    result.push(normed)
+  }
+  return result
 }

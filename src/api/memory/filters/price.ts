@@ -3,8 +3,8 @@ import { printNode } from './print'
 import { Prices } from 'scryfall-sdk/out/api/Cards'
 
 export const priceNode = (unit: keyof Prices, operator: Operator, value: number): FilterNode =>
-  printNode([unit], (it) => {
-    const printPrice = Number.parseFloat(it.prices[unit])
+  printNode([unit], ({ printing }) => {
+    const printPrice = Number.parseFloat(printing.prices[unit])
 
     if (printPrice === null || printPrice === undefined || Number.isNaN(printPrice)) {
       return false

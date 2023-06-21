@@ -1,13 +1,13 @@
 import { Filter, FilterNode } from './base'
 import { printNode } from './print'
-import { Printing } from '../types/normedCard'
+import { PrintingFilterTuple } from '../types/normedCard'
 
-export const languageFilter = (value: string): Filter<Printing> =>
-  (it) => {
+export const languageFilter = (value: string): Filter<PrintingFilterTuple> =>
+  ({ printing }) => {
     if (value === 'any') {
       return true
     }
-    return it.lang === value
+    return printing.lang === value
   }
 
 export const languageNode = (value: string): FilterNode =>
