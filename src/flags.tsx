@@ -1,7 +1,12 @@
 import React, { createContext, useState } from 'react'
 import { ObjectValues } from './types'
 import _cloneDeep from 'lodash/cloneDeep'
+import { ClientConfig, Stage } from '../config'
 
+// @ts-ignore
+import _config from 'configuration';
+console.log(_config);
+export const clientConfig = _config as ClientConfig;
 export const FLAG_NAMES = {
   adminMode: 'adminMode',
   showDebugInfo: 'showDebugInfo',
@@ -12,11 +17,11 @@ export const FLAG_NAMES = {
 export type Flag = ObjectValues<typeof FLAG_NAMES>
 
 export const INITIAL_FLAGS: Record<Flag, boolean> = {
-  showDebugInfo: false,
+  showDebugInfo: clientConfig.stage === Stage.Dev,
   adminMode: false,
-  disableCache: false,
+  disableCache: true,
   displayTypes: false,
-  multiQuery: false,
+  multiQuery: true,
 }
 
 interface FlagManager {

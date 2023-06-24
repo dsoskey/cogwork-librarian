@@ -51,8 +51,8 @@ export const useQueryCoordinator = (): QueryExecutor => {
       ).then((promiseResults) => {
         const orgo: { [id: string]: EnrichedCard } = {}
 
-        Object.values(rawData.current).forEach((q) => {
-          q.forEach((card) => {
+        for (let queryKey in rawData.current) {
+          for (let card of rawData.current[queryKey]) {
             const maybeCard = orgo[card.data.id]
             if (maybeCard !== undefined) {
               maybeCard.weight += card.weight
@@ -60,8 +60,8 @@ export const useQueryCoordinator = (): QueryExecutor => {
             } else {
               orgo[card.data.id] = card
             }
-          })
-        })
+          }
+        }
 
         const sorted: Array<EnrichedCard> = sortBy(Object.values(orgo), [
           (it) => -it.weight,

@@ -1,8 +1,7 @@
-import { ReefClientConfig, Stage } from '.'
+import { ClientConfig, Stage } from '.'
 
-const config: ReefClientConfig = {
+const config: ClientConfig = {
   stage: Stage.Prod,
-  apiUrl: 'http://api.reef.sosk.watch',
 }
 
 export default config

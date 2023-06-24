@@ -58,6 +58,7 @@ export const useCogDB = (): CogDB => {
     switch (type) {
       case 'count':
         const value = data as number
+        console.debug(`received card count ${value}`)
         dbReport.setTotalCards(value)
         break
       case 'card':

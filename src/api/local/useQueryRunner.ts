@@ -64,9 +64,9 @@ export const useMemoryQueryRunner = ({
           weight,
           matchedQueries: [query],
         }))
-        rawData.current[preparedQuery] = cloneDeep(cards)
+        rawData.current[preparedQuery] = cards
         if (!disableCache) {
-          cache.current[_cacheKey] = cards
+          cache.current[_cacheKey] = cloneDeep(cards)
         }
         report.addCardCount(cards.length)
         report.addComplete()

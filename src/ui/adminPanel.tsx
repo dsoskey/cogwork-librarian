@@ -13,6 +13,7 @@ export const AdminPanel = ({ children }) => {
     <span onClick={onOpen}>{children}</span>
     <Modal open={open} title={<h2>super secret admin panel activate!</h2>} onClose={onClose}>
       <h3>flag control</h3>
+      <p className='alert'>disclamer: the feature flags on this page change the applications behavior. some of these features are unreleased, and using them could potentially break your application or database. use at your own risk!</p>
       <div className='column'>
         {Object.keys(FLAG_NAMES).map((flag: Flag) => {
           if (flag === 'adminMode') {

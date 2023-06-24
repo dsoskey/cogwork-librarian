@@ -7,9 +7,9 @@ self.onmessage = (_event) => {
 
   console.log('received event', event)
   if (event.type === 'load') {
-    loadDb().catch(e => postMessage({ type: 'error', data: e }))
+    loadDb().catch(e => postMessage({ type: 'error', data: e.toString() }))
   } else if (event.type === 'init') {
-    initDb().catch(e => postMessage({ type: 'error', data: e }))
+    initDb().catch(e => postMessage({ type: 'error', data: e.toString() }))
   } else {
     console.error("unknown db worker event")
   }
