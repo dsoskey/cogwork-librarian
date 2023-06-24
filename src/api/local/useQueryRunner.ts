@@ -31,14 +31,15 @@ export const useMemoryQueryRunner = ({
   const runQuery: QueryRunnerFunc = (
     query: string,
     index: number,
-    options: SearchOptions
+    options: SearchOptions,
+    injectPrefixx?: (query: string) => string,
   ) => {
     if (corpus.length === 0) {
       console.warn(`ran query against an empty corpus: ${query}`)
       return
     }
     const weight = getWeight(index)
-    const preparedQuery = injectPrefix(query)
+    const preparedQuery = injectPrefixx ? injectPrefixx(query) : injectPrefix(query)
     const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
     rawData.current[preparedQuery] = []
     if (cache.current[_cacheKey] === undefined || disableCache) {

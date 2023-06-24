@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { SearchOptions } from 'scryfall-sdk'
-import { renderQueryInfo, TextEditor } from '../component/textEditor'
+import { TextEditor } from '../component/editor/textEditor'
 import { DataSource, Setter, TaskStatus } from '../../types'
 import { ScryfallIcon } from '../component/scryfallIcon'
 import { CoglibIcon } from '../component/coglibIcon'
@@ -8,6 +8,10 @@ import { InfoModal } from '../component/infoModal'
 import { DatabaseSettings } from './databaseSettings'
 import { Loader } from '../component/loader'
 import { CogDBContext } from '../../api/local/useCogDB'
+import { FlagContext } from '../../flags'
+import { multiQueryInfo } from '../component/editor/multiQueryActionBar'
+import { singleQueryInfo } from '../component/editor/singleQueryActionBar'
+import { Language } from '../../api/local/syntaxHighlighting'
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -25,7 +29,7 @@ const ScryfallLink = () => (
 export interface QueryFormProps {
   status: TaskStatus
   canRunQuery: boolean
-  execute: () => void
+  execute: (startIndex: number) => void
   queries: string[]
   setQueries: Setter<string[]>
   options: SearchOptions
@@ -44,6 +48,11 @@ export const QueryForm = ({
   setSource,
 }: QueryFormProps) => {
   const { dbReport } = useContext(CogDBContext)
+  const { multiQuery } = useContext(FlagContext).flags
+  const renderQueryInfo = useMemo(multiQuery ? multiQueryInfo : singleQueryInfo, [multiQuery])
+  // something about prism overrides the state update for this css class
+  const language: Language = `scryfall-extended${multiQuery ? '-multi' : ""}`
+  const canSubmit = canRunQuery && status !== 'loading'
   const iconSize = 30
   return (
     <>
@@ -59,8 +68,9 @@ export const QueryForm = ({
           queries={queries}
           setQueries={setQueries}
           onSubmit={execute}
-          language='scryfall-extended'
-          renderQueryInfo={renderQueryInfo()}
+          canSubmit={canSubmit}
+          language={language}
+          renderQueryInfo={renderQueryInfo}
         />
       </div>
 
@@ -115,8 +125,8 @@ export const QueryForm = ({
         </div>
         <div className='scour-button-holder'>
           <button
-            disabled={!canRunQuery || status === 'loading'}
-            onClick={execute}
+            disabled={!canSubmit}
+            onClick={() => execute(0)}
           >
             {canRunQuery &&
               `scour${status === 'loading' ? 'ing' : ''} the library`}

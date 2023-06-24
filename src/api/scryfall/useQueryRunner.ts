@@ -44,12 +44,13 @@ export const useScryfallQueryRunner = ({
   const runQuery: QueryRunnerFunc = (
     query: string,
     index: number,
-    options: SearchOptions
+    options: SearchOptions,
+    injectPrefixx?: (query: string) => string,
   ) =>
     ResultAsync.fromPromise(
       new Promise((resolve, reject) => {
         const weight = getWeight(index)
-        const preparedQuery = injectPrefix(query)
+        const preparedQuery = injectPrefixx ? injectPrefixx(query) : injectPrefix(query)
         const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
         rawData.current[preparedQuery] = []
         if (cache.current[_cacheKey] === undefined) {

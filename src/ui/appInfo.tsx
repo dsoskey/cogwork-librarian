@@ -5,11 +5,12 @@ import {
   SCORE_PRECISION,
   weightAlgorithms,
 } from '../api/queryRunnerCommon'
-import { rankInfo, renderQueryInfo } from './component/textEditor'
 import { FlagContext } from '../flags'
 import { Link } from 'react-router-dom'
 import "./appInfo.css"
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
+import { singleQueryInfo } from './component/editor/singleQueryActionBar'
+import { rankInfo } from './component/editor/infoLines'
 
 const EXAMPLE = queryExamples[0]
 const injectPrefix = _injectPrefix(EXAMPLE.prefix)
@@ -100,7 +101,7 @@ export const AppInfo = () => {
       <div className='example-query'>
         <pre className='language-none'>
           <code>
-            {renderQueryInfo(rankInfo)([
+            {singleQueryInfo(rankInfo)([
               EXAMPLE.prefix,
               ...EXAMPLE.queries,
             ]).join('\n')}

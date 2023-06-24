@@ -5,7 +5,7 @@ import { keywords, keywordsToImplement } from '../memory/types/filterKeyword'
 import { OPERATORS } from '../memory/filters/base'
 import { syntaxDocs } from './syntaxDocs'
 
-export type Language = 'regex' | 'scryfall' | 'scryfall-extended'
+export type Language = 'regex' | 'scryfall' | 'scryfall-extended' | 'scryfall-extended-multi'
 const keywordRegex = Object.values(keywords).join('|')
 const toImplementRegex = Object.values(keywordsToImplement).join('|')
 
@@ -106,6 +106,26 @@ export const scryfallExtended: Grammar = {
     pattern: /.*/,
     inside: scryfall,
     alias: ['main-query'],
+  },
+}
+
+export const scryfallExtendedMulti: Grammar = {
+  comment: {
+    pattern: /(\n|^)\s*#.*(?=\n|$)/,
+    // greedy: true,
+  },
+  // 'base-query': {
+  //   // pattern: /(?:^|\n\n+|(\n|^)\s*#.*(\n|$))(?!\s*#).*(\n|$)/,
+  //   pattern: /(^|\n\n+)(?!\s*#).*(?=\n|$)/,
+  //   inside: scryfall,
+  //   alias: ['main-query'],
+  //   // lookbehind: true,
+  //   greedy: true,
+  // },
+  'sub-query': {
+    pattern: /.*(\n|$)/,
+    inside: scryfall,
+    alias: ['sub-query'],
   },
 }
 

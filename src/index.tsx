@@ -7,6 +7,7 @@ import {
   linkWrap,
   scryfall,
   scryfallExtended,
+  scryfallExtendedMulti
 } from './api/local/syntaxHighlighting'
 import './prism-cogwork.css'
 import './styles.css'
@@ -16,6 +17,7 @@ import { BrowserRouter } from 'react-router-dom'
 
 Prism.languages['scryfall'] = scryfall
 Prism.languages['scryfall-extended'] = scryfallExtended
+Prism.languages['scryfall-extended-multi'] = scryfallExtendedMulti
 
 Prism.hooks.add('wrap', linkWrap)
 

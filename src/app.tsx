@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { BrowserView } from './ui/cardBrowser/browserView'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { QueryForm } from './ui/queryForm/queryForm'
@@ -34,7 +34,7 @@ import { ToasterMessage, Toaster, ToasterContext } from './ui/component/toaster'
 import { v4 as uuidv4 } from 'uuid';
 
 export const App = () => {
-  const { adminMode } = useContext(FlagContext).flags
+  const { adminMode, multiQuery } = useContext(FlagContext).flags
   const { pathname } = useLocation()
   const cogDB = useCogDB()
   const listImporter = useListImporter({memory: cogDB.memory})
@@ -47,23 +47,19 @@ export const App = () => {
   const { queries, setQueries, options, setOptions } = useQueryForm({
     example: () => queryExamples[_random(queryExamples.length - 1)],
   })
-  const [prefix, ...subQueries] = queries
-  const injectPrefix = useCallback(_injectPrefix(prefix), [prefix])
 
   const queryRunner = {
     local: useMemoryQueryRunner({
       getWeight: weightAlgorithms.zipf,
       corpus: cogDB.memory,
-      injectPrefix,
     }),
     scryfall: useScryfallQueryRunner({
       getWeight: weightAlgorithms.zipf,
-      injectPrefix,
     }),
   }[source]
 
   const [showCogLib, setShowCogLib] = useState<boolean>(true)
-  const [lockCoglib, setLockCogLib] = useLocalStorage<boolean>('lock-coglib', false)
+  const [lockCogLib, setLockCogLib] = useLocalStorage<boolean>('lock-coglib', false)
 
   const [messages, setMessages] = useState<ToasterMessage[]>([])
   const addMessage = (text: string, dismissible: boolean) => {
@@ -75,12 +71,41 @@ export const App = () => {
     setMessages(prev => prev.filter(it => it.id !== messageId))
   }
 
-  const execute = () => queryRunner.run(subQueries, options)
-    .then(() => {
-      if (!lockCoglib) {
-        setShowCogLib(false)
+  const execute = (baseIndex: number) => {
+    console.debug(`submitting query at line ${baseIndex}`)
+    if (baseIndex < 0 || baseIndex >= queries.length) {
+      console.error("baseIndex is out of bounds")
+      return
+    }
+    let toSubmit: string[] = []
+    if (multiQuery) {
+      let currentIndex = baseIndex
+      while (currentIndex < queries.length && queries[currentIndex].trim() !== "") {
+        if (!queries[currentIndex].trimStart().startsWith("#")) {
+          toSubmit.push(queries[currentIndex])
+        }
+        currentIndex++
       }
-    })
+      console.debug(toSubmit)
+    } else {
+      toSubmit = queries
+    }
+
+    if (toSubmit.length === 0) {
+      console.warn(`empty query for base query at index ${baseIndex}`)
+    } else {
+      const [base, ...sub] = toSubmit
+      queryRunner.run(sub, options, _injectPrefix(base))
+        .then(() => {
+          if (!lockCogLib) {
+            setShowCogLib(false)
+          }
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    }
+  }
 
   const listener = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'z') {
@@ -125,7 +150,7 @@ export const App = () => {
                   <div className='toggle'>
                     <button
                       onClick={() => setLockCogLib(prev => !prev)}
-                      title={`${lockCoglib ? "unlock":"lock"} controls`}>{lockCoglib ? "🔒":"🔓"}
+                      title={`${lockCogLib ? "unlock":"lock"} controls`}>{lockCogLib ? "🔒":"🔓"}
                     </button>
                     {queryRunner.status !== 'unstarted' && <button
                       onClick={() => setShowCogLib(prev => !prev)}
@@ -184,7 +209,7 @@ export const App = () => {
                 addIgnoredId={addIgnoredId}
                 ignoredIds={ignoredIds}
                 source={source}
-                lockCoglib={lockCoglib}
+                lockCoglib={lockCogLib}
                 openCoglib={() => setShowCogLib(true)}
               />
               <Footer />

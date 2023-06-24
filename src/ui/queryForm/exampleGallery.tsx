@@ -3,9 +3,10 @@ import React, { useContext, useState } from 'react'
 import { Setter } from '../../types'
 import { FlagContext } from '../../flags'
 import { testQueries } from '../../api/queries'
-import { rankInfo, renderQueryInfo } from '../component/textEditor'
 import { Link, Redirect } from 'react-router-dom'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
+import { singleQueryInfo } from '../component/editor/singleQueryActionBar'
+import { rankInfo } from '../component/editor/infoLines'
 
 export const ExampleGalleryLink = () => <Link to='/examples'>examples</Link>
 
@@ -39,7 +40,7 @@ export const ExampleGallery = ({ setQueries }: ExampleGalleryProps) => {
         <div className='example-query'>
           <pre className='language-none'>
             <code>
-              {renderQueryInfo(rankInfo)([
+              {singleQueryInfo(rankInfo)([
                 example.prefix,
                 ...example.queries,
               ]).join('\n')}

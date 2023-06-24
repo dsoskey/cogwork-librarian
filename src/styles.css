@@ -270,6 +270,23 @@ p {
   padding-right: 0;
 }
 
+.query-editor .labels .base {
+  background-color: var(--darkest-color);
+}
+
+.query-editor .labels .multi-code {
+  white-space: pre;
+}
+.query-editor .run-query-button {
+  background-color: transparent;
+  border-color: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+.query-editor .run-query-button:disabled {
+  cursor: unset;
+}
+
 .query-editor:focus-within * {
   outline: none;
 }

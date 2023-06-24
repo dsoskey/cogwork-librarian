@@ -1,4 +1,4 @@
-import { TextEditor } from './component/textEditor'
+import { TextEditor } from './component/editor/textEditor'
 import React, { useState } from 'react'
 import { Setter, TaskStatus } from '../types'
 import "./savedCards.css"

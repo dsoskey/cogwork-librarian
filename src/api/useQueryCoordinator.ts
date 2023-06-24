@@ -15,7 +15,11 @@ type QueryStore<T> = MutableRefObject<{ [query: string]: Array<T> }>
 export interface QueryExecutor extends QueryHandler {
   execute: (
     funk: QueryRunnerFunc
-  ) => (queries: string[], options: SearchOptions) => Promise<void>
+  ) => (
+    queries: string[],
+    options: SearchOptions,
+    injectPrefixx?: (query: string) => string,
+  ) => Promise<void>
   cache: QueryStore<EnrichedCard>
   rawData: QueryStore<EnrichedCard>
 }
@@ -29,10 +33,9 @@ export const useQueryCoordinator = (): QueryExecutor => {
   const cache = useRef<{ [query: string]: Array<EnrichedCard> }>({})
   const rawData = useRef<{ [query: string]: Array<EnrichedCard> }>({})
 
-  // should this be async/await so app can autoscroll on mobile when execute is done ?
   const execute =
     (runQuery: QueryRunnerFunc) =>
-    (queries: string[], options: SearchOptions) => new Promise<void>((resolve, reject) => {
+    (queries: string[], options: SearchOptions, injectPrefixx?: (query: string) => string) => new Promise<void>((resolve, reject) => {
       setStatus('loading')
       const filteredQueries = queries.filter(
         (q) => q.trim().length > 0 && q.trim().charAt(0) !== '#'
@@ -44,7 +47,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
       report.reset(filteredQueries.length)
       rawData.current = {}
       Promise.allSettled(
-        filteredQueries.map((q, i) => runQuery(q, i, options))
+        filteredQueries.map((q, i) => runQuery(q, i, options, injectPrefixx))
       ).then((promiseResults) => {
         const orgo: { [id: string]: EnrichedCard } = {}
 
