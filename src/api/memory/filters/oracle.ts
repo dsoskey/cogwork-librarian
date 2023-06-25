@@ -1,6 +1,6 @@
 import { FilterNode, Filter, identity } from './base'
 import { NormedCard } from '../types/normedCard'
-// TODO: reorg with base/oracle/print
+
 export interface OracleFilter {
   filtersUsed: string[]
   filterFunc: Filter<NormedCard>

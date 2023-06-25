@@ -15,6 +15,14 @@ console.debug(
 )
 const operators = Object.values(OPERATORS).join('|')
 
+const scryfallRegex = {
+  scryfallCharSet: {
+    pattern: /\\(spt|spp|smm|smr|sm|sc|ss)/,
+    alias: 'class-name',
+  },
+  ...Prism.languages.regex,
+}
+
 // Anything defined by scryfall itself goes here
 export const scryfall: Grammar = {
   negation: {
@@ -42,7 +50,7 @@ export const scryfall: Grammar = {
     alias: ['keyword', 'important'],
   },
   operator: {
-    pattern: new RegExp(`\\(|\\)|${operators}|(\\b(and|or)\\b)`, 'i'),
+    pattern: new RegExp(`\\(|\\)|${operators}|(\\b(and|or)\\b)|\\+\\+|@@`, 'i'),
   },
   manaCost: {
     pattern: /\{..?(\/.)?}/,
@@ -70,7 +78,7 @@ export const scryfall: Grammar = {
   },
   regex: {
     pattern: /\/[^/]+\//,
-    inside: Prism.languages.regex,
+    inside: scryfallRegex,
     greedy: true,
   },
   'quoted-string': {

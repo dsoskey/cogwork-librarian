@@ -106,6 +106,10 @@ pre[class*='language-'] {
   color: #f8c555;
 }
 
+.token.scryfallCharSet {
+  font-style: italic;
+}
+
 .token.selector,
 .token.atrule,
 .token.keyword,

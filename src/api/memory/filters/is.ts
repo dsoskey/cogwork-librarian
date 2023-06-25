@@ -109,7 +109,7 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
       return printing.finishes.includes('etched')
     case 'contentwarning':
       return unimplemented(value)
-    // return card.content_warning // todo: this should be on prints
+    // return card.content_warning // todo: this field should be on prints
     case 'booster':
     case 'variation':
     case 'promo':
@@ -455,16 +455,8 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
         )
       )
     case 'extra':
-      // TODO: handle memorabilia
-      /*
-       gold border,/
-       oversized,/
-       thicc,/
-       plane,/
-       test card,/
-       scheme/
-       vanguard/
-       // these aren't accounted for
+       /*
+       these aren't accounted for
        specialized
        cards only found from alchemy spellbooks
        */

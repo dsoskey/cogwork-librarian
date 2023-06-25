@@ -26,21 +26,59 @@ export const noReminderTextMatch =
         noReminderText
       )
 
+/* Raw paste from Scryfall discord
+\spt
+(?:[\dX]+\/[\dX]+)
+
+\spp
+(?:\+[\dX]+\/\+[\dX]+)
+
+\smm
+(?:\-[\dX]+\/\-[\dX]+)
+
+\smr
+(?:\{X\}\{X\}|\{0\}\{0\}|\{1\}\{1\}|\{2\}\{2\}|\{3\}\{3\}|\{4\}\{4\}|\{5\}\{5\}|\{6\}\{6\}|\{7\}\{7\}|\{8\}\{8\}|\{9\}\{9\}|\{10\}\{10\}|\{11\}\{11\}|\{12\}\{12\}|\{13\}\{13\}|\{14\}\{14\}|\{15\}\{15\}|\{16\}\{16\}|\{17\}\{17\}|\{18\}\{18\}|\{19\}\{19\}|\{20\}\{20\}|\{W/U\}\{W/U\}|\{W/B\}\{W/B\}|\{B/R\}\{B/R\}|\{B/G\}\{B/G\}|\{U/B\}\{U/B\}|\{U/R\}\{U/R\}|\{R/G\}\{R/G\}|\{R/W\}\{R/W\}|\{G/W\}\{G/W\}|\{G/U\}\{G/U\}|\{B/G/P\}\{B/G/P\}|\{B/R/P\}\{B/R/P\}|\{G/U/P\}\{G/U/P\}|\{G/W/P\}\{G/W/P\}|\{R/G/P\}\{R/G/P\}|\{R/W/P\}\{R/W/P\}|\{U/B/P\}\{U/B/P\}|\{U/R/P\}\{U/R/P\}|\{W/B/P\}\{W/B/P\}|\{W/U/P\}\{W/U/P\}|\{2/W\}\{2/W\}|\{2/U\}\{2/U\}|\{2/B\}\{2/B\}|\{2/R\}\{2/R\}|\{2/G\}\{2/G\}|\{P\}\{P\}|\{W/P\}\{W/P\}|\{U/P\}\{U/P\}|\{B/P\}\{B/P\}|\{R/P\}\{R/P\}|\{G/P\}\{G/P\}|\{W\}\{W\}|\{U\}\{U\}|\{B\}\{B\}|\{R\}\{R\}|\{G\}\{G\}|\{C\}\{C\}|\{S\}\{S\})
+
+\sm
+(?:\{[/0123456789BCGHPRSUWXYZ½∞]+\})
+
+\sc
+(?:\{(?:2/[WUBRG]|[WUBRG]/*[WUBRGP]*)+\})
+
+\ss
+(?:\{[/0123456789ABCEGHKOPQRSTUWXYZ½∞]+\})
+ */
+export const substituteScryfallRegex = (value: string): string => {
+  return value
+    .replace(/\\spt/g, "(?:[\\dX]+\\/[\\dX]+)")
+    .replace(/\\spp/g, "(?:\\+[\\dX]+\\/\\+[\\dX]+)")
+    .replace(/\\smm/g, "(?:\\-[\\dX]+\\/\\-[\\dX]+)")
+    .replace(/\\smr/g, "(?:\\{X\\}\\{X\\}|\\{0\\}\\{0\\}|\\{1\\}\\{1\\}|\\{2\\}\\{2\\}|\\{3\\}\\{3\\}|\\{4\\}\\{4\\}|\\{5\\}\\{5\\}|\\{6\\}\\{6\\}|\\{7\\}\\{7\\}|\\{8\\}\\{8\\}|\\{9\\}\\{9\\}|\\{10\\}\\{10\\}|\\{11\\}\\{11\\}|\\{12\\}\\{12\\}|\\{13\\}\\{13\\}|\\{14\\}\\{14\\}|\\{15\\}\\{15\\}|\\{16\\}\\{16\\}|\\{17\\}\\{17\\}|\\{18\\}\\{18\\}|\\{19\\}\\{19\\}|\\{20\\}\\{20\\}|\\{W/U\\}\\{W/U\\}|\\{W/B\\}\\{W/B\\}|\\{B/R\\}\\{B/R\\}|\\{B/G\\}\\{B/G\\}|\\{U/B\\}\\{U/B\\}|\\{U/R\\}\\{U/R\\}|\\{R/G\\}\\{R/G\\}|\\{R/W\\}\\{R/W\\}|\\{G/W\\}\\{G/W\\}|\\{G/U\\}\\{G/U\\}|\\{B/G/P\\}\\{B/G/P\\}|\\{B/R/P\\}\\{B/R/P\\}|\\{G/U/P\\}\\{G/U/P\\}|\\{G/W/P\\}\\{G/W/P\\}|\\{R/G/P\\}\\{R/G/P\\}|\\{R/W/P\\}\\{R/W/P\\}|\\{U/B/P\\}\\{U/B/P\\}|\\{U/R/P\\}\\{U/R/P\\}|\\{W/B/P\\}\\{W/B/P\\}|\\{W/U/P\\}\\{W/U/P\\}|\\{2/W\\}\\{2/W\\}|\\{2/U\\}\\{2/U\\}|\\{2/B\\}\\{2/B\\}|\\{2/R\\}\\{2/R\\}|\\{2/G\\}\\{2/G\\}|\\{P\\}\\{P\\}|\\{W/P\\}\\{W/P\\}|\\{U/P\\}\\{U/P\\}|\\{B/P\\}\\{B/P\\}|\\{R/P\\}\\{R/P\\}|\\{G/P\\}\\{G/P\\}|\\{W\\}\\{W\\}|\\{U\\}\\{U\\}|\\{B\\}\\{B\\}|\\{R\\}\\{R\\}|\\{G\\}\\{G\\}|\\{C\\}\\{C\\}|\\{S\\}\\{S\\})")
+    .replace(/\\sm/g, "(?:\\{[/0123456789BCGHPRSUWXYZ½∞]+\\})")
+    .replace(/\\sc/g, "(?:\\{(?:2/[WUBRG]|[WUBRG]/*[WUBRGP]*)+\\})")
+    .replace(/\\ss/g, "(?:\\{[/0123456789ABCEGHKOPQRSTUWXYZ½∞]+\\})")
+}
+
 export const regexMatch =
-  (field: OracleKeys, value: string): Filter<NormedCard> =>
-    (card: NormedCard) =>
-      anyFaceRegexMatch(
-        card,
-        field,
-        new RegExp(replaceNamePlaceholder(value, card.name))
-      )
+  (field: OracleKeys, value: string): Filter<NormedCard> => {
+      const baseRegex = substituteScryfallRegex(value)
+      return (card: NormedCard) =>
+        anyFaceRegexMatch(
+          card,
+          field,
+          new RegExp(replaceNamePlaceholder(baseRegex, card.name))
+        )
+  }
+
 
 export const noReminderRegexMatch =
-  (field: OracleKeys, value: string): Filter<NormedCard> =>
-    (card: NormedCard) =>
-      anyFaceRegexMatch(
-        card,
-        field,
-        new RegExp(replaceNamePlaceholder(value, card.name)),
-        noReminderText
-      )
+  (field: OracleKeys, value: string): Filter<NormedCard> => {
+      const baseRegex = substituteScryfallRegex(value)
+      return (card: NormedCard) =>
+        anyFaceRegexMatch(
+          card,
+          field,
+          new RegExp(replaceNamePlaceholder(baseRegex, card.name)),
+          noReminderText
+        )
+  }
