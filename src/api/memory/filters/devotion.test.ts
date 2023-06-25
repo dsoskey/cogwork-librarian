@@ -12,38 +12,38 @@ describe('devotion filter', function() {
   const queryRunner = new QueryRunner(corpus, defaultOptions)
 
   it('ignores non-permanenet cards', () => {
-    const result = queryRunner.search("devotion<=b")._unsafeUnwrap()
+    const result = queryRunner.search("devotion<=b")._unsafeUnwrap().map(it => it.id)
 
-    expect(result).toEqual([aetherbladeAgent, crystallineGiant])
+    expect(result).toEqual([aetherbladeAgent.id, crystallineGiant.id])
   })
 
   it('handles =', function() {
-    const result = queryRunner.search("devotion=bb")._unsafeUnwrap()
+    const result = queryRunner.search("devotion=bb")._unsafeUnwrap().map(it => it.id)
 
-    expect(result).toEqual([arrogantBloodlord])
+    expect(result).toEqual([arrogantBloodlord.id])
   })
 
   it('handles >=', function() {
-    const result = queryRunner.search("devotion>=bb")._unsafeUnwrap()
+    const result = queryRunner.search("devotion>=bb")._unsafeUnwrap().map(it => it.id)
 
-    expect(result).toEqual([arrogantBloodlord, lich, necroimpotence])
+    expect(result).toEqual([arrogantBloodlord.id, lich.id, necroimpotence.id])
   })
 
   it('handles <=', function() {
-    const result = queryRunner.search("devotion<=bb")._unsafeUnwrap()
+    const result = queryRunner.search("devotion<=bb")._unsafeUnwrap().map(it => it.id)
 
-    expect(result).toEqual([aetherbladeAgent, arrogantBloodlord, crystallineGiant])
+    expect(result).toEqual([aetherbladeAgent.id, arrogantBloodlord.id, crystallineGiant.id])
   })
 
   it('handles >', function() {
-    const result = queryRunner.search("devotion>bb")._unsafeUnwrap()
+    const result = queryRunner.search("devotion>bb")._unsafeUnwrap().map(it => it.id)
 
-    expect(result).toEqual([lich, necroimpotence])
+    expect(result).toEqual([lich.id, necroimpotence.id])
   })
 
   it('handles <', function() {
-    const result = queryRunner.search("devotion<bb")._unsafeUnwrap()
+    const result = queryRunner.search("devotion<bb")._unsafeUnwrap().map(it => it.id)
 
-    expect(result).toEqual([aetherbladeAgent, crystallineGiant])
+    expect(result).toEqual([aetherbladeAgent.id, crystallineGiant.id])
   })
 })

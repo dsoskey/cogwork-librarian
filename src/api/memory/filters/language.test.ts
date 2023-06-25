@@ -7,14 +7,13 @@ describe('language filter', function() {
   const corpus = [asymmetrySage, lagoHirvienteDeDarigaaz]
   const queryRunner = new QueryRunner(corpus, defaultOptions)
   it('should show all cards for language:any', function() {
-    const result = queryRunner.search("language:any")._unsafeUnwrap()
+    const result = queryRunner.search("language:any")._unsafeUnwrap().map(it => it.name)
 
-    expect(result).toEqual(corpus)
+    expect(result).toEqual(corpus.map(it => it.name))
   })
   it('should filter by language otherwise', function() {
-    const result = queryRunner.search("language:es")._unsafeUnwrap()
+    const result = queryRunner.search("language:es")._unsafeUnwrap().map(it => it.name)
 
-    expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(lagoHirvienteDeDarigaaz.id)
+    expect(result).toEqual([lagoHirvienteDeDarigaaz.name])
   })
 })

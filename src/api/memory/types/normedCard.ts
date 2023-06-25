@@ -8,6 +8,7 @@ import { CardFace } from 'scryfall-sdk/out/api/Cards'
 export const DEFAULT_CARD_BACK_ID = "0aeebaf5-8c7d-4636-9e82-8c27447861f7"
 
 const PRINT_KEYS = {
+  attraction_lights: "attraction_lights",
   arena_id: 'arena_id',
   artist: 'artist',
   booster: 'booster',
@@ -92,7 +93,7 @@ export interface NormedCard extends Omit<Card, PrintKeys> {
   card_faces: CardFace[]
 }
 
-const ignorePaths = [...Object.keys(PRINT_KEYS)]// todo: turn this back on when i have a better testing strategy, ...Object.keys(IGNORE_KEYS)]
+const ignorePaths = [...Object.keys(PRINT_KEYS), ...Object.keys(IGNORE_KEYS)]
 const printPaths = Object.keys(PRINT_KEYS)
 
 export const normCardList = (cardList: Card[]): NormedCard[] => {

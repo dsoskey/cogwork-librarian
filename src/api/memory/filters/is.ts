@@ -108,8 +108,7 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
     case 'etched':
       return printing.finishes.includes('etched')
     case 'contentwarning':
-      return unimplemented(value)
-    // return card.content_warning // todo: this field should be on prints
+    return card.content_warning
     case 'booster':
     case 'variation':
     case 'promo':
@@ -149,8 +148,8 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
     case 'colorshifted':
       return printing.frame_effects?.includes('colorshifted')
     case 'lights':
-      return unimplemented(value) // TODO: check for scryfall-sdk update
-      // return printing.attraction_lights?.length > 0
+      // @ts-ignore scryfall-sdk needs to update it
+      return printing.attraction_lights?.length > 0
     case 'back':
       return printing.card_back_id !== DEFAULT_CARD_BACK_ID
     case 'starterdeck':
@@ -270,7 +269,6 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
       return card.layout === 'adventure'
     case 'class':
       return card.type_line.toLowerCase().includes('class')
-    // TODO: check any face for types
     case 'commander':
       return (
         card.type_line.split('//')[0].toLowerCase().includes('legendary creature') ||
@@ -285,7 +283,7 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
         console.warn(`Found card with no type: ${card.name}`)
         console.warn(card)
       }
-      // @ts-ignore TODO: upgrade scryfall-sdk
+      // @ts-ignore upgrade scryfall-sdk
       return card.type_line.split('//')[0].includes('Planeswalker') && card.legalities.oathbreaker === 'legal'
     case 'duelcommander':
       return !isOracleVal('token')(card) && isOracleVal('commander')(card) && card.legalities.duel === 'legal'

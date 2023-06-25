@@ -2,7 +2,6 @@ import { FilterNode } from './base'
 import { printNode } from './print'
 import { substituteScryfallRegex } from './text'
 
-// TODO; deal with multi-face print-specific on everything that's relevant
 export const flavorMatch = (value: string): FilterNode =>
   printNode(['flavor'], ({ printing }) => {
     return (

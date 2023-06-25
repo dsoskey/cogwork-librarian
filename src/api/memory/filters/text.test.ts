@@ -24,104 +24,87 @@ describe('text filters', function() {
   ], defaultOptions)
   describe('name filter', function() {
     it("should do a name search when no keyword is present", () => {
-      const result = queryRunner.search("orda")._unsafeUnwrap()
+      const result = queryRunner.search("orda")._unsafeUnwrap().map(it => it.name)
 
-      expect(result).toEqual([concordantCrossroads, preordain])
+      expect(result).toEqual([concordantCrossroads.name, preordain.name])
     })
     it("should do a name search for a keywordless string", () => {
-      const result = queryRunner.search(`"spinerock"`)._unsafeUnwrap()
+      const result = queryRunner.search(`"spinerock"`)._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(spinerockKnoll.id)
+      expect(result).toEqual([spinerockKnoll.name])
     })
   })
   describe('exact name filter', function() {
     it("should do a name search when no keyword is present", () => {
-      const result = queryRunner.search("!preordain")._unsafeUnwrap()
+      const result = queryRunner.search("!preordain")._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(preordain.id)
+      expect(result).toEqual([preordain.name])
     })
     it("should do a name search for a keywordless string", () => {
-      const result = queryRunner.search(`!"spinerock knoll"`)._unsafeUnwrap()
+      const result = queryRunner.search(`!"spinerock knoll"`)._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(spinerockKnoll.id)
+      expect(result).toEqual([spinerockKnoll.name])
     })
   })
   describe('name regex filter', function() {
     it('handles name regex matches', () => {
-      const result = queryRunner.search('name=/^A-/')._unsafeUnwrap()
+      const result = queryRunner.search('name=/^A-/')._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(asymmetrySage.id)
+      expect(result).toEqual([asymmetrySage.name])
     })
   })
   describe('type text filter', function() {
     it('handles multi-face type matches', () => {
-      const result = queryRunner.search("t:adventure")._unsafeUnwrap()
+      const result = queryRunner.search("t:adventure")._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(emberethShieldbreaker.id)
+      expect(result).toEqual([emberethShieldbreaker.name])
     })
   })
   describe('type regex filter', function() {
     it('handles type line regex matches', () => {
-      const result = queryRunner.search("t=/tribal .* elf/")._unsafeUnwrap()
+      const result = queryRunner.search("t=/tribal .* elf/")._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(elvishPromenade.id)
+      expect(result).toEqual([elvishPromenade.name])
     })
   })
   describe('oracle text filter', function() {
     it ('handles unquoted strings', () => {
-      const result = queryRunner.search("o:draw")._unsafeUnwrap()
+      const result = queryRunner.search("o:draw")._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(2)
-      expect(result[0].id).toEqual(preordain.id)
-      expect(result[1].id).toEqual(seasideHaven.id)
+      expect(result).toEqual([preordain.name, seasideHaven.name])
     })
 
     it('excludes reminder text', () => {
-      const result = queryRunner.search(`o:"put the rest on the bottom"`)._unsafeUnwrap()
+      const result = queryRunner.search(`o:"put the rest on the bottom"`)._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(ancientStirrings.id)
+      expect(result).toEqual([ancientStirrings.name])
     })
 
     it("substitutes ~ for the card's name", () => {
-      const result = queryRunner.search('o:"~ deals 2"')._unsafeUnwrap()
+      const result = queryRunner.search('o:"~ deals 2"')._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(ramunapRuins.id)
+      expect(result).toEqual([ramunapRuins.name])
     })
   })
   describe('oracle text regex', function() {
     it("filters using regex", () => {
-      const result = queryRunner.search("o:/sacrifice a.*:/")._unsafeUnwrap()
+      const result = queryRunner.search("o:/sacrifice a.*:/")._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(2)
-      expect(result[0].id).toEqual(ramunapRuins.id)
-      expect(result[1].id).toEqual(seasideHaven.id)
+      expect(result).toEqual([ramunapRuins.name, seasideHaven.name])
     })
   })
   describe('full oracle text filter', function() {
     it('includes reminder text', () => {
-      const result = queryRunner.search(`fo:"put the rest on the bottom"`)._unsafeUnwrap()
+      const result = queryRunner.search(`fo:"put the rest on the bottom"`)._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(2)
-      expect(result[0].id).toEqual(ancientStirrings.id)
-      expect(result[1].id).toEqual(spinerockKnoll.id)
+      expect(result).toEqual([ancientStirrings.name, spinerockKnoll.name])
     })
   })
   describe('full oracle text regex', function() {
     it('includes reminder text', () => {
-      const result = queryRunner.search(`fo:/put .* on the bottom/`)._unsafeUnwrap()
+      const result = queryRunner.search(`fo:/put .* on the bottom/`)._unsafeUnwrap().map(it => it.name)
 
-      expect(result.length).toEqual(3)
-      expect(result[0].id).toEqual(ancientStirrings.id)
-      expect(result[1].id).toEqual(preordain.id)
-      expect(result[2].id).toEqual(spinerockKnoll.id)
+      expect(result).toEqual([ancientStirrings.name, preordain.name, spinerockKnoll.name])
     })
   })
 })

@@ -9,4 +9,7 @@ module.exports = {
     'tsx?$': ['@swc/jest'],
     "^.+\\.ne$": "jest-transform-nearley",
   },
+  moduleNameMapper: {
+    '^configuration$': "<rootDir>/config/development",
+  }
 }

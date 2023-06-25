@@ -11,57 +11,57 @@ describe('color filters', function() {
   const queryRunner = new QueryRunner(corpus, defaultOptions)
 
   it('handles the default for :, >=', () => {
-    const result = queryRunner.search("c>=b")._unsafeUnwrap()
-    const defaultResult = queryRunner.search("c:b")._unsafeUnwrap()
+    const result = queryRunner.search("c>=b")._unsafeUnwrap().map(it => it.name)
+    const defaultResult = queryRunner.search("c:b")._unsafeUnwrap().map(it => it.name)
 
-    expect(result).toEqual([aetherbladeAgent, davrielsWithering, kroxaTitanOfDeathsHunger])
+    expect(result).toEqual([aetherbladeAgent.name, davrielsWithering.name, kroxaTitanOfDeathsHunger.name])
     expect(defaultResult).toEqual(result)
   })
 
   it('handles =, including cards with any face that matches', () => {
-    const result = queryRunner.search("c=b")._unsafeUnwrap()
+    const result = queryRunner.search("c=b")._unsafeUnwrap().map(it => it.name)
 
-    expect(result).toEqual([aetherbladeAgent, davrielsWithering])
+    expect(result).toEqual([aetherbladeAgent.name, davrielsWithering.name])
   })
 
   it('handles !=', () => {
-    const result = queryRunner.search("c!=b")._unsafeUnwrap()
+    const result = queryRunner.search("c!=b")._unsafeUnwrap().map(it => it.name)
 
-    expect(result).toEqual([preordain, thoughtKnotSeer])
+    expect(result).toEqual([preordain.name, thoughtKnotSeer.name])
   })
 
   it('handles >', () => {
-    const result = queryRunner.search("c>b")._unsafeUnwrap()
+    const result = queryRunner.search("c>b")._unsafeUnwrap().map(it => it.name)
 
-    expect(result).toEqual([aetherbladeAgent, kroxaTitanOfDeathsHunger])
+    expect(result).toEqual([aetherbladeAgent.name, kroxaTitanOfDeathsHunger.name])
   })
 
   it('handles <', () => {
-    const result = queryRunner.search("c<rakdos")._unsafeUnwrap()
+    const result = queryRunner.search("c<rakdos")._unsafeUnwrap().map(it => it.name)
 
-    expect(result).toEqual([aetherbladeAgent, davrielsWithering, thoughtKnotSeer])
+    expect(result).toEqual([aetherbladeAgent.name, davrielsWithering.name, thoughtKnotSeer.name])
   })
 
   it('handles <=', () => {
-    const result = queryRunner.search("c<=rakdos")._unsafeUnwrap()
+    const result = queryRunner.search("c<=rakdos")._unsafeUnwrap().map(it => it.name)
 
     expect(result).toEqual([
-      aetherbladeAgent,
-      davrielsWithering,
-      kroxaTitanOfDeathsHunger,
-      thoughtKnotSeer
+      aetherbladeAgent.name,
+      davrielsWithering.name,
+      kroxaTitanOfDeathsHunger.name,
+      thoughtKnotSeer.name
     ])
   })
 
   it('handles colorless', () => {
-    const result = queryRunner.search("c=c")._unsafeUnwrap()
+    const result = queryRunner.search("c=c")._unsafeUnwrap().map(it => it.name)
 
-    expect(result).toEqual([thoughtKnotSeer])
+    expect(result).toEqual([thoughtKnotSeer.name])
   })
 
   it('handles color count filters', function () {
-    const result = queryRunner.search("c=2")._unsafeUnwrap()
+    const result = queryRunner.search("c=2")._unsafeUnwrap().map(it => it.name)
 
-    expect(result).toEqual([aetherbladeAgent, kroxaTitanOfDeathsHunger])
+    expect(result).toEqual([aetherbladeAgent.name, kroxaTitanOfDeathsHunger.name])
   })
 })
