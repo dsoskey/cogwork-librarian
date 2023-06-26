@@ -33,20 +33,23 @@ interface SearchError {
 }
 
 type ParserProducer = () => Parser
+
+interface QueryRunnerParams {
+  corpus: Card[]
+  cubes?: { [key: string]: Set<string> }
+  defaultOptions?: SearchOptions,
+  getParser?: ParserProducer
+}
 export class QueryRunner {
   private readonly corpus: NormedCard[]
   private readonly defaultOptions: SearchOptions
 
   private readonly getParser: ParserProducer
 
-  constructor(
-    corpus: Card[],
-    defaultOptions: SearchOptions = { order: "name" },
-    getParser: () => Parser = queryParser
-  ) {
+  constructor({ corpus, getParser, defaultOptions }: QueryRunnerParams) {
     this.corpus = normCardList(corpus)
-    this.getParser = getParser
-    this.defaultOptions = defaultOptions
+    this.getParser = getParser ?? queryParser
+    this.defaultOptions = defaultOptions ?? { order: 'name' }
   }
 
   search = (query: string, options?: SearchOptions): Result<Card[], SearchError> => {

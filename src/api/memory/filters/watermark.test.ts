@@ -5,7 +5,7 @@ import { bloodCrypt } from './testData/bloodCrypt'
 
 describe('watermark filter', function() {
   const corpus = [bloodCrypt, animateLand]
-  const queryRunner = new QueryRunner(corpus, defaultOptions);
+  const queryRunner = new QueryRunner({ corpus, defaultOptions });
 
   ["wm", 'watermark'].forEach(filterKeyword => {
     it(`${filterKeyword} gets parsed properly`, () => {

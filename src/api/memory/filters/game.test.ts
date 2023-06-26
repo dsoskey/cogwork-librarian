@@ -6,7 +6,7 @@ import { defaultOptions } from './testData/_options'
 
 describe('game filter', function() {
   const corpus = [asymmetrySage, barrysLand, zodiacDragonMtgo]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
   it("includes cards present in arena", function() {
     const result = queryRunner.search("game:arena")._unsafeUnwrap().map(it => it.name)
 

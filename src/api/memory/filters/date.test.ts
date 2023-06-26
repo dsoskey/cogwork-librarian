@@ -6,7 +6,7 @@ import { mirrex } from './testData/mirrex'
 
 describe('date filters', function() {
   const corpus = [preordain, adantoVanguard, mirrex]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
 
   it("returns an error when the date doesnt fit yyyy-MM-dd", () => {
     const result = queryRunner.search("date<jan1st2021")

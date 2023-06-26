@@ -6,7 +6,7 @@ import { negate } from './testData/negate'
 
 describe('rarity filter', function() {
   const corpus = [mirrex, animateLand, negate]
-  const queryRunner = new QueryRunner(corpus, defaultOptions);
+  const queryRunner = new QueryRunner({ corpus, defaultOptions });
 
   ["r", 'rarity'].forEach(filterKeyword => {
     it(`${filterKeyword} gets parsed properly`, () => {

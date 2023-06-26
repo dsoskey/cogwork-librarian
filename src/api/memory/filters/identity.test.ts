@@ -6,7 +6,7 @@ import { okoThiefOfCrowns } from './testData/okoThiefOfCrowns'
 
 describe('identity filter', function() {
   const corpus = [barrysLand, preordain, okoThiefOfCrowns]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
   it('defaults to and handles <=', function() {
     const result = queryRunner.search("id<=u")._unsafeUnwrap().map(it => it.name)
     const defaultResult = queryRunner.search("id:u")._unsafeUnwrap().map(it => it.name)

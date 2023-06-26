@@ -9,7 +9,7 @@ import { defaultOptions } from './testData/_options'
 
 describe('devotion filter', function() {
   const corpus = [arrogantBloodlord, aetherbladeAgent, davrielsWithering, crystallineGiant, necroimpotence, lich]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
 
   it('ignores non-permanenet cards', () => {
     const result = queryRunner.search("devotion<=b")._unsafeUnwrap().map(it => it.id)

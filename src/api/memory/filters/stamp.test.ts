@@ -5,7 +5,7 @@ import { kroxaTitanOfDeathsHunger } from './testData/kroxaTitanOfDeathsHunger'
 
 describe('stamp filter', function() {
   const corpus = [kroxaTitanOfDeathsHunger, animateLand]
-  const queryRunner = new QueryRunner(corpus, defaultOptions);
+  const queryRunner = new QueryRunner({ corpus, defaultOptions });
 
   it("gets parsed properly", () => {
     const result = queryRunner.search('stamp:oval')._unsafeUnwrap()

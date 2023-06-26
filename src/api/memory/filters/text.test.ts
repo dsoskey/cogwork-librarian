@@ -11,7 +11,7 @@ import { seasideHaven } from './testData/seasideHaven'
 import { asymmetrySage } from './testData/asymmetrySage'
 
 describe('text filters', function() {
-  const queryRunner = new QueryRunner([
+  const queryRunner = new QueryRunner({ corpus: [
     spinerockKnoll,
     ancientStirrings,
     preordain,
@@ -21,7 +21,7 @@ describe('text filters', function() {
     ramunapRuins,
     seasideHaven,
     asymmetrySage,
-  ], defaultOptions)
+  ], defaultOptions })
   describe('name filter', function() {
     it("should do a name search when no keyword is present", () => {
       const result = queryRunner.search("orda")._unsafeUnwrap().map(it => it.name)

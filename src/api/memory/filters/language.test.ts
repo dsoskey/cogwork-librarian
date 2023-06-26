@@ -5,7 +5,7 @@ import { defaultOptions } from './testData/_options'
 
 describe('language filter', function() {
   const corpus = [asymmetrySage, lagoHirvienteDeDarigaaz]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
   it('should show all cards for language:any', function() {
     const result = queryRunner.search("language:any")._unsafeUnwrap().map(it => it.name)
 

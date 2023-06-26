@@ -2,10 +2,11 @@ import { preordain } from './testData/preordain'
 import { asymmetrySage } from './testData/asymmetrySage'
 import { lagoHirvienteDeDarigaaz } from './testData/lagoHirvienteDeDarigaaz'
 import { QueryRunner } from '../queryRunner'
+import { defaultOptions } from './testData/_options'
 
 describe('in filter', function() {
   const corpus = [preordain, asymmetrySage, lagoHirvienteDeDarigaaz]
-  const queryRunner = new QueryRunner(corpus)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
   it('should show cards that were printed in a set', function() {
     const result = queryRunner.search("in:m11")._unsafeUnwrap().map(it => it.name)
 

@@ -8,7 +8,7 @@ import { thoughtKnotSeer } from './testData/thoughtKnotSeer'
 
 describe('color filters', function() {
   const corpus = [preordain, davrielsWithering, aetherbladeAgent, kroxaTitanOfDeathsHunger, thoughtKnotSeer]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
 
   it('handles the default for :, >=', () => {
     const result = queryRunner.search("c>=b")._unsafeUnwrap().map(it => it.name)

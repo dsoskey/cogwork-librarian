@@ -5,7 +5,7 @@ import { defaultOptions } from './testData/_options'
 
 describe('keyword filters', function() {
   const corpus = [kroxaTitanOfDeathsHunger, asymmetrySage]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
   it("should match to any card with the keyword", function() {
     const result = queryRunner.search("keyword:escape")._unsafeUnwrap()
 

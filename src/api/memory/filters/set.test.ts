@@ -4,7 +4,7 @@ import { preordain } from './testData/preordain'
 import { animateLand } from './testData/animateLand'
 
 const corpus = [preordain, animateLand]
-const queryRunner = new QueryRunner(corpus, defaultOptions)
+const queryRunner = new QueryRunner({ corpus, defaultOptions })
 
 describe('set filter', function() {
   ["s", "set", "e", "edition"].forEach(filterKeyword => {

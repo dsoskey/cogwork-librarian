@@ -6,7 +6,7 @@ import { emberethShieldbreaker } from './testData/emberethShieldbreaker'
 
 describe('format filters', function() {
   const corpus = [preordain, delverOfSecrets, emberethShieldbreaker]
-  const queryRunner = new QueryRunner(corpus, defaultOptions);
+  const queryRunner = new QueryRunner({ corpus, defaultOptions });
   it("handles banned cards", function() {
     const result = queryRunner.search("banned:modern")._unsafeUnwrap()
 

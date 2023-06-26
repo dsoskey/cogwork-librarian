@@ -14,12 +14,12 @@ describe('combat filters', function() {
     norinTheWary,
     preordain,
   ]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
 
   const dfcCorpus = [
     delverOfSecrets,
   ]
-  const dfcQueryRunner = new QueryRunner(dfcCorpus, defaultOptions)
+  const dfcQueryRunner = new QueryRunner({ corpus: dfcCorpus, defaultOptions })
   describe('combatToCombatNode', function() {
     it('should handle pow number comparisons and dfcs', () => {
       const result = dfcQueryRunner.search("pow>2")._unsafeUnwrap()
@@ -109,7 +109,7 @@ describe('combat filters', function() {
     })
 
     it("should handle stars", () => {
-      const goyfQueryRunner = new QueryRunner([tarmogoyf], defaultOptions)
+      const goyfQueryRunner = new QueryRunner({ corpus: [tarmogoyf], defaultOptions })
       const result = goyfQueryRunner.search('pow=0 name:tarmogoyf')._unsafeUnwrap()
 
       expect(result.length).toEqual(1)

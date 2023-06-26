@@ -6,7 +6,7 @@ import { asymmetrySage } from './testData/asymmetrySage'
 
 describe('price filter', function() {
   const corpus = [asymmetrySage, bloodCrypt, tarmogoyf];
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
   describe('usd', function() {
     it(`< should work`, function() {
       const result = queryRunner.search("usd<15")._unsafeUnwrap()

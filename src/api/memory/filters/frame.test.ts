@@ -5,7 +5,7 @@ import { defaultOptions } from './testData/_options'
 
 describe('frame filter', function() {
   const corpus = [narcomoeba, crystallineGiant]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
   it("matches the card's frame exactly", () => {
     const result = queryRunner.search("frame:future")._unsafeUnwrap()
 

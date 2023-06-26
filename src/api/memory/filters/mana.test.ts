@@ -7,7 +7,7 @@ import { darkConfidant } from './testData/darkConfidant'
 
 describe('mana filter', function() {
   const corpus = [preordain, davrielsWithering, darkConfidant, kroxaTitanOfDeathsHunger]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
   it('should handle exact match', function() {
     const result = queryRunner.search("mana=rb")._unsafeUnwrap().map(it => it.name)
 

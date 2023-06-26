@@ -5,7 +5,7 @@ import { defaultOptions } from './testData/_options'
 
 describe('border filter', function() {
   const corpus = [mirrex, birdsOfParadise]
-  const queryRunner = new QueryRunner(corpus, defaultOptions);
+  const queryRunner = new QueryRunner({ corpus, defaultOptions });
 
   it("gets parsed properly", () => {
     const result = queryRunner.search('border:white')._unsafeUnwrap()

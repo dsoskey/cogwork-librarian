@@ -6,7 +6,7 @@ import { QueryRunner } from '../queryRunner'
 
 describe("flavor filters", () => {
   const corpus = [gorillaTitan, birdsOfParadise, emberethShieldbreaker]
-  const queryRunner = new QueryRunner(corpus, defaultOptions)
+  const queryRunner = new QueryRunner({ corpus, defaultOptions })
 
   it('should handle string searches', function() {
     const result = queryRunner.search("flavor:banana")._unsafeUnwrap()

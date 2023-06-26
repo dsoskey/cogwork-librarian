@@ -7,7 +7,7 @@ import { defaultOptions } from './testData/_options'
 
 describe('collectorNumber filter', function() {
   const corpus = [negate, phantomBeast, preordain]
-  const queryRunner = new QueryRunner(corpus, defaultOptions);
+  const queryRunner = new QueryRunner({ corpus, defaultOptions });
 
   ['cn', 'number'].forEach(filterKeyword => {
     it(`${filterKeyword} parses <= properly`, () => {
