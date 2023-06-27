@@ -21,7 +21,7 @@ export const INITIAL_FLAGS: Record<Flag, boolean> = {
   adminMode: false,
   disableCache: true,
   displayTypes: false,
-  multiQuery: true,
+  multiQuery: clientConfig.stage === Stage.Dev,
 }
 
 interface FlagManager {
