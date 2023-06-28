@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { CardDataView } from './cardDataView'
-import { CubeImporter } from './cubeImporter'
+import { NewCubeImporter } from './cubeImporter'
 import "./dataView.css"
 
 export const DataView = () => {
@@ -31,6 +31,6 @@ export const DataView = () => {
       </h3>
     </section>
     {dataTarget === 'card' && <CardDataView/>}
-    {dataTarget === 'cube' && <CubeImporter/>}
+    {dataTarget === 'cube' && <NewCubeImporter/>}
   </div>
 }

@@ -5,7 +5,8 @@ import { Card } from 'scryfall-sdk'
 import { Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { ListImporterContext } from '../../api/local/useListImporter'
-import { Manifest } from '../../api/local/db'
+import { cogDB, Manifest } from '../../api/local/db'
+import { invertCubes } from '../../api/memory/types/cube'
 
 const JSONMIME = "application/json"
 const TEXTMIME = "text/plain"
@@ -40,7 +41,9 @@ export const FileImporter = ({
     let cards: NormedCard[]
     switch (file.type) {
       case JSONMIME:
-        cards = normCardList(JSON.parse(content).map(Card.construct))
+        const cubes = await cogDB.cube.toArray()
+        const cardIdToCubes = invertCubes(cubes)
+        cards = normCardList(JSON.parse(content).map(Card.construct), cardIdToCubes)
         break
       case TEXTMIME:
         cards = await listImporter.attemptImport(content.split(/[\r\n]+/), true)

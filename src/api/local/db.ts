@@ -1,6 +1,7 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import { NormedCard } from '../memory/types/normedCard'
+import { CubeDefinition } from '../memory/types/cube'
 export interface Collection {
   id: string
   name: string
@@ -8,6 +9,7 @@ export interface Collection {
   blob: Blob
   lastUpdated: Date
 }
+
 export type Manifest = Omit<Collection, 'blob'>
 
 export const toManifest = (
@@ -25,10 +27,11 @@ export class TypedDexie extends Dexie {
 
   card!: Table<NormedCard>
 
+  cube!: Table<CubeDefinition>
+
   constructor() {
     super('cogwork-librarian')
 
-    // DEPRECATED
     this.version(1).stores({
       manifest: 'id, uri, type, updated_at',
       card: 'id, oracle_id, cmc, color_identity, colors, name, oracle_text, power, toughness',
@@ -43,6 +46,18 @@ export class TypedDexie extends Dexie {
     this.version(3).stores({
       collection: 'id, name, last_updated',
       card: 'oracle_id, name',
+    })
+
+    this.version(4).stores({
+      collection: 'id, name, last_updated',
+      card: 'oracle_id, name',
+      cube: 'key',
+    }).upgrade (trans => {
+      return trans.table("card").toCollection().modify (card => {
+        if (card.cube_ids === undefined) {
+          card.cube_ids = new Set()
+        }
+      })
     })
   }
 }

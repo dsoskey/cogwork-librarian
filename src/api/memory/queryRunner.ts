@@ -5,6 +5,7 @@ import { NearlyError } from './types/error'
 import { queryParser } from './parser'
 import { FilterNode } from './filters/base'
 import { normCardList, NormedCard } from './types/normedCard'
+import { CubeDefinition, invertCubes } from './types/cube'
 import { sortFunc, SortOrder } from './filters/sort'
 import { chooseFilterFunc } from './filters/print'
 import { Parser } from 'nearley'
@@ -36,7 +37,7 @@ type ParserProducer = () => Parser
 
 interface QueryRunnerParams {
   corpus: Card[]
-  cubes?: { [key: string]: Set<string> }
+  cubes?: CubeDefinition[]
   defaultOptions?: SearchOptions,
   getParser?: ParserProducer
 }
@@ -46,8 +47,8 @@ export class QueryRunner {
 
   private readonly getParser: ParserProducer
 
-  constructor({ corpus, getParser, defaultOptions }: QueryRunnerParams) {
-    this.corpus = normCardList(corpus)
+  constructor({ corpus, getParser, defaultOptions, cubes }: QueryRunnerParams) {
+    this.corpus = normCardList(corpus, invertCubes(cubes ?? []))
     this.getParser = getParser ?? queryParser
     this.defaultOptions = defaultOptions ?? { order: 'name' }
   }

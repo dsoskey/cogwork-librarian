@@ -2,6 +2,7 @@ import { Card } from 'scryfall-sdk'
 import { cogDB, Manifest } from './db'
 import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
+import { CubeDefinition, invertCubes } from '../memory/types/cube'
 
 export const downloadCards = async (
   manifest: BulkDataDefinition
@@ -10,7 +11,11 @@ export const downloadCards = async (
 
   const results: Array<Card> = (await download.json()).map(Card.construct)
 
-  return normCardList(results)
+  const cubes: CubeDefinition[] = await cogDB.cube.toArray()
+
+  const cardIdToCubes = invertCubes(cubes)
+
+  return normCardList(results, cardIdToCubes)
 }
 export const putFile = async (manifest: Manifest, data: NormedCard[]) => {
   const toSave: NormedCard[] = []

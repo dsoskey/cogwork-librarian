@@ -1,19 +1,21 @@
 import React, { useContext, useState } from 'react'
 import { ObjectValues, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
-import { ScryfallImporter } from '../queryForm/scryfallImporter'
-import { FileImporter } from '../queryForm/fileImporter'
-import { ListImporter } from '../queryForm/listImporter'
+import { ScryfallImporter } from './scryfallImporter'
+import { FileImporter } from './fileImporter'
+import { ListImporter } from './listImporter'
 
 export const IMPORT_SOURCE = {
   scryfall: 'scryfall',
+  cubeCobra: 'cubeCobra',
   file: 'file',
   text: 'text',
 } as const
 export type ImportSource = ObjectValues<typeof IMPORT_SOURCE>
 
-const sourceToLabel: Record<ImportSource, string> = {
+export const sourceToLabel: Record<ImportSource, string> = {
   scryfall: 'scryfall',
+  cubeCobra: 'cube cobra',
   file: 'a file',
   text: 'a text list',
 }
@@ -81,7 +83,7 @@ export const CardDataView = () => {
     <section className='db-import'>
       <h4>
         import from{" "}
-        {Object.keys(IMPORT_SOURCE).map(source => (<React.Fragment key={source}>
+        {Object.keys(IMPORT_SOURCE).filter(it => it !== "cubeCobra").map(source => (<React.Fragment key={source}>
           <input
             id={`import-${source}`}
             type='radio'
