@@ -42,3 +42,19 @@ export const putFile = async (manifest: Manifest, data: NormedCard[]) => {
     await cogDB.card.bulkPut(toSave)
   })
 }
+
+const cubeNamespace = ".cube.coglib.sosk.watch"
+export const migrateCubes = async () => {
+  const existingCubes: CubeDefinition[] = Object.keys(localStorage)
+    .filter(it => it.endsWith(cubeNamespace))
+    .map(it => ({
+      key: it.slice(0, it.indexOf(".")),
+      oracle_ids: JSON.parse(localStorage.getItem(it) ?? "[]"),
+    }))
+
+
+  for await (const cube of existingCubes) {
+    await cogDB.addCube(cube)
+    localStorage.removeItem(`${cube.key}${cubeNamespace}`)
+  }
+}

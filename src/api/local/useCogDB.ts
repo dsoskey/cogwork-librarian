@@ -1,7 +1,7 @@
 import { createContext, useEffect, useRef, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, Manifest } from './db'
-import { putFile } from './populate'
+import { migrateCubes, putFile } from './populate'
 import { NormedCard } from '../memory/types/normedCard'
 import { QueryReport, useReporter } from '../useReporter'
 
@@ -126,6 +126,7 @@ export const useCogDB = (): CogDB => {
 
   const resetDB = async () => {
     try {
+      await migrateCubes()
       await newLoadDB()
     } catch (e) {
       console.error(e)

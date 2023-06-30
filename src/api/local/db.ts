@@ -60,5 +60,20 @@ export class TypedDexie extends Dexie {
       })
     })
   }
+
+  addCube = async (cube: CubeDefinition) => {
+    await this.transaction("rw", this.cube, this.card, async () => {
+      await this.cube.put(cube)
+      await this.card.where("oracle_id").anyOf(cube.oracle_ids)
+        .modify(it => {
+          if (it.cube_ids === undefined) {
+            it.cube_ids = new Set()
+          }
+          it.cube_ids.add(cube.key)
+        })
+    })
+  }
+
+
 }
 export const cogDB = new TypedDexie()
