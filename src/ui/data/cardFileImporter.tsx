@@ -10,16 +10,16 @@ import { invertCubes } from '../../api/memory/types/cube'
 
 const JSONMIME = "application/json"
 const TEXTMIME = "text/plain"
-export interface FileImporterProps {
+export interface CardFileImporterProps {
   setDbDirty: Setter<boolean>
   dbImportStatus: TaskStatus
   setDbImportStatus: Setter<TaskStatus>
 }
-export const FileImporter = ({
+export const CardFileImporter = ({
   dbImportStatus,
   setDbImportStatus,
   setDbDirty,
-}: FileImporterProps) => {
+}: CardFileImporterProps) => {
   const { manifest, setManifest, setMemory } = useContext(CogDBContext)
   const listImporter = useContext(ListImporterContext)
   const proposedManifest = useRef<Manifest>(manifest)

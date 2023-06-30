@@ -4,9 +4,13 @@ import { CogDBContext } from '../../api/local/useCogDB'
 
 export interface DatabaseSettingsProps {}
 
-export const DatabaseLink = () => {
+export interface DatabaseLinkProps { active: boolean }
+
+export const DatabaseLink = ({ active }: DatabaseLinkProps) => {
   const { outOfDate } = useContext(CogDBContext)
-  return <Link to='/data'>settings {outOfDate && <span className='alert'>!!</span>}</Link>
+  return <Link to='/data/card' className={active ? "active-link" : ""}>
+    settings {outOfDate && <span className='alert'>!!</span>}
+  </Link>
 
 }
 

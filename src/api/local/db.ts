@@ -59,18 +59,42 @@ export class TypedDexie extends Dexie {
         }
       })
     })
+
+    this.version(5).stores({
+      collection: 'id, name, last_updated',
+      card: 'oracle_id, name',
+      cube: 'key',
+    }).upgrade (trans => {
+      return trans.table("card").toCollection().modify (card => {
+        if (card.cube_ids === undefined) {
+          card.cube_ids = {}
+        } else if (card.cube_ids instanceof Set) {
+          const cube_ids = {}
+          for (const id of Array.from(card.cube_ids)) {
+            cube_ids[id as string] = true
+          }
+        }
+      })
+    })
   }
 
   addCube = async (cube: CubeDefinition) => {
+    const existingCube: CubeDefinition = await this.cube.get(cube.key) ?? { key: cube.key, oracle_ids: [] }
+    const cardSet = new Set(cube.oracle_ids)
+    const toRemove = existingCube.oracle_ids.filter(it => !cardSet.has(it))
     await this.transaction("rw", this.cube, this.card, async () => {
       await this.cube.put(cube)
       await this.card.where("oracle_id").anyOf(cube.oracle_ids)
         .modify(it => {
           if (it.cube_ids === undefined) {
-            it.cube_ids = new Set()
+            it.cube_ids = {}
           }
-          it.cube_ids.add(cube.key)
+          it.cube_ids[cube.key] = true
         })
+      if (toRemove.length > 0) {
+        await this.card.where("oracle_id").anyOf(toRemove)
+          .modify(it => delete it.cube_ids[cube.key])
+      }
     })
   }
 

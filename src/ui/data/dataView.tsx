@@ -1,36 +1,30 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { CardDataView } from './cardDataView'
-import { NewCubeImporter } from './cubeImporter'
+import { CubeDataView } from './cubeDataView'
 import "./dataView.css"
+import { Link } from 'react-router-dom'
+import { Route, useLocation } from 'react-router'
 
 export const DataView = () => {
-  const [dataTarget, setDataTarget] = useState<'card'| 'cube'>('card')
+  const { pathname } = useLocation()
   return <div className='data-view-root'>
     <section>
-      <h3>i want to manage{" "}
-      <label htmlFor='manage-card'>
-        <input
-          id='manage-card'
-          type={'radio'}
-          value='card'
-          checked={dataTarget === 'card'}
-          onChange={() => setDataTarget('card')}
-        />
-        <span>cards</span>
-      </label>
-      <label htmlFor='manage-cube'>
-        <input
-          id='manage-cube'
-          type={'radio'}
-          value='cube'
-          checked={dataTarget === 'cube'}
-          onChange={() => setDataTarget('cube')}
-        />
-        <span>cubes</span>
-      </label>
+      <h3 className='row'>
+        <span>i want to manage</span>
+        <Link to='/data/card' className={`input-link ${pathname === '/data/card' ? 'active-link': ""}`}>
+          cards
+        </Link>
+        <Link to='/data/cube' className={`input-link ${pathname === '/data/cube' ? 'active-link': ""}`}>
+          cubes
+        </Link>
+
       </h3>
     </section>
-    {dataTarget === 'card' && <CardDataView/>}
-    {dataTarget === 'cube' && <NewCubeImporter/>}
+    <Route path='/data/card'>
+      <CardDataView/>
+    </Route>
+    <Route path='/data/cube'>
+      <CubeDataView/>
+    </Route>
   </div>
 }

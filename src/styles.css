@@ -57,10 +57,13 @@ button:disabled {
 }
 
 input {
-  color: #ccc;
+  color: var(--blue);
   background: var(--darker-color);
   font-family: var(--monospace-family);
   border: none;
+}
+input::placeholder {
+  color: var(--blue-mid-alpha);
 }
 
 fieldset {
@@ -175,6 +178,13 @@ p {
   margin-bottom: 0;
 }
 
+.data-view-root .input-link input {
+ appearance: none;
+  outline: none;
+  margin: 0;
+}
+
+.data-view-root .input-link,
 .masthead a {
   color: var(--blue-mid-alpha);
   text-decoration: none;
@@ -185,13 +195,16 @@ p {
   border-radius: 2px;
 }
 
+.data-view-root .input-link.active-link,
+.data-view-root .input-link:focus-visible,
+.data-view-root .input-link:hover,
+.masthead a.active-link,
 .masthead a:focus-visible,
 .masthead a:hover {
   color: var(--dark-color);
   background-color: var(--blue);
   border-color: var(--blue-mid-alpha) inset;
 }
-
 
 .cogwork-librarian.hide .masthead .toggle {
   margin-right: 0;
@@ -334,7 +347,7 @@ p {
 }
 
 .query-editor .controller::placeholder {
-  color: var(--blue);
+  color: var(--blue-mid-alpha);
 }
 
 .query-editor .display {
@@ -477,7 +490,7 @@ p {
 }
 
 .cards-to-import::placeholder {
-  color: var(--blue);
+  color: var(--blue-mid-alpha);
 }
 
 .results {

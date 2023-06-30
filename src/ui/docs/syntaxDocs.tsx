@@ -4,15 +4,12 @@ import {
 } from '../../api/memory/types/filterKeyword'
 import React from 'react'
 import { syntaxDocs } from '../../api/local/syntaxDocs'
-import { Link } from 'react-router-dom'
 import "./syntaxDocs.css"
 
-export const SyntaxDocsLink = () => <Link to='/user-guide'>syntax guide</Link>
 export const SyntaxDocs = () => {
   return <div className='user-guide-root'>
     <p className='alert'>
-      this modal is under active construction. expect its location to
-      change in the future!
+      this page is under active construction!
     </p>
 
     <p>

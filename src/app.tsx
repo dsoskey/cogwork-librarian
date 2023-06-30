@@ -17,16 +17,15 @@ import { useViewportListener } from './viewport'
 import { CoglibIcon } from './ui/component/coglibIcon'
 import { queryExamples } from './api/example'
 import _random from 'lodash/random'
-import { ExampleGallery, ExampleGalleryLink } from './ui/queryForm/exampleGallery'
-import { SyntaxDocs, SyntaxDocsLink } from './ui/docs/syntaxDocs'
-import { AppInfo, AppInfoLink } from './ui/appInfo'
+import { ExampleGallery } from './ui/queryForm/exampleGallery'
+import { SyntaxDocs } from './ui/docs/syntaxDocs'
+import { AppInfo } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
 import { FlagContext } from './flags'
 import { AdminPanel } from './ui/adminPanel'
 import { Route, Switch, useLocation } from 'react-router'
 import { DataView } from './ui/data/dataView'
 import { Link } from 'react-router-dom'
-import { subHeader } from './ui/router'
 import { DatabaseLink } from './ui/queryForm/databaseSettings'
 import { SearchError } from './ui/component/searchError'
 import { SavedCards } from './ui/savedCards'
@@ -36,6 +35,8 @@ import { v4 as uuidv4 } from 'uuid';
 export const App = () => {
   const { adminMode, multiQuery } = useContext(FlagContext).flags
   const { pathname } = useLocation()
+  const topPath = pathname.replace("/","").split("/")[0]
+
   const cogDB = useCogDB()
   const listImporter = useListImporter({memory: cogDB.memory})
   const viewport = useViewportListener()
@@ -124,26 +125,26 @@ export const App = () => {
         <ProjectContext.Provider value={project}>
           <ToasterContext.Provider value={{ messages, addMessage, dismissMessage }}>
             <div className='root'>
-              <div className={`cogwork-librarian ${pathname.replace("/","")} ${showCogLib ? "show":"hide"}`}>
+              <div className={`cogwork-librarian ${topPath} ${showCogLib ? "show":"hide"}`}>
                 <div className={`row masthead`}>
                   {(showCogLib || viewport.mobile) && adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
                   {(showCogLib || viewport.mobile) && !adminMode && <CoglibIcon size='3em' />}
 
                   {(showCogLib || viewport.mobile) && <div className='column'>
-                    <h1 className='page-title'>{subHeader[pathname]}</h1>
+                    <h1 className='page-title'>cogwork librarian</h1>
                     <div className='row'>
 
-                      <Link to='/'>search</Link>
+                      <Link to='/' className={pathname === "/" ? "active-link" : ""}>search</Link>
 
-                      <Link to='/saved'>saved cards</Link>
+                      <Link to='/saved' className={pathname === "/saved" ? "active-link" : ""}>saved cards</Link>
 
-                      <DatabaseLink />
+                      <DatabaseLink active={topPath === 'data'} />
 
-                      <AppInfoLink />
+                      <Link to='/about-me' className={pathname === "/about-me" ? "active-link" : ""}>about me</Link>
 
-                      <ExampleGalleryLink />
+                      <Link to='/examples' className={topPath === "examples" ? "active-link" : ""}>examples</Link>
 
-                      <SyntaxDocsLink />
+                      <Link to='/user-guide' className={topPath === "user-guide" ? "active-link" : ""}>syntax guide</Link>
 
                     </div>
                   </div>}
@@ -162,7 +163,7 @@ export const App = () => {
                 </div>
 
                 {showCogLib && <Switch>
-                  <Route path='/data' exact>
+                  <Route path='/data'>
                     <DataView />
                   </Route>
                   <Route path='/saved' exact>

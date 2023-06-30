@@ -2,8 +2,8 @@ import React, { useContext, useState } from 'react'
 import { ObjectValues, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { ScryfallImporter } from './scryfallImporter'
-import { FileImporter } from './fileImporter'
-import { ListImporter } from './listImporter'
+import { CardFileImporter } from './cardFileImporter'
+import { CardListImporter } from './cardListImporter'
 
 export const IMPORT_SOURCE = {
   scryfall: 'scryfall',
@@ -81,9 +81,11 @@ export const CardDataView = () => {
       </button>}
     </section>
     <section className='db-import'>
-      <h4>
-        import from{" "}
-        {Object.keys(IMPORT_SOURCE).filter(it => it !== "cubeCobra").map(source => (<React.Fragment key={source}>
+      <h4 className='row'>
+        <span>import from</span>
+        {Object.keys(IMPORT_SOURCE).filter(it => it !== "cubeCobra").map(source => (<label key={source}
+          className={`input-link ${source === importType ? "active-link" : ""}`}
+        >
           <input
             id={`import-${source}`}
             type='radio'
@@ -91,20 +93,20 @@ export const CardDataView = () => {
             checked={source === importType}
             onChange={() => setImportType(source as ImportSource)}
           />
-          <label htmlFor={`import-${source}`}>{sourceToLabel[source]}</label>
-        </React.Fragment>))}
+          {sourceToLabel[source]}
+        </label>))}
       </h4>
       {importType === "scryfall" && <ScryfallImporter
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}
         setDbDirty={setDbDirty}
       />}
-      {importType === "file" && <FileImporter
+      {importType === "file" && <CardFileImporter
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}
         setDbDirty={setDbDirty}
       />}
-      {importType === "text" && <ListImporter
+      {importType === "text" && <CardListImporter
         setDbDirty={setDbDirty}
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}

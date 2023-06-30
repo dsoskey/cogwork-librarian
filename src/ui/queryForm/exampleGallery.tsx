@@ -3,12 +3,10 @@ import React, { useContext, useState } from 'react'
 import { Setter } from '../../types'
 import { FlagContext } from '../../flags'
 import { testQueries } from '../../api/queries'
-import { Link, Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { singleQueryInfo } from '../component/editor/singleQueryActionBar'
 import { rankInfo } from '../component/editor/infoLines'
-
-export const ExampleGalleryLink = () => <Link to='/examples'>examples</Link>
 
 export interface ExampleGalleryProps {
   setQueries: Setter<string[]>

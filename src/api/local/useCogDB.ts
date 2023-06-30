@@ -63,7 +63,6 @@ export const useCogDB = (): CogDB => {
         break
       case 'card':
         const { card, index } = data
-        // console.log(index)
         rezzy.current.push(card)
         if (index % 1000 === 0)
           dbReport.addCardCount(1000)
@@ -80,7 +79,6 @@ export const useCogDB = (): CogDB => {
         break
       case 'error':
         console.error('waaaaaa', data)
-        // dbReport.markTimepoint('end')
         break
       default:
         console.error('unknown message from db worker')
@@ -126,7 +124,9 @@ export const useCogDB = (): CogDB => {
 
   const resetDB = async () => {
     try {
+      console.time("migrated cubes")
       await migrateCubes()
+      console.timeEnd("migrated cubes")
       await newLoadDB()
     } catch (e) {
       console.error(e)

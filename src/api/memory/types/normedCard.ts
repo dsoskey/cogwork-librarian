@@ -92,7 +92,7 @@ export interface NormedCard extends Omit<Card, PrintKeys> {
   printings: Printing[]
   // there are oracle and print fields on card faces, so the normed card holds a reference to one for oracle filters
   card_faces: CardFace[]
-  cube_ids: Set<string>
+  cube_ids: { [key: string]: boolean }
 }
 
 const ignorePaths = [...Object.keys(PRINT_KEYS), ...Object.keys(IGNORE_KEYS)]
@@ -104,12 +104,16 @@ export const normCardList = (cardList: Card[], cardIdToCubes: CardIdToCubeIds): 
 
   for (const oracleId in cardsByOracle) {
     const cards = cardsByOracle[oracleId]
+    const cube_ids = {}
+    for (const id of cardIdToCubes[cards[0].oracle_id] ?? []) {
+      cube_ids[id] = true
+    }
     const normed = {
       ...(_omit(cards[0], ignorePaths)) as Omit<Card, PrintKeys>,
       printings: cards.map((it) => _pick(it, printPaths) as Printing
       ),
       card_faces: cards[0].card_faces,
-      cube_ids: new Set(cardIdToCubes[cards[0].oracle_id] ?? []),
+      cube_ids,
     }
     result.push(normed)
   }

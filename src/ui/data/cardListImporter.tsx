@@ -7,16 +7,16 @@ import { Loader } from '../component/loader'
 import { ProjectContext } from '../../api/useProject'
 import { NormedCard } from '../../api/memory/types/normedCard'
 
-export interface ListImporterProps {
+export interface CardListImporterProps {
   setDbDirty: Setter<boolean>
   dbImportStatus: TaskStatus
   setDbImportStatus: Setter<TaskStatus>
 }
-export const ListImporter = ({
+export const CardListImporter = ({
   dbImportStatus,
   setDbImportStatus,
   setDbDirty,
-}: ListImporterProps) => {
+}: CardListImporterProps) => {
   const { manifest, setManifest, setMemory } = useContext(CogDBContext)
   const listImporter = useContext(ListImporterContext)
   const project = useContext(ProjectContext)
@@ -37,9 +37,7 @@ export const ListImporter = ({
 
   const doTry = (target: string[], restart: boolean) => {
     listImporter.attemptImport(target, restart)
-      .then((cards) => {
-        finish(cards)
-      })
+      .then(finish)
       .catch((error) => {
         console.error(error)
         setDbImportStatus('error')

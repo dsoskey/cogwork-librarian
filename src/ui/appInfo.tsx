@@ -6,7 +6,6 @@ import {
   weightAlgorithms,
 } from '../api/queryRunnerCommon'
 import { FlagContext } from '../flags'
-import { Link } from 'react-router-dom'
 import "./appInfo.css"
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
 import { singleQueryInfo } from './component/editor/singleQueryActionBar'
@@ -14,8 +13,6 @@ import { rankInfo } from './component/editor/infoLines'
 
 const EXAMPLE = queryExamples[0]
 const injectPrefix = _injectPrefix(EXAMPLE.prefix)
-
-export const AppInfoLink = () => <Link to='/about-me'>about me</Link>
 
 export const AppInfo = () => {
   const { setFlag } = useContext(FlagContext)
