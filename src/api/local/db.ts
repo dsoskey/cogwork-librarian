@@ -10,14 +10,16 @@ export interface Collection {
   lastUpdated: Date
 }
 
+export const MANIFEST_ID = 'the_one'
 export type Manifest = Omit<Collection, 'blob'>
 
 export const toManifest = (
   bulkDataDefinition: BulkDataDefinition
 ): Manifest => ({
   ...bulkDataDefinition,
+  id: MANIFEST_ID,
   name: bulkDataDefinition.uri,
-  lastUpdated: new Date(bulkDataDefinition.updated_at),
+  lastUpdated: new Date(),
 })
 
 export class TypedDexie extends Dexie {

@@ -2,20 +2,19 @@ import React, { useContext, useRef, useState } from 'react'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { Setter, TaskStatus } from '../../types'
-import { Manifest } from '../../api/local/db'
+import { Manifest, MANIFEST_ID } from '../../api/local/db'
 import { Loader } from '../component/loader'
 import { ProjectContext } from '../../api/useProject'
 import { NormedCard } from '../../api/memory/types/normedCard'
 
 export interface CardListImporterProps {
-  setDbDirty: Setter<boolean>
   dbImportStatus: TaskStatus
   setDbImportStatus: Setter<TaskStatus>
 }
+
 export const CardListImporter = ({
   dbImportStatus,
   setDbImportStatus,
-  setDbDirty,
 }: CardListImporterProps) => {
   const { manifest, setManifest, setMemory } = useContext(CogDBContext)
   const listImporter = useContext(ListImporterContext)
@@ -26,7 +25,6 @@ export const CardListImporter = ({
   const finish = (res: NormedCard[]) => {
     setMemory(res)
     setManifest(proposedManifest.current)
-    setDbDirty(true)
     setDbImportStatus("success")
     setCardsToImport([])
   }
@@ -48,7 +46,7 @@ export const CardListImporter = ({
     setDbImportStatus('loading')
     const lastUpdated = new Date()
     proposedManifest.current = {
-      id: 'text',
+      id: MANIFEST_ID,
       name: `text-import-${lastUpdated.toString()}`,
       type: 'text',
       lastUpdated,

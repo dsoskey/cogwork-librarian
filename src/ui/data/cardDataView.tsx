@@ -4,6 +4,8 @@ import { CogDBContext } from '../../api/local/useCogDB'
 import { ScryfallImporter } from './scryfallImporter'
 import { CardFileImporter } from './cardFileImporter'
 import { CardListImporter } from './cardListImporter'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { cogDB } from '../../api/local/db'
 
 export const IMPORT_SOURCE = {
   scryfall: 'scryfall',
@@ -20,33 +22,48 @@ export const sourceToLabel: Record<ImportSource, string> = {
   text: 'a text list',
 }
 
-
+const dateString = (date: Date) =>
+  `${date.getFullYear()}.${date.getMonth().toString().padStart(2, "0")}.${date.getDay().toString().padStart(2, "0")}-${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`
 export const CardDataView = () => {
   const { dbStatus, memStatus, manifest, outOfDate, saveToDB, resetDB } = useContext(CogDBContext)
-  const [dbDirty, setDbDirty] = useState<boolean>(false)
+  const dbManifest = useLiveQuery(async () => cogDB.collection.get("the_one"))
+  const dbDirty = dbManifest === undefined || manifest.id === 'loading'
+    ? false
+    : dbManifest.lastUpdated.getTime() !== manifest.lastUpdated.getTime() || dbManifest.id !== manifest.id
   const [dbImportStatus, setDbImportStatus] = useState<TaskStatus>('unstarted')
   const [importType, setImportType] = useState<ImportSource>("scryfall")
 
-  const saveMemoryToDB = () => {
-    saveToDB().then(() => setDbDirty(false))
-  }
-  const loadDBIntoMemory = () => {
-    resetDB().then(() => setDbDirty(false))
-  }
-
   return <>
     <section className='card-import'>
-      <h4>in memory {dbImportStatus === 'loading' && '(importing...)'}</h4>
-      <div>
-        <strong>source:</strong> <code>{manifest.name}</code>
+      <div className='row'>
+        <div>
+          <h4>in memory {dbImportStatus === 'loading' && '(importing...)'}</h4>
+          <div>
+            <strong>source:</strong> <code>{manifest.name}</code>
+          </div>
+          <div>
+            <strong>type:</strong> <code>{manifest.type}</code>
+          </div>
+          <div>
+            <strong>last updated:</strong>{' '}
+            <code>{dateString(manifest.lastUpdated)}</code>
+          </div>
+        </div>
+        {dbDirty && dbManifest && <div>
+          <h4>in database</h4>
+          <div>
+            <strong>source:</strong> <code>{dbManifest.name}</code>
+          </div>
+          <div>
+            <strong>type:</strong> <code>{dbManifest.type}</code>
+          </div>
+          <div>
+            <strong>last updated:</strong>{' '}
+            <code>{dateString(dbManifest.lastUpdated)}</code>
+          </div>
+        </div>}
       </div>
-      <div>
-        <strong>type:</strong> <code>{manifest.type}</code>
-      </div>
-      <div>
-        <strong>last updated:</strong>{' '}
-        <code>{manifest.lastUpdated.toString()}</code>
-      </div>
+
       {outOfDate && (
         <div className='alert'>
           cogwork librarian's syntax has updated since you last synced
@@ -63,7 +80,7 @@ export const CardDataView = () => {
       )}
       <button
         disabled={dbStatus === 'loading' || memStatus === 'loading' || !dbDirty}
-        onClick={saveMemoryToDB}
+        onClick={saveToDB}
       >
         {dbStatus !== 'loading' && memStatus !== 'loading' && !dbDirty
           ? 'database in sync'
@@ -73,13 +90,14 @@ export const CardDataView = () => {
       </button>
       {dbDirty && <button
         disabled={dbStatus === 'loading' || memStatus === 'loading'}
-        onClick={loadDBIntoMemory}
+        onClick={resetDB}
       >
         {`reload${
           dbStatus === 'loading' || memStatus === 'loading' ? 'ing' : ''
         } local database`}
       </button>}
     </section>
+
     <section className='db-import'>
       <h4 className='row'>
         <span>import from</span>
@@ -99,15 +117,12 @@ export const CardDataView = () => {
       {importType === "scryfall" && <ScryfallImporter
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}
-        setDbDirty={setDbDirty}
       />}
       {importType === "file" && <CardFileImporter
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}
-        setDbDirty={setDbDirty}
       />}
       {importType === "text" && <CardListImporter
-        setDbDirty={setDbDirty}
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}
       />}

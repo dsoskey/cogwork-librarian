@@ -8,17 +8,12 @@ import { Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
 
 export interface ScryfallImporterProps {
-
-
-  // should be props
-  setDbDirty: Setter<boolean>
   dbImportStatus: TaskStatus
   setDbImportStatus: Setter<TaskStatus>
 }
 export const ScryfallImporter = ({
   dbImportStatus,
   setDbImportStatus,
-  setDbDirty,
 }: ScryfallImporterProps) => {
   const { setManifest, setMemory } = useContext(CogDBContext)
 
@@ -40,7 +35,6 @@ export const ScryfallImporter = ({
       const cards = await downloadCards(targetDefinition)
       setMemory(cards)
       setManifest(toManifest(targetDefinition))
-      setDbDirty(true)
       setDbImportStatus('success')
     }
   }

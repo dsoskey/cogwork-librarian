@@ -1,5 +1,5 @@
 import { Card } from 'scryfall-sdk'
-import { cogDB, Manifest } from './db'
+import { cogDB, Manifest, MANIFEST_ID } from './db'
 import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import { CubeDefinition, invertCubes } from '../memory/types/cube'
@@ -34,8 +34,7 @@ export const putFile = async (manifest: Manifest, data: NormedCard[]) => {
   await cogDB.transaction("rw", cogDB.collection, cogDB.card, async () => {
     await cogDB.collection.put({
       ...manifest,
-      lastUpdated: new Date(),
-      id: 'the_one',
+      id: MANIFEST_ID,
       blob: new Blob([]),
     })
     await cogDB.card.clear()

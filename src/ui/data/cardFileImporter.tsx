@@ -5,20 +5,18 @@ import { Card } from 'scryfall-sdk'
 import { Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { ListImporterContext } from '../../api/local/useListImporter'
-import { cogDB, Manifest } from '../../api/local/db'
+import { cogDB, Manifest, MANIFEST_ID } from '../../api/local/db'
 import { invertCubes } from '../../api/memory/types/cube'
 
 const JSONMIME = "application/json"
 const TEXTMIME = "text/plain"
 export interface CardFileImporterProps {
-  setDbDirty: Setter<boolean>
   dbImportStatus: TaskStatus
   setDbImportStatus: Setter<TaskStatus>
 }
 export const CardFileImporter = ({
   dbImportStatus,
   setDbImportStatus,
-  setDbDirty,
 }: CardFileImporterProps) => {
   const { manifest, setManifest, setMemory } = useContext(CogDBContext)
   const listImporter = useContext(ListImporterContext)
@@ -26,13 +24,12 @@ export const CardFileImporter = ({
   const moveImportToMemory = () => {
     setMemory(listImporter.result)
     setManifest(proposedManifest.current)
-    setDbDirty(true)
     setDbImportStatus("success")
   }
 
   const processFileText = async (file: File): Promise<void> => {
     proposedManifest.current = {
-      id: 'file',
+      id: MANIFEST_ID,
       name: file.name,
       type: 'file',
       lastUpdated: new Date(file.lastModified),
@@ -53,7 +50,6 @@ export const CardFileImporter = ({
     }
     setMemory(cards)
     setManifest(proposedManifest.current)
-    setDbDirty(true)
   }
   const onFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDbImportStatus('loading')
