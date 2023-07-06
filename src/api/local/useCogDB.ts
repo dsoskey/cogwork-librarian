@@ -14,7 +14,7 @@ export interface CogDB {
   manifest: Manifest
   outOfDate: boolean
   setManifest: Setter<Manifest>
-  saveToDB: () => Promise<void>
+  saveToDB: (manifest?: Manifest, cards?: NormedCard[]) => Promise<void>
   resetDB: () => Promise<void>
 }
 
@@ -86,10 +86,10 @@ export const useCogDB = (): CogDB => {
     }
   }
 
-  const saveToDB = async () => {
+  const saveToDB = async (manifestOverride?: Manifest, cards?: NormedCard[]) => {
     setDbStatus('loading')
     try {
-      await putFile(manifest, memory)
+      await putFile(manifestOverride ?? manifest, cards ?? memory)
       setDbStatus('success')
     } catch (e) {
       console.error(e)

@@ -7,24 +7,39 @@ import { CogDBContext } from '../../api/local/useCogDB'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { cogDB, Manifest, MANIFEST_ID } from '../../api/local/db'
 import { invertCubes } from '../../api/memory/types/cube'
+import { ImportTarget } from './cardDataView'
 
 const JSONMIME = "application/json"
 const TEXTMIME = "text/plain"
+
 export interface CardFileImporterProps {
+  importTargets: ImportTarget[]
   dbImportStatus: TaskStatus
   setDbImportStatus: Setter<TaskStatus>
 }
+
 export const CardFileImporter = ({
+  importTargets,
   dbImportStatus,
   setDbImportStatus,
 }: CardFileImporterProps) => {
-  const { manifest, setManifest, setMemory } = useContext(CogDBContext)
+  const { manifest, setManifest, setMemory, saveToDB } = useContext(CogDBContext)
   const listImporter = useContext(ListImporterContext)
   const proposedManifest = useRef<Manifest>(manifest)
   const moveImportToMemory = () => {
-    setMemory(listImporter.result)
-    setManifest(proposedManifest.current)
-    setDbImportStatus("success")
+    if (importTargets.find(it => it === "memory")) {
+      setManifest(proposedManifest.current)
+      setMemory(listImporter.result)
+    }
+    if (importTargets.find(it => it === "db")) {
+      saveToDB(proposedManifest.current, listImporter.result).then(() => {
+        setDbImportStatus("success")
+      }).catch(() => {
+        setDbImportStatus("error")
+      })
+    } else {
+      setDbImportStatus("success")
+    }
   }
 
   const processFileText = async (file: File): Promise<void> => {
@@ -48,8 +63,14 @@ export const CardFileImporter = ({
       default:
         throw Error(`unrecognized file type ${file.type}`)
     }
-    setMemory(cards)
-    setManifest(proposedManifest.current)
+
+    if (importTargets.find(it => it === "memory")) {
+      setManifest(proposedManifest.current)
+      setMemory(cards)
+    }
+    if (importTargets.find(it => it === "db")) {
+      await saveToDB(proposedManifest.current, cards)
+    }
   }
   const onFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDbImportStatus('loading')

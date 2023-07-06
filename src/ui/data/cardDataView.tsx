@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { ObjectValues, TaskStatus } from '../../types'
+import { ObjectValues, Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { ScryfallImporter } from './scryfallImporter'
 import { CardFileImporter } from './cardFileImporter'
@@ -24,6 +24,30 @@ export const sourceToLabel: Record<ImportSource, string> = {
 
 const dateString = (date: Date) =>
   `${date.getFullYear()}.${date.getMonth().toString().padStart(2, "0")}.${date.getDay().toString().padStart(2, "0")}-${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`
+
+export type ImportTarget = "memory" | "db"
+interface TargetCheckboxProps {
+  importTargets: ImportTarget[]
+  setImportTargets: Setter<ImportTarget[]>
+  target: ImportTarget
+}
+
+const TargetCheckbox = ({ importTargets, setImportTargets, target }: TargetCheckboxProps) => {
+  const checked = importTargets.find(it => it === target) !== undefined
+  return <label className={`input-link ${checked ? "active-link" : ""}`}>
+    <input type='checkbox' checked={checked} onChange={() => {
+      setImportTargets(prev => {
+        if (prev.find(it => it === target)) {
+          return prev.filter(it => it !== target)
+        } else {
+          return [...prev, target]
+        }
+      })
+    }}/>
+    {target}
+  </label>
+}
+
 export const CardDataView = () => {
   const { dbStatus, memStatus, manifest, outOfDate, saveToDB, resetDB } = useContext(CogDBContext)
   const dbManifest = useLiveQuery(async () => cogDB.collection.get("the_one"))
@@ -31,7 +55,8 @@ export const CardDataView = () => {
     ? false
     : dbManifest.lastUpdated.getTime() !== manifest.lastUpdated.getTime() || dbManifest.id !== manifest.id
   const [dbImportStatus, setDbImportStatus] = useState<TaskStatus>('unstarted')
-  const [importType, setImportType] = useState<ImportSource>("scryfall")
+  const [importSource, setImportSource] = useState<ImportSource>("scryfall")
+  const [importTargets, setImportTargets] = useState<ImportTarget[]>(["memory", "db"])
 
   return <>
     <section className='card-import'>
@@ -80,7 +105,7 @@ export const CardDataView = () => {
       )}
       <button
         disabled={dbStatus === 'loading' || memStatus === 'loading' || !dbDirty}
-        onClick={saveToDB}
+        onClick={() => saveToDB()}
       >
         {dbStatus !== 'loading' && memStatus !== 'loading' && !dbDirty
           ? 'database in sync'
@@ -102,27 +127,33 @@ export const CardDataView = () => {
       <h4 className='row'>
         <span>import from</span>
         {Object.keys(IMPORT_SOURCE).filter(it => it !== "cubeCobra").map(source => (<label key={source}
-          className={`input-link ${source === importType ? "active-link" : ""}`}
+          className={`input-link ${source === importSource ? "active-link" : ""}`}
         >
           <input
             id={`import-${source}`}
             type='radio'
             value={source}
-            checked={source === importType}
-            onChange={() => setImportType(source as ImportSource)}
+            checked={source === importSource}
+            onChange={() => setImportSource(source as ImportSource)}
           />
           {sourceToLabel[source]}
         </label>))}
+        <span>to</span>
+        <TargetCheckbox target='memory' importTargets={importTargets} setImportTargets={setImportTargets} />
+        <TargetCheckbox target='db' importTargets={importTargets} setImportTargets={setImportTargets} />
       </h4>
-      {importType === "scryfall" && <ScryfallImporter
+      {importSource === "scryfall" && <ScryfallImporter
+        importTargets={importTargets}
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}
       />}
-      {importType === "file" && <CardFileImporter
+      {importSource === "file" && <CardFileImporter
+        importTargets={importTargets}
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}
       />}
-      {importType === "text" && <CardListImporter
+      {importSource === "text" && <CardListImporter
+        importTargets={importTargets}
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}
       />}

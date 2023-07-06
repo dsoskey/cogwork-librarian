@@ -6,16 +6,19 @@ import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import * as Scry from 'scryfall-sdk'
 import { Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
+import { ImportTarget } from './cardDataView'
 
 export interface ScryfallImporterProps {
+  importTargets: ImportTarget[]
   dbImportStatus: TaskStatus
   setDbImportStatus: Setter<TaskStatus>
 }
 export const ScryfallImporter = ({
+  importTargets,
   dbImportStatus,
   setDbImportStatus,
 }: ScryfallImporterProps) => {
-  const { setManifest, setMemory } = useContext(CogDBContext)
+  const { setManifest, setMemory, saveToDB } = useContext(CogDBContext)
 
   const [targetDefinition, setTargetDefinition] = useState<
     BulkDataDefinition | undefined
@@ -33,8 +36,15 @@ export const ScryfallImporter = ({
     if (targetDefinition) {
       setDbImportStatus('loading')
       const cards = await downloadCards(targetDefinition)
-      setMemory(cards)
-      setManifest(toManifest(targetDefinition))
+      const manifest = toManifest(targetDefinition)
+      if (importTargets.find(it => it === "memory")) {
+        setMemory(cards)
+        setManifest(manifest)
+      }
+
+      if (importTargets.find(it => it === "db")) {
+        await saveToDB(manifest, cards)
+      }
       setDbImportStatus('success')
     }
   }

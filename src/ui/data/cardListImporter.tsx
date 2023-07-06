@@ -6,27 +6,36 @@ import { Manifest, MANIFEST_ID } from '../../api/local/db'
 import { Loader } from '../component/loader'
 import { ProjectContext } from '../../api/useProject'
 import { NormedCard } from '../../api/memory/types/normedCard'
+import { ImportTarget } from './cardDataView'
 
 export interface CardListImporterProps {
+  importTargets: ImportTarget[]
   dbImportStatus: TaskStatus
   setDbImportStatus: Setter<TaskStatus>
 }
 
 export const CardListImporter = ({
+  importTargets,
   dbImportStatus,
   setDbImportStatus,
 }: CardListImporterProps) => {
-  const { manifest, setManifest, setMemory } = useContext(CogDBContext)
+  const { manifest, setManifest, setMemory, saveToDB } = useContext(CogDBContext)
   const listImporter = useContext(ListImporterContext)
   const project = useContext(ProjectContext)
+  const [listTitle, setListTitle] = useState<string>("custom text import")
   const [cardsToImport, setCardsToImport] = useState<string[]>([])
   const proposedManifest = useRef<Manifest>(manifest)
 
-  const finish = (res: NormedCard[]) => {
-    setMemory(res)
-    setManifest(proposedManifest.current)
-    setDbImportStatus("success")
+  const finish = async (res: NormedCard[]) => {
+    if (importTargets.find(it => it === "memory")) {
+      setManifest(proposedManifest.current)
+      setMemory(res)
+    }
+    if (importTargets.find(it => it === "db")) {
+      await saveToDB(proposedManifest.current, res)
+    }
     setCardsToImport([])
+    setDbImportStatus("success")
   }
 
   const useSavedCards = () => {
@@ -47,7 +56,7 @@ export const CardListImporter = ({
     const lastUpdated = new Date()
     proposedManifest.current = {
       id: MANIFEST_ID,
-      name: `text-import-${lastUpdated.toString()}`,
+      name: listTitle.length > 0 ? listTitle : "text import",
       type: 'text',
       lastUpdated,
     }
@@ -85,6 +94,10 @@ export const CardListImporter = ({
 
     </>)}
     {dbImportStatus !== "loading" && dbImportStatus !== "error" && <>
+      <label className='row'>
+        <strong>data set name:</strong>
+        <input value={listTitle} onChange={event => setListTitle(event.target.value)} />
+      </label>
       <textarea
         className='cards-to-import coglib-prism-theme'
         value={cardsToImport.join('\n')}
