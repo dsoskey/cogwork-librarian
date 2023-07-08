@@ -97,7 +97,7 @@ export const CardFileImporter = ({
     {listImporter.status === "loading" && (
       <Loader
         label="cards found"
-        width={200}
+        width={400}
         count={listImporter.report.complete}
         total={listImporter.report.totalQueries}
       />

@@ -28,13 +28,15 @@ export const CubeCobraImporter = ({ cubeId, setError, setCards, children, loader
     }
   }
 
-  return <div className='cubecobra-import row'>
-    {children}
-    <button
-      disabled={showConfirmation || cubeId.trim().length === 0 || listImporter.status === 'loading'}
-      onClick={attemptCubeCobraImport}>
-      import
-    </button>
+  return <div className='cubecobra-import column'>
+    <div className='row'>
+      {children}
+      <button
+        disabled={showConfirmation || cubeId.trim().length === 0 || listImporter.status === 'loading'}
+        onClick={attemptCubeCobraImport}>
+        import
+      </button>
+    </div>
     {loader}
   </div>
 }

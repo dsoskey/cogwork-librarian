@@ -166,6 +166,9 @@ p {
 .row > :not(dialog):not(:first-child)  {
   margin-left: 4px;
 }
+.column > :not(dialog):not(:first-child)  {
+  margin-top: 4px;
+}
 
 .masthead {
   margin: var(--spacing-200);
@@ -528,7 +531,7 @@ p {
 }
 
 .loader .background {
-  fill: var(--dark-color);
+  fill: var(--light-color);
 }
 
 .loader .foreground {

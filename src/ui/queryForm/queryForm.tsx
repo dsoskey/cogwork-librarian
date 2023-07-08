@@ -124,15 +124,18 @@ export const QueryForm = ({
           </div>
         </div>
         <div className='scour-button-holder'>
-          <button
+          {!multiQuery && <button
             disabled={!canSubmit}
             onClick={() => execute(0)}
           >
             {canRunQuery &&
               `scour${status === 'loading' ? 'ing' : ''} the library`}
             {!canRunQuery && `preparing the library`}
-          </button>
-          {!canRunQuery && dbReport.totalCards > 0 && <Loader width={750} count={dbReport.cardCount} total={dbReport.totalCards} />}
+          </button>}
+          {!canRunQuery && dbReport.totalCards > 0 && <>
+            <span>preparing the library...</span>
+            <Loader width="100%" count={dbReport.cardCount} total={dbReport.totalCards} />
+          </>}
         </div>
       </div>
     </>

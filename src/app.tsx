@@ -130,7 +130,7 @@ export const App = () => {
                   {(showCogLib || viewport.mobile) && adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
                   {(showCogLib || viewport.mobile) && !adminMode && <CoglibIcon size='3em' />}
 
-                  {(showCogLib || viewport.mobile) && <div className='column'>
+                  {(showCogLib || viewport.mobile) && <div>
                     <h1 className='page-title'>cogwork librarian</h1>
                     <div className='row'>
 
