@@ -12,7 +12,8 @@ export const FLAG_NAMES = {
   showDebugInfo: 'showDebugInfo',
   disableCache: 'disableCache',
   displayTypes: 'displayTypes',
-  multiQuery: 'multiQuery'
+  multiQuery: 'multiQuery',
+  tagger: 'tagger',
 } as const
 export type Flag = ObjectValues<typeof FLAG_NAMES>
 
@@ -21,7 +22,8 @@ export const INITIAL_FLAGS: Record<Flag, boolean> = {
   adminMode: false,
   disableCache: true,
   displayTypes: false,
-  multiQuery: clientConfig.stage === Stage.Dev,
+  multiQuery: true,
+  tagger: false,
 }
 
 interface FlagManager {
