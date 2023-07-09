@@ -72,6 +72,7 @@ const printMattersFields = new Set<IsValue>([
   'localizedname',
   'flavorname',
   'halo',
+  'ub',
 ])
 export function printMatters(value: IsValue): boolean {
   return printMattersFields.has(value)
@@ -132,6 +133,8 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
     case 'stamp':
     case 'stamped':
       return printing.security_stamp?.length > 0
+    case 'ub':
+      return printing.security_stamp?.includes('triangle')
     case 'artist':
       return printing.artist?.length > 0
     case 'flavor':
@@ -387,8 +390,8 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
     case 'painland':
       return (
         card.type_line.includes('Land') &&
-        /\{T}: Add {C}\./.test(card.oracle_text) &&
-        /\{T}: Add {.} or {.}\. .* deals 1 damage to you\./.test(
+        /\{T}: Add \{C}\./.test(card.oracle_text) &&
+        /\{T}: Add \{.} or \{.}\. .* deals 1 damage to you\./.test(
           card.oracle_text
         )
       )
@@ -426,7 +429,7 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
       return (
         card.type_line.includes('Land') &&
         hasNumLandTypes(card, 0) &&
-        /\{T}: Add {.}, \{.}, or {.}\./.test(card.oracle_text)
+        /\{T}: Add \{.}, \{.}, or \{.}\./.test(card.oracle_text)
       )
     case 'trikeland':
     case 'tricycleland':
@@ -434,7 +437,7 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
       return (
         card.type_line.includes('Land') &&
         hasNumLandTypes(card, 3) &&
-        /\{T}: Add {.}, \{.}, or {.}\./.test(card.oracle_text)
+        /\{T}: Add \{.}, \{.}, or \{.}\./.test(card.oracle_text)
       )
     case 'tangoland':
     case 'battleland':
@@ -444,6 +447,11 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
         /.* enters the battlefield tapped unless you control two or more basic lands\./.test(
           card.oracle_text
         )
+      )
+    case 'multiland':
+      return (
+        card.type_line.includes("Land") &&
+        card.oracle_text?.includes("enters the battlefield tapped unless you have two or more opponents")
       )
     case 'slowland':
       return (

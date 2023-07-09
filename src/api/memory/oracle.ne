@@ -339,7 +339,9 @@ isValue -> (
   | "party"i | "phyrexia"i | "planar"i | "planeswalkerdeck"i | "prerelease"i | "printedtext"i
   | "related"i | "release"i | "reserved"i | "reversible"i | "stamp"i | "showcase"i
   | "spellbook"i | "spikey"i | "stamped"i | "starterdeck"i | "story"i | "tcgplayer"i | "textless"i
-  | "tombstone"i | "onlyprint"i | "variation"i | "watermark"i
+  | "tombstone"i | "onlyprint"i | "variation"i | "watermark"i | "ub"i
+  # these ones i made up :)
+  | "multiland"i
 ) {% ([[category]]) => category.toLowerCase() %}
 
 # anything that isn't a special character and isn't "and" or "or"
