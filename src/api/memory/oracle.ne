@@ -83,7 +83,8 @@ condition -> (
     uniqueCondition |
     orderCondition |
     directionCondition |
-    devotionCondition
+    devotionCondition |
+    oracleTagCondition
 ) {% ([[condition]]) => condition %}
 
 
@@ -296,6 +297,9 @@ watermarkCondition -> ("wm"i | "watermark"i) equalityOperator stringValue
 
 cubeCondition -> "cube"i equalityOperator stringValue
     {% ([_, [_op], value]) => filters.cubeFilter(value) %}
+
+oracleTagCondition -> ("function"i | "oracletag"i | "otag"i) equalityOperator stringValue
+    {% ([_, [_op], value]) => filters.oracleTagFilter(value) %}
 
 # Values
 stringValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value.toLowerCase() %}

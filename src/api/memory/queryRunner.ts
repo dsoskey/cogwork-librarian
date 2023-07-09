@@ -10,6 +10,7 @@ import { sortFunc, SortOrder } from './filters/sort'
 import { chooseFilterFunc } from './filters/print'
 import { Parser } from 'nearley'
 import { SearchOptions } from './types/searchOptions'
+import { invertTags, OracleTag } from './types/tag'
 
 export const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
   const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
@@ -38,6 +39,7 @@ type ParserProducer = () => Parser
 interface QueryRunnerParams {
   corpus: Card[]
   cubes?: CubeDefinition[]
+  oracleTags?: OracleTag[]
   defaultOptions?: SearchOptions,
   getParser?: ParserProducer
 }
@@ -47,8 +49,12 @@ export class QueryRunner {
 
   private readonly getParser: ParserProducer
 
-  constructor({ corpus, getParser, defaultOptions, cubes }: QueryRunnerParams) {
-    this.corpus = normCardList(corpus, invertCubes(cubes ?? []))
+  constructor({ corpus, getParser, defaultOptions, cubes, oracleTags }: QueryRunnerParams) {
+    this.corpus = normCardList(
+      corpus,
+      invertCubes(cubes ?? []),
+      invertTags(oracleTags ?? [])
+    )
     this.getParser = getParser ?? queryParser
     this.defaultOptions = defaultOptions ?? { order: 'name' }
   }

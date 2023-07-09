@@ -7,6 +7,7 @@ import * as Scry from 'scryfall-sdk'
 import { filters } from '../memory/filters'
 import { cogDB } from './db'
 import { invertCubes } from '../memory/types/cube'
+import { invertTags } from '../memory/types/tag'
 
 interface ListImporterProps {
   memory: NormedCard[]
@@ -41,6 +42,8 @@ export const useListImporter = ({ memory }: ListImporterProps): ListImporter => 
   const run = async (rawCards: string[], restart: boolean = false) => {
     const cubes = await cogDB.cube.toArray()
     const cardIdToCubes = invertCubes(cubes)
+    const tags = await cogDB.oracleTag.toArray()
+    const cardIdToOracleTags = invertTags(tags)
 
     return new Promise<NormedCard[]>((resolve, reject) => {
       const foundCards: NormedCard[] = []
@@ -89,7 +92,7 @@ export const useListImporter = ({ memory }: ListImporterProps): ListImporter => 
         console.log("calling them")
         Scry.Cards.collection(...cardsToQueryAPI.map(name => ({name})))
           .on('data', data => {
-            foundCards.push(normCardList([data], cardIdToCubes)[0])
+            foundCards.push(normCardList([data], cardIdToCubes, cardIdToOracleTags)[0])
             report.addComplete()
           })
           .on("not_found", data => {

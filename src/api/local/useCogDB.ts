@@ -1,10 +1,20 @@
 import { createContext, useEffect, useRef, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
-import { cogDB, Manifest } from './db'
+import { cogDB, isScryfallManifest, Manifest } from './db'
 import { migrateCubes, putFile } from './populate'
 import { NormedCard } from '../memory/types/normedCard'
 import { QueryReport, useReporter } from '../useReporter'
 
+export const DB_INIT_MESSAGES = [
+  "loading card manifest...",
+  "downloading card data...",
+  "loading cubes...",
+  "downloading oracle tags...",
+  "preparing card entries...",
+  "loading cards to memory...",
+  "persisting cards to database. search is ready, but don't leave the page or make data changes",
+  "persisting oracle tags to database. search is ready, but don't leave the page or make data changes",
+]
 export interface CogDB {
   dbStatus: TaskStatus
   memStatus: TaskStatus
@@ -16,6 +26,7 @@ export interface CogDB {
   setManifest: Setter<Manifest>
   saveToDB: (manifest?: Manifest, cards?: NormedCard[]) => Promise<void>
   resetDB: () => Promise<void>
+  refreshDB: () => Promise<void>
 }
 
 const defaultDB: CogDB = {
@@ -33,6 +44,7 @@ const defaultDB: CogDB = {
   setManifest: () => console.error("CogDB.setManifest called without a provider!"),
   saveToDB: () => Promise.reject("CogDB.saveToDB called without a provider!"),
   resetDB: () => Promise.reject("CogDB.resetDB called without a provider!"),
+  refreshDB: () => Promise.reject("CogDB.refreshDB called without a provider!"),
   outOfDate: false,
 }
 
@@ -53,7 +65,7 @@ export const useCogDB = (): CogDB => {
   })
 
   const rezzy = useRef<NormedCard[]>([])
-  const onWorkerMessage = (event: MessageEvent): any => {
+  const handleLoadDB = (event: MessageEvent): any => {
     const {type, data} = event.data
     switch (type) {
       case 'count':
@@ -73,7 +85,6 @@ export const useCogDB = (): CogDB => {
       case 'end':
         setMemory(rezzy.current)
         setMemStatus('success')
-        setDbStatus('success')
         console.timeEnd(`loading mem`)
         dbReport.markTimepoint('end')
         break
@@ -96,27 +107,78 @@ export const useCogDB = (): CogDB => {
       setDbStatus('error')
     }
   }
+  const handleInitDB = (event: MessageEvent): any => {
+    const {type, data} = event.data
+    switch (type) {
+      case 'manifest':
+        dbReport.addComplete()
+        setManifest(data)
+        break
+      case "downloaded-cards":
+      case "loaded-cubes":
+      case "downloaded-otags":
+        dbReport.addComplete()
+        break
+      case "normed-cards":
+        dbReport.addComplete()
+        dbReport.setTotalCards(data)
+        break
+      case 'card':
+        const { card, index } = data
+        rezzy.current.push(card)
+        if (index % 1000 === 0)
+          dbReport.addCardCount(1000)
+        break
+      case 'memory-end':
+        setMemory(rezzy.current)
+        setMemStatus('success')
+        console.timeEnd(`loading mem`)
+        dbReport.addComplete()
+        break
+      case "saved-cards":
+        dbReport.addComplete()
+        break
+      case 'db-end':
+        setDbStatus('success')
+        dbReport.addComplete()
+        dbReport.markTimepoint('end')
+        break
+      case 'error':
+        console.error('waaaaaa', data)
+        setMemStatus(prev => prev === 'loading' ? 'error' : prev)
+        setDbStatus(prev => prev === 'loading' ? 'error' : prev)
+        break
+      default:
+        console.error('unknown message from db worker')
+        break
+    }
+  }
 
-  const newLoadDB = async () => {
+  const loadDB = async (refresh?: boolean) => {
     console.debug("starting worker")
     // @ts-ignore
     const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
     rezzy.current = []
-    dbReport.reset(0)
+    dbReport.reset(DB_INIT_MESSAGES.length)
     setMemStatus('loading')
     console.time(`loading mem`)
 
-    console.debug("configuring worker")
-    // @ts-ignore
-    worker.onmessage = onWorkerMessage
-    const count = await cogDB.collection.count()
-    console.debug(`counted ${count} collections!`)
-    if (count === 0) {
+    const cardManifest = await cogDB.collection.get("the_one")
+    if (cardManifest === undefined) {
+      console.debug('initializing db')
       setDbStatus('loading')
+      worker.onmessage = handleInitDB
+      worker.postMessage({ type: 'init', data: 'default_cards' })
+    } else if (refresh) {
+      if (!isScryfallManifest(manifest.type)) {
+        throw Error("don't try to refresh the db with a non-scryfall manifest")
+      }
       console.debug('refreshing db')
-      worker.postMessage({ type: 'init' })
+      worker.onmessage = handleInitDB
+      worker.postMessage({ type: 'init', data: manifest.type })
     } else {
       console.debug("posting start message to worker")
+      worker.onmessage = handleLoadDB
       worker.postMessage({ type: 'load' })
     }
 
@@ -127,11 +189,15 @@ export const useCogDB = (): CogDB => {
       console.time("migrated cubes")
       await migrateCubes()
       console.timeEnd("migrated cubes")
-      await newLoadDB()
+      await loadDB()
     } catch (e) {
       console.error(e)
       setMemStatus('error')
     }
+  }
+
+  const refreshDB = async () => {
+    await loadDB(true)
   }
 
   useEffect(() => { resetDB() }, [])
@@ -145,6 +211,7 @@ export const useCogDB = (): CogDB => {
     memory,
     setMemory,
     resetDB,
+    refreshDB,
     dbReport,
     outOfDate: (manifest?.lastUpdated ?? EPOCH) < cogDB.LAST_UPDATE
   }

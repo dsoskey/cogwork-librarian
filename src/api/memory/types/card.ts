@@ -266,7 +266,7 @@ export const manaAliases: Record<ManaSymbol, ManaSymbol> = {
   'w/u': 'w/u',
   x: 'x',
   y: 'y',
-  // ts-ignore
+  // @ts-ignore
   z: 'z',
   generic: 'generic',
   w: 'w',

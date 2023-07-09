@@ -2,6 +2,7 @@ import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import { NormedCard } from '../memory/types/normedCard'
 import { CubeDefinition } from '../memory/types/cube'
+import { OracleTag } from '../memory/types/tag'
 export interface Collection {
   id: string
   name: string
@@ -12,6 +13,9 @@ export interface Collection {
 
 export const MANIFEST_ID = 'the_one'
 export type Manifest = Omit<Collection, 'blob'>
+
+export const isScryfallManifest = (s: string): boolean =>
+  ["oracle_cards", "unique_artwork", "default_cards", "all_cards", "rulings"].includes(s)
 
 export const toManifest = (
   bulkDataDefinition: BulkDataDefinition
@@ -30,6 +34,8 @@ export class TypedDexie extends Dexie {
   card!: Table<NormedCard>
 
   cube!: Table<CubeDefinition>
+
+  oracleTag!: Table<OracleTag>
 
   constructor() {
     super('cogwork-librarian')
@@ -78,6 +84,19 @@ export class TypedDexie extends Dexie {
         }
       })
     })
+
+    this.version(6).stores({
+      collection: 'id, name, last_updated',
+      card: 'oracle_id, name',
+      cube: 'key',
+      oracleTag: 'id, label'
+    }).upgrade(trans => {
+      return trans.table("card").toCollection().modify (card => {
+        if (card.oracle_tags === undefined) {
+          card.oracle_tags = {}
+        }
+      })
+    })
   }
 
   addCube = async (cube: CubeDefinition) => {
@@ -99,7 +118,5 @@ export class TypedDexie extends Dexie {
       }
     })
   }
-
-
 }
 export const cogDB = new TypedDexie()

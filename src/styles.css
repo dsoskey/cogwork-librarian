@@ -373,6 +373,8 @@ p {
 .scour-button-holder {
   display:flex;
   flex-direction: column;
+  max-width: 50%;
+  flex: 1;
 }
 
 .source-option {

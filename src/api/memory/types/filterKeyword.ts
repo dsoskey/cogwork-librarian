@@ -64,6 +64,9 @@ export const keywords = {
   unique: 'unique',
   watermark: 'watermark', wm: 'wm',
   year: 'year',
+  // Requires tagging data
+  function: 'function', oracletag: 'oracletag', otag: 'otag',
+
 } as const
 
 export const keywordsToImplement = {
@@ -73,7 +76,6 @@ export const keywordsToImplement = {
   prefer: 'prefer',
   // Requires tagging data
   art: 'art', arttag: 'arttag', atag: 'atag',
-  function: 'function', oracletag: 'oracletag', otag: 'otag',
   // Requires set data
   b: 'b', block: 'block',
   // these affect scryfall's UI behavior. are they needed here?

@@ -8,6 +8,7 @@ import { ListImporterContext } from '../../api/local/useListImporter'
 import { cogDB, Manifest, MANIFEST_ID } from '../../api/local/db'
 import { invertCubes } from '../../api/memory/types/cube'
 import { ImportTarget } from './cardDataView'
+import { invertTags } from '../../api/memory/types/tag'
 
 const JSONMIME = "application/json"
 const TEXTMIME = "text/plain"
@@ -55,7 +56,13 @@ export const CardFileImporter = ({
       case JSONMIME:
         const cubes = await cogDB.cube.toArray()
         const cardIdToCubes = invertCubes(cubes)
-        cards = normCardList(JSON.parse(content).map(Card.construct), cardIdToCubes)
+        console.time("tag.toArray")
+        const tags = await cogDB.oracleTag.toArray()
+        console.timeEnd("tag.toArray")
+        console.time("tag invert")
+        const cardIdToOracleTags = invertTags(tags)
+        console.timeEnd("tag invert")
+        cards = normCardList(JSON.parse(content).map(Card.construct), cardIdToCubes, cardIdToOracleTags)
         break
       case TEXTMIME:
         cards = await listImporter.attemptImport(content.split(/[\r\n]+/), true)

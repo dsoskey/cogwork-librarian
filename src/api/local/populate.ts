@@ -3,8 +3,21 @@ import { cogDB, Manifest, MANIFEST_ID } from './db'
 import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import { CubeDefinition, invertCubes } from '../memory/types/cube'
+import { invertTags } from '../memory/types/tag'
+import { downloadOracleTags } from '../scryfall/tagger'
 
-export const downloadCards = async (
+const DOWNLOAD_TAGS = false
+
+export const downloadCards = async (manifest: BulkDataDefinition) => {
+
+  const download = await fetch(manifest.download_uri, { method: 'GET' })
+
+  const results: Array<Card> = (await download.json()).map(Card.construct)
+
+  return results
+}
+
+export const downloadNormedCards = async (
   manifest: BulkDataDefinition
 ): Promise<NormedCard[]> => {
   const download = await fetch(manifest.download_uri, { method: 'GET' })
@@ -12,10 +25,21 @@ export const downloadCards = async (
   const results: Array<Card> = (await download.json()).map(Card.construct)
 
   const cubes: CubeDefinition[] = await cogDB.cube.toArray()
-
   const cardIdToCubes = invertCubes(cubes)
 
-  return normCardList(results, cardIdToCubes)
+  let tags
+  console.time("tag.toArray")
+  if (DOWNLOAD_TAGS) {
+    tags = await downloadOracleTags()
+  } else {
+    tags = await cogDB.oracleTag.toArray()
+  }
+  console.timeEnd("tag.toArray")
+  console.time("tag invert")
+  const cardIdToOracleTags = invertTags(tags)
+  console.timeEnd("tag invert")
+
+  return normCardList(results, cardIdToCubes, cardIdToOracleTags)
 }
 export const putFile = async (manifest: Manifest, data: NormedCard[]) => {
   const toSave: NormedCard[] = []

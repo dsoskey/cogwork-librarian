@@ -182,7 +182,6 @@ export const App = () => {
                     <div className='search-root'>
                       <QueryForm
                         status={queryRunner.status}
-                        canRunQuery={source === 'scryfall' || cogDB.memStatus === 'success'}
                         execute={execute}
                         queries={queries}
                         setQueries={setQueries}

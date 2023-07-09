@@ -7,7 +7,7 @@ import { CoglibIcon } from '../component/coglibIcon'
 import { InfoModal } from '../component/infoModal'
 import { DatabaseSettings } from './databaseSettings'
 import { Loader } from '../component/loader'
-import { CogDBContext } from '../../api/local/useCogDB'
+import { CogDBContext, DB_INIT_MESSAGES } from '../../api/local/useCogDB'
 import { FlagContext } from '../../flags'
 import { multiQueryInfo } from '../component/editor/multiQueryActionBar'
 import { singleQueryInfo } from '../component/editor/singleQueryActionBar'
@@ -28,7 +28,6 @@ const ScryfallLink = () => (
 
 export interface QueryFormProps {
   status: TaskStatus
-  canRunQuery: boolean
   execute: (startIndex: number) => void
   queries: string[]
   setQueries: Setter<string[]>
@@ -40,18 +39,19 @@ export interface QueryFormProps {
 
 export const QueryForm = ({
   status,
-  canRunQuery,
   execute,
   queries,
   setQueries,
   source,
   setSource,
 }: QueryFormProps) => {
-  const { dbReport } = useContext(CogDBContext)
+  const { dbReport, memStatus, dbStatus } = useContext(CogDBContext)
   const { multiQuery } = useContext(FlagContext).flags
   const renderQueryInfo = useMemo(multiQuery ? multiQueryInfo : singleQueryInfo, [multiQuery])
   // something about prism overrides the state update for this css class
   const language: Language = `scryfall-extended${multiQuery ? '-multi' : ""}`
+
+  const canRunQuery = source === 'scryfall' || memStatus === 'success'
   const canSubmit = canRunQuery && status !== 'loading'
   const iconSize = 30
   return (
@@ -132,9 +132,19 @@ export const QueryForm = ({
               `scour${status === 'loading' ? 'ing' : ''} the library`}
             {!canRunQuery && `preparing the library`}
           </button>}
-          {!canRunQuery && dbReport.totalCards > 0 && <>
+          {dbStatus === 'loading' && <>
+            <span>{DB_INIT_MESSAGES[dbReport.complete]}</span>
+            <div className='column'>
+              <Loader width="100%" count={dbReport.complete} total={dbReport.totalQueries} />
+              {memStatus === "loading" && dbReport.totalCards > 0 && <Loader
+                width="100%" label='cards loaded'
+                count={dbReport.cardCount} total={dbReport.totalCards}
+              />}
+            </div>
+          </>}
+          {dbStatus !== 'loading' && memStatus === "loading" && dbReport.totalCards > 0 && <>
             <span>preparing the library...</span>
-            <Loader width="100%" count={dbReport.cardCount} total={dbReport.totalCards} />
+            <Loader width="100%" count={dbReport.cardCount} total={dbReport.totalCards} label='cards loaded' />
           </>}
         </div>
       </div>

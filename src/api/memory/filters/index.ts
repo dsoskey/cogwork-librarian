@@ -30,6 +30,7 @@ import { artistNode } from './artist'
 import { frameNode } from './frame'
 import { borderNode } from './border'
 import { collectorNumberNode } from './collectorNumber'
+import { oracleTagFilter } from './tag'
 export const filters = {
   identity: identityNode,
   and: andNode,
@@ -68,6 +69,7 @@ export const filters = {
   stampFilter,
   watermarkFilter,
   cubeFilter,
+  oracleTagFilter,
   producesMatch,
   producesMatchCount,
   devotionOperation

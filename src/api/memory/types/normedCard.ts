@@ -5,6 +5,7 @@ import _pick from 'lodash/pick'
 import _omit from 'lodash/omit'
 import { CardFace } from 'scryfall-sdk/out/api/Cards'
 import { CardIdToCubeIds } from './cube'
+import { CardIdToTagLabels } from './tag'
 
 export const DEFAULT_CARD_BACK_ID = "0aeebaf5-8c7d-4636-9e82-8c27447861f7"
 
@@ -93,12 +94,13 @@ export interface NormedCard extends Omit<Card, PrintKeys> {
   // there are oracle and print fields on card faces, so the normed card holds a reference to one for oracle filters
   card_faces: CardFace[]
   cube_ids: { [key: string]: boolean }
+  oracle_tags: { [key: string]: boolean }
 }
 
 const ignorePaths = [...Object.keys(PRINT_KEYS), ...Object.keys(IGNORE_KEYS)]
 const printPaths = Object.keys(PRINT_KEYS)
 
-export const normCardList = (cardList: Card[], cardIdToCubes: CardIdToCubeIds): NormedCard[] => {
+export const normCardList = (cardList: Card[], cardIdToCubes: CardIdToCubeIds, cardIdToOracleTags: CardIdToTagLabels): NormedCard[] => {
   const cardsByOracle = _groupBy(cardList, 'oracle_id')
   const result: NormedCard[] = []
 
@@ -108,12 +110,17 @@ export const normCardList = (cardList: Card[], cardIdToCubes: CardIdToCubeIds): 
     for (const id of cardIdToCubes[cards[0].oracle_id] ?? []) {
       cube_ids[id] = true
     }
+    const oracle_tags = {}
+    for (const id of cardIdToOracleTags[cards[0].oracle_id] ?? []) {
+      oracle_tags[id] = true
+    }
     const normed = {
       ...(_omit(cards[0], ignorePaths)) as Omit<Card, PrintKeys>,
       printings: cards.map((it) => _pick(it, printPaths) as Printing
       ),
       card_faces: cards[0].card_faces,
       cube_ids,
+      oracle_tags,
     }
     result.push(normed)
   }

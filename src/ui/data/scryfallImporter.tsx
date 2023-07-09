@@ -1,5 +1,5 @@
 import { humanFileSize } from '../humanFileSize'
-import { downloadCards } from '../../api/local/populate'
+import { downloadNormedCards } from '../../api/local/populate'
 import { toManifest } from '../../api/local/db'
 import React, { useContext, useEffect, useState } from 'react'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
@@ -35,7 +35,7 @@ export const ScryfallImporter = ({
   const importFromScryfall = async () => {
     if (targetDefinition) {
       setDbImportStatus('loading')
-      const cards = await downloadCards(targetDefinition)
+      const cards = await downloadNormedCards(targetDefinition)
       const manifest = toManifest(targetDefinition)
       if (importTargets.find(it => it === "memory")) {
         setMemory(cards)
