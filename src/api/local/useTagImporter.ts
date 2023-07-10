@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import { TaskStatus } from '../../types'
 import { QueryReport, useReporter } from '../useReporter'
+import { NormedCard } from '../memory/types/normedCard'
+import { CogDBContext } from './useCogDB'
 
 export interface OracleTagImporter {
   oracleTagReport: QueryReport
@@ -15,9 +17,11 @@ export const LOADING_MESSAGES = [
   "propagating tags to cards...",
 ]
 export const useTagImporter = (): OracleTagImporter => {
+  const { setMemory } = useContext(CogDBContext)
   const [taskStatus, setTaskStatus] = useState<TaskStatus>('unstarted')
   const [cardModifyStatus, setCardModifyStatus] = useState<TaskStatus>('unstarted')
   const oracleTagReport = useReporter()
+  const rezzy = useRef<NormedCard[]>([])
 
   const onOracleTagWorkerMessage = (event: MessageEvent) => {
     const { type, data } = event.data
@@ -32,7 +36,9 @@ export const useTagImporter = (): OracleTagImporter => {
         setCardModifyStatus("loading")
         break;
       case "oracle-tags-card-saved":
-        if (data % 1000 === 0) {
+        const { card, index } = data
+        rezzy.current.push(card)
+        if (index % 1000 === 0) {
           oracleTagReport.addCardCount(1000)
         }
         break;
@@ -40,6 +46,7 @@ export const useTagImporter = (): OracleTagImporter => {
         console.timeEnd("loaded oracle tags")
         oracleTagReport.addComplete()
         oracleTagReport.markTimepoint('end')
+        setMemory(rezzy.current)
         setTaskStatus('success')
         setCardModifyStatus("success")
         break;
@@ -60,6 +67,7 @@ export const useTagImporter = (): OracleTagImporter => {
     const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
     setTaskStatus("loading")
     oracleTagReport.reset(3)
+    rezzy.current = []
 
     worker.onmessage = onOracleTagWorkerMessage
 

@@ -118,7 +118,7 @@ async function loadOracleTags() {
         card.oracle_tags[tag] = true
       }
       index++
-      postMessage({ type: "oracle-tags-card-saved", data: index })
+      postMessage({ type: "oracle-tags-card-saved", data: { card, index }})
     })
   })
 
