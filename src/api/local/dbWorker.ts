@@ -6,6 +6,7 @@ import { invertTags } from '../memory/types/tag'
 import { invertCubes } from '../memory/types/cube'
 import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { BulkDataType } from 'scryfall-sdk/out/api/BulkData'
+import { ImportTarget } from '../../ui/data/cardDataView'
 
 self.onmessage = (_event) => {
   const event = _event.data
@@ -14,7 +15,9 @@ self.onmessage = (_event) => {
   if (event.type === 'load') {
     loadDb().catch(e => postMessage({ type: 'error', data: e.toString() }))
   } else if (event.type === 'init') {
-    initDb(event.data ?? "default_cards").catch(e => postMessage({ type: 'error', data: e.toString() }))
+    // idea: this event data has manifest OR type name to fetch
+    const { bulkType, targets } = event.data
+    initDb(bulkType ?? "default_cards", targets).catch(e => postMessage({ type: 'error', data: e.toString() }))
   } else if (event.type === 'load-oracle-tags') {
     loadOracleTags().catch(e => postMessage({ type: 'error', data: e.toString() }))
   } else {
@@ -37,10 +40,13 @@ async function loadDb() {
   postMessage({ type: 'end' })
 }
 
-async function initDb(type: BulkDataType) {
+async function initDb(type: BulkDataType, targets: ImportTarget[]) {
+  if (targets.length === 0) {
+    throw Error("No targets specified!")
+  }
   const bulkDataDefinition = await Scry.BulkData.definitionByType(type)
   const manifest = toManifest(bulkDataDefinition)
-  postMessage({ type: 'manifest', data: manifest })
+  postMessage({ type: 'manifest', data: { manifest, shouldSetManifest: targets.find(it => it === 'memory') }})
 
   const cards = await downloadCards(bulkDataDefinition)
   postMessage({ type: "downloaded-cards" })
@@ -56,41 +62,46 @@ async function initDb(type: BulkDataType) {
   const res = normCardList(cards, invertedCubes, invertedOracleTags)
   postMessage({ type: "normed-cards", data: res.length })
 
-  let index = 0
-  for (const card of res) {
-    index++
-    postMessage({ type: 'card', data: { card, index } })
+  if (targets.find(it => it === 'memory')) {
+    let index = 0
+    for (const card of res) {
+      index++
+      postMessage({ type: 'card', data: { card, index } })
+    }
   }
   postMessage({ type: 'memory-end' })
 
-  const toSave: NormedCard[] = []
-  for (const card of res) {
-    if (card.oracle_id === undefined) {
-      console.warn(`card with no oracle_id: ${card.name}`)
-      console.debug(card)
-    } else if (card.name === undefined) {
-      console.warn(`card with no name: ${card.oracle_id}`)
-      console.debug(card)
-    } else {
-      toSave.push(card)
+  if (targets.find(it => it === 'db')) {
+    const toSave: NormedCard[] = []
+    for (const card of res) {
+      if (card.oracle_id === undefined) {
+        console.warn(`card with no oracle_id: ${card.name}`)
+        console.debug(card)
+      } else if (card.name === undefined) {
+        console.warn(`card with no name: ${card.oracle_id}`)
+        console.debug(card)
+      } else {
+        toSave.push(card)
+      }
     }
-  }
 
-  await cogDB.transaction("rw", cogDB.collection, cogDB.card, cogDB.oracleTag, async () => {
-    await cogDB.collection.put({
-      ...manifest,
-      id: MANIFEST_ID,
-      blob: new Blob([]),
+    await cogDB.transaction("rw", cogDB.collection, cogDB.card, cogDB.oracleTag, async () => {
+      await cogDB.collection.put({
+        ...manifest,
+        id: MANIFEST_ID,
+        blob: new Blob([]),
+      })
+      await cogDB.card.clear()
+      await cogDB.card.bulkPut(toSave)
+      postMessage({ type: "saved-cards" })
+      await cogDB.oracleTag.clear()
+      await cogDB.oracleTag.bulkPut(oracleTags)
     })
-    await cogDB.card.clear()
-    await cogDB.card.bulkPut(toSave)
-    postMessage({ type: "saved-cards" })
-    await cogDB.oracleTag.clear()
-    await cogDB.oracleTag.bulkPut(oracleTags)
-  })
+  }
 
   postMessage({ type: 'db-end' })
 }
+
 async function loadOracleTags() {
   const tags = await downloadOracleTags()
   const cardIdToTags = invertTags(tags)

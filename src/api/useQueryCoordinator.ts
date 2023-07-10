@@ -68,7 +68,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
         ])
 
         const errors = promiseResults
-          .filter((it) => it.status === 'fulfilled' && it.value.isErr())
+          .filter((it) => it.status === 'fulfilled' && it.value?.isErr())
           // @ts-ignore
           .map((it) => it.value.error)
 

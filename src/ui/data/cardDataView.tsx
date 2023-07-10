@@ -6,6 +6,7 @@ import { CardFileImporter } from './cardFileImporter'
 import { CardListImporter } from './cardListImporter'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB } from '../../api/local/db'
+import { OracleTagImporter } from './oracleTagImporter'
 
 export const IMPORT_SOURCE = {
   scryfall: 'scryfall',
@@ -58,6 +59,12 @@ export const CardDataView = () => {
   const [importSource, setImportSource] = useState<ImportSource>("scryfall")
   const [importTargets, setImportTargets] = useState<ImportTarget[]>(["memory", "db"])
 
+  let saveText: string = 'database in sync'
+  if (memStatus === 'loading' || dbStatus === 'loading') {
+    saveText = 'synchronizing with database'
+  } else if (dbDirty) {
+    saveText = 'save to database'
+  }
   return <>
     <section className='card-import'>
       <div className='row'>
@@ -98,7 +105,7 @@ export const CardDataView = () => {
           choose "Default Cards" from import from scryfall below.
         </div>
       )}
-      {dbDirty && (
+      {dbStatus !== 'loading' && memStatus !== 'loading' && dbDirty && (
         <div className='alert'>
           in-memory data set hasn't been saved to database yet
         </div>
@@ -107,11 +114,7 @@ export const CardDataView = () => {
         disabled={dbStatus === 'loading' || memStatus === 'loading' || !dbDirty}
         onClick={() => saveToDB()}
       >
-        {dbStatus !== 'loading' && memStatus !== 'loading' && !dbDirty
-          ? 'database in sync'
-          : `sav${
-            dbStatus === 'loading' || memStatus === 'loading' ? 'ing' : 'e'
-          } to local database`}
+        {saveText}
       </button>
       {dbDirty && <button
         disabled={dbStatus === 'loading' || memStatus === 'loading'}
@@ -122,7 +125,7 @@ export const CardDataView = () => {
         } local database`}
       </button>}
     </section>
-
+    {dbStatus === "success" && <OracleTagImporter />}
     <section className='db-import'>
       <h4 className='row'>
         <span>import from</span>
@@ -142,11 +145,7 @@ export const CardDataView = () => {
         <TargetCheckbox target='memory' importTargets={importTargets} setImportTargets={setImportTargets} />
         <TargetCheckbox target='db' importTargets={importTargets} setImportTargets={setImportTargets} />
       </h4>
-      {importSource === "scryfall" && <ScryfallImporter
-        importTargets={importTargets}
-        dbImportStatus={dbImportStatus}
-        setDbImportStatus={setDbImportStatus}
-      />}
+      {importSource === "scryfall" && <ScryfallImporter importTargets={importTargets} />}
       {importSource === "file" && <CardFileImporter
         importTargets={importTargets}
         dbImportStatus={dbImportStatus}

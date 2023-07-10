@@ -1,24 +1,17 @@
 import { humanFileSize } from '../humanFileSize'
-import { downloadNormedCards } from '../../api/local/populate'
 import { toManifest } from '../../api/local/db'
 import React, { useContext, useEffect, useState } from 'react'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import * as Scry from 'scryfall-sdk'
-import { Setter, TaskStatus } from '../../types'
-import { CogDBContext } from '../../api/local/useCogDB'
+import { CogDBContext, DB_INIT_MESSAGES } from '../../api/local/useCogDB'
 import { ImportTarget } from './cardDataView'
+import { Loader } from '../component/loader'
 
 export interface ScryfallImporterProps {
   importTargets: ImportTarget[]
-  dbImportStatus: TaskStatus
-  setDbImportStatus: Setter<TaskStatus>
 }
-export const ScryfallImporter = ({
-  importTargets,
-  dbImportStatus,
-  setDbImportStatus,
-}: ScryfallImporterProps) => {
-  const { setManifest, setMemory, saveToDB } = useContext(CogDBContext)
+export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
+  const { memStatus, dbStatus, dbReport, loadManifest } = useContext(CogDBContext)
 
   const [targetDefinition, setTargetDefinition] = useState<
     BulkDataDefinition | undefined
@@ -27,25 +20,15 @@ export const ScryfallImporter = ({
     BulkDataDefinition[]
   >([])
   useEffect(() => {
-    Scry.BulkData.definitions().then((definitions) =>
+    Scry.BulkData.definitions().then((definitions) => {
       setBulkDataDefinitions(definitions.filter((it) => it.type !== 'rulings'))
-    )
+      setTargetDefinition(definitions.find(it => it.type === 'default_cards'))
+    })
   }, [])
 
   const importFromScryfall = async () => {
     if (targetDefinition) {
-      setDbImportStatus('loading')
-      const cards = await downloadNormedCards(targetDefinition)
-      const manifest = toManifest(targetDefinition)
-      if (importTargets.find(it => it === "memory")) {
-        setMemory(cards)
-        setManifest(manifest)
-      }
-
-      if (importTargets.find(it => it === "db")) {
-        await saveToDB(manifest, cards)
-      }
-      setDbImportStatus('success')
+      await loadManifest(toManifest(targetDefinition), importTargets)
     }
   }
 
@@ -64,10 +47,18 @@ export const ScryfallImporter = ({
         <div>{it.description}</div>
       </div>
     ))}
+    {dbStatus === 'loading' && <>
+      <span>{DB_INIT_MESSAGES[dbReport.complete]}</span>
+      <div className='column'>
+        <Loader width={500} count={dbReport.complete} total={dbReport.totalQueries} />
+        {memStatus === "loading" && dbReport.totalCards > 0 && <Loader
+          width={500} label='cards loaded'
+          count={dbReport.cardCount} total={dbReport.totalCards}
+        />}
+      </div>
+    </>}
     <button
-      disabled={
-        dbImportStatus === 'loading' || targetDefinition === undefined
-      }
+      disabled={dbStatus === 'loading' || memStatus === 'loading' || targetDefinition === undefined}
       onClick={importFromScryfall}
     >
       import data
