@@ -448,7 +448,7 @@ const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
           card.oracle_text
         )
       )
-    case 'multiland':
+    case 'bondland':
       return (
         card.type_line.includes("Land") &&
         card.oracle_text?.includes("enters the battlefield tapped unless you have two or more opponents")

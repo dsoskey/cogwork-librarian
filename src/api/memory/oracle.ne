@@ -295,7 +295,7 @@ stampCondition -> "stamp"i equalityOperator stringValue
 watermarkCondition -> ("wm"i | "watermark"i) equalityOperator stringValue
     {% ([_, [_op], value]) => filters.watermarkFilter(value) %}
 
-cubeCondition -> "cube"i equalityOperator stringValue
+cubeCondition -> ("cube"i | "ctag"i | "tag"i) equalityOperator stringValue
     {% ([_, [_op], value]) => filters.cubeFilter(value) %}
 
 oracleTagCondition -> ("function"i | "oracletag"i | "otag"i) equalityOperator stringValue
@@ -329,7 +329,7 @@ isValue -> (
   | "checkland"i | "dual"i | "fastland"i | "filterland"i | "gainland"i | "painland"i | "scryland"i | "shadowland"i | "snarl"i
   | "slowland"i | "shockland"i | "storageland"i | "creatureland"i | "manland"i
   | "triland"i | "triome"i | "trikeland"i | "tricycleland"i
-  | "tangoland"i | "battleland"i
+  | "tangoland"i | "battleland"i | "bondland"i
   # pulled these from advanced tab in scryfall
   | "adventure"i | "arenaid"i | "artseries"i | "artist"i | "artistmisprint"i | "belzenlok"i
   | "lights"i | "augmentation"i | "back"i | "bear"i | "booster"i | "brawlcommander"i | "buyabox"i
@@ -344,8 +344,6 @@ isValue -> (
   | "related"i | "release"i | "reserved"i | "reversible"i | "stamp"i | "showcase"i
   | "spellbook"i | "spikey"i | "stamped"i | "starterdeck"i | "story"i | "tcgplayer"i | "textless"i
   | "tombstone"i | "onlyprint"i | "variation"i | "watermark"i | "ub"i
-  # these ones i made up :)
-  | "multiland"i
 ) {% ([[category]]) => category.toLowerCase() %}
 
 # anything that isn't a special character and isn't "and" or "or"

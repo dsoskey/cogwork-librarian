@@ -11,7 +11,8 @@ export const keywords = {
   ci: 'ci',
   commander: 'commander',
   cmc: 'cmc',
-  cube: 'cube',
+  // tag and ctag are custom aliases for cube
+  cube: 'cube', tag: 'tag', ctag: 'ctag',
   color: 'color',
   date: 'date',
   devotion: 'devotion', // !Devotion can only match single color or hybrid mana. No two-brid either
@@ -74,7 +75,7 @@ export const keywordsToImplement = {
   new: 'new', // rarity, flavor, art, artist, frame, language, game, paper, mtgo, arena, nonfoil, foil
   // its not: etched, masterpiece, promo, border, stamp
   prefer: 'prefer',
-  // Requires tagging data
+  // Requires illustration tagging data
   art: 'art', arttag: 'arttag', atag: 'atag',
   // Requires set data
   b: 'b', block: 'block',

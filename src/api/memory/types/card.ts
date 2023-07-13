@@ -77,7 +77,7 @@ export const isValues = {
   tricycleland: 'tricycleland',
   tangoland: 'tangoland',
   battleland: 'battleland',
-  multiland: 'multiland',
+  bondland: 'bondland',
   ub: 'ub', //universes beyond
   extra: 'extra',
   adventure: "adventure",
