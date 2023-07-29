@@ -77,7 +77,7 @@ export const scryfall: Grammar = {
     },
   },
   regex: {
-    pattern: /\/[^/]+\//,
+    pattern: /\/(\\\/|[^/])+\//,
     inside: scryfallRegex,
     greedy: true,
   },

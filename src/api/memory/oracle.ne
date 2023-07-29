@@ -20,7 +20,6 @@ filter ->
       filter __ connector clause {% ([clause1, _, connectorFunc, clause2]) => {
         return connectorFunc(clause1, clause2)
       } %}
-      # is this where i put the plain text search?
     | clause {% id %}
 
 clause -> "-":? (
@@ -304,7 +303,7 @@ oracleTagCondition -> ("function"i | "oracletag"i | "otag"i) equalityOperator st
 # Values
 stringValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value.toLowerCase() %}
 
-regexString -> "/" [^/]:* "/"  {% function(d) {return d[1].join(""); } %}
+regexString -> "/" ([^/] {% id %} | "\/" {% id %}):* "/"  {% function(d) {return d[1].join(""); } %}
 
 integerValue -> [0-9]:+ {% ([digits]) => parseInt(digits.join(''), 10) %}
 

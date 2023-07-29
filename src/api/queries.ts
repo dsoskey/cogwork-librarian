@@ -52,6 +52,7 @@ export const testQueries = [
   'year=2020',
   'lang:any',
   'cube:april',
+  "o:\\/\\/+[1-9]\\d*/", // this one wasn't escaping \/ properly
 ]
 
 const unimplementedQueries = [
@@ -62,13 +63,8 @@ const unimplementedQueries = [
   'st:funny',
   'is:planeswalker_deck',
   'is:league',
-  'is:etched',
-  'is:buyabox',
   'is:giftbox',
   'is:intro_pack',
-  'is:gameday',
-  'is:prerelease',
-  'is:release',
   'is:fnm',
   'is:judge_gift',
   'is:arena_league',
@@ -91,7 +87,7 @@ const unimplementedQueries = [
 ]
 
 const notGonnaImplementQueries = [
-  'art|atag|arttag|function|otag|oracletag'
+  'art|atag|arttag'
 ] // custom regex, display keywords
 
 const brokenQueries = [
