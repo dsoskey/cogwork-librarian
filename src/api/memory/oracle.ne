@@ -294,7 +294,7 @@ stampCondition -> "stamp"i equalityOperator stringValue
 watermarkCondition -> ("wm"i | "watermark"i) equalityOperator stringValue
     {% ([_, [_op], value]) => filters.watermarkFilter(value) %}
 
-cubeCondition -> ("cube"i | "ctag"i | "tag"i) equalityOperator stringValue
+cubeCondition -> ("cube"i | "ctag"i | "tag"i) equalityOperator cubeValue
     {% ([_, [_op], value]) => filters.cubeFilter(value) %}
 
 oracleTagCondition -> ("function"i | "oracletag"i | "otag"i) equalityOperator stringValue
@@ -302,6 +302,8 @@ oracleTagCondition -> ("function"i | "oracletag"i | "otag"i) equalityOperator st
 
 # Values
 stringValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value.toLowerCase() %}
+
+cubeValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value %}
 
 regexString -> "/" ([^/] {% id %} | "\/" {% id %}):* "/"  {% function(d) {return d[1].join(""); } %}
 
@@ -354,7 +356,7 @@ noQuoteStringValue ->
     | "and"i [^ \t\n"'\\=<>:]
     | "o"i [^rR \t\n"'\\=<>:]
     | "or"i [^ \t\n"'\\=<>:]
-    ) [^ \t\n"'\\=<>:]:* {% ([startChars, chars]) => startChars.concat(chars).join('').toLowerCase() %}
+    ) [^ \t\n"'\\=<>:]:* {% ([startChars, chars]) => startChars.concat(chars).join('') %}
 
 # https://github.com/dekkerglen/CubeCobra/blob/dfbe1bdea3020cf4c619d6c6b360efe8e78f100f/nearley/values.ne#L85
 comb1[A] -> null {% () => [] %}
