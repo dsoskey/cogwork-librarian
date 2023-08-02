@@ -44,7 +44,7 @@ export const producesMatchCount =
         case '<=':
           return cardCount <= count
         case '>':
-          return cardCount === count
+          return cardCount > count
         // Scryfall adapts ":" to the context. in this context it acts as >=
         case ':':
         case '>=':

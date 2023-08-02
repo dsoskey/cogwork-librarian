@@ -71,5 +71,14 @@ describe('produces filter', function() {
       expect(result[0].id).toEqual(bloodCrypt.id)
       expect(result[1].id).toEqual(ramunapRuins.id)
     })
+
+    it('handles > comparisons for the number of colors cards produce', () => {
+      const result = queryRunner.search("produces>1")._unsafeUnwrap()
+
+      expect(result.length).toEqual(3)
+      expect(result[0].id).toEqual(birdsOfParadise.id)
+      expect(result[1].id).toEqual(bloodCrypt.id)
+      expect(result[2].id).toEqual(ramunapRuins.id)
+    })
   })
 })
