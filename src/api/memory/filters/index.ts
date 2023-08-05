@@ -31,6 +31,7 @@ import { frameNode } from './frame'
 import { borderNode } from './border'
 import { collectorNumberNode } from './collectorNumber'
 import { oracleTagFilter } from './tag'
+import { oddEvenFilter } from './manavalue'
 export const filters = {
   identity: identityNode,
   and: andNode,
@@ -72,5 +73,6 @@ export const filters = {
   oracleTagFilter,
   producesMatch,
   producesMatchCount,
-  devotionOperation
+  devotionOperation,
+  oddEvenFilter,
 }

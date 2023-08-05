@@ -86,12 +86,13 @@ condition -> (
     oracleTagCondition
 ) {% ([[condition]]) => condition %}
 
-
 cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
     {% ([_, [operator], value]) => oracleNode({
         filtersUsed: ["cmc"],
         filterFunc: filters.defaultOperation('cmc', operator, value),
     }) %}
+| ("manavalue"i | "mv"i | "cmc"i) onlyEqualOperator ("even"i | "odd"i)
+    {% ([_kw, _op, [value]]) => filters.oddEvenFilter(value === "even") %}
 
 exactNameCondition -> "!":? stringValue
     {% ([op, value]) => oracleNode({
@@ -99,13 +100,13 @@ exactNameCondition -> "!":? stringValue
         filterFunc: op === "!" ? filters.exactMatch('name', value) : filters.textMatch('name', value)
     })%}
 
-nameCondition -> ("name"i) (":" | "=") stringValue
+nameCondition -> ("name"i) onlyEqualOperator stringValue
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["name"],
         filterFunc: filters.textMatch('name', value)
     })%}
 
-nameRegexCondition -> ("name"i) (":" | "=") regexString
+nameRegexCondition -> ("name"i) onlyEqualOperator regexString
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["name"],
         filterFunc: filters.regexMatch('name', value)
@@ -126,40 +127,40 @@ colorIdentityCondition ->
 manaCostCondition -> ("mana"i | "m"i) anyOperator manaCostValue
     {% ([_, [operator], value]) => filters.manaCostMatch(operator, value) %}
 
-oracleCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") stringValue
+oracleCondition -> ("oracle"i | "o"i | "text"i) onlyEqualOperator stringValue
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["oracle"],
         filterFunc: filters.noReminderTextMatch('oracle_text', value),
     }) %}
 
-oracleRegexCondition -> ("oracle"i | "o"i | "text"i) (":" | "=") regexString
+oracleRegexCondition -> ("oracle"i | "o"i | "text"i) onlyEqualOperator regexString
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["oracle"],
         filterFunc: filters.noReminderRegexMatch('oracle_text', value),
     }) %}
 
-fullOracleCondition -> ("fo"i) (":" | "=") stringValue
+fullOracleCondition -> ("fo"i) onlyEqualOperator stringValue
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["full-oracle"],
         filterFunc: filters.textMatch('oracle_text', value),
     }) %}
 
-fullOracleRegexCondition -> ("fo"i) (":" | "=") regexString
+fullOracleRegexCondition -> ("fo"i) onlyEqualOperator regexString
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["full-oracle"],
         filterFunc: filters.regexMatch('oracle_text', value),
     }) %}
 
-keywordCondition -> "keyword"i (":" | "=") stringValue
+keywordCondition -> "keyword"i onlyEqualOperator stringValue
     {% ([_, [_op], value]) => filters.keywordMatch(value) %}
 
-typeCondition -> ("t"i | "type"i) (":" | "=") stringValue
+typeCondition -> ("t"i | "type"i) onlyEqualOperator stringValue
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["type"],
         filterFunc: filters.textMatch('type_line', value),
     }) %}
 
-typeRegexCondition -> ("t"i | "type"i) (":" | "=") regexString
+typeRegexCondition -> ("t"i | "type"i) onlyEqualOperator regexString
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["type-regex"],
         filterFunc: filters.regexMatch('type_line', value),
@@ -192,13 +193,13 @@ bannedCondition -> "banned"i equalityOperator formatValue
 restrictedCondition -> "restricted"i equalityOperator formatValue
     {% ([_, [_op], value]) => filters.formatMatch('restricted', value) %}
 
-isCondition -> ("is"i | "has"i) ":" isValue
+isCondition -> ("is"i | "has"i) onlyEqualOperator isValue
     {% ([_, [_op], value]) => filters.isVal(value) %}
 
-notCondition -> "not"i ":" isValue
+notCondition -> "not"i onlyEqualOperator isValue
     {% ([_, [_op], value]) => filters.not(filters.isVal(value)) %}
 
-inCondition -> "in"i ":" stringValue
+inCondition -> "in"i onlyEqualOperator stringValue
     {% ([_, [_op], value]) => filters.inFilter(value) %}
 
 producesCondition ->
@@ -216,7 +217,7 @@ producesCondition ->
 devotionCondition -> "devotion"i anyOperator devotionValue
     {% ([_, [operator], [pips]]) => filters.devotionOperation(operator, pips) %}
 
-uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
+uniqueCondition -> "unique"i onlyEqualOperator ("cards"i | "prints"i | "art"i)
     {% ([_, [operator], value]) => oracleNode({
         filtersUsed: [`unique:${value}`],
         filterFunc: identity(),
@@ -234,14 +235,14 @@ uniqueCondition -> "unique"i ":" ("cards"i | "prints"i | "art"i)
     }) %}
 
 
-orderCondition -> "order"i ":" orderValue
+orderCondition -> "order"i onlyEqualOperator orderValue
     {% ([_, [operator], value]) => oracleNode({
         filtersUsed: [`order:${value}`],
         filterFunc: identity(),
         inverseFunc: identity(),
     }) %}
 
-directionCondition -> "direction"i ":" ("asc"i | "desc"i)
+directionCondition -> "direction"i onlyEqualOperator ("asc"i | "desc"i)
     {% ([_, [operator], value]) => oracleNode({
         filtersUsed: [`direction:${value}`],
         filterFunc: identity(),
@@ -315,6 +316,8 @@ numberValue -> [0-9]:* ("." [0-9]:+):?
 anyOperator -> ":" | "=" | "!=" | "<>" | "<=" | "<" | ">=" | ">" {% id %}
 
 equalityOperator -> ":" | "=" | "!=" | "<>" {% id %}
+
+onlyEqualOperator -> ":" | "=" {% id %}
 
 formatValue -> (
     "standard"i | "future"i | "historic"i | "pioneer"i | "modern"i | "legacy"i | "paupercommander"i |
