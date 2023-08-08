@@ -20,12 +20,6 @@ const description: Record<DataSource, String> = {
     'processes queries against a local database of oracle cards. syntax support is incomplete, but it runs an order of magnitude faster than communicating with scryfall',
 }
 
-const ScryfallLink = () => (
-  <a href='https://scryfall.com/docs/syntax' rel='noreferrer' target='_blank'>
-    scryfall query
-  </a>
-)
-
 export interface QueryFormProps {
   status: TaskStatus
   execute: (startIndex: number) => void
@@ -57,13 +51,6 @@ export const QueryForm = ({
   return (
     <>
       <div className={`column ${source}`}>
-        <label>
-          enter a base <ScryfallLink /> to include in each subquery, and enter
-          any number of subqueries to combine with the base query, one per row.
-          exclude subqueries by adding a{' '}
-          <code className='language-scryfall-extended'>#</code> at the beginning
-          of the row
-        </label>
         <TextEditor
           queries={queries}
           setQueries={setQueries}
@@ -76,7 +63,7 @@ export const QueryForm = ({
 
       <div className='row execute-controls'>
         <div className='row'>
-          <label>data source:</label>
+          <label><strong>data source:</strong></label>
           <div className={`source-option row ${source === 'scryfall' ? 'selected' : ''}`}>
             <div className='radio-button-holder'>
               <ScryfallIcon

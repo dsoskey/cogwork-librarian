@@ -1,18 +1,8 @@
 import React, { useContext, useState } from 'react'
-import { queryExamples } from '../api/example'
-import {
-  injectPrefix as _injectPrefix,
-  SCORE_PRECISION,
-  weightAlgorithms,
-} from '../api/queryRunnerCommon'
 import { FlagContext } from '../flags'
 import "./appInfo.css"
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
-import { singleQueryInfo } from './component/editor/singleQueryActionBar'
-import { rankInfo } from './component/editor/infoLines'
-
-const EXAMPLE = queryExamples[0]
-const injectPrefix = _injectPrefix(EXAMPLE.prefix)
+import { BaseSubExplanation } from './docs/baseSubExplanation'
 
 export const AppInfo = () => {
   const { setFlag } = useContext(FlagContext)
@@ -42,6 +32,7 @@ export const AppInfo = () => {
 
   return (
     <div className='app-info-root'>
+      <h3>what is this thing???</h3>
       <p>
         <span onClick={tryLock}>cogwork librarian</span> wants to help you brainstorm and build cubes, battle
         boxes, and other custom magic formats. craft more complex queries to
@@ -51,6 +42,7 @@ export const AppInfo = () => {
         card format to power the most custom environments with scryfall's
         syntax.
       </p>
+      <br />
 
       <h3>
         why should i use cogwork librarian? why not use scryfall directly?
@@ -78,74 +70,11 @@ export const AppInfo = () => {
           use a custom data set.
         </li>
       </ol>
+      <br />
 
-      <h3>how does the base/sub query model work?</h3>
-      <p>
-        the base/sub query model aims to let you curate complex searches with
-        minimal syntax. it uses a custom 3-step algorithm on top of scryfall's
-        filter syntax:
-      </p>
-      <ol>
-        <li>combine the base query with each subquery</li>
-        <li>
-          weigh each query, assigning that weight to each card in the query
-        </li>
-        <li>aggregate cards by total query weight</li>
-      </ol>
 
-      <h4>1. combine the base query with each subquery</h4>
-      <p>starting from an input like this:</p>
-      <div className='example-query'>
-        <pre className='language-none'>
-          <code>
-            {singleQueryInfo(rankInfo)([
-              EXAMPLE.prefix,
-              ...EXAMPLE.queries,
-            ]).join('\n')}
-          </code>
-        </pre>
-        <pre className='language-scryfall-extended'>
-          <code>{[EXAMPLE.prefix, ...EXAMPLE.queries].join('\n')}</code>
-        </pre>
-      </div>
-
-      <p>cogwork librarian transforms the queries into this:</p>
-      <pre className='language-scryfall'>
-        <code>{EXAMPLE.queries.map(injectPrefix).join('\n')}</code>
-      </pre>
-      <p>
-        this lets you treat the first query as the total set of cards you want
-        to see in each subquery.
-      </p>
-
-      <h4>
-        2. weigh each query, assigning that weight to each card in the query
-      </h4>
-      <p>
-        once prepared, each query is weighed by its order in the list of
-        queries (first being highest)
-      </p>
-      <pre className='language-scryfall'>
-        <code>
-          {EXAMPLE.queries
-            .map(injectPrefix)
-            .map(
-              (it, index) =>
-                `[${weightAlgorithms
-                  .zipf(index)
-                  .toPrecision(SCORE_PRECISION)}] ${it}`
-            )
-            .join('\n')}
-        </code>
-      </pre>
-
-      <h4>3. aggregate cards by total query weight</h4>
-      <p>
-        cards in multiple queries get their combined weight, so their final
-        placement rises above cards that matched fewer or lower placed queries
-        (tip: use scryfall's <code>or</code> syntax to give two queries the
-        same weight)
-      </p>
+      <BaseSubExplanation />
+      <br />
 
       <h3>
         okay all of those are great but it's not enough for me yet. what else
@@ -165,6 +94,7 @@ export const AppInfo = () => {
         <li>project import/export with per-project saved/ignored lists</li>
         <li>shareable search links</li>
       </ul>
+      <br/>
 
       <h3>this looks cool<span onClick={clickPin2}>!</span> how can i contribute?</h3>
       <p>

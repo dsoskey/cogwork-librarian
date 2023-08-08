@@ -15,8 +15,6 @@ import { useProject, ProjectContext } from './api/useProject'
 import { Footer } from './ui/footer'
 import { useViewportListener } from './viewport'
 import { CoglibIcon } from './ui/component/coglibIcon'
-import { queryExamples } from './api/example'
-import _random from 'lodash/random'
 import { ExampleGallery } from './ui/queryForm/exampleGallery'
 import { SyntaxDocs } from './ui/docs/syntaxDocs'
 import { AppInfo } from './ui/appInfo'
@@ -31,6 +29,7 @@ import { SearchError } from './ui/component/searchError'
 import { SavedCards } from './ui/savedCards'
 import { ToasterMessage, Toaster, ToasterContext } from './ui/component/toaster'
 import { v4 as uuidv4 } from 'uuid';
+import { INTRO_EXAMPLE } from './ui/docs/introExample'
 
 export const App = () => {
   const { adminMode, multiQuery } = useContext(FlagContext).flags
@@ -46,7 +45,7 @@ export const App = () => {
   const { addIgnoredId, ignoredIds, addCard } = project
 
   const { queries, setQueries, options, setOptions } = useQueryForm({
-    example: () => queryExamples[_random(queryExamples.length - 1)],
+    example: () => ({ queries: INTRO_EXAMPLE }),
   })
 
   const queryRunner = {

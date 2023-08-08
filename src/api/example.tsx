@@ -28,7 +28,7 @@ export const queryExamples: QueryExample[] = [
   },
   {
     title: 'savai sacrifice',
-    prefix: '-t:vanguard ci:rwb o:/sacrifice an? *./',
+    prefix: '-is:extra ci:savai o:/sacrifice an? *./',
     queries: [
       'o:/draw .* cards?/',
       'o:/deals? .* damage/',
@@ -37,7 +37,7 @@ export const queryExamples: QueryExample[] = [
       'o:/scry/',
       't:creature',
       '-t:planeswalker -t:creature',
-      'ci:brw',
+      'ci:savai',
     ],
   },
   // {
