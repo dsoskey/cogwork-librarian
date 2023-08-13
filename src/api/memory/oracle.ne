@@ -97,13 +97,13 @@ cmcCondition -> ("manavalue"i | "mv"i | "cmc"i) anyOperator integerValue
 exactNameCondition -> "!":? stringValue
     {% ([op, value]) => oracleNode({
         filtersUsed: [op === "!" ? "exact" : "name"],
-        filterFunc: op === "!" ? filters.exactMatch('name', value) : filters.textMatch('name', value)
+        filterFunc: op === "!" ? filters.exactMatch('name', value) : filters.nameFilter(value)
     })%}
 
 nameCondition -> ("name"i) onlyEqualOperator stringValue
     {% ([_, [_op], value]) => oracleNode({
         filtersUsed: ["name"],
-        filterFunc: filters.textMatch('name', value)
+        filterFunc: filters.nameFilter(value)
     })%}
 
 nameRegexCondition -> ("name"i) onlyEqualOperator regexString

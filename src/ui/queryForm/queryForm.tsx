@@ -129,9 +129,14 @@ export const QueryForm = ({
               />}
             </div>
           </>}
-          {dbStatus !== 'loading' && memStatus === "loading" && dbReport.totalCards > 0 && <>
+          {dbStatus !== 'loading' && memStatus === "loading" && <>
             <span>preparing the library...</span>
-            <Loader width="100%" count={dbReport.cardCount} total={dbReport.totalCards} label='cards loaded' />
+            {dbReport.totalCards > 0 && <Loader
+              width="100%"
+              count={dbReport.cardCount}
+              total={dbReport.totalCards}
+              label='cards loaded'
+            />}
           </>}
         </div>
       </div>

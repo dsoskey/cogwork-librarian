@@ -366,9 +366,6 @@ p {
 .execute-controls {
  flex-wrap: wrap;
 }
-.execute-controls > * {
-  margin-bottom: var(--spacing-200);
-}
 
 .scour-button-holder {
   display:flex;
