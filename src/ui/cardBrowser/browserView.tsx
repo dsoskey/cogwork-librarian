@@ -94,10 +94,7 @@ export const BrowserView = React.memo(
     useHighlightPrism([result, revealDetails, visibleDetails])
 
     if (status === 'unstarted') {
-      return <div className='void'>
-        {viewport.desktop && adminMode && <AdminPanel><CoglibIcon isActive={adminMode} size='3em' /></AdminPanel>}
-        {viewport.desktop && !adminMode && <CoglibIcon size='3em' />}
-      </div>
+      return null
     }
 
     return <div className='results'>

@@ -107,7 +107,7 @@ p {
 }
 
 .cogwork-librarian {
-  position: absolute;
+  position: relative;
   top: 0;
   z-index: 5;
   width: var(--coglib-width);
@@ -143,13 +143,6 @@ p {
   left: calc(0px - var(--coglib-width));
   background-color: transparent;
   /*width: var(--coglib-width);*/
-}
-
-.cogwork-librarian.show.examples,
-.cogwork-librarian.show.about-me,
-.cogwork-librarian.show.user-guide,
-.cogwork-librarian.show.data {
-  width: 100%;
 }
 
 .column {
@@ -238,6 +231,17 @@ p {
   display: flex;
   flex-direction: column;
   margin: var(--spacing-300);
+}
+.cumbo {
+  position: relative;
+  height: 100vh;
+}
+.saved-cards-floater {
+  width: 25%;
+  height: 100%;
+  overflow-y: scroll;
+  align-self: start;
+  background-color: var(--green);
 }
 
 .example-query {
