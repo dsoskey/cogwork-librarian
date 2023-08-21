@@ -172,7 +172,7 @@ export const App = () => {
                     <AppInfo />
                   </Route>
                   <Route path='/examples' exact>
-                    <ExampleGallery setQueries={setQueries} />
+                    <ExampleGallery />
                   </Route>
                   <Route path='/user-guide' exact>
                     <SyntaxDocs />
