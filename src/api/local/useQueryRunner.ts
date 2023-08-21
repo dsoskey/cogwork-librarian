@@ -1,5 +1,4 @@
 import { Card } from 'scryfall-sdk/out/api/Cards'
-import cloneDeep from 'lodash/cloneDeep'
 import {
   QueryRunner as CoglibQueryRunner,
   QueryRunnerFunc,
@@ -10,8 +9,6 @@ import { useQueryCoordinator } from '../useQueryCoordinator'
 import { NormedCard } from '../memory/types/normedCard'
 import { errAsync, okAsync } from 'neverthrow'
 import { displayMessage } from '../../error'
-import { useContext } from 'react'
-import { FlagContext } from '../../flags'
 import { QueryRunner } from '../memory/queryRunner'
 import { SearchOptions } from '../memory/types/searchOptions'
 
@@ -23,10 +20,9 @@ export const useMemoryQueryRunner = ({
   injectPrefix,
   corpus,
 }: MemoryQueryRunnerProps): CoglibQueryRunner => {
-  const { status, report, cache, result, rawData, execute, errors } =
+  const { status, report, result, rawData, execute, errors } =
     useQueryCoordinator()
-  const { disableCache } = useContext(FlagContext).flags
-  const getCards = QueryRunner.generateSearchFunction(corpus)
+  const searchCards = QueryRunner.generateSearchFunction(corpus)
 
   const runQuery: QueryRunnerFunc = (
     query: string,
@@ -40,49 +36,34 @@ export const useMemoryQueryRunner = ({
     }
     const weight = getWeight(index)
     const preparedQuery = injectPrefixx ? injectPrefixx(query) : injectPrefix(query)
-    const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
     rawData.current[preparedQuery] = []
-    if (cache.current[_cacheKey] === undefined || disableCache) {
-      try {
-        const cardResult = getCards(preparedQuery, options)
-        if (cardResult.isErr()) {
-          report.addError()
-          const { query, errorOffset, message } = cardResult.error
-          return errAsync({
-            query,
-            debugMessage: message,
-            displayMessage: displayMessage(query, index, errorOffset),
-          })
-        }
-
-        // This smells. should the cache manage its own disability?
-        if (!disableCache) {
-          cache.current[_cacheKey] = []
-        }
-        const cards = cardResult.value.map((card: Card) => ({
-          data: card,
-          weight,
-          matchedQueries: [query],
-        }))
-        rawData.current[preparedQuery] = cards
-        if (!disableCache) {
-          cache.current[_cacheKey] = cloneDeep(cards)
-        }
-        report.addCardCount(cards.length)
-        report.addComplete()
-      } catch (error) {
-        console.log(error)
+    try {
+      const cardResult = searchCards(preparedQuery, options)
+      if (cardResult.isErr()) {
         report.addError()
+        const { query, errorOffset, message } = cardResult.error
         return errAsync({
-          query: preparedQuery,
-          displayMessage: error.toLocaleString(),
-          debugMessage: error.toLocaleString(),
+          query,
+          debugMessage: message,
+          displayMessage: displayMessage(query, index, errorOffset),
         })
       }
-    } else {
-      rawData.current[preparedQuery] = cloneDeep(cache.current[_cacheKey])
-      report.addCardCount(rawData.current[preparedQuery].length)
+      const cards = cardResult.value.map((card: Card) => ({
+        data: card,
+        weight,
+        matchedQueries: [query],
+      }))
+      rawData.current[preparedQuery] = cards
+      report.addCardCount(cards.length)
       report.addComplete()
+    } catch (error) {
+      console.log(error)
+      report.addError()
+      return errAsync({
+        query: preparedQuery,
+        displayMessage: error.toLocaleString(),
+        debugMessage: error.toLocaleString(),
+      })
     }
     return okAsync(preparedQuery)
   }
