@@ -3,6 +3,9 @@
     margin-left: 0.75%;
     padding-bottom: var(--spacing-200);
 }
+.card-view:focus-visible {
+    outline: unset;
+}
 
 @media (min-width: 1024px) {
     .card-view {

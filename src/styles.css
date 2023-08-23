@@ -247,7 +247,10 @@ p {
 .example-query {
   display: flex;
   flex-direction: row;
-  /*align-items: center;*/
+}
+
+.example-query .labels {
+  padding-right: 0;
 }
 
 .example-query > :last-child {

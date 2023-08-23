@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, useContext, useState } from 'react'
+import React, { KeyboardEvent, useContext, useRef, useState } from 'react'
 import { Card, ImageUris } from 'scryfall-sdk'
 import { EnrichedCard, SCORE_PRECISION } from '../../../api/queryRunnerCommon'
 import { WEIGHT, QUERIES } from '../constants'
@@ -44,6 +44,7 @@ export const CardImageView = ({
   const { showDebugInfo } = useContext(FlagContext).flags
   const [flipped, setFlipped] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const cardViewRef = useRef<HTMLDivElement>()
   const [clipboardStatus, setClipboardStatus] =
     useState<TaskStatus>('unstarted')
   const _card = card.data
@@ -66,37 +67,33 @@ export const CardImageView = ({
       })
   }
 
-  const handleHoverOn = () => setHovered(true)
-  const handleHoverOff = () => setHovered(false)
+  const handleHoverOn = () => {
+    cardViewRef.current?.focus()
+    setHovered(true)
+  }
+  const handleHoverOff = () => {
+    cardViewRef.current?.blur()
+    setHovered(false)
+  }
 
-  // todo: debug why this doesn't work
   const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
-    console.log('key pressed!')
-    event.stopPropagation()
-    if (hovered) {
-      switch (event.key) {
-        case 'a':
-          console.log("added!")
-          onAdd();
-          break;
-        case 'i':
-          console.log("ignored!")
-          onIgnore();
-          break;
-        default:
-          console.log(`unrecognized key: ${event.key}`)
-          break
-      }
-    } else {
-      console.log("not hovered!")
+    switch (event.key) {
+      case 'a':
+        onAdd();
+        break;
+      default:
+        break;
     }
   }
 
 
   return (
-    <div className='card-view'
+    <div className='card-view' ref={cardViewRef}
+      tabIndex={-1}
+      onKeyDown={handleKeyPress}
       onMouseOver={handleHoverOn}
-      onMouseLeave={handleHoverOff}>
+      onMouseLeave={handleHoverOff}
+    >
       <img
         width='100%'
         src={imageSource}

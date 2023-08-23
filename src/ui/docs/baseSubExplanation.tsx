@@ -26,14 +26,14 @@ export const BaseSubExplanation = () => {
     <h4>1. combine the base query with each subquery</h4>
     <p>starting from an input like this:</p>
     <div className='example-query'>
-        <pre className='language-none'>
-          <code>
-            {singleQueryInfo(rankInfo)([
-              EXAMPLE.prefix,
-              ...EXAMPLE.queries,
-            ]).join('\n')}
-          </code>
-        </pre>
+      <pre className='language-none labels'>
+        <code>
+          {singleQueryInfo(rankInfo)([
+            EXAMPLE.prefix,
+            ...EXAMPLE.queries,
+          ]).join('\n')}
+        </code>
+      </pre>
       <pre className='language-scryfall-extended'>
           <code>{[EXAMPLE.prefix, ...EXAMPLE.queries].join('\n')}</code>
         </pre>
@@ -55,19 +55,23 @@ export const BaseSubExplanation = () => {
       once prepared, each query is weighed by its order in the list of
       queries (first being highest)
     </p>
-    <pre className='language-scryfall'>
+    <div className='example-query'>
+      <pre className='language-none labels'>
+        <code>
+          {EXAMPLE.queries.map((_, index) =>
+            `[${weightAlgorithms
+              .zipf(index)
+              .toPrecision(SCORE_PRECISION)}]`).join('\n')}
+        </code>
+      </pre>
+      <pre className='language-scryfall'>
         <code>
           {EXAMPLE.queries
             .map(injectPrefix)
-            .map(
-              (it, index) =>
-                `[${weightAlgorithms
-                  .zipf(index)
-                  .toPrecision(SCORE_PRECISION)}] ${it}`
-            )
             .join('\n')}
         </code>
       </pre>
+    </div>
 
     <h4>3. aggregate cards by total query weight</h4>
     <p>

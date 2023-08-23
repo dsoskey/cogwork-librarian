@@ -1,42 +1,23 @@
 import { TextEditor } from './component/editor/textEditor'
-import React, { useState } from 'react'
-import { Setter, TaskStatus } from '../types'
+import React from 'react'
+import { Setter } from '../types'
 import "./savedCards.css"
+import { CopyToClipboardButton } from './component/copyToClipboardButton'
 
 export interface SavedCardsProps {
   savedCards: string[]
   setSavedCards: Setter<string[]>
 }
 
-const buttonText = {
-  unstarted: 'copy to clipboard',
-  success: 'copied successfully!',
-  error: 'there was an error copying',
-}
+
 export const SavedCards = ({ savedCards, setSavedCards }: SavedCardsProps) => {
-  const [clipboardStatus, setClipboardStatus] =
-    useState<TaskStatus>('unstarted')
+
   return (
     <div className='saved-cards-root'>
-        <button
-          className='copy-text'
-          disabled={clipboardStatus !== 'unstarted'}
-          onClick={() => {
-            navigator.clipboard
-              .writeText(savedCards.join('\n'))
-              .then(() => {
-                setClipboardStatus('success')
-                setTimeout(() => {
-                  setClipboardStatus('unstarted')
-                }, 3000)
-              })
-              .catch(() => {
-                setClipboardStatus('error')
-              })
-          }}
-        >
-          {buttonText[clipboardStatus]}
-        </button>
+      <CopyToClipboardButton
+        className='copy-text'
+        copyText={savedCards.join('\n')}
+      />
 
       <TextEditor
         queries={savedCards}
