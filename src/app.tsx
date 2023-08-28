@@ -32,7 +32,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { INTRO_EXAMPLE } from './ui/docs/introExample'
 
 export const App = () => {
-  const { adminMode, multiQuery } = useContext(FlagContext).flags
+  const { adminMode, multiQuery, uniformMode } = useContext(FlagContext).flags
   const { pathname } = useLocation()
   const topPath = pathname.replace("/","").split("/")[0]
 
@@ -50,11 +50,11 @@ export const App = () => {
 
   const queryRunner = {
     local: useMemoryQueryRunner({
-      getWeight: weightAlgorithms.zipf,
+      getWeight: uniformMode ? weightAlgorithms.uniform : weightAlgorithms.zipf,
       corpus: cogDB.memory,
     }),
     scryfall: useScryfallQueryRunner({
-      getWeight: weightAlgorithms.zipf,
+      getWeight: uniformMode ? weightAlgorithms.uniform : weightAlgorithms.zipf,
     }),
   }[source]
 
