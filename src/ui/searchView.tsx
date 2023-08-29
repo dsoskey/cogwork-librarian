@@ -21,10 +21,11 @@ interface SearchViewProps {
 }
 
 export const SearchView = () => {
-  const { multiQuery } = useContext(FlagContext).flags
+  const { uniformMode, multiQuery } = useContext(FlagContext).flags
   const viewport = useViewportListener()
 
   const cogDB = useContext(CogDBContext)
+
 
   const { addIgnoredId, addCard, savedCards, ignoredIds, setSavedCards } = useContext(ProjectContext)
   const { queries, setQueries, options, setOptions } = useQueryForm({
@@ -33,11 +34,11 @@ export const SearchView = () => {
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
   const queryRunner = {
     local: useMemoryQueryRunner({
-      getWeight: weightAlgorithms.zipf,
+      getWeight: uniformMode ? weightAlgorithms.uniform : weightAlgorithms.zipf,
       corpus: cogDB.memory,
     }),
     scryfall: useScryfallQueryRunner({
-      getWeight: weightAlgorithms.zipf,
+      getWeight: uniformMode ? weightAlgorithms.uniform : weightAlgorithms.zipf,
     }),
   }[source]
 

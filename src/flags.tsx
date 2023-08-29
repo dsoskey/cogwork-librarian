@@ -14,6 +14,7 @@ export const FLAG_NAMES = {
   displayTypes: 'displayTypes',
   multiQuery: 'multiQuery',
   tagger: 'tagger',
+  uniformMode: 'uniformMode',
 } as const
 export type Flag = ObjectValues<typeof FLAG_NAMES>
 
@@ -24,6 +25,7 @@ export const INITIAL_FLAGS: Record<Flag, boolean> = {
   displayTypes: false,
   multiQuery: true,
   tagger: false,
+  uniformMode: false
 }
 
 interface FlagManager {
