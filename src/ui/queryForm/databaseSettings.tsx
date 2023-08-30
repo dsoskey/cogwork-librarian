@@ -18,7 +18,7 @@ export const DatabaseSettings = ({}: DatabaseSettingsProps) => {
   const { outOfDate } = useContext(CogDBContext)
   return (
     <div className='row'>
-      <Link to='/data'>
+      <Link to='/data/card'>
         <button className='db-settings' title='settings'>
           ⚙
         </button>

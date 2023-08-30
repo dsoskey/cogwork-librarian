@@ -14,7 +14,7 @@ export const ExampleGallery = () => {
   return <div className='example-content'>
     {queryExamples.map((example) => (
       <div key={example.title}>
-        <div className='row'>
+        <div className='row center'>
           <h3>{example.title}</h3>
           <CopyToClipboardButton copyText={[example.prefix, ...example.queries].join('\n')} />
         </div>

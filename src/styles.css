@@ -91,7 +91,6 @@ p {
 @media (min-width: 769px) {
   .root {
     flex-direction: column;
-    height: 100vh;
     overflow-x: hidden;
     display: flex;
   }
@@ -153,6 +152,10 @@ p {
 .row {
   display: flex;
   flex-direction: row;
+}
+
+.column.center,
+.row.center {
   align-items: center;
 }
 
@@ -211,6 +214,10 @@ p {
   right: var(--spacing-200);
 }
 
+.search-view-root .masthead {
+  flex: 1;
+}
+
 .coglib-prism-theme {
   /* copies prism theme */
   font-family: var(--monospace-family);
@@ -227,21 +234,9 @@ p {
   border: none;
 }
 
-.search-root {
+.search-view-root {
   display: flex;
-  flex-direction: column;
-  margin: var(--spacing-300);
-}
-.cumbo {
-  position: relative;
-  height: 100vh;
-}
-.saved-cards-floater {
-  width: 25%;
-  height: 100%;
-  overflow-y: scroll;
-  align-self: start;
-  background-color: var(--green);
+  flex-direction: row;
 }
 
 .example-query {
@@ -264,9 +259,10 @@ p {
   height: unset;
 }
 
-.search-root input {
-  box-sizing: border-box;
-  caret-color: var(--blue);
+/* query form */
+
+.query-form {
+  margin: var(--spacing-200);
 }
 
 .query-editor {
@@ -351,8 +347,7 @@ p {
   scrollbar-width: revert;
 }
 
-.query-editor .controller::selection,
-.search-root input::selection {
+.query-editor .controller::selection {
   background-color: var(--blue-low-alpha);
 }
 
@@ -374,10 +369,13 @@ p {
  flex-wrap: wrap;
 }
 
-.scour-button-holder {
+.execute-controls .loader {
+  max-width: 50%;
+}
+
+.db-info-holder {
   display:flex;
   flex-direction: column;
-  max-width: 50%;
   flex: 1;
 }
 
@@ -507,7 +505,12 @@ p {
   color: var(--light-color);
   display: flex;
   flex-direction: row;
-  flex: 1;
+}
+
+.query-panel {
+  flex:1;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .results .content {
@@ -542,4 +545,35 @@ p {
 
 .loader .foreground {
   fill: var(--green);
+}
+
+.saved-cards-toggle {
+  margin: var(--spacing-200);
+}
+
+.saved-cards-floater {
+  height: 100vh;
+  overflow-y: scroll;
+  border-left: var(--gray-68) 2px solid;
+  box-shadow: -2px 0 2px 0 var(--gray-68-shadow);
+
+  transition-property: width;
+  transition-delay: 25ms;
+  transition-duration: 200ms;
+  transition-timing-function: ease-in-out;
+}
+
+.saved-cards-floater.show {
+  width: 25%;
+}
+
+.saved-cards-floater.hide {
+  width: 0;
+}
+
+.saved-cards-floater textarea {
+  height: max-content;
+  resize: none;
+  width: auto;
+  flex: 1
 }

@@ -1,11 +1,11 @@
 .saved-cards-root {
     margin: var(--spacing-300);
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
-.saved-cards-root .copy-text {
-    position: absolute;
-    z-index: 10;
-    top: 0;
-    right: 0;
+.saved-cards-root h2 {
+    margin-top: 0;
+    margin-bottom: 0;
 }

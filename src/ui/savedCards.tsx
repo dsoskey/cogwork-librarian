@@ -1,4 +1,3 @@
-import { TextEditor } from './component/editor/textEditor'
 import React from 'react'
 import { Setter } from '../types'
 import "./savedCards.css"
@@ -14,15 +13,23 @@ export const SavedCards = ({ savedCards, setSavedCards }: SavedCardsProps) => {
 
   return (
     <div className='saved-cards-root'>
-      <CopyToClipboardButton
-        className='copy-text'
-        copyText={savedCards.join('\n')}
-      />
+      <div className='row center'>
+        <h2>saved cards</h2>
+        <CopyToClipboardButton
+          className='copy-text'
+          copyText={savedCards.join('\n')}
+        />
+      </div>
 
-      <TextEditor
-        queries={savedCards}
-        setQueries={setSavedCards}
+      <textarea
+        className='language-none coglib-prism-theme'
+        value={savedCards.join("\n")}
         placeholder='add one card per line'
+        spellCheck={false}
+        onChange={(event) => {
+          setSavedCards(event.target.value.split("\n"))
+        }}
+        rows={savedCards.length}
       />
     </div>
   )

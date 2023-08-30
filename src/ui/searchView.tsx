@@ -1,35 +1,27 @@
 import { QueryForm } from './queryForm/queryForm'
-import { SearchError } from './component/searchError'
 import { BrowserView } from './cardBrowser/browserView'
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { ProjectContext } from '../api/useProject'
-import { injectPrefix as _injectPrefix, QueryRunner, weightAlgorithms } from '../api/queryRunnerCommon'
+import { injectPrefix as _injectPrefix, weightAlgorithms } from '../api/queryRunnerCommon'
 import { useQueryForm } from './queryForm/useQueryForm'
 import { INTRO_EXAMPLE } from './docs/introExample'
 import { FlagContext } from '../flags'
 import { useLocalStorage } from '../api/local/useLocalStorage'
-import { DataSource, Setter } from '../types'
-import { useViewportListener } from '../viewport'
+import { DataSource } from '../types'
 import { useMemoryQueryRunner } from '../api/local/useQueryRunner'
 import { useScryfallQueryRunner } from '../api/scryfall/useQueryRunner'
 import { CogDBContext } from '../api/local/useCogDB'
-
-interface SearchViewProps {
-  source: DataSource
-  setSource: Setter<DataSource>
-  queryRunner: QueryRunner
-}
+import { SavedCards } from './savedCards'
+import { Masthead } from './component/masthead'
+import { Footer } from './footer'
 
 export const SearchView = () => {
   const { uniformMode, multiQuery } = useContext(FlagContext).flags
-  const viewport = useViewportListener()
-
   const cogDB = useContext(CogDBContext)
-
 
   const { addIgnoredId, addCard, savedCards, ignoredIds, setSavedCards } = useContext(ProjectContext)
   const { queries, setQueries, options, setOptions } = useQueryForm({
-    example: () => INTRO_EXAMPLE,
+    example: () => ({ queries: INTRO_EXAMPLE }),
   })
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
   const queryRunner = {
@@ -42,22 +34,7 @@ export const SearchView = () => {
     }),
   }[source]
 
-
-  const [showCogLib, setShowCogLib] = useState<boolean>(true)
-  const [lockCogLib, setLockCogLib] = useLocalStorage<boolean>('lock-coglib', false)
-
-  const toggle = <div className='toggle'>
-    <button
-      onClick={() => setLockCogLib(prev => !prev)}
-      title={`${lockCogLib ? "unlock":"lock"} controls`}>{lockCogLib ? "🔒":"🔓"}
-    </button>
-    {queryRunner.status !== 'unstarted' && <button
-      onClick={() => setShowCogLib(prev => !prev)}
-      title={`${showCogLib ? "close":"open"} controls`}
-    >
-      {viewport.mobile ? (showCogLib ? "^" : "v") : (showCogLib ? "<<":">>")}
-    </button>}
-  </div>
+  const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>("showSavedCards", true)
 
   const execute = (baseIndex: number) => {
     console.debug(`submitting query at line ${baseIndex}`)
@@ -85,19 +62,22 @@ export const SearchView = () => {
       const [base, ...sub] = toSubmit
       //setSubmittedQuery(toSubmit)
       queryRunner.run(sub, options, _injectPrefix(base))
-        .then(() => {
-          if (!lockCogLib) {
-            setShowCogLib(false)
-          }
-        })
         .catch(error => {
           console.error(error)
         })
     }
   }
 
-  return <div className='cumbo'>
-    <div className={`search-root cogwork-librarian ${showCogLib ? "show": "hide"}`}>
+  return<div className='search-view-root'>
+    <div className='query-panel'>
+      <div className='row'>
+        <Masthead />
+        <div className='saved-cards-toggle'>
+          <button onClick={() => setShowSavedCards(prev => !prev)}>
+            {showSavedCards ? "hide": "show"} saved cards
+          </button>
+        </div>
+      </div>
       <QueryForm
         status={queryRunner.status}
         execute={execute}
@@ -108,14 +88,6 @@ export const SearchView = () => {
         source={source}
         setSource={setSource}
       />
-
-      {queryRunner.status === 'error' && <SearchError
-        report={queryRunner.report}
-        errors={queryRunner.errors}
-        source={source}
-      />}
-    </div>
-    <div className='row'>
       <BrowserView
         report={queryRunner.report}
         result={queryRunner.result}
@@ -125,12 +97,12 @@ export const SearchView = () => {
         addIgnoredId={addIgnoredId}
         ignoredIds={ignoredIds}
         source={source}
-        lockCoglib={lockCogLib}
-        openCoglib={() => setShowCogLib(true)}
       />
-      {<div className='saved-cards-floater'>
-        {/*<SavedCards savedCards={project.savedCards} setSavedCards={project.setSavedCards} />*/}
-      </div>}
+      <Footer />
     </div>
-  </div>
+
+    {<div className={`saved-cards-floater ${showSavedCards ? "show" : "hide"}`}>
+      {showSavedCards && <SavedCards savedCards={savedCards} setSavedCards={setSavedCards} />}
+    </div>}
+  </div>;
 }

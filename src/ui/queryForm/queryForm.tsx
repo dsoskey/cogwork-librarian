@@ -49,8 +49,8 @@ export const QueryForm = ({
   const canSubmit = canRunQuery && status !== 'loading'
   const iconSize = 30
   return (
-    <>
-      <div className={`column ${source}`}>
+    <div className='query-form'>
+      <div className={source}>
         <TextEditor
           queries={queries}
           setQueries={setQueries}
@@ -61,31 +61,29 @@ export const QueryForm = ({
         />
       </div>
 
-      <div className='row execute-controls'>
-        <div className='row'>
-          <label><strong>data source:</strong></label>
-          <div className={`source-option row ${source === 'scryfall' ? 'selected' : ''}`}>
-            <div className='radio-button-holder'>
-              <ScryfallIcon
-                isActive={source === 'scryfall'}
-                size={iconSize}
-              />
-              <input
-                id={`source-scryfall`}
-                type='radio'
-                value='scryfall'
-                checked={source === 'scryfall'}
-                onChange={() => setSource('scryfall')}
-              />
-            </div>
-            <label htmlFor={`source-scryfall`}>scryfall</label>
-            <InfoModal title={<h2 className='row'>
-              <ScryfallIcon size={iconSize} />
-              <span>data source: scryfall</span>
-            </h2>} info={description['scryfall']} />
+      <div className='row center execute-controls'>
+        <label><strong>data source:</strong></label>
+        <div className={`source-option row center ${source === 'scryfall' ? 'selected' : ''}`}>
+          <div className='radio-button-holder'>
+            <ScryfallIcon
+              isActive={source === 'scryfall'}
+              size={iconSize}
+            />
+            <input
+              id={`source-scryfall`}
+              type='radio'
+              value='scryfall'
+              checked={source === 'scryfall'}
+              onChange={() => setSource('scryfall')}
+            />
           </div>
-
-          <div className={`source-option row ${source === 'local' ? 'selected' : ''}`}>
+          <label htmlFor={`source-scryfall`}>scryfall</label>
+          <InfoModal title={<h2 className='row center'>
+            <ScryfallIcon size={iconSize} />
+            <span>data source: scryfall</span>
+          </h2>} info={description['scryfall']} />
+        </div>
+        <div className={`source-option row center ${source === 'local' ? 'selected' : ''}`}>
             <div className='radio-button-holder'>
               <CoglibIcon
                 size={iconSize}
@@ -102,23 +100,15 @@ export const QueryForm = ({
             <label htmlFor={`source-local`}>local</label>
             {<DatabaseSettings />}
             <InfoModal
-              title={<h2 className='row'>
+              title={<h2 className='row center'>
                 <CoglibIcon size={iconSize} />
                 <span>data source: local</span>
               </h2>}
               info={description['local']}
             />
           </div>
-        </div>
-        <div className='scour-button-holder'>
-          {!multiQuery && <button
-            disabled={!canSubmit}
-            onClick={() => execute(0)}
-          >
-            {canRunQuery &&
-              `scour${status === 'loading' ? 'ing' : ''} the library`}
-            {!canRunQuery && `preparing the library`}
-          </button>}
+
+        <div className='db-info-holder'>
           {dbStatus === 'loading' && <>
             <span>{DB_INIT_MESSAGES[dbReport.complete]}</span>
             <div className='column'>
@@ -140,6 +130,6 @@ export const QueryForm = ({
           </>}
         </div>
       </div>
-    </>
+    </div>
   )
 }

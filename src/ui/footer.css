@@ -1,8 +1,6 @@
 .footer {
-    margin-left: -8px;
-    margin-right: -8px;
     max-width: 100% !important;
-    padding: 16px 8px;
+    padding: 16px 4px;
     background: var(--darkest-color);
     color: var(--light-color);
     font-size: 0.8em;

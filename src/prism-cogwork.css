@@ -5,7 +5,8 @@
  */
 
 code[class*='language-'],
-pre[class*='language-'] {
+pre[class*='language-'],
+textarea[class*='language-'] {
   color: #ccc;
   background: none;
   font-family: var(--monospace-family);
@@ -28,14 +29,16 @@ pre[class*='language-'] {
 }
 
 /* Code blocks */
-pre[class*='language-'] {
+pre[class*='language-'],
+textarea[class*='language-'] {
   padding: 1em;
   margin: 0.5em 0;
   overflow: auto;
 }
 
 :not(pre) > code[class*='language-'],
-pre[class*='language-'] {
+pre[class*='language-'],
+textarea[class*='language-'] {
   background: var(--darker-color);
 }
 
