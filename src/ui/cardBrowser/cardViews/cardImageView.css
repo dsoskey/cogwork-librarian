@@ -1,7 +1,9 @@
 .card-view {
     position: relative;
     margin-left: 0.75%;
-    padding-bottom: var(--spacing-200);
+    margin-bottom: var(--spacing-200);
+    aspect-ratio: 2.5/3.5;
+    border-radius: var(--card-radius);
 }
 .card-view:focus-visible {
     outline: unset;
