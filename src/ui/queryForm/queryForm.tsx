@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext } from 'react'
 import { SearchOptions } from 'scryfall-sdk'
 import { TextEditor } from '../component/editor/textEditor'
 import { DataSource, Setter, TaskStatus } from '../../types'
@@ -8,10 +8,6 @@ import { InfoModal } from '../component/infoModal'
 import { DatabaseSettings } from './databaseSettings'
 import { Loader } from '../component/loader'
 import { CogDBContext, DB_INIT_MESSAGES } from '../../api/local/useCogDB'
-import { FlagContext } from '../../flags'
-import { multiQueryInfo } from '../component/editor/multiQueryActionBar'
-import { singleQueryInfo } from '../component/editor/singleQueryActionBar'
-import { Language } from '../../api/local/syntaxHighlighting'
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -40,10 +36,7 @@ export const QueryForm = ({
   setSource,
 }: QueryFormProps) => {
   const { dbReport, memStatus, dbStatus } = useContext(CogDBContext)
-  const { multiQuery } = useContext(FlagContext).flags
-  const renderQueryInfo = useMemo(multiQuery ? multiQueryInfo : singleQueryInfo, [multiQuery])
   // something about prism overrides the state update for this css class
-  const language: Language = `scryfall-extended${multiQuery ? '-multi' : ""}`
 
   const canRunQuery = source === 'scryfall' || memStatus === 'success'
   const canSubmit = canRunQuery && status !== 'loading'
@@ -56,8 +49,7 @@ export const QueryForm = ({
           setQueries={setQueries}
           onSubmit={execute}
           canSubmit={canSubmit}
-          language={language}
-          renderQueryInfo={renderQueryInfo}
+          language='scryfall-extended-multi'
         />
       </div>
 

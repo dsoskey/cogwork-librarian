@@ -16,7 +16,7 @@ import { Masthead } from './component/masthead'
 import { Footer } from './footer'
 
 export const SearchView = () => {
-  const { uniformMode, multiQuery } = useContext(FlagContext).flags
+  const { uniformMode } = useContext(FlagContext).flags
   const cogDB = useContext(CogDBContext)
 
   const { addIgnoredId, addCard, savedCards, ignoredIds, setSavedCards } = useContext(ProjectContext)
@@ -42,19 +42,16 @@ export const SearchView = () => {
       console.error("baseIndex is out of bounds")
       return
     }
+
     let toSubmit: string[] = []
-    if (multiQuery) {
-      let currentIndex = baseIndex
-      while (currentIndex < queries.length && queries[currentIndex].trim() !== "") {
-        if (!queries[currentIndex].trimStart().startsWith("#")) {
-          toSubmit.push(queries[currentIndex])
-        }
-        currentIndex++
+    let currentIndex = baseIndex
+    while (currentIndex < queries.length && queries[currentIndex].trim() !== "") {
+      if (!queries[currentIndex].trimStart().startsWith("#")) {
+        toSubmit.push(queries[currentIndex])
       }
-      console.debug(toSubmit)
-    } else {
-      toSubmit = queries
+      currentIndex++
     }
+    console.debug(toSubmit)
 
     if (toSubmit.length === 0) {
       console.warn(`empty query for base query at index ${baseIndex}`)

@@ -12,7 +12,6 @@ export const FLAG_NAMES = {
   showDebugInfo: 'showDebugInfo',
   disableCache: 'disableCache',
   displayTypes: 'displayTypes',
-  multiQuery: 'multiQuery',
   tagger: 'tagger',
   uniformMode: 'uniformMode',
 } as const
@@ -23,7 +22,6 @@ export const INITIAL_FLAGS: Record<Flag, boolean> = {
   adminMode: false,
   disableCache: true,
   displayTypes: false,
-  multiQuery: true,
   tagger: false,
   uniformMode: false
 }

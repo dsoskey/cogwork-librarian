@@ -2,7 +2,7 @@ import React from 'react'
 import { rankInfo } from './infoLines'
 import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
 
-export const multiQueryInfo = (renderSubquery: (count: number) => string = rankInfo) =>
+export const multiQueryInfo = (renderSubquery: (count: number) => string) =>
   (queries: string[]): string[] => {
     if (queries.length === 0) {
       return []
@@ -25,23 +25,22 @@ export const multiQueryInfo = (renderSubquery: (count: number) => string = rankI
     }
     return result
   }
+const RENDER_QUERY_INFO = multiQueryInfo(rankInfo)
 
 export interface MultiQueryInfoBarProps {
   queries: string[]
-  renderQueryInfo: (queries: string[]) => string[]
   copyText: (mindex: number, maxdex: number) => void
   onSubmit: (baseIndex: number) => void
   canSubmit: boolean
 }
 export const MultiQueryActionBar = ({
-  renderQueryInfo,
   queries,
   copyText,
   canSubmit,
   onSubmit,
 }: MultiQueryInfoBarProps) => {
   useHighlightPrism([queries])
-  const lineInfo = renderQueryInfo(queries)
+  const lineInfo = RENDER_QUERY_INFO(queries)
 
   return <pre tabIndex={-1} className='language-none labels'>
     {lineInfo.map((line, index) => <div

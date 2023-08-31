@@ -1,7 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Language, useHighlightPrism } from '../../../api/local/syntaxHighlighting'
-import { FlagContext } from '../../../flags'
-import { SingleQueryActionBar } from './singleQueryActionBar'
 import { MultiQueryActionBar } from './multiQueryActionBar'
 import { ok, Result } from 'neverthrow'
 
@@ -33,8 +31,6 @@ export const findQueryIndex = (value: string, cursorIndex: number): Result<numbe
           }
         }
       }
-    } else {
-      //index--
     }
     index--
   }
@@ -53,20 +49,6 @@ export const getLineIndex = (value: string, index: number, lineBreak: string = "
   }
 
   return result;
-
-// else if (event.key === "/") {
-//     const cursorIndex = controller.current.selectionStart ?? 0
-//     const nextLineIndex = getLineIndex(value, cursorIndex)
-//     setQueries(prev => {
-//       const line = prev[nextLineIndex]
-//       if (line.trimStart().startsWith("#")) {
-//         prev[nextLineIndex] = line.replace(/^\s*#\s*/, "")
-//       } else {
-//         prev[nextLineIndex] = `# ${line}`
-//       }
-//       return _cloneDeep(prev)
-//     })
-//   }
 }
 
 export interface QueryInputProps {
@@ -74,7 +56,6 @@ export interface QueryInputProps {
   queries: string[]
   onSubmit?: (baseIndex: number) => void
   canSubmit?: boolean
-  renderQueryInfo?: (queries: string[]) => string[]
   placeholder?: string | undefined
   language?: Language
   disabled?: boolean
@@ -85,12 +66,10 @@ export const TextEditor = ({
   setQueries,
   onSubmit,
   canSubmit,
-  renderQueryInfo,
   placeholder,
   language,
   disabled,
 }: QueryInputProps) => {
-  const { multiQuery } = useContext(FlagContext).flags
   const separator = '\n'
   const value = queries.join(separator)
   const controller = useRef<HTMLTextAreaElement>()
@@ -106,14 +85,12 @@ export const TextEditor = ({
     if (event.metaKey || event.ctrlKey) {
       if (event.key == "Enter") {
         let baseIndex = 0
-        if (multiQuery) {
-          const cursorIndex = controller.current.selectionStart ?? 0
-          const queryIndex = findQueryIndex(value, cursorIndex)
-          if (queryIndex.isOk()) {
-            baseIndex = queryIndex._unsafeUnwrap()
-          } else {
-            console.warn("cursor not on a query")
-          }
+        const cursorIndex = controller.current.selectionStart ?? 0
+        const queryIndex = findQueryIndex(value, cursorIndex)
+        if (queryIndex.isOk()) {
+          baseIndex = queryIndex._unsafeUnwrap()
+        } else {
+          console.warn("cursor not on a query")
         }
         if (canSubmit) {
           onSubmit?.(baseIndex)
@@ -140,7 +117,7 @@ export const TextEditor = ({
     controller.current.setSelectionRange(mindex, maxdex)
   }
 
-  useHighlightPrism([value, multiQuery, language])
+  useHighlightPrism([value, language])
   React.useLayoutEffect(() => {
 
     // Shamelessly stolen from https://stackoverflow.com/a/65990608
@@ -165,19 +142,12 @@ export const TextEditor = ({
   }, [])
   return (
     <div className='query-editor' onKeyDown={showLinks} onKeyUp={hideLinks}>
-      {renderQueryInfo !== undefined && !multiQuery &&
-        <SingleQueryActionBar
-          queries={queries}
-          renderQueryInfo={renderQueryInfo}
-          copyText={copyText}
-        />}
-      {renderQueryInfo !== undefined && onSubmit !== undefined &&
-        multiQuery && <MultiQueryActionBar
+      <MultiQueryActionBar
         queries={queries}
-        renderQueryInfo={renderQueryInfo}
         copyText={copyText}
         onSubmit={onSubmit}
-        canSubmit={canSubmit} />}
+        canSubmit={canSubmit}
+      />
       <pre
         ref={linker}
         tabIndex={-1}
