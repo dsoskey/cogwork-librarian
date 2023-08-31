@@ -23,7 +23,7 @@ export const keywords = {
   game: 'game',
   is: 'is', has: 'has',
   in: 'in',
-  keyword: 'keyword',
+  keyword: 'keyword', kw: 'kw',
   lang: 'lang', language: 'language',
   layout: 'layout',
   loy: 'loy', loyalty: 'loyalty',

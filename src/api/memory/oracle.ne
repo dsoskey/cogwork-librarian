@@ -151,7 +151,7 @@ fullOracleRegexCondition -> ("fo"i) onlyEqualOperator regexString
         filterFunc: filters.regexMatch('oracle_text', value),
     }) %}
 
-keywordCondition -> "keyword"i onlyEqualOperator stringValue
+keywordCondition -> ("kw"i | "keyword"i) onlyEqualOperator stringValue
     {% ([_, [_op], value]) => filters.keywordMatch(value) %}
 
 typeCondition -> ("t"i | "type"i) onlyEqualOperator stringValue
