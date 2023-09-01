@@ -35,6 +35,10 @@ export const scryfall: Grammar = {
     alias: ['deleted', 'limited'],
     greedy: true,
   },
+  use: {
+    pattern: /(^|\b)@(use|u):\w+(?= )/,
+    alias: 'extension',
+  },
   keyword: {
     pattern: new RegExp(`(^|\\b)(${keywordRegex})(?=(${operators}))`, 'i'),
   },
@@ -121,6 +125,10 @@ export const scryfallExtendedMulti: Grammar = {
   comment: {
     pattern: /(\n|^)\s*#.*(?=\n|$)/,
     // greedy: true,
+  },
+  extension: {
+    // pattern: /(\n|^)\s*#.*(?=\n|$)/,
+    pattern: /@(defaultMode|dm|defaultWeight|dw|alias|a):\w+/
   },
   // 'base-query': {
   //   // pattern: /(?:^|\n\n+|(\n|^)\s*#.*(\n|$))(?!\s*#).*(\n|$)/,

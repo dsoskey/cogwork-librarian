@@ -8,7 +8,8 @@ export type QueryRunnerFunc = (
   query: string,
   index: number,
   options: SearchOptions,
-  injectPrefixx?: (query: string) => string,
+  injectPrefix?: (query: string) => string,
+  getWeight?: (index:number) => number,
 ) => ResultAsync<string, CogError>
 
 export type ErrorMap = { [key: string]: CogError }
@@ -32,7 +33,12 @@ export interface QueryHandler {
 }
 
 export interface QueryRunner extends QueryHandler {
-  run: (queries: string[], options: SearchOptions, injectPrefix?: (query:string) => string) => Promise<void>
+  run: (
+    queries: string[],
+    options: SearchOptions,
+    injectPrefix?: (query:string) => string,
+    getWeight?: (index:number) => number,
+  ) => Promise<void>
   result: Array<EnrichedCard>
   status: TaskStatus
   report: QueryReport

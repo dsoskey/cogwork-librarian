@@ -2,7 +2,7 @@ import { QueryForm } from './queryForm/queryForm'
 import { BrowserView } from './cardBrowser/browserView'
 import React, { useContext } from 'react'
 import { ProjectContext } from '../api/useProject'
-import { injectPrefix as _injectPrefix, weightAlgorithms } from '../api/queryRunnerCommon'
+import { weightAlgorithms } from '../api/queryRunnerCommon'
 import { useQueryForm } from './queryForm/useQueryForm'
 import { INTRO_EXAMPLE } from './docs/introExample'
 import { FlagContext } from '../flags'
@@ -14,6 +14,7 @@ import { CogDBContext } from '../api/local/useCogDB'
 import { SavedCards } from './savedCards'
 import { Masthead } from './component/masthead'
 import { Footer } from './footer'
+import { parseQuerySet } from '../api/scryfallExtendedParser'
 
 export const SearchView = () => {
   const { uniformMode } = useContext(FlagContext).flags
@@ -43,26 +44,14 @@ export const SearchView = () => {
       return
     }
 
-    let toSubmit: string[] = []
-    let currentIndex = baseIndex
-    while (currentIndex < queries.length && queries[currentIndex].trim() !== "") {
-      if (!queries[currentIndex].trimStart().startsWith("#")) {
-        toSubmit.push(queries[currentIndex])
-      }
-      currentIndex++
-    }
-    console.debug(toSubmit)
-
-    if (toSubmit.length === 0) {
-      console.warn(`empty query for base query at index ${baseIndex}`)
-    } else {
-      const [base, ...sub] = toSubmit
-      //setSubmittedQuery(toSubmit)
-      queryRunner.run(sub, options, _injectPrefix(base))
-        .catch(error => {
-          console.error(error)
-        })
-    }
+    parseQuerySet(queries, baseIndex)
+      .map(({ queries, getWeight, injectPrefix }) => {
+        queryRunner.run(queries, options, injectPrefix, getWeight)
+          .catch(error => {
+            console.error(error)
+          })
+      })
+      .mapErr(console.error)
   }
 
   return<div className='search-view-root'>

@@ -29,12 +29,13 @@ export const useMemoryQueryRunner = ({
     index: number,
     options: SearchOptions,
     injectPrefixx?: (query: string) => string,
+    getWeightt?: (index: number) => number
   ) => {
     if (corpus.length === 0) {
       console.warn(`ran query against an empty corpus: ${query}`)
       return
     }
-    const weight = getWeight(index)
+    const weight = getWeightt ? getWeightt(index) : getWeight(index)
     const preparedQuery = injectPrefixx ? injectPrefixx(query) : injectPrefix(query)
     rawData.current[preparedQuery] = []
     try {

@@ -113,6 +113,11 @@ textarea[class*='language-'] {
   font-style: italic;
 }
 
+.token.extension {
+  color: #6196cc;
+  font-weight: bold;
+}
+
 .token.selector,
 .token.atrule,
 .token.keyword,

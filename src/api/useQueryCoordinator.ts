@@ -35,7 +35,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
 
   const execute =
     (runQuery: QueryRunnerFunc) =>
-    (queries: string[], options: SearchOptions, injectPrefixx?: (query: string) => string) => new Promise<void>((resolve, reject) => {
+    (queries: string[], options: SearchOptions, injectPrefixx?: (query: string) => string, getWeight?: (index: number) => number)  => new Promise<void>((resolve, reject) => {
       setStatus('loading')
       const filteredQueries = queries.filter(
         (q) => q.trim().length > 0 && q.trim().charAt(0) !== '#'
@@ -47,7 +47,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
       report.reset(filteredQueries.length)
       rawData.current = {}
       Promise.allSettled(
-        filteredQueries.map((q, i) => runQuery(q, i, options, injectPrefixx))
+        filteredQueries.map((q, i) => runQuery(q, i, options, injectPrefixx, getWeight))
       ).then((promiseResults) => {
         const orgo: { [id: string]: EnrichedCard } = {}
 
