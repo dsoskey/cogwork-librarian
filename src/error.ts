@@ -6,7 +6,7 @@ export interface CogError {
   // error message meant to be displayed in the UI
   displayMessage: string
   // more detailed version that's used for populating bug reports
-  debugMessage: string
+  debugMessage?: string
 }
 
 const opsFirstLetter = Object.values(OPERATORS).map((it) => it[0])
@@ -25,7 +25,12 @@ export const displayMessage = (
       .pop()
     baseMessage = `unknown keyword "${badKeyword}" in query ${index + 1}`
   }
-  const columnShower = `\n\t${query}\n\t${' '.repeat(offset)}^`
 
-  return baseMessage + columnShower
+  return baseMessage + columnShower(query, offset)
+}
+
+
+
+export function columnShower (query: string, offset: number): string {
+  return `\n\t${query}\n\t${' '.repeat(offset)}^`
 }

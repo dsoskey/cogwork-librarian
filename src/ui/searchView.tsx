@@ -1,6 +1,6 @@
 import { QueryForm } from './queryForm/queryForm'
 import { BrowserView } from './cardBrowser/browserView'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { ProjectContext } from '../api/useProject'
 import { weightAlgorithms } from '../api/queryRunnerCommon'
 import { useQueryForm } from './queryForm/useQueryForm'
@@ -15,6 +15,7 @@ import { SavedCards } from './savedCards'
 import { Masthead } from './component/masthead'
 import { Footer } from './footer'
 import { parseQuerySet } from '../api/scryfallExtendedParser'
+import { CogError } from '../error'
 
 export const SearchView = () => {
   const { uniformMode } = useContext(FlagContext).flags
@@ -34,6 +35,8 @@ export const SearchView = () => {
       getWeight: uniformMode ? weightAlgorithms.uniform : weightAlgorithms.zipf,
     }),
   }[source]
+  const [extendedParseError, setExtendedParseError] = useState<CogError[]>([])
+  const errorsToDisplay = extendedParseError.length > 0 ? extendedParseError : queryRunner.errors
 
   const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>("showSavedCards", true)
 
@@ -43,6 +46,7 @@ export const SearchView = () => {
       console.error("baseIndex is out of bounds")
       return
     }
+    setExtendedParseError([])
 
     parseQuerySet(queries, baseIndex)
       .map(({ queries, getWeight, injectPrefix }) => {
@@ -51,7 +55,7 @@ export const SearchView = () => {
             console.error(error)
           })
       })
-      .mapErr(console.error)
+      .mapErr(it => setExtendedParseError([it]))
   }
 
   return<div className='search-view-root'>
@@ -78,7 +82,7 @@ export const SearchView = () => {
         report={queryRunner.report}
         result={queryRunner.result}
         status={queryRunner.status}
-        errors={queryRunner.errors}
+        errors={errorsToDisplay}
         addCard={addCard}
         addIgnoredId={addIgnoredId}
         ignoredIds={ignoredIds}

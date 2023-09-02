@@ -1,5 +1,6 @@
 import { ok, err, Result } from 'neverthrow'
 import { injectPrefix, weightAlgorithms } from './queryRunnerCommon'
+import { CogError, columnShower } from '../error'
 
 type QueryMode = "allsub" | "basesub"
 type QueryWeight = "uniform" | "zipf"
@@ -21,15 +22,20 @@ export const ALIAS_REGEXP = /^@(a|alias):/
 const DEFAULT_MODE: QueryMode = "basesub"
 const DEFAULT_WEIGHT: QueryWeight = "zipf"
 
-function parseAlias(alias: string): Result<Alias, string> {
+interface AliasError {
+  message: string
+  offset: number
+}
+
+function parseAlias(alias: string): Result<Alias, AliasError> {
   let firstLeftParen = alias.indexOf("(")
   if (firstLeftParen === 0) {
-    return err(`missing alias name`)
+    return err({ message:`missing alias name`, offset: 0 })
   } else if (firstLeftParen === -1) {
-    return err(`missing open parens`)
+    return err({ message:`missing open parens`, offset: alias.length - 1 })
   }
   if (alias[alias.length - 1] !== ")") {
-    return err(`missing final right parens`)
+    return err({ message:`missing final right parens`, offset: alias.length - 1 })
   }
 
   return ok<Alias>({
@@ -38,24 +44,35 @@ function parseAlias(alias: string): Result<Alias, string> {
   })
 }
 
-export function parseEnv(lines: string[]): Result<QueryEnvironment, string> {
-  const domains = {}
+export function parseEnv(lines: string[]): Result<QueryEnvironment, CogError> {
+  const aliases = {}
   let defaultMode: QueryMode | undefined = undefined
   let defaultWeight: QueryWeight | undefined = undefined
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
     const trimmed = line.trim()
     if (ALIAS_REGEXP.test(trimmed)) {
       const index = trimmed.indexOf(":");
-      const domain = parseAlias(trimmed.substring(index + 1))
-      if (domain.isErr()) {
-        return err(domain._unsafeUnwrapErr())
+      const aliasRes = parseAlias(trimmed.substring(index + 1))
+      if (aliasRes.isErr()) {
+        const {message, offset} = aliasRes._unsafeUnwrapErr()
+        return err({
+          query: trimmed,
+          displayMessage: `syntax error for query ${index + 1} at col ${
+            offset + 1
+          }: ${message}` + columnShower(trimmed, offset)
+        })
       }
-      const unwrapped = domain._unsafeUnwrap()
-      if (domains[unwrapped.name] !== undefined) {
-        return err(`duplicate domains named ${unwrapped.name} detected`)
+      const alias = aliasRes._unsafeUnwrap()
+      if (aliases[alias.name] !== undefined) {
+        return err({
+          query: trimmed,
+          displayMessage: `duplicate aliases named ${alias.name} detected.\n`
+          + `- @alias:${alias.name}${aliases[alias.name].query}\n- ${trimmed}`
+        })
       }
-      domains[unwrapped.name] = unwrapped
+      aliases[alias.name] = alias
     } else if (/^@(dw|defaultWeight):/.test(trimmed)) {
       const index = trimmed.indexOf(":");
       const value = trimmed.substring(index + 1);
@@ -63,12 +80,18 @@ export function parseEnv(lines: string[]): Result<QueryEnvironment, string> {
         case "zipf":
         case "uniform":
           if (defaultWeight !== undefined) {
-            return err("duplicate default weights detected")
+            return err({
+              query: trimmed,
+              displayMessage:"duplicate default weights detected"
+            })
           }
           defaultWeight = value
           break;
         default:
-          return err(`unrecognized weight algorithm ${value}. choose zipf or uniform`)
+          return err({
+            query: trimmed,
+            displayMessage: `unrecognized weight algorithm ${value}. choose zipf or uniform`
+          })
       }
     } else if (/^@(dm|defaultMode):/.test(trimmed)) {
       const index = trimmed.indexOf(":");
@@ -77,18 +100,24 @@ export function parseEnv(lines: string[]): Result<QueryEnvironment, string> {
         case "allsub":
         case "basesub":
           if (defaultMode !== undefined) {
-            return err("duplicate default modes detected")
+            return err({
+              query: trimmed,
+              displayMessage: "duplicate default modes detected"
+            })
           }
           defaultMode = value
           break;
         default:
-          return err(`unrecognized aggregation mode ${value}. choose allsub or basesub`)
+          return err({
+            query: trimmed,
+            displayMessage: `unrecognized aggregation mode ${value}. choose allsub or basesub`
+          })
       }
     }
   }
 
   return ok({
-    domains,
+    domains: aliases,
     defaultMode: defaultMode ?? DEFAULT_MODE,
     defaultWeight: defaultWeight ?? DEFAULT_WEIGHT,
   })
@@ -99,7 +128,10 @@ interface ParsedQuerySet {
   getWeight: (index: number) => number
 }
 
-export function parseQuerySet(queries: string[], baseIndex: number): Result<ParsedQuerySet, string>  {
+export function parseQuerySet(
+  queries: string[],
+  baseIndex: number
+): Result<ParsedQuerySet, CogError>  {
   const queryEnvRes = parseEnv(queries)
   if (queryEnvRes.isErr()) {
     return err(queryEnvRes._unsafeUnwrapErr())
@@ -114,7 +146,10 @@ export function parseQuerySet(queries: string[], baseIndex: number): Result<Pars
       if (queryEnv.domains[name] !== undefined) {
         selectedQueries = [queryEnv.domains[name].query]
       } else {
-        return err(`unknown alias ${name}`)
+        return err({
+          query,
+          displayMessage: `unknown alias ${name}`,
+        })
       }
     } else if (!query.startsWith("#")) {
       // this isn't ideal: still replaces @use tokens inside of strings and such.
@@ -124,22 +159,34 @@ export function parseQuerySet(queries: string[], baseIndex: number): Result<Pars
           if (USE_REGEXP.test(it)) {
             const name = it.substring(it.indexOf(":") + 1)
             if (queryEnv.domains[name] !== undefined) {
-              return queryEnv.domains[name].query
+              return ok(queryEnv.domains[name].query)
             } else {
-              // todo: propagate an error?
-              console.warn(`ignoring unknown alias ${name}`)
-              return ""
+              // this should never get hit
+              return err(`unknown alias ${name}`)
             }
           }
-          return it
+          return ok(it)
         })
-      selectedQueries.push(splittered.join(" "))
+      const errors = splittered.filter(it => it.isErr())
+      if (errors.length) {
+        const aggedErrors = errors.map(it => `  - ${it._unsafeUnwrapErr()}`)
+          .join("\n")
+        return err({
+          query,
+          displayMessage: `syntax errors for query ${currentIndex + 1}:\n${aggedErrors}` + columnShower(queries[currentIndex], 0)
+        })
+      }
+
+      selectedQueries.push(splittered.map(it => it._unsafeUnwrap()).join(" "))
     }
     currentIndex++
   }
   console.debug(selectedQueries)
   if (selectedQueries.length === 0) {
-    return err(`empty query for base query at line ${baseIndex + 1}`)
+    return err({
+      query: queries[baseIndex],
+      displayMessage: `empty query for base query at line ${baseIndex + 1}\n -${queries[baseIndex]}`
+    })
   }
 
   let [base, ...sub] = selectedQueries

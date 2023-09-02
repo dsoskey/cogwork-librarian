@@ -110,7 +110,7 @@ export const TopBar = ({
               )}
             </div>
           </>)}
-        {status === 'error' && <SearchError report={report} source={source} errors={errors}/>}
+        {errors.length > 0 && <SearchError report={report} source={source} errors={errors}/>}
         {status === 'success' && (<>
             <div>
               {searchCount > 0 &&
@@ -162,7 +162,7 @@ export const TopBar = ({
         )}
       </div>
       <div className='result-controls'>
-        {status !== 'error' && activeCount > 0 && (
+        {errors.length === 0 && activeCount > 0 && (
           <PageControl
             page={page}
             setPage={setPage}
