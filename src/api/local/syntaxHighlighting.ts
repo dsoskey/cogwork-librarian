@@ -36,7 +36,7 @@ export const scryfall: Grammar = {
     greedy: true,
   },
   use: {
-    pattern: /(^|\b)@(use|u):\w+(?= )/,
+    pattern: /(^|\b)@(use|u):\w+(?=[ \n])/,
     alias: 'extension',
   },
   keyword: {
