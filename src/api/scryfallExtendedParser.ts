@@ -56,7 +56,7 @@ export function parseEnv(lines: string[]): Result<QueryEnvironment, CogError> {
       const index = trimmed.indexOf(":");
       const aliasRes = parseAlias(trimmed.substring(index + 1))
       if (aliasRes.isErr()) {
-        const {message, offset} = aliasRes._unsafeUnwrapErr()
+        const {message, offset} = aliasRes.error
         return err({
           query: trimmed,
           displayMessage: `syntax error for query ${index + 1} at col ${
@@ -64,7 +64,7 @@ export function parseEnv(lines: string[]): Result<QueryEnvironment, CogError> {
           }: ${message}` + columnShower(trimmed, offset)
         })
       }
-      const alias = aliasRes._unsafeUnwrap()
+      const alias = aliasRes.value
       if (aliases[alias.name] !== undefined) {
         return err({
           query: trimmed,
@@ -134,9 +134,9 @@ export function parseQuerySet(
 ): Result<ParsedQuerySet, CogError>  {
   const queryEnvRes = parseEnv(queries)
   if (queryEnvRes.isErr()) {
-    return err(queryEnvRes._unsafeUnwrapErr())
+    return err(queryEnvRes.error)
   }
-  const queryEnv = queryEnvRes._unsafeUnwrap()
+  const queryEnv = queryEnvRes.value
   let selectedQueries: string[] = []
   let currentIndex = baseIndex
   while (currentIndex < queries.length && queries[currentIndex].trim() !== "") {

@@ -2,14 +2,14 @@ import { singleQueryInfo } from '../component/editor/singleQueryActionBar'
 import { rankInfo } from '../component/editor/infoLines'
 import { injectPrefix as _injectPrefix, SCORE_PRECISION, weightAlgorithms } from '../../api/queryRunnerCommon'
 import React from 'react'
-import { queryExamples } from '../../api/example'
+import { KNIGHTS_EXAMPLE } from '../../api/example'
 
-const EXAMPLE = queryExamples[0]
+const EXAMPLE = KNIGHTS_EXAMPLE
 const injectPrefix = _injectPrefix(EXAMPLE.prefix)
 
 export const BaseSubExplanation = () => {
   return <>
-    <h3>how does the base/sub query model work?</h3>
+    <h3 id="basesub">how does the base/sub query model work?</h3>
     <p>
       the base/sub query model helps you curate complex searches with
       minimal syntax. it uses a custom 3-step algorithm on top of scryfall's

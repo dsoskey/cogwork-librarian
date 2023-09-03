@@ -13,7 +13,6 @@ export const FLAG_NAMES = {
   disableCache: 'disableCache',
   displayTypes: 'displayTypes',
   tagger: 'tagger',
-  uniformMode: 'uniformMode',
 } as const
 export type Flag = ObjectValues<typeof FLAG_NAMES>
 
@@ -23,7 +22,6 @@ export const INITIAL_FLAGS: Record<Flag, boolean> = {
   disableCache: true,
   displayTypes: false,
   tagger: false,
-  uniformMode: false
 }
 
 interface FlagManager {

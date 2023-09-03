@@ -27,7 +27,7 @@ export const SearchError = ({ report, source, errors }: SearchErrorProps) => {
     )}
     {
       <pre>
-        <code className='language-scryfall'>{errorText}</code>
+        <code className='language-none'>{errorText}</code>
       </pre>
     }
   </div>

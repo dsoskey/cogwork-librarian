@@ -4,8 +4,6 @@ import React, { useContext, useState } from 'react'
 import { ProjectContext } from '../api/useProject'
 import { weightAlgorithms } from '../api/queryRunnerCommon'
 import { useQueryForm } from './queryForm/useQueryForm'
-import { INTRO_EXAMPLE } from './docs/introExample'
-import { FlagContext } from '../flags'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 import { DataSource } from '../types'
 import { useMemoryQueryRunner } from '../api/local/useQueryRunner'
@@ -16,9 +14,9 @@ import { Masthead } from './component/masthead'
 import { Footer } from './footer'
 import { parseQuerySet } from '../api/scryfallExtendedParser'
 import { CogError } from '../error'
+import { INTRO_EXAMPLE } from '../api/example'
 
 export const SearchView = () => {
-  const { uniformMode } = useContext(FlagContext).flags
   const cogDB = useContext(CogDBContext)
 
   const { addIgnoredId, addCard, savedCards, ignoredIds, setSavedCards } = useContext(ProjectContext)
@@ -28,11 +26,11 @@ export const SearchView = () => {
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
   const queryRunner = {
     local: useMemoryQueryRunner({
-      getWeight: uniformMode ? weightAlgorithms.uniform : weightAlgorithms.zipf,
+      getWeight: weightAlgorithms.zipf,
       corpus: cogDB.memory,
     }),
     scryfall: useScryfallQueryRunner({
-      getWeight: uniformMode ? weightAlgorithms.uniform : weightAlgorithms.zipf,
+      getWeight: weightAlgorithms.zipf,
     }),
   }[source]
   const [extendedParseError, setExtendedParseError] = useState<CogError[]>([])

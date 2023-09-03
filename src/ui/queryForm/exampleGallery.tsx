@@ -3,9 +3,9 @@ import React, { useContext } from 'react'
 import { FlagContext } from '../../flags'
 import { testQueries } from '../../api/queries'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
-import { singleQueryInfo } from '../component/editor/singleQueryActionBar'
 import { rankInfo } from '../component/editor/infoLines'
 import { CopyToClipboardButton } from '../component/copyToClipboardButton'
+import { multiQueryInfo } from '../component/editor/multiQueryActionBar'
 
 export const ExampleGallery = () => {
   useHighlightPrism([])
@@ -24,13 +24,13 @@ export const ExampleGallery = () => {
         <div className='example-query'>
           <pre className='language-none'>
             <code>
-              {singleQueryInfo(rankInfo)([
+              {multiQueryInfo(rankInfo)([
                 example.prefix,
                 ...example.queries,
               ]).join('\n')}
             </code>
           </pre>
-          <pre className='language-scryfall-extended'>
+          <pre className='language-scryfall-extended-multi'>
             <code>{[example.prefix, ...example.queries].join('\n')}</code>
           </pre>
         </div>
