@@ -6,8 +6,8 @@ import { ScryfallIcon } from '../component/scryfallIcon'
 import { CoglibIcon } from '../component/coglibIcon'
 import { InfoModal } from '../component/infoModal'
 import { DatabaseSettings } from './databaseSettings'
-import { Loader } from '../component/loader'
-import { CogDBContext, DB_INIT_MESSAGES } from '../../api/local/useCogDB'
+import { CogDBContext } from '../../api/local/useCogDB'
+import { DBStatusLoader } from '../component/dbStatusLoader'
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -35,7 +35,7 @@ export const QueryForm = ({
   source,
   setSource,
 }: QueryFormProps) => {
-  const { dbReport, memStatus, dbStatus } = useContext(CogDBContext)
+  const { memStatus } = useContext(CogDBContext)
   // something about prism overrides the state update for this css class
 
   const canRunQuery = source === 'scryfall' || memStatus === 'success'
@@ -100,27 +100,7 @@ export const QueryForm = ({
             />
           </div>
 
-        <div className='db-info-holder'>
-          {dbStatus === 'loading' && <>
-            <span>{DB_INIT_MESSAGES[dbReport.complete]}</span>
-            <div className='column'>
-              <Loader width="100%" count={dbReport.complete} total={dbReport.totalQueries} />
-              {memStatus === "loading" && dbReport.totalCards > 0 && <Loader
-                width="100%" label='cards loaded'
-                count={dbReport.cardCount} total={dbReport.totalCards}
-              />}
-            </div>
-          </>}
-          {dbStatus !== 'loading' && memStatus === "loading" && <>
-            <span>preparing the library...</span>
-            {dbReport.totalCards > 0 && <Loader
-              width="100%"
-              count={dbReport.cardCount}
-              total={dbReport.totalCards}
-              label='cards loaded'
-            />}
-          </>}
-        </div>
+        <DBStatusLoader />
       </div>
     </div>
   )

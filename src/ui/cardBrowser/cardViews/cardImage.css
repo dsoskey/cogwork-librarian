@@ -1,0 +1,25 @@
+.card-image img {
+    clip-path: inset(0 0 0 0 round var(--card-radius));
+    box-shadow: var(--spacing-200) var(--gray-68);
+    position: relative;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+.card-image .flip-button {
+    position: absolute;
+    z-index: 2;
+    top: 11%;
+    right: 8%;
+    background-color: transparent;
+    border-color: transparent;
+    font-size: 1.75em;
+    cursor: pointer;
+}
+
+.card-image .flip-button:hover {
+    color: whitesmoke;
+}
