@@ -18,7 +18,7 @@ export const App = () => {
   const { pathname } = useLocation()
 
   const cogDB = useCogDB()
-  const listImporter = useListImporter({memory: cogDB.memory})
+  const listImporter = useListImporter(cogDB)
 
   const project = useProject()
 

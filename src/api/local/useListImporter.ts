@@ -1,17 +1,13 @@
 import { QueryReport, useReporter } from '../useReporter'
-import { createContext, useRef, useState } from 'react'
+import { createContext, useState } from 'react'
 import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { Setter, TaskStatus } from '../../types'
-import isEqual from 'lodash/isEqual'
 import * as Scry from 'scryfall-sdk'
-import { filters } from '../memory/filters'
 import { cogDB } from './db'
 import { invertCubes } from '../memory/types/cube'
 import { invertTags } from '../memory/types/tag'
+import { CogDB } from './useCogDB'
 
-interface ListImporterProps {
-  memory: NormedCard[]
-}
 interface ListImporter {
   attemptImport: (rawCards: string[], restart: boolean) => Promise<NormedCard[]>
   result: NormedCard[]
@@ -31,13 +27,11 @@ const defaultListImporter: ListImporter = {
 }
 
 export const ListImporterContext = createContext(defaultListImporter)
-export const useListImporter = ({ memory }: ListImporterProps): ListImporter => {
+export const useListImporter = (cogDb: CogDB): ListImporter => {
   const [status, setStatus] = useState<TaskStatus>('unstarted')
   const [result, setResult] = useState<NormedCard[]>([])
   const [missing, setMissing] = useState<string[]>([])
   const report = useReporter()
-
-  const rawData = useRef<{ [name: string]: NormedCard }>({})
 
   const run = async (rawCards: string[], restart: boolean = false) => {
     const cubes = await cogDB.cube.toArray()
@@ -66,19 +60,9 @@ export const useListImporter = ({ memory }: ListImporterProps): ListImporter => 
       setStatus('loading')
       report.reset(rawCards.length)
 
-      if (isEqual(rawData.current, {})) {
-        // Idea: store cards in memory like this
-        const isToken = filters.textMatch("type_line", "Token")
-        for (const cardInMemory of memory) {
-          if (!isToken(cardInMemory)) {
-            rawData.current[cardInMemory.name.toLowerCase()] = cardInMemory
-          }
-        }
-      }
-
       console.log("process raws")
       rawCards.filter(it => it.length > 0).forEach(rawCard => {
-        const maybeCard = rawData.current[rawCard.toLowerCase()]
+        const maybeCard = cogDb.cardByName(rawCard.toLowerCase())
         if (maybeCard !== undefined) {
           foundCards.push(maybeCard)
           report.addComplete()
