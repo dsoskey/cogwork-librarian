@@ -211,7 +211,7 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
   }
 }
 
-const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
+export const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
   switch (value) {
     case 'spellbook': // check oracle text for draft from spellbook text
       return anyFaceRegexMatch(card, 'oracle_text', /(conjure the power nine|(conjure|draft).* from .* spellbook)/)

@@ -1,10 +1,12 @@
-import { createContext, useEffect, useRef, useState } from 'react'
+import { createContext, SetStateAction, useEffect, useRef, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, isScryfallManifest, Manifest } from './db'
 import { migrateCubes, putFile } from './populate'
 import { NormedCard } from '../memory/types/normedCard'
 import { QueryReport, useReporter } from '../useReporter'
 import { ImportTarget } from '../../ui/data/cardDataView'
+import { isFunction } from 'lodash'
+import { isOracleVal } from '../memory/filters/is'
 
 export const DB_INIT_MESSAGES = [
   "loading card manifest...",
@@ -29,6 +31,7 @@ export interface CogDB {
   resetDB: () => Promise<void>
   refreshDB: () => Promise<void>
   loadManifest: (manifest: Manifest, targets: ImportTarget[]) => Promise<void>
+  cardByName: (name: string, fuzzy?: boolean) => (NormedCard | undefined)
 }
 
 const defaultDB: CogDB = {
@@ -37,6 +40,10 @@ const defaultDB: CogDB = {
   memory: [],
   dbReport: null,
   setMemory: () => console.error("CogDB.setMemory called without a provider!"),
+  cardByName: () => {
+    console.error("CogDB.cardByName called without a provider!")
+    return undefined
+  },
   manifest: {
     id: '',
     name: '',
@@ -59,7 +66,35 @@ export const useCogDB = (): CogDB => {
   const dbReport = useReporter()
   const [dbStatus, setDbStatus] = useState<TaskStatus>('unstarted')
   const [memStatus, setMemStatus] = useState<TaskStatus>('loading')
-  const [memory, setMemory] = useState<NormedCard[]>([])
+
+  const [memory, rawSetMemory] = useState<NormedCard[]>([])
+  const rezzy = useRef<NormedCard[]>([])
+
+  const oracleToCard = useRef<{ [id: string]: NormedCard}>({})
+  const nameToOracle = useRef<{ [name: string]: string }>({})
+
+  const resetIndex = () => {
+    oracleToCard.current = {}
+    nameToOracle.current = {}
+  }
+  const addCardToIndex = (card: NormedCard) => {
+    if (!isOracleVal("extra")(card)) {
+      oracleToCard.current[card.oracle_id] = card
+      nameToOracle.current[card.name] = card.oracle_id
+      nameToOracle.current[card.name.toLowerCase()] = card.oracle_id
+      if (card.name.includes(" // ")) {
+        nameToOracle.current[card.name.split(" // ")[0]] = card.oracle_id
+        nameToOracle.current[card.name.split(" // ")[0].toLowerCase()] = card.oracle_id
+      }
+    }
+  }
+  const setMemory = (setto: SetStateAction<NormedCard[]>) => {
+    const res = isFunction(setto) ? setto(memory) : setto
+    rawSetMemory(res)
+    resetIndex()
+    res.forEach(addCardToIndex)
+  }
+
   const [manifest, setManifest] = useState<Manifest>({
     id: 'loading',
     name: 'loading',
@@ -67,7 +102,6 @@ export const useCogDB = (): CogDB => {
     lastUpdated: new Date(),
   })
 
-  const rezzy = useRef<NormedCard[]>([])
   const handleLoadDB = (event: MessageEvent): any => {
     const {type, data} = event.data
     switch (type) {
@@ -79,6 +113,7 @@ export const useCogDB = (): CogDB => {
       case 'card':
         const { card, index } = data
         rezzy.current.push(card)
+        addCardToIndex(card)
         if (index % 1000 === 0)
           dbReport.addCardCount(1000)
         break
@@ -86,7 +121,7 @@ export const useCogDB = (): CogDB => {
         setManifest(data)
         break
       case 'end':
-        setMemory(rezzy.current)
+        rawSetMemory(rezzy.current)
         setMemStatus('success')
         setDbStatus('success')
         console.timeEnd(`loading mem`)
@@ -137,7 +172,7 @@ export const useCogDB = (): CogDB => {
           dbReport.addCardCount(1000)
         break
       case 'memory-end':
-        setMemory(rezzy.current)
+        rawSetMemory(rezzy.current)
         setMemStatus('success')
         console.timeEnd(`loading mem`)
         dbReport.addComplete()
@@ -228,6 +263,12 @@ export const useCogDB = (): CogDB => {
 
   useEffect(() => { resetDB() }, [])
 
+  const cardByName = (name: string, fuzzy: boolean = false): NormedCard | undefined => {
+    // todo: add fuzzing
+    const fuzzed = fuzzy ? name : name
+    return oracleToCard.current[nameToOracle.current[fuzzed]]
+  }
+
   return {
     dbStatus,
     saveToDB,
@@ -240,6 +281,7 @@ export const useCogDB = (): CogDB => {
     refreshDB,
     loadManifest,
     dbReport,
-    outOfDate: (manifest?.lastUpdated ?? EPOCH) < cogDB.LAST_UPDATE
+    outOfDate: (manifest?.lastUpdated ?? EPOCH) < cogDB.LAST_UPDATE,
+    cardByName,
   }
 }
