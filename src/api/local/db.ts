@@ -3,6 +3,7 @@ import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import { NormedCard } from '../memory/types/normedCard'
 import { CubeDefinition } from '../memory/types/cube'
 import { OracleTag } from '../memory/types/tag'
+
 export interface Collection {
   id: string
   name: string
@@ -100,7 +101,7 @@ export class TypedDexie extends Dexie {
   }
 
   addCube = async (cube: CubeDefinition) => {
-    const existingCube: CubeDefinition = await this.cube.get(cube.key) ?? { key: cube.key, oracle_ids: [] }
+    const existingCube: CubeDefinition = await this.cube.get(cube.key) ?? { key: cube.key, oracle_ids: [], lastUpdated: "" }
     const cardSet = new Set(cube.oracle_ids)
     const toRemove = existingCube.oracle_ids.filter(it => !cardSet.has(it))
     await this.transaction("rw", this.cube, this.card, async () => {
@@ -116,6 +117,54 @@ export class TypedDexie extends Dexie {
         await this.card.where("oracle_id").anyOf(toRemove)
           .modify(it => delete it.cube_ids[cube.key])
       }
+    })
+  }
+
+  bulkUpsertCube = async (cubes: CubeDefinition[]) => {
+    const cubeIds = cubes.map(it => it.key)
+    const existingCubes = await this.cube.bulkGet(cubeIds)
+    const oracleIdToCubesToAdd: { [oracleId: string]: string[] } = {}
+    const oracleIdToCubesToRemove: { [oracleId: string]: string[] } = {}
+    const oracleIdsToCheck = new Set<string>()
+
+    cubes.forEach((cube, index) => {
+      const existingCube = existingCubes[index] ?? { key: cube.key, oracle_ids: [] }
+      const cardSet = new Set(cube.oracle_ids)
+
+      cardSet.forEach(it => {
+        if (oracleIdToCubesToAdd[it] === undefined) {
+          oracleIdToCubesToAdd[it] = []
+        }
+        oracleIdToCubesToAdd[it].push(cube.key)
+        oracleIdsToCheck.add(it)
+      })
+
+      existingCube.oracle_ids.filter(it => !cardSet.has(it)).forEach(it => {
+        if (oracleIdToCubesToRemove[it] === undefined) {
+          oracleIdToCubesToRemove[it] = []
+        }
+        oracleIdToCubesToRemove[it].push(cube.key)
+        oracleIdsToCheck.add(it)
+      })
+    })
+
+    await this.transaction("rw", this.cube, this.card, async () => {
+      await this.cube.bulkPut(cubes)
+      await this.card.where("oracle_id").anyOf(Array.from(oracleIdsToCheck))
+        .modify(it => {
+          if (it.cube_ids === undefined) {
+            it.cube_ids = {}
+          }
+          const cubesToAdd = oracleIdToCubesToAdd[it.oracle_id] ?? []
+          cubesToAdd.forEach(cube => {
+           it.cube_ids[cube] = true
+          })
+
+          const cubesToRemove = oracleIdToCubesToRemove[it.oracle_id] ?? []
+          cubesToRemove.forEach(cube => {
+            delete it.cube_ids[cube]
+          })
+        })
     })
   }
 }

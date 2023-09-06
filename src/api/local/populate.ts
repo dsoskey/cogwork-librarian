@@ -46,6 +46,8 @@ export const migrateCubes = async () => {
     .map(it => ({
       key: it.slice(0, it.indexOf(".")),
       oracle_ids: JSON.parse(localStorage.getItem(it) ?? "[]"),
+      source: "list",
+      last_updated: new Date(),
     }))
 
 

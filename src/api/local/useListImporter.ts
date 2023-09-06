@@ -60,20 +60,23 @@ export const useListImporter = (cogDb: CogDB): ListImporter => {
       setStatus('loading')
       report.reset(rawCards.length)
 
-      console.log("process raws")
-      rawCards.filter(it => it.length > 0).forEach(rawCard => {
-        const maybeCard = cogDb.cardByName(rawCard.toLowerCase())
-        if (maybeCard !== undefined) {
-          foundCards.push(maybeCard)
-          report.addComplete()
-        } else {
-          cardsToQueryAPI.push(rawCard)
+      console.time("process raws")
+      for (const rawCard of rawCards) {
+        if (rawCard.length > 0) {
+          const maybeCard = cogDb.cardByName(rawCard.toLowerCase())
+          if (maybeCard !== undefined) {
+            foundCards.push(maybeCard)
+            report.addComplete()
+          } else {
+            cardsToQueryAPI.push(rawCard)
+          }
         }
-      })
-      console.log(`processed local. ${foundCards.length} found. ${cardsToQueryAPI.length} to query`)
+      }
+      console.timeEnd("process raws")
+      console.debug(`processed local. ${foundCards.length} found. ${cardsToQueryAPI.length} to query`)
 
       if (cardsToQueryAPI.length > 0) {
-        console.log("calling them")
+        console.debug("querying scryfall for missing cards")
         Scry.Cards.collection(...cardsToQueryAPI.map(name => ({name})))
           .on('data', data => {
             foundCards.push(normCardList([data], cardIdToCubes, cardIdToOracleTags)[0])

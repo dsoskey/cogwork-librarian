@@ -4,13 +4,14 @@ import { cogDB } from '../../api/local/db'
 import { NormedCard } from '../../api/memory/types/normedCard'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { ImportSource, sourceToLabel } from './cardDataView'
-import { CubeCobraImporter } from './cubeCobraImporter'
+import { BulkCubeCobraImporter } from './cubeCobraImporter'
 import { isFunction } from 'lodash'
 import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { Loader } from '../component/loader'
 import { CubeListImporter } from './cubeListImporter'
 import { Setter } from '../../types'
+import { CubeDefinitionTable } from './cubeDefinitionTable'
 
 // AB test idea: add an import list from cubecobra button on the list importer?
 export const CubeDataView = () => {
@@ -37,7 +38,7 @@ export const CubeDataView = () => {
     } else {
       const oracle_ids = cards.map(it => it.oracle_id)
       const oracleSet = new Set(oracle_ids)
-      await cogDB.addCube({ key, oracle_ids })
+      await cogDB.addCube({ key, oracle_ids, source: "list", last_updated: new Date() })
       setMemory(prev => {
         for (const card of prev) {
           if (card.cube_ids === undefined) {
@@ -109,14 +110,7 @@ export const CubeDataView = () => {
     <h3>manage cube lists</h3>
     <p>local <code className='language-scryfall-extended'>cube:</code> queries match against these cube ids</p>
 
-    <div>
-      <strong>saved cube ids:</strong>
-      {existingCubes === undefined && <span>{" "}loading cubes...</span>}
-      {existingCubes?.length === 0 && <span>{" "}no cubes saved!</span>}
-      {existingCubes?.length > 0 && <ul>
-        {existingCubes.map(({ key }) => <li key={key}>{key}</li>)}
-      </ul>}
-    </div>
+    <CubeDefinitionTable cubes={existingCubes} />
 
     <h4 className='row'>
       <span>import from</span>
@@ -133,15 +127,7 @@ export const CubeDataView = () => {
         {sourceToLabel[source]}
       </label>))}
     </h4>
-    {importType === "cubeCobra" && <CubeCobraImporter
-      cubeId={cubeId}
-      setError={setError}
-      setCards={setCards}
-      loader={loader}
-      showConfirmation={showConfirmation}
-    >
-      {CubeIdInput}
-    </CubeCobraImporter>}
+    {importType === "cubeCobra" && <BulkCubeCobraImporter />}
     {importType === "text" && <CubeListImporter
       setCards={setCards}
       setError={setError}
