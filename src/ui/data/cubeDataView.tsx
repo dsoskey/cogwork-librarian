@@ -13,7 +13,6 @@ import { CubeListImporter } from './cubeListImporter'
 import { Setter } from '../../types'
 import { CubeDefinitionTable } from './cubeDefinitionTable'
 
-// AB test idea: add an import list from cubecobra button on the list importer?
 export const CubeDataView = () => {
   const { addMessage, dismissMessage } = useContext(ToasterContext)
   const { setMemory } = useContext(CogDBContext)

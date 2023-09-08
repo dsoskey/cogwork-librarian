@@ -3,6 +3,8 @@ import { CubeDefinition } from '../memory/types/cube'
 import { cogDB } from '../local/db'
 import { isOracleVal } from '../memory/filters/is'
 import { not } from '../memory/filters/base'
+import * as Scry from 'scryfall-sdk'
+import { normCardList, NormedCard } from '../memory/types/normedCard'
 
 
 self.onmessage = (_event) => {
@@ -18,8 +20,6 @@ async function searchCubes(cubeIds: string[]) {
   const foundNames = new Set<string>()
   const missingCubes: string[] = []
 
-  console.time("download cubes")
-
   const results = await Promise.allSettled(cubeIds.map(importCube))
   for (let i = 0; i < results.length; i++) {
     const cubeId = cubeIds[i]
@@ -34,8 +34,6 @@ async function searchCubes(cubeIds: string[]) {
       missingCubes.push(cubeId)
     }
   }
-
-  console.timeEnd("download cubes")
 
   if (missingCubes.length) {
     postMessage({ type: "error-missing-cubes", data: missingCubes })
@@ -68,7 +66,7 @@ async function searchCubes(cubeIds: string[]) {
 }
 
 async function lookupCards(
-  foundCubes: { [cubeId: string]: string[]},
+  foundCubes: { [cubeId: string]: string[] },
   foundNames: Set<string>,
 ): Promise<{ [name: string]: string}> {
   postMessage({ type: "card-lookup" })
@@ -77,21 +75,53 @@ async function lookupCards(
   const foundCards: Set<string> = new Set()
 
   const filter = not(isOracleVal("extra"))
-  await cogDB.card.each(card => {
-    const name = foundNames.has(card.name) ? card.name :
-      (foundNames.has(card.name.split(" // ")[0]) ? card.name.split(" // ")[0] : undefined)
-    if (filter(card) && name !== undefined) {
-      nameToOracleId[name] = card.oracle_id
-      foundCards.add(name)
+  const addToFoundCards = (card: NormedCard) => {
+    if (filter(card)) {
+      if (foundNames.has(card.name)) {
+        nameToOracleId[card.name] = card.oracle_id
+        foundCards.add(card.name)
+      } else {
+        const split = card.name.split(" // ")
+        if (foundNames.has(split[0])) {
+          nameToOracleId[split[0]] = card.oracle_id
+          foundCards.add(split[0])
+        }
+        if (foundNames.has(split[1])) {
+          nameToOracleId[split[1]] = card.oracle_id
+          foundCards.add(split[1])
+        }
+      }
     }
-  })
+  }
+
+  await cogDB.card.each(addToFoundCards)
 
   const missingCards = Array.from(foundNames).filter(it => !foundCards.has(it))
 
   if (missingCards.length) {
     postMessage({ type: "scryfall-lookup", data: `missing ${missingCards.length} cards` })
-    console.log(missingCards)
-    //   search scryfall
+    const cards = await Scry.Cards.collection(...missingCards.map(name => ({name}))).waitForAll()
+    if (cards.not_found.length) {
+      const notFound = new Set(cards.not_found.map(it => it.name))
+      const missingCubeCards = {};
+      for (const key in foundCubes) {
+        const inCube = foundCubes[key].filter(notFound.has)
+        if (inCube.length > 0) {
+          missingCubeCards[key] = inCube
+        }
+      }
+      postMessage({
+        type: "scryfall-cards-missing",
+        data: {
+          missingCubeCards,
+          count: cards.not_found.length,
+        }})
+    } else {
+      for (const card of cards) {
+        const normed = normCardList([card], {}, {})[0]
+        addToFoundCards(normed)
+      }
+    }
   }
 
   return nameToOracleId
