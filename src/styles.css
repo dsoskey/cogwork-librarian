@@ -66,6 +66,34 @@ input::placeholder {
   color: var(--blue-mid-alpha);
 }
 
+input[type="checkbox"] {
+  appearance: none;
+  position: relative;
+  width: 1.2em;
+  height: 1.2em;
+  border: 1px solid var(--light-color);
+  /* Adjusts the position of the checkboxes on the text baseline */
+  vertical-align: -2px;
+  /* Set here so that Windows' High-Contrast Mode can override */
+  color: var(--blue);
+}
+input[type="checkbox"]::before {
+  content: "✔";
+  position: absolute;
+  font-size: 1.6em;
+  top: -0.45em;
+  visibility: hidden;
+}
+input[type="checkbox"]:checked::before {
+  /* Use `visibility` instead of `display` to avoid recalculating layout */
+  visibility: visible;
+}
+input[type="checkbox"]:indeterminate::before {
+  content: "-";
+  font-weight: bold;
+  visibility: visible;
+}
+
 fieldset {
   margin-left: 0;
   padding-left: unset;
@@ -278,6 +306,8 @@ p {
 .query-editor pre, .query-editor textarea {
   margin-top: 0;
   margin-bottom: 0;
+  overflow-y: clip;
+
 }
 
 .query-editor .labels {
@@ -319,6 +349,7 @@ p {
   box-sizing: border-box;
   display: inline-block;
   background: transparent;
+  scrollbar-color: var(--blue-mid-alpha) var(--dark-color);
 }
 .query-editor .links :not(a) {
   color: transparent;
@@ -339,7 +370,7 @@ p {
   grid-area: overlap;
   z-index: 3;
   box-sizing: border-box;
-  overflow: auto;
+  overflow-x: auto;
   scrollbar-color: var(--blue-mid-alpha) var(--dark-color);
 }
 .query-editor input.controller {

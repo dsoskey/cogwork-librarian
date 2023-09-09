@@ -1,0 +1,62 @@
+.cube-definitions table {
+    border-collapse: collapse;
+}
+
+.cube-definitions .table-controls,
+.cube-definitions table {
+    min-width: 769px;
+    max-width: 50%;
+}
+
+@media (max-width: 768px) {
+    .cube-definitions .table-controls,
+    .cube-definitions table {
+        max-width: 100%;
+        min-width: 100%;
+    }
+}
+
+.cube-definitions .table-controls {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: var(--spacing-200);
+}
+
+.cube-definitions .table-controls .filter {
+    flex:1;
+    display: flex;
+    flex-direction: row;
+}
+
+.cube-definitions thead {
+    background-color: var(--darkest-color);
+}
+
+.cube-definitions tbody {
+    background-color: var(--dark-color);
+}
+
+.cube-definitions tbody tr:nth-child(even) {
+    background-color: var(--darker-color);
+}
+
+.cube-definitions th,
+.cube-definitions td {
+    padding: var(--spacing-200);
+    width: 33%;
+}
+
+.cube-definitions th:nth-child(1),
+.cube-definitions td:nth-child(1) {
+    width: max-content;
+    padding: var(--spacing-100);
+}
+
+.cube-definitions td.notfound {
+    width: unset;
+    text-align: center;
+}
+
+.cube-definitions .page-numbers {
+    margin-left: var(--spacing-200);
+}
