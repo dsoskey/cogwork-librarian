@@ -61,7 +61,7 @@ export const BaseSubExplanation = () => {
           {EXAMPLE.queries.map((_, index) =>
             `[${weightAlgorithms
               .zipf(index)
-              .toPrecision(SCORE_PRECISION)}]`).join('\n')}
+              .toFixed(SCORE_PRECISION)}]`).join('\n')}
         </code>
       </pre>
       <pre className='language-scryfall'>

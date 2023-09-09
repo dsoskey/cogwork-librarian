@@ -109,7 +109,7 @@ export const CardImageView = ({
           )}
           {visibleDetails.includes(WEIGHT) && (
             <div>
-              weight: <code>{card.weight.toPrecision(SCORE_PRECISION)}</code>
+              weight: <code>{card.weight.toFixed(SCORE_PRECISION)}</code>
             </div>
           )}
           {visibleDetails.includes(QUERIES) && (

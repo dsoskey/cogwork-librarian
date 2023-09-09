@@ -67,7 +67,6 @@ export const BrowserView = React.memo(({
   const onPageChange = (n: number) => {
     setPage(n)
     setTimeout(() => {
-      // todo: test fix on mobile
       topOfResults.current?.scrollIntoView({
         block: "start",
         inline: "nearest",
