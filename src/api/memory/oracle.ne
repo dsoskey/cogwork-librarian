@@ -345,7 +345,7 @@ isValue -> (
   | "localizedname"i | "mtgoid"i | "masterpiece"i
   | "modern"i | "multiverse"i | "new"i | "oathbreaker"i | "old"i | "oversized"i | "paperart"i
   | "party"i | "phyrexia"i | "planar"i | "planeswalkerdeck"i | "prerelease"i | "printedtext"i
-  | "related"i | "release"i | "reserved"i | "reversible"i | "stamp"i | "showcase"i
+  | "related"i | "release"i | "reserved"i | "reversible"i | "stamp"i | "showcase"i | "serialized"i
   | "spellbook"i | "spikey"i | "stamped"i | "starterdeck"i | "story"i | "tcgplayer"i | "textless"i
   | "tombstone"i | "onlyprint"i | "variation"i | "watermark"i | "ub"i
 ) {% ([[category]]) => category.toLowerCase() %}

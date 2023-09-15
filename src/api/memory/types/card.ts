@@ -156,6 +156,7 @@ export const isValues = {
   onlyprint: "onlyprint",
   variation: "variation",
   watermark: "watermark",
+  serialized: "serialized",
 } as const
 export type IsValue = ObjectValues<typeof isValues>
 

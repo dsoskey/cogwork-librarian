@@ -73,6 +73,7 @@ const printMattersFields = new Set<IsValue>([
   'flavorname',
   'halo',
   'ub',
+  'serialized',
 ])
 export function printMatters(value: IsValue): boolean {
   return printMattersFields.has(value)
@@ -162,6 +163,7 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
     case 'datestamped':
     case 'intropack':
     case 'release':
+    case 'serialized':
     case 'planeswalkerdeck':
       return printing.promo_types?.includes(value)
     case 'halo':
