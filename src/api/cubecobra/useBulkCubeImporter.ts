@@ -1,7 +1,16 @@
 import { createContext, useState } from 'react'
 import { CogDB } from '../local/useCogDB'
 import { Setter } from '../../types'
+import { cogDB as cogDBClient } from '../local/db'
 
+const RUNNING_STATES = [
+  "querying-cubecobra",
+  "finding-oracle-ids",
+  "scryfall-lookup",
+  "generating-cube-definitions",
+  "saving-to-db",
+  "refresh-memory",
+]
 export interface MissingCards {
   cubeToCard: { [cubeId: string]: string[] }
   count: number
@@ -9,7 +18,9 @@ export interface MissingCards {
 
 interface BulkCubeImporter {
   attemptImport: (cubeIds: string[]) => void
+  deleteCubes: (cubeIds: string[]) => Promise<void>
   status: string
+  isRunning: boolean
   missingCubes: string[]
   missingCards: MissingCards
   cubeIds: string[]
@@ -19,20 +30,23 @@ interface BulkCubeImporter {
 const defaultCubeImporter: BulkCubeImporter = {
   attemptImport: () => console.error("BulkCubeImporterContext.attemptImport without a producer!"),
   status: "importer dont work!",
+  isRunning: false,
   missingCubes: [],
   missingCards: { cubeToCard: {}, count: 0 },
   cubeIds: [],
   setCubeIds: () => console.error("BulkCubeImporterContext.setCubeIds called without a producer!"),
+  deleteCubes: () => Promise.reject("BulkCubeImporterContext.setCubeIds called without a producer!")
 }
 
 export const BulkCubeImporterContext = createContext(defaultCubeImporter)
 export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
-  const [cubeIds, setCubeIds] = useState<string[]>([])
-  const [status, setStatus] = useState<string>("scryfall-cards-missing")
-  const [missingCubes, setMissingCubes] = useState<[]>([])
+  const [cubeIds, setCubeIds] = useState<string[]>([]);
+  const [status, setStatus] = useState<string>("scryfall-cards-missing");
+  const isRunning = RUNNING_STATES.includes(status);
+  const [missingCubes, setMissingCubes] = useState<[]>([]);
   const [missingCards, setMissingCards] = useState<MissingCards>({
     cubeToCard: {}, count: 0
-  })
+  });
 
   const handleCubeCobraImport = (event: MessageEvent): any => {
     const {type, data} = event.data
@@ -87,12 +101,19 @@ export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
     worker.postMessage({ type: "import", data: submittableCubeIds })
   }
 
+  const deleteCubes = async (cubeIds) => {
+    await cogDBClient.bulkDeleteCube(cubeIds);
+    cogDB.resetDB();
+  }
+
   return {
     attemptImport,
     status,
+    isRunning,
     missingCubes,
     missingCards,
     cubeIds,
     setCubeIds,
+    deleteCubes,
   }
 }

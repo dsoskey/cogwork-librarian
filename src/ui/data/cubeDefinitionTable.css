@@ -23,7 +23,6 @@
 }
 
 .cube-definitions .table-controls .filter {
-    flex:1;
     display: flex;
     flex-direction: row;
 }
@@ -87,4 +86,15 @@
     content: "-";
     font-weight: bold;
     visibility: visible;
+}
+
+.cube-definitions .select-actions {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: baseline;
+    flex: 1;
+}
+
+.cube-definitions .select-actions .message {
+    margin-right: var(--spacing-200);
 }

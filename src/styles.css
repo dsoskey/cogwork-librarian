@@ -321,7 +321,7 @@ p {
   box-sizing: border-box;
   display: inline-block;
   background: transparent;
-  scrollbar-color: var(--blue-mid-alpha) var(--dark-color);
+  scrollbar-color: var(--blue-mid-alpha) var(--darker-color);
 }
 .query-editor .links :not(a) {
   color: transparent;
@@ -343,7 +343,7 @@ p {
   z-index: 3;
   box-sizing: border-box;
   overflow-x: auto;
-  scrollbar-color: var(--blue-mid-alpha) var(--dark-color);
+  scrollbar-color: var(--blue-mid-alpha) var(--darker-color);
 }
 .query-editor input.controller {
   padding-right: 0;

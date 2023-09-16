@@ -21,20 +21,24 @@ export const CUBE_IMPORT_MESSAGES = {
   "refresh-memory": "reloading memory...",
 }
 
-const RUNNING_STATES = [
-  "querying-cubecobra",
-  "finding-oracle-ids",
-  "scryfall-lookup",
-  "generating-cube-definitions",
-  "saving-to-db",
-  "refresh-memory",
-]
+export const CubeCobraImportMessage = () => {
+  const { missingCards, missingCubes, status } = useContext(BulkCubeImporterContext)
+  return <div className='row'>
+    {CUBE_IMPORT_MESSAGES[status]?.length > 0 && <div>{CUBE_IMPORT_MESSAGES[status]}</div>}
+    {missingCubes.length > 0 && <span className='alert'>
+        couldn't find cubes: {missingCubes.join(", ")}
+      </span>}
+    {status === "scryfall-cards-missing" && missingCards.count > 0 && <span className='alert'>
+        could not find {missingCards.count} cards. this should never happen, so please{" "}
+      <a href={`${REPORT_URL_BASE}${encodeObject(missingCards.cubeToCard)}${NL}\`\`\``}
+         target="_blank"
+         rel="noreferrer"
+      >report this bug</a>
+      </span>}
+  </div>
+}
 export const BulkCubeCobraImporter = () => {
-  const {
-    cubeIds, setCubeIds, missingCards,
-    attemptImport, missingCubes, status
-  } = useContext(BulkCubeImporterContext)
-  const isRunning = RUNNING_STATES.includes(status)
+  const { cubeIds, setCubeIds,  attemptImport, isRunning } = useContext(BulkCubeImporterContext)
 
   return <div className='cubecobra-import'>
     <textarea
@@ -46,17 +50,7 @@ export const BulkCubeCobraImporter = () => {
     />
     <div className='row'>
       <button onClick={() => attemptImport(cubeIds)} disabled={isRunning}>import cubes</button>
-      {CUBE_IMPORT_MESSAGES[status]?.length > 0 && <div>{CUBE_IMPORT_MESSAGES[status]}</div>}
-      {missingCubes.length > 0 && <span className='alert'>
-        couldn't find cubes: {missingCubes.join(", ")}
-      </span>}
-      {status === "scryfall-cards-missing" && missingCards.count > 0 && <span className='alert'>
-        could not find {missingCards.count} cards. this should never happen, so please{" "}
-        <a href={`${REPORT_URL_BASE}${encodeObject(missingCards.cubeToCard)}${NL}\`\`\``}
-           target="_blank"
-           rel="noreferrer"
-        >report this bug</a>
-      </span>}
     </div>
+    <CubeCobraImportMessage />
   </div>
 }

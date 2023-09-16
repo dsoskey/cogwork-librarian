@@ -167,5 +167,16 @@ export class TypedDexie extends Dexie {
         })
     })
   }
+
+  bulkDeleteCube = async (cubeIds: string[]) => {
+    await this.transaction("rw", this.cube, this.card, async () => {
+      await this.cube.bulkDelete(cubeIds);
+      await this.card.toCollection().modify(card => {
+        for (const id of cubeIds) {
+          delete card.cube_ids[id];
+        }
+      })
+    })
+  }
 }
 export const cogDB = new TypedDexie()
