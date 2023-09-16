@@ -101,7 +101,8 @@ export class TypedDexie extends Dexie {
   }
 
   addCube = async (cube: CubeDefinition) => {
-    const existingCube: CubeDefinition = await this.cube.get(cube.key) ?? { key: cube.key, oracle_ids: [], lastUpdated: "" }
+    const existingCube: CubeDefinition = await this.cube.get(cube.key)
+      ?? { key: cube.key, oracle_ids: [], source: "list", last_updated: new Date() }
     const cardSet = new Set(cube.oracle_ids)
     const toRemove = existingCube.oracle_ids.filter(it => !cardSet.has(it))
     await this.transaction("rw", this.cube, this.card, async () => {

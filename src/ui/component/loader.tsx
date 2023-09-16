@@ -22,14 +22,14 @@ export const Loader = ({ width, count, total, label }: LoaderProps) => {
       <rect className='background' width={viewWidth} height={viewHeight} rx={rx} />
       <rect
         className='foreground'
-        width={(viewWidth * count) / total}
+        width={total === 0 ? 0 : (viewWidth * count) / total}
         height={viewHeight}
         rx={rx}
       />
       <rect
         className='foreground'
         x={rx}
-        width={(viewWidth * count) / total - rx}
+        width={(total - rx) === 0 ? 0 : (viewWidth * count) / total - rx}
         height={viewHeight}
       />
 

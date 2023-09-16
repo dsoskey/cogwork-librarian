@@ -302,8 +302,12 @@ p {
   background-color: transparent;
   border: 0;
   padding: 0;
+  padding-right: var(--spacing-100);
   margin: 0;
+  top: .15em;
+  position: relative;
   cursor: pointer;
+  aspect-ratio: 1/1;
 }
 .query-editor .run-query-button:disabled {
   cursor: unset;

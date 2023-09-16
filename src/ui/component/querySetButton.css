@@ -1,0 +1,11 @@
+.loading-button .background {
+    fill: var(--blue);
+}
+
+.run-query-button:disabled .loading-button .background {
+    fill: var(--blue-mid-alpha);
+}
+
+.loading-button:disabled .play {
+    fill: var(--dark-color);
+}

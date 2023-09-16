@@ -1,6 +1,7 @@
 import React from 'react'
 import { rankInfo } from './infoLines'
 import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
+import { QuerySetButton } from '../querySetButton'
 
 export const multiQueryInfo = (renderSubquery: (count: number) => string) =>
   (queries: string[]): string[] => {
@@ -64,7 +65,7 @@ export const MultiQueryActionBar = ({
         disabled={!canSubmit}
         title='run query'
         className='run-query-button'>
-        ▶️
+        <QuerySetButton />
       </button>}
     </div>)}
   </pre>

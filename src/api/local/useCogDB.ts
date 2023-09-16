@@ -116,6 +116,9 @@ export const useCogDB = (): CogDB => {
         addCardToIndex(card)
         if (index % 1000 === 0)
           dbReport.addCardCount(1000)
+        else if (index === dbReport.totalCards - 1) {
+          dbReport.addCardCount(index % 1000)
+        }
         break
       case 'manifest':
         setManifest(data)
