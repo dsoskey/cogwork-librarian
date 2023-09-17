@@ -36,7 +36,7 @@ export const scryfall: Grammar = {
     greedy: true,
   },
   use: {
-    pattern: /(^|\b)@(use|u):\w+(?=( |\n|$))/,
+    pattern: /(^|\s)@(use|u):\w+(?=( |\n|$))/,
     alias: 'extension',
   },
   keyword: {
@@ -128,7 +128,7 @@ export const scryfallExtendedMulti: Grammar = {
   },
   extension: {
     // pattern: /(\n|^)\s*#.*(?=\n|$)/,
-    pattern: /@(defaultMode|dm|defaultWeight|dw|alias|a):\w+/
+    pattern: /@(include|i|defaultMode|dm|defaultWeight|dw|alias|a):\w+/
   },
   // 'base-query': {
   //   // pattern: /(?:^|\n\n+|(\n|^)\s*#.*(\n|$))(?!\s*#).*(\n|$)/,

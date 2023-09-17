@@ -103,8 +103,5 @@ export const chooseFilterFunc = (filtersUsed: string[]) => {
     }
   }
 
-  return filtersUsed
-    .filter((it) => showAllFilter.has(it)).length
-    ? allPrintings
-    : findPrinting
+  return findPrinting
 }

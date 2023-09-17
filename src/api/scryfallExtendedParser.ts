@@ -1,4 +1,5 @@
 import { ok, err, Result } from 'neverthrow'
+import { format } from 'date-fns'
 import { injectPrefix, weightAlgorithms } from './queryRunnerCommon'
 import { CogError, columnShower } from '../error'
 
@@ -45,7 +46,8 @@ function parseAlias(alias: string): Result<Alias, AliasError> {
 }
 
 export function parseEnv(lines: string[]): Result<QueryEnvironment, CogError> {
-  const aliases = {}
+  const now = new Date();
+  const aliases: { [name: string]: Alias } = {}
   let defaultMode: QueryMode | undefined = undefined
   let defaultWeight: QueryWeight | undefined = undefined
 
@@ -112,6 +114,13 @@ export function parseEnv(lines: string[]): Result<QueryEnvironment, CogError> {
             query: trimmed,
             displayMessage: `unrecognized aggregation mode ${value}. choose allsub or basesub`
           })
+      }
+    } else if (/^@(include|i):/.test(trimmed)) {
+      const index = trimmed.indexOf(":");
+      const value = trimmed.substring(index + 1);
+      switch (value) {
+        case "stdlib":
+          aliases.released = { name: "released", query: `date<=${format(now, "yyyy-MM-dd")}` }
       }
     }
   }
