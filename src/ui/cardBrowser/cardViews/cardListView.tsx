@@ -5,6 +5,21 @@ import { ManaSymbol, toSplitCost } from '../../../api/memory/types/card'
 import { ManaIcon } from '../../card/manaSymbol'
 import { FlagContext } from '../../../flags'
 
+interface ManaCostProps {
+  manaCost: string
+}
+export const ManaCost = ({ manaCost }: ManaCostProps) => {
+  const split = manaCost.split(" // ");
+
+  return <>
+    {toSplitCost(split[0]).map((it, index) => <ManaIcon key={index} symbol={it as ManaSymbol} />)}
+    {split.length > 1 && <>
+      <code>{" // "}</code>
+      {toSplitCost(split[1]).map((it, index) => <ManaIcon key={index} symbol={it as ManaSymbol} />)}
+      </>}
+    </>
+}
+
 interface CardListRowProps {
   card: EnrichedCard
 }
@@ -19,11 +34,8 @@ export const CardListRow = ({ card }: CardListRowProps) => {
         {card.data.name}
       </a>
     </td>
-    <td>
-      {card.data.mana_cost ?
-        toSplitCost(card.data.mana_cost).map(it => <ManaIcon symbol={it as ManaSymbol} />) :
-        '~'
-      }
+    <td className='mana-cost'>
+      {card.data.mana_cost ? <ManaCost manaCost={card.data.mana_cost} /> : '~'}
     </td>
     <td>{card.data.type_line}</td>
     {showDebugInfo && <td>{card.weight.toPrecision(SCORE_PRECISION)}</td>}

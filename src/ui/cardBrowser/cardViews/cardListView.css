@@ -1,3 +1,6 @@
 .list-view a {
     color: var(--light-color);
 }
+.mana-cost > :not(dialog):not(:first-child) {
+    margin-left: var(--spacing-100);
+}

@@ -1,7 +1,3 @@
-.cube-definitions table {
-    border-collapse: collapse;
-}
-
 .cube-definitions .table-controls,
 .cube-definitions table {
     min-width: 769px;
@@ -41,7 +37,6 @@
 
 .cube-definitions th,
 .cube-definitions td {
-    padding: var(--spacing-200);
     width: 33%;
 }
 
