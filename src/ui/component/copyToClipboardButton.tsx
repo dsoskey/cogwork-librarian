@@ -9,9 +9,10 @@ const buttonText = {
 
 interface CopyToClipboardButtonProps {
   copyText: string
+  children?: React.ReactNode
   className?: string
 }
-export const CopyToClipboardButton = ({ copyText, className }: CopyToClipboardButtonProps) => {
+export const CopyToClipboardButton = ({ copyText, className, children }: CopyToClipboardButtonProps) => {
   const [clipboardStatus, setClipboardStatus] =
     useState<TaskStatus>('unstarted')
 
@@ -32,6 +33,6 @@ export const CopyToClipboardButton = ({ copyText, className }: CopyToClipboardBu
         })
     }}
   >
-    {buttonText[clipboardStatus]}
+    {children ?? buttonText[clipboardStatus]}
   </button>
 }

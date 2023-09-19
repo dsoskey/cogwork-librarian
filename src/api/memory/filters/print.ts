@@ -1,4 +1,4 @@
-import { Filter, FilterNode, not } from './base'
+import { Filter, FilterNode } from './base'
 import { Card } from 'scryfall-sdk'
 import { NormedCard, Printing, PrintingFilterTuple } from '../types/normedCard'
 
@@ -8,8 +8,22 @@ export const printNode = (
 ): FilterNode => {
   return {
     filtersUsed,
-    filterFunc: (card) => card.printings.find(printing => printFilter({printing, card})) !== undefined,
-    inverseFunc: (card) => card.printings.find(printing => not(printFilter)({printing, card})) !== undefined,
+    filterFunc: (card) => {
+      for (const printing of card.printings) {
+        if (printFilter({printing,card})) {
+          return true
+        }
+      }
+      return false
+    },
+    inverseFunc: (card) => {
+      for (const printing of card.printings) {
+        if (!printFilter({printing, card})) {
+          return true;
+        }
+      }
+      return false
+    },
     printFilter,
   }
 }

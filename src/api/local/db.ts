@@ -3,6 +3,7 @@ import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import { NormedCard } from '../memory/types/normedCard'
 import { CubeDefinition } from '../memory/types/cube'
 import { OracleTag } from '../memory/types/tag'
+import { DataSource } from '../../types'
 
 export interface Collection {
   id: string
@@ -10,6 +11,15 @@ export interface Collection {
   type: string
   blob: Blob
   lastUpdated: Date
+}
+
+export interface QueryHistory {
+  id?: string
+  rawQueries: string[],
+  baseIndex: number
+  errorText?: string
+  source: DataSource
+  executedAt: Date
 }
 
 export const MANIFEST_ID = 'the_one'
@@ -37,6 +47,7 @@ export class TypedDexie extends Dexie {
   cube!: Table<CubeDefinition>
 
   oracleTag!: Table<OracleTag>
+  history!: Table<QueryHistory>
 
   constructor() {
     super('cogwork-librarian')
@@ -97,6 +108,10 @@ export class TypedDexie extends Dexie {
           card.oracle_tags = {}
         }
       })
+    })
+
+    this.version(7).stores({
+      history: '++id, executedAt',
     })
   }
 

@@ -3,7 +3,6 @@ import { BrowserView } from './cardBrowser/browserView'
 import React, { useContext, useState } from 'react'
 import { ProjectContext } from '../api/useProject'
 import { weightAlgorithms } from '../api/queryRunnerCommon'
-import { useQueryForm } from './queryForm/useQueryForm'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 import { DataSource } from '../types'
 import { useMemoryQueryRunner } from '../api/local/useQueryRunner'
@@ -15,14 +14,19 @@ import { Footer } from './footer'
 import { parseQuerySet } from '../api/scryfallExtendedParser'
 import { CogError } from '../error'
 import { INTRO_EXAMPLE } from '../api/example'
+import { SearchOptions } from '../api/memory/types/searchOptions'
+import { cogDB as cogDBClient } from '../api/local/db'
 
+const options: SearchOptions = {
+  order: 'cmc',
+  dir: 'auto',
+}
 export const SearchView = () => {
   const cogDB = useContext(CogDBContext)
 
   const { addIgnoredId, addCard, savedCards, ignoredIds, setSavedCards } = useContext(ProjectContext)
-  const { queries, setQueries, options, setOptions } = useQueryForm({
-    example: () => ({ queries: INTRO_EXAMPLE }),
-  })
+  const [rawQueries, setRawQueries] = useLocalStorage<string[]>('queries', INTRO_EXAMPLE)
+
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
   const queryRunner = {
     local: useMemoryQueryRunner({
@@ -40,17 +44,32 @@ export const SearchView = () => {
 
   const execute = (baseIndex: number) => {
     console.debug(`submitting query at line ${baseIndex}`)
-    if (baseIndex < 0 || baseIndex >= queries.length) {
+    if (baseIndex < 0 || baseIndex >= rawQueries.length) {
       console.error("baseIndex is out of bounds")
       return
     }
     setExtendedParseError([])
 
-    parseQuerySet(queries, baseIndex)
+    parseQuerySet(rawQueries, baseIndex)
       .map(({ queries, getWeight, injectPrefix }) => {
+        const executedAt = new Date();
         queryRunner.run(queries, options, injectPrefix, getWeight)
-          .catch(error => {
+          .then(() =>
+            cogDBClient.history.put({
+              rawQueries,
+              baseIndex,
+              source,
+              executedAt,
+            })
+          ).catch(error => {
             console.error(error)
+            cogDBClient.history.put({
+              rawQueries,
+              baseIndex,
+              source,
+              errorText: error.toString(),
+              executedAt,
+            })
           })
       })
       .mapErr(it => setExtendedParseError([it]))
@@ -69,10 +88,8 @@ export const SearchView = () => {
       <QueryForm
         status={queryRunner.status}
         execute={execute}
-        queries={queries}
-        setQueries={setQueries}
-        options={options}
-        setOptions={setOptions}
+        queries={rawQueries}
+        setQueries={setRawQueries}
         source={source}
         setSource={setSource}
       />

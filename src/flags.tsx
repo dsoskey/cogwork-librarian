@@ -10,18 +10,14 @@ export const clientConfig = _config as ClientConfig;
 export const FLAG_NAMES = {
   adminMode: 'adminMode',
   showDebugInfo: 'showDebugInfo',
-  disableCache: 'disableCache',
   displayTypes: 'displayTypes',
-  tagger: 'tagger',
 } as const
 export type Flag = ObjectValues<typeof FLAG_NAMES>
 
 export const INITIAL_FLAGS: Record<Flag, boolean> = {
   showDebugInfo: clientConfig.stage === Stage.Dev,
   adminMode: false,
-  disableCache: true,
   displayTypes: false,
-  tagger: false,
 }
 
 interface FlagManager {

@@ -14,6 +14,7 @@ import { SearchView } from './ui/searchView'
 import { Masthead } from './ui/component/masthead'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
 import { SyntaxDocs } from './ui/docs/syntaxDocs'
+import { HistoryView } from './ui/historyView'
 
 export const App = () => {
   const { pathname } = useLocation()
@@ -59,6 +60,9 @@ export const App = () => {
                     </Route>
                     <Route path='/user-guide' exact>
                       <SyntaxDocs />
+                    </Route>
+                    <Route path='/history' exact>
+                      <HistoryView />
                     </Route>
                     <Route>
                       <div>404'ed!</div>

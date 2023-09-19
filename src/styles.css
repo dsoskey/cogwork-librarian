@@ -159,6 +159,10 @@ p {
   align-items: center;
 }
 
+.row.baseline {
+  align-items: baseline;
+}
+
 .row > :not(dialog):not(:first-child)  {
   margin-left: 4px;
 }

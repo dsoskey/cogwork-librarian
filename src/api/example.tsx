@@ -1,9 +1,10 @@
 import React from 'react'
-import { QueryFormFields } from '../ui/queryForm/useQueryForm'
 
-export interface QueryExample extends Omit<QueryFormFields, 'options'> {
+export interface QueryExample {
   title: string
   description?: React.ReactNode
+  queries: string[]
+  prefix: string
 }
 
 const SAVAI_SACRIFICE_EXAMPLE: QueryExample = {

@@ -1,0 +1,27 @@
+.history-view {
+    margin-left: var(--spacing-200);
+}
+
+.history-view .page-numbers {
+    flex: 1;
+}
+
+.history-view .route-header,
+.history-view pre.history {
+    min-width: 769px;
+    max-width: 50%;
+}
+
+@media (max-width: 768px) {
+    .history-view .route-header,
+    .history-view pre.history {
+        max-width: 100%;
+        min-width: 100%;
+    }
+}
+
+.history-item .query-label {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+}

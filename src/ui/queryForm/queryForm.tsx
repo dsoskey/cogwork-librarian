@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import { SearchOptions } from 'scryfall-sdk'
 import { TextEditor } from '../component/editor/textEditor'
 import { DataSource, Setter, TaskStatus } from '../../types'
 import { ScryfallIcon } from '../component/scryfallIcon'
@@ -21,8 +20,6 @@ export interface QueryFormProps {
   execute: (startIndex: number) => void
   queries: string[]
   setQueries: Setter<string[]>
-  options: SearchOptions
-  setOptions: Setter<SearchOptions>
   source: DataSource
   setSource: Setter<DataSource>
 }
