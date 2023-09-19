@@ -341,7 +341,7 @@ isValue -> (
   | "covered"i | "datestamped"i | "doublesided"i | "duelcommander"i | "etb"i
   | "englishart"i | "etch"i | "extended"i | "flavorname"i | "flavor"i
   | "fbb"i | "fwb"i | "frenchvanilla"i | "funny"i | "future"i | "gameday"i
-  | "halo"i | "hires"i | "splitmana"i | "illustration"i | "intropack"i | "invitational"i
+  | "halo"i | "hires"i | "splitmana"i | "illustration"i | "intropack"i | "invitational"i | "setextension"i
   | "localizedname"i | "mtgoid"i | "masterpiece"i
   | "modern"i | "multiverse"i | "new"i | "oathbreaker"i | "old"i | "oversized"i | "paperart"i
   | "party"i | "phyrexia"i | "planar"i | "planeswalkerdeck"i | "prerelease"i | "printedtext"i

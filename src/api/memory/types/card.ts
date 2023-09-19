@@ -157,6 +157,7 @@ export const isValues = {
   variation: "variation",
   watermark: "watermark",
   serialized: "serialized",
+  setextension: "setextension",
 } as const
 export type IsValue = ObjectValues<typeof isValues>
 

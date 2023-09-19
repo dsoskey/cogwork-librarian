@@ -86,6 +86,26 @@ p {
   margin-bottom: 0.5em;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: var(--darkest-color);
+}
+
+tbody {
+  background-color: var(--dark-color);
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--darker-color);
+}
+
+th, td {
+  padding: var(--spacing-200);
+}
+
 /* classnames */
 
 @media (min-width: 769px) {
