@@ -20,10 +20,13 @@ export const CardListRow = ({ card }: CardListRowProps) => {
       </a>
     </td>
     <td>
-      {card.data.mana_cost && toSplitCost(card.data.mana_cost).map(it => <ManaIcon symbol={it as ManaSymbol} />)}
+      {card.data.mana_cost ?
+        toSplitCost(card.data.mana_cost).map(it => <ManaIcon symbol={it as ManaSymbol} />) :
+        '~'
+      }
     </td>
     <td>{card.data.type_line}</td>
-    {showDebugInfo && card.weight.toPrecision(SCORE_PRECISION)}
+    {showDebugInfo && <td>{card.weight.toPrecision(SCORE_PRECISION)}</td>}
   </tr>
 }
 

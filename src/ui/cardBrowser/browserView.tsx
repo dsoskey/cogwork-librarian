@@ -63,9 +63,9 @@ export const BrowserView = React.memo(({
   } = useDebugDetails()
 
   const [pageSize] = useLocalStorage('page-size', PAGE_SIZE)
-  const [page, setPage] = useState(0)
-  const onPageChange = (n: number) => {
-    setPage(n)
+  const [page, _setPage] = useState(0)
+  const setPage = (n: number) => {
+    _setPage(n)
     setTimeout(() => {
       topOfResults.current?.scrollIntoView({
         block: "start",
@@ -77,7 +77,7 @@ export const BrowserView = React.memo(({
   const lowerBound = page * pageSize + 1
   const upperBound = (page + 1) * pageSize
   useEffect(() => {
-    onPageChange(0)
+    setPage(0)
   }, [result])
   const currentPage = useMemo(
     () => activeCards.slice(lowerBound - 1, upperBound),
@@ -91,14 +91,41 @@ export const BrowserView = React.memo(({
     return null
   }
 
+  const pageControl = showCards ? <PageControl
+    page={page}
+    setPage={setPage}
+    pageSize={pageSize}
+    upperBound={upperBound}
+    cardCount={activeCards.length}
+  /> : null
+
+
+  const downloadButton = <div><button onClick={() => {
+    const blob = new Blob([JSON.stringify(result)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob)
+    const now = new Date()
+
+    const link = document.createElement("a")
+    link.href = url;
+    link.download = `coglib-results-${now.toISOString().replace(/:/g, "-")}.json`
+    document.body.append(link);
+    link.click();
+
+    URL.revokeObjectURL(url)
+    link.remove()
+  }}>download json</button></div>
+
   return <div className='results' ref={topOfResults}>
       <div className='column content'>
         <TopBar
+          pageControl={pageControl}
+          downloadButton={downloadButton}
           errors={errors}
           source={source}
           status={status}
           report={report}
-          activeCount={activeCards.length}
           searchCount={cards.search.length}
           ignoreCount={cards.ignore.length}
           visibleDetails={visibleDetails}
@@ -107,9 +134,6 @@ export const BrowserView = React.memo(({
           setRevealDetails={setRevealDetails}
           lowerBound={lowerBound}
           upperBound={upperBound}
-          page={page}
-          setPage={onPageChange}
-          pageSize={pageSize}
           displayType={displayType}
           setDisplayType={setDisplayType}
           activeCollection={activeCollection}
@@ -144,13 +168,7 @@ export const BrowserView = React.memo(({
             {displayType === 'list' && <CardListView result={currentPage} />}
           </div>
           {viewport.mobile && <div className='bottom-page-control'>
-            <PageControl
-              page={page}
-              setPage={onPageChange}
-              pageSize={pageSize}
-              upperBound={upperBound}
-              cardCount={activeCards.length}
-            />
+            {pageControl}
           </div>}
         </>}
       </div>

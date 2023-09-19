@@ -48,13 +48,14 @@ export const AppInfo = () => {
         why should i use cogwork librarian? why not use scryfall directly?
       </h3>
       <p>
-        for the average search query, scryfall is more than sufficient.
+        for the average one-off search query, scryfall is more than sufficient.
         cogwork librarian offers some key advantages over scryfall:
       </p>
       <ol>
         <li>
-          it is designed with brainstorming lists in mind. the ignorelist and
-          the base/sub query model let you focus only on the subset of cards
+          it is designed with brainstorming lists in mind.
+          organize multiple query sets into a single project to keep relevant queries together.
+          the ignorelist and the base/sub query model let you focus only on the subset of cards
           that you care about
         </li>
         <li>

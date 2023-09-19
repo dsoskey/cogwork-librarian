@@ -1,6 +1,5 @@
 import { Loader } from '../component/loader'
 import { QUERIES, WEIGHT } from './constants'
-import { PageControl } from './pageControl'
 import React, { useCallback, useContext, useMemo } from 'react'
 import { DataSource, Setter, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
@@ -22,10 +21,11 @@ interface TopBarProps {
   status: TaskStatus
   errors: CogError[]
   report: QueryReport
-  activeCount: number
   searchCount: number
   ignoreCount: number
   // details control
+  pageControl: React.ReactNode
+  downloadButton: React.ReactNode
   visibleDetails: string[]
   setVisibleDetails: Setter<string[]>
   revealDetails: boolean
@@ -33,9 +33,6 @@ interface TopBarProps {
   // page control
   lowerBound: number
   upperBound: number
-  page: number
-  setPage: Setter<number>
-  pageSize: number
   displayType: DisplayType,
   setDisplayType: Setter<DisplayType>
   activeCollection: ActiveCollection
@@ -43,18 +40,16 @@ interface TopBarProps {
 }
 
 export const TopBar = ({
+  pageControl,
+  downloadButton,
   status,
   report,
-  activeCount,
   searchCount,
   ignoreCount,
   setVisibleDetails,
   visibleDetails,
   setRevealDetails,
   revealDetails,
-  page,
-  setPage,
-  pageSize,
   lowerBound,
   upperBound,
   source,
@@ -81,8 +76,8 @@ export const TopBar = ({
       return Array.from(next)
     })
   }
-  const toggleWeight = useCallback(toggleBase(WEIGHT), [setVisibleDetails])
-  const toggleQueries = useCallback(toggleBase(QUERIES), [setVisibleDetails])
+  const toggleWeight = useCallback(toggleBase(WEIGHT), [setVisibleDetails]);
+  const toggleQueries = useCallback(toggleBase(QUERIES), [setVisibleDetails]);
 
   return (
     <div className='topbar'>
@@ -161,16 +156,8 @@ export const TopBar = ({
           </>
         )}
       </div>
-      <div className='result-controls'>
-        {errors.length === 0 && activeCount > 0 && (
-          <PageControl
-            page={page}
-            setPage={setPage}
-            pageSize={pageSize}
-            upperBound={upperBound}
-            cardCount={activeCount}
-          />
-        )}
+      <div className='result-controls column'>
+        {pageControl}
         {displayTypes && <label className='display-type'>
           <span>show{" "}</span>
           <select value={activeCollection} onChange={event => setActiveCollection(event.target.value as ActiveCollection)}>
@@ -180,9 +167,9 @@ export const TopBar = ({
           <select value={displayType} onChange={event => setDisplayType(event.target.value as DisplayType)}>
             <option>cards</option>
             <option>list</option>
-            {showDebugInfo && <option>json</option>}
           </select>
         </label>}
+        {downloadButton}
       </div>
     </div>
   )

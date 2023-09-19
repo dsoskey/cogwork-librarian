@@ -14,7 +14,7 @@ const LoaderButton = ({ vh, vw, count, total }) => {
   const joined = trianglePoints.map(({x, y}) => `${x},${y}`).join(" ")
   return <svg className='loading-button' width='1.25em' height='1.25em' viewBox={`0 0 ${vw} ${vh}`}>
     <clipPath id="myClip" width={vw} height={vh}>
-      <rect width={(vw * count) / total} height={vh} />
+      <rect width={total === 0 ? 0 : (vw * count) / total} height={vh} />
     </clipPath>
 
     <rect clipPath="url(#myClip)" className='background' width={vw} height={vh} rx={rx} />

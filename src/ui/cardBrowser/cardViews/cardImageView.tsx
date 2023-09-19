@@ -83,6 +83,8 @@ export const CardImageView = ({
       onMouseLeave={handleHoverOff}
     >
       <CardImage card={card.data} />
+      {showDebugInfo && revealDetails && visibleDetails.includes(WEIGHT) &&
+        <code className='card-weight'>{card.weight.toFixed(SCORE_PRECISION)}</code>}
       {hovered && <div className='hover-actions'>
         <a
           href={card.data.scryfall_uri.replace(/\?.*$/, '')}
@@ -106,11 +108,6 @@ export const CardImageView = ({
           <div>{card.data.name}</div>
           {visibleDetails.includes('oracle') && (
             <div>{card.data.oracle_text}</div>
-          )}
-          {visibleDetails.includes(WEIGHT) && (
-            <div>
-              weight: <code>{card.weight.toFixed(SCORE_PRECISION)}</code>
-            </div>
           )}
           {visibleDetails.includes(QUERIES) && (
             <>

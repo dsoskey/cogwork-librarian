@@ -29,6 +29,15 @@
     margin-top: var(--spacing-200);
 }
 
+.card-view .card-weight {
+    position: absolute;
+    z-index: 2;
+    bottom: 0;
+    right: 0;
+    background-color: var(--dark-color);
+    color: var(--light-color);
+}
+
 .card-view .hover-actions {
     position: absolute;
     z-index: 2;
