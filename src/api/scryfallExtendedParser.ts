@@ -121,6 +121,7 @@ export function parseEnv(lines: string[]): Result<QueryEnvironment, CogError> {
       switch (value) {
         case "stdlib":
           aliases.released = { name: "released", query: `date<=${format(now, "yyyy-MM-dd")}` }
+          aliases.newest = { name: "newest", query: `order:released direction:desc` }
       }
     }
   }

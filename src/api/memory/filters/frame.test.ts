@@ -1,7 +1,7 @@
 import { QueryRunner } from '../queryRunner'
 import { narcomoeba } from './testData/narcomoeba'
 import { crystallineGiant } from './testData/crystallineGiant'
-import { defaultOptions } from './testData/_options'
+import { defaultOptions } from './testData/_utils'
 
 describe('frame filter', function() {
   const corpus = [narcomoeba, crystallineGiant]

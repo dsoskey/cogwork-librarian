@@ -4,7 +4,7 @@ import { birdsOfParadise } from './testData/birdsOfParadise'
 import { ramunapRuins } from './testData/ramunapRuins'
 import { concordantCrossroads } from './testData/concordantCrossroads'
 import { bojukaBog } from './testData/bojukaBog'
-import { defaultOptions } from './testData/_options'
+import { defaultOptions } from './testData/_utils'
 
 const corpus = [bojukaBog, bloodCrypt, birdsOfParadise, ramunapRuins, concordantCrossroads]
 const queryRunner = new QueryRunner({ corpus, defaultOptions })

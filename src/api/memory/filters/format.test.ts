@@ -1,5 +1,5 @@
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions } from './testData/_options'
+import { defaultOptions } from './testData/_utils'
 import { preordain } from './testData/preordain'
 import { delverOfSecrets } from './testData/delverOfSecrets'
 import { emberethShieldbreaker } from './testData/emberethShieldbreaker'

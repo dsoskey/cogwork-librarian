@@ -1881,3 +1881,4 @@ const printings = [
 ]
 
 export const delverOfSecrets = Card.construct(printings[0])
+export const ftvDelverOfSecrets = Card.construct(printings[1])

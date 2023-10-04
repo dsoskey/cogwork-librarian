@@ -1,7 +1,7 @@
 import { bloodCrypt } from './testData/bloodCrypt'
 import { tarmogoyf } from './testData/tarmogoyf'
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions } from './testData/_options'
+import { defaultOptions } from './testData/_utils'
 import { asymmetrySage } from './testData/asymmetrySage'
 
 describe('price filter', function() {

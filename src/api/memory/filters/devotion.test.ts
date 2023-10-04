@@ -5,7 +5,7 @@ import { crystallineGiant } from './testData/crystallineGiant'
 import { necroimpotence } from './testData/necroimpotence'
 import { lich } from './testData/lich'
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions } from './testData/_options'
+import { defaultOptions } from './testData/_utils'
 
 describe('devotion filter', function() {
   const corpus = [arrogantBloodlord, aetherbladeAgent, davrielsWithering, crystallineGiant, necroimpotence, lich]

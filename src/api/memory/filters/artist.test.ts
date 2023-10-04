@@ -1,7 +1,7 @@
 import { mirrex } from './testData/mirrex'
 import { animateLand } from './testData/animateLand'
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions } from './testData/_options'
+import { defaultOptions } from './testData/_utils'
 
 describe('artist filter', function() {
   const corpus = [mirrex, animateLand]

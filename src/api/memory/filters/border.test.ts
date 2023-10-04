@@ -1,7 +1,7 @@
 import { mirrex } from './testData/mirrex'
 import { birdsOfParadise } from './testData/birdsOfParadise'
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions } from './testData/_options'
+import { defaultOptions } from './testData/_utils'
 
 describe('border filter', function() {
   const corpus = [mirrex, birdsOfParadise]

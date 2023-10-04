@@ -28,7 +28,7 @@ export const getDirection = (filtersUsed: string[], options: SearchOptions) => {
   return options.dir ?? 'auto'
 }
 
-interface SearchError {
+export interface SearchError {
   query: string
   errorOffset: number
   message: string
