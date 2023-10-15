@@ -26,6 +26,7 @@ function generateBase(stage) {
         { test: /\.css$/, use: ['style-loader', 'css-loader'] },
         { test: /\.(png|jpeg|svg)/, type: 'asset/resource' },
         { test: /\.ne$/, use: ['@leetcode/nearley-loader'] },
+        { test: /\.md$/, type: 'asset/source' },
       ],
     },
     devServer: {

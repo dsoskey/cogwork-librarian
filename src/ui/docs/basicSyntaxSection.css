@@ -1,0 +1,17 @@
+.basic-syntax-root {
+    display: flex;
+    flex-direction: row;
+}
+
+.basic-syntax-root > div {
+    flex: 1;
+    padding: var(--spacing-300);
+}
+
+.basic-syntax-root .example {
+    padding: var(--spacing-300);
+}
+
+.basic-syntax-root:nth-of-type(odd) {
+    flex-direction: row-reverse;
+}

@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { useProject, ProjectContext } from './api/useProject'
 import { Footer } from './ui/footer'
 import { ExampleGallery } from './ui/queryForm/exampleGallery'
 import { AppInfo } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
-import { Route, Switch, useLocation } from 'react-router'
+import { Route, Routes, useLocation } from 'react-router'
 import { DataView } from './ui/data/dataView'
 import { SavedCards } from './ui/savedCards'
 import { ToasterMessage, Toaster, ToasterContext } from './ui/component/toaster'
@@ -15,9 +15,13 @@ import { Masthead } from './ui/component/masthead'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
 import { SyntaxDocs } from './ui/docs/syntaxDocs'
 import { HistoryView } from './ui/historyView'
+import { Playground } from './playground'
+import { DocsView } from './ui/docs/docsView'
+import { FlagContext } from './flags'
 
 export const App = () => {
   const { pathname } = useLocation()
+  const { docsUpdate } = useContext(FlagContext).flags;
 
   const cogDB = useCogDB()
   const listImporter = useListImporter(cogDB)
@@ -45,29 +49,19 @@ export const App = () => {
                 {pathname === "/" && <SearchView />}
                 {pathname !== "/" && <>
                   <Masthead/>
-                  <Switch>
-                    <Route path='/data'>
-                      <DataView />
-                    </Route>
-                    <Route path='/saved' exact>
-                      <SavedCards savedCards={project.savedCards} setSavedCards={project.setSavedCards} />
-                    </Route>
-                    <Route path='/about-me' exact>
-                      <AppInfo />
-                    </Route>
-                    <Route path='/examples' exact>
-                      <ExampleGallery />
-                    </Route>
-                    <Route path='/user-guide' exact>
-                      <SyntaxDocs />
-                    </Route>
-                    <Route path='/history' exact>
-                      <HistoryView />
-                    </Route>
-                    <Route>
-                      <div>404'ed!</div>
-                    </Route>
-                  </Switch>
+                  <Routes>
+                    <Route path='/data/*' element={<DataView />}/>
+                    <Route
+                      path='/saved'
+                      element={<SavedCards savedCards={project.savedCards} setSavedCards={project.setSavedCards} />}
+                    />
+                    <Route path='/about-me' element={<AppInfo />} />
+                    <Route path='/examples' element={<ExampleGallery />} />
+                    <Route path='/user-guide' element={docsUpdate ? <DocsView /> : <SyntaxDocs />} />
+                    <Route path='/history' element={<HistoryView />} />
+                    <Route path='/playground' element={<Playground />} />
+                    <Route element={<div>404'ed!</div>} />
+                  </Routes>
                   <Footer />
                 </>}
                 <Toaster />

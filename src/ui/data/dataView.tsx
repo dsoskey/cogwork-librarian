@@ -3,7 +3,7 @@ import { CardDataView } from './cardDataView'
 import { CubeDataView } from './cubeDataView'
 import "./dataView.css"
 import { Link } from 'react-router-dom'
-import { Route, useLocation } from 'react-router'
+import { Route, Routes, useLocation } from 'react-router'
 
 export const DataView = () => {
   const { pathname } = useLocation()
@@ -20,11 +20,9 @@ export const DataView = () => {
 
       </h3>
     </section>
-    <Route path='/data/card'>
-      <CardDataView/>
-    </Route>
-    <Route path='/data/cube'>
-      <CubeDataView/>
-    </Route>
+    <Routes>
+      <Route path='card' element={<CardDataView/>}/>
+      <Route path='cube' element={<CubeDataView/>}/>
+    </Routes>
   </div>
 }

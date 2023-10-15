@@ -7,17 +7,20 @@ import { ClientConfig, Stage } from '../config'
 import _config from 'configuration';
 console.log(_config);
 export const clientConfig = _config as ClientConfig;
+const IS_DEV = clientConfig.stage === Stage.Dev;
 export const FLAG_NAMES = {
   adminMode: 'adminMode',
   showDebugInfo: 'showDebugInfo',
   displayTypes: 'displayTypes',
+  docsUpdate: 'docsUpdate',
 } as const
 export type Flag = ObjectValues<typeof FLAG_NAMES>
 
 export const INITIAL_FLAGS: Record<Flag, boolean> = {
-  showDebugInfo: clientConfig.stage === Stage.Dev,
+  showDebugInfo: IS_DEV,
   adminMode: false,
   displayTypes: false,
+  docsUpdate: IS_DEV
 }
 
 interface FlagManager {
