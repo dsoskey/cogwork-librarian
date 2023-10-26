@@ -34,6 +34,7 @@ export const keywords = {
   pow: 'pow', power: 'power',
   powtou: 'powtou', pt: 'pt',
   produces: 'produces',
+  prints: 'prints',
   order: 'order',
   r: 'r', rarity: 'rarity',
   restricted: 'restricted',
@@ -62,6 +63,7 @@ export const keywordsToImplement = {
   // these affect scryfall's UI behavior. are they needed here?
   include: 'include', // maybe this one overrides a similar scryfall default?
   // display: 'display', is display needed?
+  paperprints: 'paperprints',
 } as const
 
 const all = {

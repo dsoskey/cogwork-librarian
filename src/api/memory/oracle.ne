@@ -61,6 +61,7 @@ condition -> (
     restrictedCondition |
     isCondition |
     notCondition |
+    printCountCondition |
     inCondition |
     rarityCondition |
     setCondition |
@@ -198,6 +199,9 @@ isCondition -> ("is"i | "has"i) onlyEqualOperator isValue
 
 notCondition -> "not"i onlyEqualOperator isValue
     {% ([_, [_op], value]) => filters.not(filters.isVal(value)) %}
+
+printCountCondition -> "prints" anyOperator integerValue
+    {% ([_, [operator], value]) => filters.printCountFilter(operator, value) %}
 
 inCondition -> "in"i onlyEqualOperator stringValue
     {% ([_, [_op], value]) => filters.inFilter(value) %}
@@ -347,7 +351,7 @@ isValue -> (
   | "party"i | "phyrexia"i | "planar"i | "planeswalkerdeck"i | "prerelease"i | "printedtext"i
   | "related"i | "release"i | "reserved"i | "reversible"i | "stamp"i | "showcase"i | "serialized"i
   | "spellbook"i | "spikey"i | "stamped"i | "starterdeck"i | "story"i | "tcgplayer"i | "textless"i
-  | "tombstone"i | "onlyprint"i | "variation"i | "watermark"i | "ub"i
+  | "tombstone"i | "onlyprint"i | "variation"i | "watermark"i | "ub"i | "unique"i | "placeholderimage"i
 ) {% ([[category]]) => category.toLowerCase() %}
 
 # anything that isn't a special character and isn't "and" or "or"

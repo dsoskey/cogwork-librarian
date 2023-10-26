@@ -6,7 +6,7 @@ import { queryParser } from './parser'
 import { FilterNode } from './filters/base'
 import { normCardList, NormedCard } from './types/normedCard'
 import { CubeDefinition, invertCubes } from './types/cube'
-import { sortFunc, SortOrder } from './filters/sort'
+import { byName, sortFunc, SortOrder } from './filters/sort'
 import { chooseFilterFunc } from './filters/print'
 import { Parser } from 'nearley'
 import { SearchOptions } from './types/searchOptions'
@@ -124,7 +124,7 @@ export class QueryRunner {
 
     // sort
     const order: SortOrder = getOrder(filtersUsed, options)
-    const sorted = sortBy(printFiltered, [...sortFunc(order), 'name']) as Card[]
+    const sorted = sortBy(printFiltered, [...sortFunc(order), byName]) as Card[]
 
     // direction
     const direction = getDirection(filtersUsed, options)

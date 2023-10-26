@@ -73,8 +73,10 @@ const printMattersFields = new Set<IsValue>([
   'flavorname',
   'halo',
   'ub',
+  'universesbeyond',
   'serialized',
   'setextension',
+  'placeholderimage',
 ])
 export function printMatters(value: IsValue): boolean {
   return printMattersFields.has(value)
@@ -136,6 +138,7 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
     case 'stamped':
       return printing.security_stamp?.length > 0
     case 'ub':
+    case 'universesbeyond':
       return printing.security_stamp?.includes('triangle')
     case 'artist':
       return printing.artist?.length > 0
@@ -205,6 +208,8 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
         printing.games.includes("sega") ||
         printing.set_name.includes("Heroes of the Realm") ||
         printing.set_name.includes("Playtest Cards")
+    case 'placeholderimage':
+      return printing.image_status === 'placeholder'
     // return card.layout === 'art_series' ||
     //   card.layout === 'token' ||
     //   card.layout === 'double_faced_token' ||
@@ -217,6 +222,10 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
 
 export const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
   switch (value) {
+    case 'unique': {
+      const set = new Set(card.printings.map(it => it.set))
+      return set.size === 1
+    }
     case 'spellbook': // check oracle text for draft from spellbook text
       return anyFaceRegexMatch(card, 'oracle_text', /(conjure the power nine|(conjure|draft).* from .* spellbook)/)
     case 'etb':

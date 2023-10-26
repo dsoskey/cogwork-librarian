@@ -78,7 +78,8 @@ export const isValues = {
   tangoland: 'tangoland',
   battleland: 'battleland',
   bondland: 'bondland',
-  ub: 'ub', //universes beyond
+  ub: 'ub', universesbeyond: 'universesbeyond',
+  unique: 'unique',
   extra: 'extra',
   adventure: "adventure",
   arenaid: "arenaid",
@@ -136,6 +137,7 @@ export const isValues = {
   party: "party",
   phyrexia: "phyrexia",
   planar: "planar",
+  placeholderimage: 'placeholderimage',
   planeswalkerdeck: "planeswalkerdeck",
   prerelease: "prerelease",
   printedtext: "printedtext",

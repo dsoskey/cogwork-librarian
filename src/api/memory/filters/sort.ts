@@ -26,6 +26,7 @@ export type SortOrder = ObjectValues<typeof SORT_ORDERS>
 export const sortFunc = (key: SortOrder): any[] => {
   switch (key) {
     case 'name':
+      return [byName]
     case 'artist':
     case 'cmc':
       return [key]
@@ -102,6 +103,10 @@ const colorOrder = {
   BGUW: 29,
   BGRUW: 30,
   "": 31,
+}
+
+export function byName(card:Card) {
+  return card.name.toLowerCase().replace(/( |\B|-)/g, "");
 }
 
 function byColor(card: Card) {

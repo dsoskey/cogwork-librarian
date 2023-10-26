@@ -33,6 +33,7 @@ import { collectorNumberNode } from './collectorNumber'
 import { oracleTagFilter } from './tag'
 import { oddEvenFilter } from './manavalue'
 import { nameFilter } from './name'
+import { printCountFilter } from './printCount'
 export const filters = {
   identity: identityNode,
   and: andNode,
@@ -77,4 +78,5 @@ export const filters = {
   devotionOperation,
   oddEvenFilter,
   nameFilter,
+  printCountFilter,
 }
