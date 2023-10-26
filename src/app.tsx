@@ -15,7 +15,6 @@ import { Masthead } from './ui/component/masthead'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
 import { SyntaxDocs } from './ui/docs/syntaxDocs'
 import { HistoryView } from './ui/historyView'
-import { Playground } from './playground'
 import { DocsView } from './ui/docs/docsView'
 import { FlagContext } from './flags'
 
@@ -59,7 +58,6 @@ export const App = () => {
                     <Route path='/examples' element={<ExampleGallery />} />
                     <Route path='/user-guide' element={docsUpdate ? <DocsView /> : <SyntaxDocs />} />
                     <Route path='/history' element={<HistoryView />} />
-                    <Route path='/playground' element={<Playground />} />
                     <Route element={<div>404'ed!</div>} />
                   </Routes>
                   <Footer />
