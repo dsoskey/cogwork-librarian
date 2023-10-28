@@ -1,6 +1,6 @@
 import { bloodCrypt } from './testData/bloodCrypt'
 import { tarmogoyf } from './testData/tarmogoyf'
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions } from './testData/_utils'
 import { asymmetrySage } from './testData/asymmetrySage'
 

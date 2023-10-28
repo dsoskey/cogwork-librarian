@@ -1,6 +1,6 @@
 import { preordain } from './testData/preordain'
 import { barrysLand } from './testData/barrysLand'
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions, names } from './testData/_utils'
 import { okoThiefOfCrowns } from './testData/okoThiefOfCrowns'
 

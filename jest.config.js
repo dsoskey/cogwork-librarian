@@ -11,5 +11,6 @@ module.exports = {
   },
   moduleNameMapper: {
     '^configuration$': "<rootDir>/config/development",
+    "\\.(css|sass)$": "identity-obj-proxy",
   }
 }

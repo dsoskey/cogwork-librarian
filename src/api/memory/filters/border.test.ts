@@ -1,6 +1,6 @@
 import { mirrex } from './testData/mirrex'
 import { birdsOfParadise } from './testData/birdsOfParadise'
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions } from './testData/_utils'
 
 describe('border filter', function() {

@@ -1,4 +1,4 @@
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions } from './testData/_utils'
 import { animateLand } from './testData/animateLand'
 import { kroxaTitanOfDeathsHunger } from './testData/kroxaTitanOfDeathsHunger'

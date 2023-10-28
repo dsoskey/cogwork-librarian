@@ -1,6 +1,6 @@
 import { barrysLand } from './testData/barrysLand'
 import { delverOfSecrets } from './testData/delverOfSecrets'
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { names } from './testData/_utils'
 
 describe('oddEvenFilter', function() {

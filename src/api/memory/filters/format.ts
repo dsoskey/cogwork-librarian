@@ -1,9 +1,10 @@
-import { Format, Legality } from 'scryfall-sdk/out/api/Cards'
+import { Format } from 'scryfall-sdk/out/api/Cards'
 import { NormedCard } from '../types/normedCard'
 import { FilterNode } from './base'
 import { oracleNode } from './oracle'
 
+type Legality = "legal" | "not_legal" | "restricted" | "banned"
 export const formatMatch = (legality: Legality, value: Format): FilterNode => oracleNode({
-  filtersUsed: [legality.toString()],
-  filterFunc: (card: NormedCard) => card.legalities[value] === (legality as unknown as string),
+  filtersUsed: [legality],
+  filterFunc: (card: NormedCard) => card.legalities[value] === legality,
 })

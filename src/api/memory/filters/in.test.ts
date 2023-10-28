@@ -1,7 +1,7 @@
 import { preordain } from './testData/preordain'
 import { asymmetrySage } from './testData/asymmetrySage'
 import { lagoHirvienteDeDarigaaz } from './testData/lagoHirvienteDeDarigaaz'
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions, names } from './testData/_utils'
 import { ftvDelverOfSecrets } from './testData/delverOfSecrets'
 import { darkConfidant } from './testData/darkConfidant'

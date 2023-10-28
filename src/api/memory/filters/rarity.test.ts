@@ -1,6 +1,6 @@
 import { mirrex } from './testData/mirrex'
 import { animateLand } from './testData/animateLand'
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions } from './testData/_utils'
 import { negate } from './testData/negate'
 

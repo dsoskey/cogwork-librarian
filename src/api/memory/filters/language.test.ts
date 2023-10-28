@@ -1,6 +1,6 @@
 import { lagoHirvienteDeDarigaaz } from './testData/lagoHirvienteDeDarigaaz'
 import { asymmetrySage } from './testData/asymmetrySage'
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions, names } from './testData/_utils'
 
 describe('language filter', function() {

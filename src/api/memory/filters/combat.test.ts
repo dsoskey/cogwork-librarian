@@ -1,8 +1,8 @@
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { phantomBeast } from './testData/phantomBeast'
 import { kroxaTitanOfDeathsHunger } from './testData/kroxaTitanOfDeathsHunger'
 import { delverOfSecrets } from './testData/delverOfSecrets'
-import { defaultOptions } from './testData/_utils'
+import { defaultOptions, names } from './testData/_utils'
 import { norinTheWary } from './testData/norinTheWary'
 import { tarmogoyf } from './testData/tarmogoyf'
 import { preordain } from './testData/preordain'
@@ -22,108 +22,88 @@ describe('combat filters', function() {
   const dfcQueryRunner = new QueryRunner({ corpus: dfcCorpus, defaultOptions })
   describe('combatToCombatNode', function() {
     it('should handle pow number comparisons and dfcs', () => {
-      const result = dfcQueryRunner.search("pow>2")._unsafeUnwrap()
+      const result = names(dfcQueryRunner.search("pow>2"))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(delverOfSecrets.id)
+      expect(result).toEqual([delverOfSecrets.name])
     })
 
     it('should handle tou number comparisons and dfcs', () => {
-      const result = dfcQueryRunner.search("tou<2")._unsafeUnwrap()
+      const result = names(dfcQueryRunner.search("tou<2"))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(delverOfSecrets.id)
+      expect(result).toEqual([delverOfSecrets.name])
     })
 
     it('should handle pow>tou', function() {
-      const result = queryRunner.search("pow>tou")._unsafeUnwrap()
+      const result = names(queryRunner.search("pow>tou"))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(norinTheWary.id)
+      expect(result).toEqual([norinTheWary.name])
     })
     it('should handle pow=tou', function() {
-      const result = queryRunner.search("pow=tou")._unsafeUnwrap()
+      const result = names(queryRunner.search("pow=tou"))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(kroxaTitanOfDeathsHunger.id)
+      expect(result).toEqual([kroxaTitanOfDeathsHunger.name])
     })
     it('should handle pow<tou', function() {
-      const result = queryRunner.search("pow<tou")._unsafeUnwrap()
+      const result = names(queryRunner.search("pow<tou"))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(phantomBeast.id)
+      expect(result).toEqual([phantomBeast.name])
     })
     it('should handle pow>=tou', function() {
-      const result = queryRunner.search("pow>=tou")._unsafeUnwrap()
+      const result = names(queryRunner.search("pow>=tou"))
 
-      expect(result.length).toEqual(2)
-      expect(result[0].id).toEqual(kroxaTitanOfDeathsHunger.id)
-      expect(result[1].id).toEqual(norinTheWary.id)
+      expect(result).toEqual([kroxaTitanOfDeathsHunger.name, norinTheWary.name])
     })
     it('should handle pow<=tou', function() {
-      const result = queryRunner.search("pow<=tou")._unsafeUnwrap()
+      const result = names(queryRunner.search("pow<=tou"))
 
-      expect(result.length).toEqual(2)
-      expect(result[0].id).toEqual(kroxaTitanOfDeathsHunger.id)
-      expect(result[1].id).toEqual(phantomBeast.id)
+      expect(result).toEqual([kroxaTitanOfDeathsHunger.name, phantomBeast.name])
     })
     it('should handle pow!=tou', function() {
-      const result = queryRunner.search("pow!=tou")._unsafeUnwrap()
+      const result = names(queryRunner.search("pow!=tou"))
 
-      expect(result.length).toEqual(2)
-      expect(result[0].id).toEqual(norinTheWary.id)
-      expect(result[1].id).toEqual(phantomBeast.id)
+      expect(result).toEqual([norinTheWary.name, phantomBeast.name])
     })
 
     it('should handle tou>pow', function() {
-      const result = queryRunner.search("tou>pow")._unsafeUnwrap()
+      const result = names(queryRunner.search("tou>pow"))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(phantomBeast.id)
+      expect(result).toEqual([phantomBeast.name])
     })
     it('should handle tou=pow', function() {
-      const result = queryRunner.search("tou=pow")._unsafeUnwrap()
+      const result = names(queryRunner.search("tou=pow"))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(kroxaTitanOfDeathsHunger.id)
+      expect(result).toEqual([kroxaTitanOfDeathsHunger.name])
     })
     it('should handle tou<pow', function() {
-      const result = queryRunner.search("tou<pow")._unsafeUnwrap()
+      const result = names(queryRunner.search("tou<pow"))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(norinTheWary.id)
+      expect(result).toEqual([norinTheWary.name])
     })
     it('should handle tou>=pow', function() {
-      const result = queryRunner.search("tou>=pow")._unsafeUnwrap()
+      const result = names(queryRunner.search("tou>=pow"))
 
-      expect(result.length).toEqual(2)
-      expect(result[1].id).toEqual(phantomBeast.id)
-      expect(result[0].id).toEqual(kroxaTitanOfDeathsHunger.id)
+      expect(result).toEqual([kroxaTitanOfDeathsHunger.name, phantomBeast.name])
     })
     it('should handle tou<=pow', function() {
-      const result = queryRunner.search("tou<=pow")._unsafeUnwrap()
+      const result = names(queryRunner.search("tou<=pow"))
 
-      expect(result.length).toEqual(2)
-      expect(result[0].id).toEqual(kroxaTitanOfDeathsHunger.id)
-      expect(result[1].id).toEqual(norinTheWary.id)
+      expect(result).toEqual([kroxaTitanOfDeathsHunger.name, norinTheWary.name])
     })
 
     it("should handle stars", () => {
       const goyfQueryRunner = new QueryRunner({ corpus: [tarmogoyf], defaultOptions })
-      const result = goyfQueryRunner.search('pow=0 name:tarmogoyf')._unsafeUnwrap()
+      const result = names(goyfQueryRunner.search('pow=0 name:tarmogoyf'))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(tarmogoyf.id)
+      expect(result).toEqual([tarmogoyf.name])
     })
   })
 
   describe('powTouTotalOperation', function() {
     ["pt", "powtou"].forEach(filterKeyword => {
       it(`should handle ${filterKeyword}`, () => {
-        const result = queryRunner.search(`${filterKeyword}>11`)._unsafeUnwrap()
+        const result = names(queryRunner.search(`${filterKeyword}>11`))
 
-        expect(result.length).toEqual(1)
-        expect(result[0].id).toEqual(kroxaTitanOfDeathsHunger.id)
+        expect(result).toEqual([kroxaTitanOfDeathsHunger.name])
       })
     })
   })

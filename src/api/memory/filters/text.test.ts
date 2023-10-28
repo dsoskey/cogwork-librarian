@@ -1,4 +1,4 @@
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions, names } from './testData/_utils'
 import { spinerockKnoll } from './testData/spinerockKnoll'
 import { ancientStirrings } from './testData/ancientStirrings'

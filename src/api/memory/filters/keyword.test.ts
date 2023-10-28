@@ -1,6 +1,6 @@
 import { kroxaTitanOfDeathsHunger } from './testData/kroxaTitanOfDeathsHunger'
 import { asymmetrySage } from './testData/asymmetrySage'
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions } from './testData/_utils'
 
 describe('keyword filters', function() {

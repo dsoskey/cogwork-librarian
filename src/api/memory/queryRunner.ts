@@ -36,7 +36,7 @@ export interface SearchError {
 
 type ParserProducer = () => Parser
 
-interface QueryRunnerParams {
+export interface QueryRunnerParams {
   corpus: Card[]
   cubes?: CubeDefinition[]
   oracleTags?: OracleTag[]

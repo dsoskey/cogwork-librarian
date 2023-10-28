@@ -42,9 +42,6 @@ const withoutDiacritics = (str: string): string => {
 }
 
 export const nameFilter = (name: string): Filter<NormedCard> => (card) => {
-  if (card.name === "Éomer, King of Rohan") {
-    console.log(withoutDiacritics(card.name.toLowerCase()))
-  }
   return anyFaceContains(card, "name", name) ||
     anyFaceContains(card, "name", name, withoutDiacritics)
 }

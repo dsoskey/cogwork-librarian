@@ -1,4 +1,4 @@
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 import { defaultOptions } from './testData/_utils'
 import { preordain } from './testData/preordain'
 import { adantoVanguard } from './testData/adantoVanguard'

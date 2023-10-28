@@ -2,7 +2,7 @@ import { gorillaTitan } from './testData/gorillaTitan'
 import { birdsOfParadise } from './testData/birdsOfParadise'
 import { emberethShieldbreaker } from './testData/emberethShieldbreaker'
 import { defaultOptions } from './testData/_utils'
-import { QueryRunner } from '../queryRunner'
+import { QueryRunner } from '../mql'
 
 describe("flavor filters", () => {
   const corpus = [gorillaTitan, birdsOfParadise, emberethShieldbreaker]
