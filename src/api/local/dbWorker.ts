@@ -73,7 +73,7 @@ async function initDb(type: BulkDataType, targets: ImportTarget[]) {
 
   await loadIllustrationTags()
 
-  const res = normCardList(cards, {}, {})
+  const res = normCardList(cards)
   postMessage({ type: "normed-cards", data: res.length })
 
   if (targets.find(it => it === 'memory')) {

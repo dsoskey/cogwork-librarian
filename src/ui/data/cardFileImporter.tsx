@@ -5,10 +5,8 @@ import { Card } from 'scryfall-sdk'
 import { Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { ListImporterContext } from '../../api/local/useListImporter'
-import { cogDB, Manifest, MANIFEST_ID } from '../../api/local/db'
-import { invertCubes } from '../../api/memory/types/cube'
+import { Manifest, MANIFEST_ID } from '../../api/local/db'
 import { ImportTarget } from './cardDataView'
-import { invertTags } from '../../api/memory/types/tag'
 
 const JSONMIME = "application/json"
 const TEXTMIME = "text/plain"
@@ -48,21 +46,13 @@ export const CardFileImporter = ({
       id: MANIFEST_ID,
       name: file.name,
       type: 'file',
-      lastUpdated: new Date(file.lastModified),
+      lastUpdated: new Date(),
     }
     const content = await file.text()
     let cards: NormedCard[]
     switch (file.type) {
       case JSONMIME:
-        const cubes = await cogDB.cube.toArray()
-        const cardIdToCubes = invertCubes(cubes)
-        console.time("tag.toArray")
-        const tags = await cogDB.oracleTag.toArray()
-        console.timeEnd("tag.toArray")
-        console.time("tag invert")
-        const cardIdToOracleTags = invertTags(tags)
-        console.timeEnd("tag invert")
-        cards = normCardList(JSON.parse(content).map(Card.construct), cardIdToCubes, cardIdToOracleTags)
+        cards = normCardList(JSON.parse(content).map(Card.construct))
         break
       case TEXTMIME:
         cards = await listImporter.attemptImport(content.split(/[\r\n]+/), true)

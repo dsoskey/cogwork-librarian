@@ -121,7 +121,7 @@ async function lookupCards(
         }})
     } else {
       for (const card of cards) {
-        const normed = normCardList([card], {}, {})[0]
+        const normed = normCardList([card])[0]
         addToFoundCards(normed)
       }
     }

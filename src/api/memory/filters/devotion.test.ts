@@ -4,7 +4,7 @@ import { davrielsWithering } from './testData/davrielsWithering'
 import { crystallineGiant } from './testData/crystallineGiant'
 import { necroimpotence } from './testData/necroimpotence'
 import { lich } from './testData/lich'
-import { QueryRunner } from '../mql'
+import { QueryRunner } from '../queryRunner'
 import { defaultOptions, names } from './testData/_utils'
 
 describe('devotion filter', function() {

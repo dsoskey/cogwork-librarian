@@ -1,4 +1,4 @@
-import { QueryRunner } from '../mql'
+import { QueryRunner } from '../queryRunner'
 import { eomerKingOfRohan } from './testData/eomerKingOfRohan'
 import { names } from './testData/_utils'
 

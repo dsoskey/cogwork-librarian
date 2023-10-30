@@ -10,8 +10,9 @@ import { NormedCard } from '../memory/types/normedCard'
 import { errAsync, okAsync } from 'neverthrow'
 import { displayMessage } from '../../error'
 import { SearchOptions } from '../memory/types/searchOptions'
-import { FilterProvider, QueryRunner } from '../memory/mql'
+import { QueryRunner } from '../memory/queryRunner'
 import { useMemo } from 'react'
+import { FilterProvider } from '../memory/filters'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]

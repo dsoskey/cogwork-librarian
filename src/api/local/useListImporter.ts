@@ -3,9 +3,6 @@ import { createContext, useState } from 'react'
 import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { Setter, TaskStatus } from '../../types'
 import * as Scry from 'scryfall-sdk'
-import { cogDB } from './db'
-import { invertCubes } from '../memory/types/cube'
-import { invertTags } from '../memory/types/tag'
 import { CogDB } from './useCogDB'
 
 interface ListImporter {
@@ -34,11 +31,6 @@ export const useListImporter = (cogDb: CogDB): ListImporter => {
   const report = useReporter()
 
   const run = async (rawCards: string[], restart: boolean = false) => {
-    const cubes = await cogDB.cube.toArray()
-    const cardIdToCubes = invertCubes(cubes)
-    const tags = await cogDB.oracleTag.toArray()
-    const cardIdToOracleTags = invertTags(tags)
-
     return new Promise<NormedCard[]>((resolve, reject) => {
       const foundCards: NormedCard[] = []
       const cardsToQueryAPI: string[] = []
@@ -79,7 +71,7 @@ export const useListImporter = (cogDb: CogDB): ListImporter => {
         console.debug("querying scryfall for missing cards")
         Scry.Cards.collection(...cardsToQueryAPI.map(name => ({name})))
           .on('data', data => {
-            foundCards.push(normCardList([data], cardIdToCubes, cardIdToOracleTags)[0])
+            foundCards.push(normCardList([data])[0])
             report.addComplete()
           })
           .on("not_found", data => {

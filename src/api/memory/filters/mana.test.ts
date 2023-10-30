@@ -1,6 +1,6 @@
 import { davrielsWithering } from './testData/davrielsWithering'
 import { kroxaTitanOfDeathsHunger } from './testData/kroxaTitanOfDeathsHunger'
-import { QueryRunner } from '../mql'
+import { QueryRunner } from '../queryRunner'
 import { defaultOptions, names } from './testData/_utils'
 import { preordain } from './testData/preordain'
 import { darkConfidant } from './testData/darkConfidant'

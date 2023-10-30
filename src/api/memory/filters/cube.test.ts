@@ -1,4 +1,4 @@
-import { QueryRunner } from '../mql'
+import { QueryRunner } from '../queryRunner'
 import { birdsOfParadise } from './testData/birdsOfParadise'
 import { bojukaBog } from './testData/bojukaBog'
 import { bloodCrypt } from './testData/bloodCrypt'

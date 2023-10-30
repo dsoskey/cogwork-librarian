@@ -1,7 +1,7 @@
 import { asymmetrySage } from './testData/asymmetrySage'
 import { barrysLand } from './testData/barrysLand'
 import { zodiacDragonMtgo } from './testData/zodiacDragon'
-import { QueryRunner } from '../mql'
+import { QueryRunner } from '../queryRunner'
 import { defaultOptions, names } from './testData/_utils'
 
 describe('game filter', function() {

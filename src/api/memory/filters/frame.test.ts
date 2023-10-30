@@ -1,4 +1,4 @@
-import { QueryRunner } from '../mql'
+import { QueryRunner } from '../queryRunner'
 import { narcomoeba } from './testData/narcomoeba'
 import { crystallineGiant } from './testData/crystallineGiant'
 import { defaultOptions } from './testData/_utils'

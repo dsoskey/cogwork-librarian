@@ -4,8 +4,6 @@ import _groupBy from 'lodash/groupBy'
 import _pick from 'lodash/pick'
 import _omit from 'lodash/omit'
 import { CardFace } from 'scryfall-sdk/out/api/Cards'
-import { CardIdToCubeIds } from './cube'
-import { CardIdToTagLabels } from './tag'
 
 export const DEFAULT_CARD_BACK_ID = "0aeebaf5-8c7d-4636-9e82-8c27447861f7"
 
@@ -93,14 +91,12 @@ export interface NormedCard extends Omit<Card, PrintKeys> {
   printings: Printing[]
   // there are oracle and print fields on card faces, so the normed card holds a reference to one for oracle filters
   card_faces: CardFace[]
-  cube_ids: { [key: string]: boolean }
-  oracle_tags: { [key: string]: boolean }
 }
 
 const ignorePaths = [...Object.keys(PRINT_KEYS), ...Object.keys(IGNORE_KEYS)]
 const printPaths = Object.keys(PRINT_KEYS)
 
-export const normCardList = (cardList: Card[], cardIdToCubes: CardIdToCubeIds, cardIdToOracleTags: CardIdToTagLabels): NormedCard[] => {
+export const normCardList = (cardList: Card[]): NormedCard[] => {
   // grouping by oracle_id flattens cards with multiple different rules text prints like Balloon Stand
   // This makes things like prints behave unexpectedly, since scryfall counts the one printing but coglib counts 4
   const cardsByOracle = _groupBy(cardList, 'oracle_id')
@@ -108,21 +104,11 @@ export const normCardList = (cardList: Card[], cardIdToCubes: CardIdToCubeIds, c
 
   for (const oracleId in cardsByOracle) {
     const cards = cardsByOracle[oracleId]
-    const cube_ids = {}
-    for (const id of cardIdToCubes[cards[0].oracle_id] ?? []) {
-      cube_ids[id] = true
-    }
-    const oracle_tags = {}
-    for (const id of cardIdToOracleTags[cards[0].oracle_id] ?? []) {
-      oracle_tags[id] = true
-    }
     const normed = {
       ...(_omit(cards[0], ignorePaths)) as Omit<Card, PrintKeys>,
       printings: cards.map((it) => _pick(it, printPaths) as Printing
       ),
       card_faces: cards[0].card_faces,
-      cube_ids,
-      oracle_tags,
     }
     result.push(normed)
   }

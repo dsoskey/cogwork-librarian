@@ -2,11 +2,12 @@ import { useContext, useRef, useState } from 'react'
 import { TaskStatus } from '../../types'
 import { QueryReport, useReporter } from '../useReporter'
 import { CogDBContext } from './useCogDB'
+import { TagType } from '../memory/types/tag'
 
 export interface OracleTagImporter {
   oracleTagReport: QueryReport
   taskStatus: TaskStatus
-  loadTags: (type: "oracle" | "illustration") => Promise<void>
+  loadTags: (type: TagType) => Promise<void>
 }
 
 export const LOADING_MESSAGES = [
@@ -50,7 +51,7 @@ export const useTagImporter = (): OracleTagImporter => {
     }
   }
 
-  const loadTags = async (type: "oracle" | "illustration") => {
+  const loadTags = async (type: TagType) => {
     console.time(`loaded ${type} tags`)
     // @ts-ignore
     const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))

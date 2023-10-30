@@ -1,7 +1,7 @@
 import { kroxaTitanOfDeathsHunger } from './testData/kroxaTitanOfDeathsHunger'
 import { aetherbladeAgent } from './testData/aetherbladeAgent'
 import { preordain } from './testData/preordain'
-import { QueryRunner } from '../mql'
+import { QueryRunner } from '../queryRunner'
 import { defaultOptions, names } from './testData/_utils'
 import { davrielsWithering } from './testData/davrielsWithering'
 import { thoughtKnotSeer } from './testData/thoughtKnotSeer'

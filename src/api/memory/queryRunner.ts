@@ -1,16 +1,17 @@
-import sortBy from 'lodash/sortBy'
-import { Card } from 'scryfall-sdk'
-import { err, ok, Result } from 'neverthrow'
-import { NearlyError } from './types/error'
-import { queryParser } from './parser'
-import { FilterNode } from './filters/base'
-import { normCardList, NormedCard } from './types/normedCard'
-import { CubeDefinition, invertCubes } from './types/cube'
-import { byName, sortFunc, SortOrder } from './filters/sort'
-import { chooseFilterFunc } from './filters/print'
 import { Parser } from 'nearley'
+import { normCardList, NormedCard } from './types/normedCard'
 import { SearchOptions } from './types/searchOptions'
-import { invertTags, OracleTag } from './types/tag'
+import { err, ok, Result } from 'neverthrow'
+import { Card } from 'scryfall-sdk'
+import { NearlyError, SearchError } from './types/error'
+import { andNode, FilterNode, notNode, orNode } from './filters/base'
+import { FilterProvider } from './filters'
+import { chooseFilterFunc } from './filters/print'
+import { byName, sortFunc, SortOrder } from './filters/sort'
+import sortBy from 'lodash/sortBy'
+import { IllustrationTag, OracleTag } from './types/tag'
+import { BinaryNode, AstLeaf, UnaryNode, AstNode } from './types/ast'
+import { MQLParser } from './mql'
 
 export const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
   const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
@@ -28,77 +29,100 @@ export const getDirection = (filtersUsed: string[], options: SearchOptions) => {
   return options.dir ?? 'auto'
 }
 
-export interface SearchError {
-  query: string
-  errorOffset: number
-  message: string
-}
-
 type ParserProducer = () => Parser
 
 export interface QueryRunnerParams {
   corpus: Card[]
-  cubes?: CubeDefinition[]
+  cubes?: { [cubeId: string]: Set<string> }
   oracleTags?: OracleTag[]
+  illustrationTags?: IllustrationTag[]
   defaultOptions?: SearchOptions,
   getParser?: ParserProducer
 }
+
 export class QueryRunner {
   private readonly corpus: NormedCard[]
   private readonly defaultOptions: SearchOptions
-
   private readonly getParser: ParserProducer
 
-  constructor({ corpus, getParser, defaultOptions, cubes, oracleTags }: QueryRunnerParams) {
-    this.corpus = normCardList(
-      corpus,
-      invertCubes(cubes ?? []),
-      invertTags(oracleTags ?? [])
-    )
-    this.getParser = getParser ?? queryParser
+  private readonly filters: FilterProvider
+
+  constructor({ corpus, cubes, oracleTags, illustrationTags, defaultOptions, getParser }: QueryRunnerParams) {
+    this.corpus = normCardList(corpus);
+    const otags = {}
+    for (const tag of oracleTags ?? []) {
+      otags[tag.label] = new Set(tag.oracle_ids)
+    }
+    const atags = {}
+    for (const tag of illustrationTags ?? []) {
+      otags[tag.label] = new Set(tag.illustration_ids)
+    }
+    this.filters = new FilterProvider({ cubes, otags, atags })
+    this.getParser = getParser ?? MQLParser
     this.defaultOptions = defaultOptions ?? { order: 'name' }
   }
 
-  search = (query: string, options?: SearchOptions): Result<Card[], SearchError> => {
-    // parse query
-    const func = QueryRunner.generateSearchFunction(this.corpus, this.getParser)
-    return func(query, options ?? this.defaultOptions)
+  search = (query: string, _options?: SearchOptions): Result<Card[], SearchError> => {
+    const options = _options ?? this.defaultOptions
+    const func = QueryRunner.generateSearchFunction(this.corpus, this.filters, this.getParser)
+    return func(query, options)
   }
 
-  static generateSearchFunction = (corpus: NormedCard[], getParser: ParserProducer = queryParser) => (
+  static generateSearchFunction = (
+    corpus: NormedCard[],
+    filters: FilterProvider,
+    getParser: ParserProducer = MQLParser
+  ) => (
     query: string,
     options: SearchOptions
   ): Result<Card[], SearchError> => {
-    // parse query
-    const parser = getParser()
+    const visitNode = (node: AstNode): FilterNode => {
+      if (node.hasOwnProperty("filter")) {
+        return filters.getFilter(node as AstLeaf)
+      } else {
+        // @ts-ignore
+        switch (node.operator) {
+          case "negate":
+            return notNode(visitNode((node as UnaryNode).clause));
+          case "and":
+            return andNode(
+              visitNode((node as BinaryNode).left),
+              visitNode((node as BinaryNode).right));
+          case "or":
+            return orNode(
+              visitNode((node as BinaryNode).left),
+              visitNode((node as BinaryNode).right));
+        }
+
+      }
+    }
+
+    const parser = getParser();
     try {
       console.debug(`feeding ${query}`)
       parser.feed(query)
       console.debug(`parsed`)
       console.debug(parser.results)
       if (parser.results.length > 1) {
-        const uniqueParses = new Set<string>(
-          parser.results.map((it) => {
-            return it.filtersUsed.toString()
-          })
-        )
+        const uniqueParses = new Set(parser.results.map(it => JSON.stringify(it)))
         if (uniqueParses.size > 1) {
           console.warn('ambiguous parse!')
         }
       }
     } catch (error) {
-      const { message } = error as NearlyError
+      const { message, offset } = error as NearlyError
       console.error(message)
       return err({
         query,
-        errorOffset: error.offset ?? 0,
+        errorOffset: offset ?? 0,
         message,
       })
     }
 
     // filter normedCards
-    const { filterFunc, filtersUsed, printFilter } = parser
-      .results[0] as FilterNode
+    const { filterFunc, filtersUsed, printFilter } =
+      visitNode(parser.results[0] as AstNode);
+
     const filtered = []
     try {
       for (const card of corpus) {

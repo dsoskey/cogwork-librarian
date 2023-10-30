@@ -1,7 +1,7 @@
 import { phantomBeast } from './testData/phantomBeast'
 import { preordain } from './testData/preordain'
 import { negate } from './testData/negate'
-import { QueryRunner } from '../mql'
+import { QueryRunner } from '../queryRunner'
 import { defaultOptions } from './testData/_utils'
 
 
