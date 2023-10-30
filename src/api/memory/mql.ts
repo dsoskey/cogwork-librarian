@@ -5,7 +5,7 @@ import nearly, { Grammar, Parser } from 'nearley'
 import mql from './mql.ne'
 import { normCardList, NormedCard } from './types/normedCard'
 import { CardIdToCubeIds, CubeDefinition, invertCubes } from './types/cube'
-import { getDirection, getOrder, QueryRunnerParams, SearchError } from './queryRunner'
+import { getDirection, getOrder, SearchError } from './queryRunner'
 import { SearchOptions } from './types/searchOptions'
 import { err, ok, Result } from 'neverthrow'
 import { Card, Legality } from 'scryfall-sdk'
@@ -22,9 +22,10 @@ import sortBy from 'lodash/sortBy'
 import { FilterType } from './types/filterKeyword'
 import { Prices } from 'scryfall-sdk/out/api/Cards'
 import { colorMatch } from './filters/color'
+import { OracleTag } from './types/tag'
 
 interface FilterLeaf {
-  filter: FilterType // TODO: enum?
+  filter: FilterType
   unit?: keyof Prices
   operator?: Operator
   value: any
@@ -50,7 +51,7 @@ export const queryParser = () => new Parser(mqlGrammar)
 interface Filters {
   getFilter: (leaf: FilterLeaf) => FilterNode
 }
-class FilterProvider implements Filters {
+export class FilterProvider implements Filters {
   // cubeId -> oracleId
   private readonly cubes: { [cubeId: string]: Set<string> }
   // otag -> oracleId
@@ -58,8 +59,10 @@ class FilterProvider implements Filters {
   // atag -> id
   private readonly atags: { [atag: string]: Set<string> }
 
-  constructor({ cubes }) {
+  constructor({ cubes, otags, atags }) {
     this.cubes = cubes;
+    this.otags = otags;
+    this.atags = atags;
   }
 
   cubeFilter = (cubeKey: string) => oracleNode({
@@ -67,12 +70,19 @@ class FilterProvider implements Filters {
     filterFunc: (card: NormedCard) => this.cubes[cubeKey]?.has(card.oracle_id)
   })
 
-  otagFilter = (tag: string) => oracleNode({
+  otagFilter = (key: string) => oracleNode({
     filtersUsed: ["otag"],
-    filterFunc: (card: NormedCard) => this.otags[tag]?.has(card.oracle_id)
+    filterFunc: (card: NormedCard) => this.otags[key]?.has(card.oracle_id)
   })
 
-  atagFilter = (tag: string) => printNode(["atag"], ({printing}) => this.atags[tag]?.has(printing.id))
+  atagFilter = (key: string) => printNode(
+    ["atag"],
+    ({printing}) => {
+      const tag = this.atags[key]
+      return tag?.has(printing.illustration_id) ||
+      printing.card_faces.find(it=>tag?.has(it.illustration_id)) !== undefined
+    }
+  )
 
   getFilter = (leaf: FilterLeaf): FilterNode => {
     switch (leaf.filter) {
@@ -231,52 +241,76 @@ class FilterProvider implements Filters {
         return this.cubeFilter(leaf.value)
       case FilterType.OracleTag:
         return this.otagFilter(leaf.value)
-
+      case FilterType.IllustrationTag:
+        return this.atagFilter(leaf.value)
     }
   }
 }
+
+export interface QueryRunnerParams {
+  corpus: Card[]
+  cubes?: { [cubeId: string]: Set<string> }
+  oracleTags?: OracleTag[]
+  defaultOptions?: SearchOptions,
+  getParser?: ParserProducer
+}
+
+type ParserProducer = () => Parser
+
 export class QueryRunner {
   private readonly corpus: NormedCard[]
   private readonly defaultOptions: SearchOptions
-  // cubeId -> oracleId
-  private readonly cubes: { [cubeId: string]: Set<string> }
+  private readonly getParser: ParserProducer
+
   private readonly filters: FilterProvider
 
-  constructor({ corpus, cubes, defaultOptions }: QueryRunnerParams) {
+  constructor({ corpus, cubes, oracleTags, defaultOptions, getParser }: QueryRunnerParams) {
     this.corpus = normCardList(corpus, {}, {});
-    const cubemap = {}
-    for (const cube of cubes ?? []) {
-      cubemap[cube.key] = new Set(cube.oracle_ids)
+    const otags = {}
+    for (const tag of oracleTags ?? []) {
+      otags[tag.label] = new Set(tag.oracle_ids)
     }
-    this.cubes = cubemap
-    this.filters = new FilterProvider({ cubes: cubemap })
+    const atags = {}
+    this.filters = new FilterProvider({ cubes, otags, atags })
+    this.getParser = getParser ?? queryParser
     this.defaultOptions = defaultOptions ?? { order: 'name' }
   }
 
-
-  visitNode = (node: Node): FilterNode => {
-    if (node.hasOwnProperty("filter")) {
-      return this.filters.getFilter(node as FilterLeaf)
-    } else {
-      // @ts-ignore
-      switch (node.operator) {
-        case "negate":
-          return notNode(this.visitNode((node as UnaryNode).clause));
-        case "and":
-          return andNode(
-            this.visitNode((node as BinaryNode).left),
-            this.visitNode((node as BinaryNode).right));
-        case "or":
-          return orNode(
-            this.visitNode((node as BinaryNode).left),
-            this.visitNode((node as BinaryNode).right));
-      }
-
-    }
-  }
   search = (query: string, _options?: SearchOptions): Result<Card[], SearchError> => {
     const options = _options ?? this.defaultOptions
-    const parser = queryParser();
+    const func = QueryRunner.generateSearchFunction(this.corpus, this.filters, this.getParser)
+    return func(query, options)
+  }
+
+  static generateSearchFunction = (
+    corpus: NormedCard[],
+    filters: FilterProvider,
+    getParser: ParserProducer = queryParser) => (
+    query: string,
+    options: SearchOptions
+  ): Result<Card[], SearchError> => {
+    const visitNode = (node: Node): FilterNode => {
+      if (node.hasOwnProperty("filter")) {
+        return filters.getFilter(node as FilterLeaf)
+      } else {
+        // @ts-ignore
+        switch (node.operator) {
+          case "negate":
+            return notNode(visitNode((node as UnaryNode).clause));
+          case "and":
+            return andNode(
+              visitNode((node as BinaryNode).left),
+              visitNode((node as BinaryNode).right));
+          case "or":
+            return orNode(
+              visitNode((node as BinaryNode).left),
+              visitNode((node as BinaryNode).right));
+        }
+
+      }
+    }
+
+    const parser = getParser();
     try {
       parser.feed(query)
 
@@ -301,11 +335,11 @@ export class QueryRunner {
 
     const root = parser.results[0] as Node
 
-    const { filterFunc, filtersUsed, printFilter } = this.visitNode(root);
+    const { filterFunc, filtersUsed, printFilter } = visitNode(root);
 
     const filtered = []
     try {
-      for (const card of this.corpus) {
+      for (const card of corpus) {
         if (filterFunc(card)) {
           filtered.push(card)
         }

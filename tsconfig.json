@@ -8,6 +8,13 @@
       "docs": ["docs/*"]
     },
     "resolveJsonModule": true,
-    "lib": ["dom", "es5", "scripthost", "es2020.promise"]
+    "lib": [
+      "dom",
+      "es5",
+      "scripthost",
+      "es2020.promise",
+      "es2015.collection",
+      "es2015.promise"
+    ]
   }
 }

@@ -78,7 +78,8 @@ condition -> (
     orderCondition |
     directionCondition |
     devotionCondition |
-    oracleTagCondition
+    oracleTagCondition |
+    artTagCondition
 ) {% ([[condition]]) => condition %}
 
 cmcCondition ->
@@ -239,6 +240,9 @@ cubeCondition -> ("cube"i | "ctag"i | "tag"i) onlyEqualOperator cubeValue
 
 oracleTagCondition -> ("function"i | "oracletag"i | "otag"i) onlyEqualOperator stringValue
     {% ([_, [_op], value]) => ({ filter: FilterType.OracleTag, value }) %}
+
+artTagCondition -> ("art"i | "arttag"i | "atag"i) onlyEqualOperator stringValue
+    {% ([_, [_op], value]) => ({ filter: FilterType.IllustrationTag, value }) %}
 
 # Values
 stringValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value.toLowerCase() %}

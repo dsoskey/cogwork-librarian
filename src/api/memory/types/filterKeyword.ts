@@ -49,6 +49,7 @@ export const keywords = {
   watermark: 'watermark', wm: 'wm',
   // Requires tagging data
   function: 'function', oracletag: 'oracletag', otag: 'otag',
+  art: 'art', arttag: 'arttag', atag: 'atag',
 } as const
 
 export const keywordsToImplement = {
@@ -56,8 +57,6 @@ export const keywordsToImplement = {
   new: 'new', // rarity, flavor, art, artist, frame, language, game, paper, mtgo, arena, nonfoil, foil
   // its not: etched, masterpiece, promo, border, stamp
   prefer: 'prefer',
-  // Requires illustration tagging data
-  art: 'art', arttag: 'arttag', atag: 'atag',
   // Requires set data
   b: 'b', block: 'block',
   // these affect scryfall's UI behavior. are they needed here?
@@ -126,4 +125,5 @@ export enum FilterType {
   Watermark,
   Cube,
   OracleTag,
+  IllustrationTag
 }

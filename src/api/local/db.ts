@@ -2,7 +2,7 @@ import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import { NormedCard } from '../memory/types/normedCard'
 import { CubeDefinition } from '../memory/types/cube'
-import { OracleTag } from '../memory/types/tag'
+import { IllustrationTag, OracleTag } from '../memory/types/tag'
 import { DataSource } from '../../types'
 
 export interface Collection {
@@ -47,6 +47,7 @@ export class TypedDexie extends Dexie {
   cube!: Table<CubeDefinition>
 
   oracleTag!: Table<OracleTag>
+  illustrationTag!: Table<IllustrationTag>
   history!: Table<QueryHistory>
 
   constructor() {
@@ -112,6 +113,10 @@ export class TypedDexie extends Dexie {
 
     this.version(7).stores({
       history: '++id, executedAt',
+    })
+
+    this.version(8).stores({
+      illustrationTag: 'id, label'
     })
   }
 

@@ -8,21 +8,36 @@ import { ImportTarget } from '../../ui/data/cardDataView'
 import { isFunction } from 'lodash'
 import { isOracleVal } from '../memory/filters/is'
 
+export const DB_LOAD_MESSAGES = [
+  "loading cubes...",
+  "loading oracle tags...",
+  "loading illustration tags...",
+  "preparing the library...",
+]
+
 export const DB_INIT_MESSAGES = [
   "loading card manifest...",
   "downloading card data...",
-  "loading cubes...",
   "downloading oracle tags...",
+  "preparing oracle tags...",
+  "downloading illustration tags...",
+  "preparing illustration tags...",
   "preparing card entries...",
   "loading cards to memory...",
   "persisting cards to database. search is ready, but don't leave the page or make data changes",
-  "persisting oracle tags to database. search is ready, but don't leave the page or make data changes",
 ]
+
 export interface CogDB {
   dbStatus: TaskStatus
   memStatus: TaskStatus
   dbReport: QueryReport
   memory: NormedCard[]
+  cubes: { [cubeId: string]: Set<string> }
+  setCubes: Setter<{ [cubeId: string]: Set<string> }>
+  otags: { [otag: string]: Set<string> }
+  setOtags: Setter<{ [otag: string]: Set<string> }>
+  atags: { [atag: string]: Set<string> }
+  setAtags: Setter<{ [atag: string]: Set<string> }>
   setMemory: Setter<NormedCard[]>
   manifest: Manifest
   outOfDate: boolean
@@ -38,6 +53,12 @@ const defaultDB: CogDB = {
   dbStatus: 'unstarted',
   memStatus: 'unstarted',
   memory: [],
+  cubes: {},
+  setCubes: () => console.error("CogDB.setCubes called without a provider!"),
+  otags: {},
+  setAtags: () => console.error("CogDB.setOtags called without a provider!"),
+  atags: {},
+  setOtags: () => console.error("CogDB.setAtags called without a provider!"),
   dbReport: null,
   setMemory: () => console.error("CogDB.setMemory called without a provider!"),
   cardByName: () => {
@@ -69,6 +90,15 @@ export const useCogDB = (): CogDB => {
 
   const [memory, rawSetMemory] = useState<NormedCard[]>([])
   const rezzy = useRef<NormedCard[]>([])
+
+  const [cubes, setCubes] = useState<{ [cubeId: string]: Set<string> }>({})
+  const cubeRes = useRef<{ [cubeId: string]: Set<string> }>({})
+
+  const [otags, setOtags] = useState<{ [cubeId: string]: Set<string> }>({})
+  const otagRes = useRef<{ [cubeId: string]: Set<string> }>({})
+
+  const [atags, setAtags] = useState<{ [cubeId: string]: Set<string> }>({})
+  const atagRes = useRef<{ [cubeId: string]: Set<string> }>({})
 
   const oracleToCard = useRef<{ [id: string]: NormedCard}>({})
   const nameToOracle = useRef<{ [name: string]: string }>({})
@@ -120,10 +150,26 @@ export const useCogDB = (): CogDB => {
           dbReport.addCardCount(index % 1000)
         }
         break
+      case 'otag':
+      case 'atag':
+      case 'cube': {
+        const ref = type === 'otag'?otagRes:(type==='atag'?atagRes:cubeRes)
+        const { key, values } = data
+        ref.current[key] = new Set(values)
+        break;
+      }
       case 'manifest':
         setManifest(data)
         break
+      case "cube-end":
+      case "oracle-tag-end":
+      case "illustration-tag-end":
+        dbReport.addComplete();
+        break;
       case 'end':
+        setCubes(cubeRes.current)
+        setOtags(otagRes.current)
+        setAtags(atagRes.current)
         rawSetMemory(rezzy.current)
         setMemStatus('success')
         setDbStatus('success')
@@ -134,7 +180,7 @@ export const useCogDB = (): CogDB => {
         console.error('waaaaaa', data)
         break
       default:
-        console.error('unknown message from db worker')
+        console.error(`unknown message [${type}] from db worker`)
         break
     }
   }
@@ -161,7 +207,10 @@ export const useCogDB = (): CogDB => {
         break
       case "downloaded-cards":
       case "loaded-cubes":
-      case "downloaded-otags":
+      case "oracle-tag-downloaded":
+      case "oracle-tag-end":
+      case "illustration-tag-downloaded":
+      case "illustration-tag-end":
         dbReport.addComplete()
         break
       case "normed-cards":
@@ -174,8 +223,16 @@ export const useCogDB = (): CogDB => {
         if (index % 1000 === 0)
           dbReport.addCardCount(1000)
         break
+      case 'oracle-tag':
+      case 'illustration-tag': {
+        const res = type === "oracle-tag" ? otagRes : atagRes;
+        res.current[data.key] = new Set(data.values);
+        break;
+      }
       case 'memory-end':
         rawSetMemory(rezzy.current)
+        setOtags(otagRes.current)
+        setAtags(atagRes.current)
         setMemStatus('success')
         console.timeEnd(`loading mem`)
         dbReport.addComplete()
@@ -194,7 +251,7 @@ export const useCogDB = (): CogDB => {
         setDbStatus(prev => prev === 'loading' ? 'error' : prev)
         break
       default:
-        console.error('unknown message from db worker')
+        console.error(`unknown message [${type}] from db worker`)
         break
     }
   }
@@ -204,13 +261,13 @@ export const useCogDB = (): CogDB => {
     // @ts-ignore
     const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
     rezzy.current = []
-    dbReport.reset(DB_INIT_MESSAGES.length)
     setMemStatus('loading')
     console.time(`loading mem`)
 
     const cardManifest = await cogDB.collection.get("the_one")
     if (cardManifest === undefined) {
       console.debug('initializing db')
+      dbReport.reset(DB_INIT_MESSAGES.length)
       setDbStatus('loading')
       worker.onmessage = handleInitDB
       worker.postMessage({
@@ -221,6 +278,7 @@ export const useCogDB = (): CogDB => {
         }
       })
     } else {
+      dbReport.reset(DB_LOAD_MESSAGES.length)
       console.debug("posting start message to worker")
       worker.onmessage = handleLoadDB
       worker.postMessage({ type: 'load' })
@@ -279,6 +337,12 @@ export const useCogDB = (): CogDB => {
     manifest,
     setManifest,
     memory,
+    cubes,
+    setCubes,
+    atags,
+    setOtags,
+    otags,
+    setAtags,
     setMemory,
     resetDB,
     refreshDB,

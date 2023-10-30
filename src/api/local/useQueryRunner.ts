@@ -9,20 +9,31 @@ import { useQueryCoordinator } from '../useQueryCoordinator'
 import { NormedCard } from '../memory/types/normedCard'
 import { errAsync, okAsync } from 'neverthrow'
 import { displayMessage } from '../../error'
-import { QueryRunner } from '../memory/queryRunner'
 import { SearchOptions } from '../memory/types/searchOptions'
+import { FilterProvider, QueryRunner } from '../memory/mql'
+import { useMemo } from 'react'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]
+  cubes: { [cubeId: string]: Set<string> }
+  otags: { [otag: string]: Set<string> }
+  atags: { [atag: string]: Set<string> }
 }
 export const useMemoryQueryRunner = ({
   getWeight = weightAlgorithms.uniform,
   injectPrefix,
   corpus,
+  cubes, atags, otags
 }: MemoryQueryRunnerProps): CoglibQueryRunner => {
   const { status, report, result, rawData, execute, errors } =
     useQueryCoordinator()
-  const searchCards = QueryRunner.generateSearchFunction(corpus)
+  const searchCards = useMemo(
+    () => {
+      const filters = new FilterProvider({ cubes, otags, atags });
+      return QueryRunner.generateSearchFunction(corpus, filters)
+    },
+    [corpus, cubes, atags, otags]
+  )
 
   const runQuery: QueryRunnerFunc = (
     query: string,

@@ -6,7 +6,7 @@ import { CardFileImporter } from './cardFileImporter'
 import { CardListImporter } from './cardListImporter'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB } from '../../api/local/db'
-import { OracleTagImporter } from './oracleTagImporter'
+import { TagImporter } from './tagImporter'
 
 export const IMPORT_SOURCE = {
   scryfall: 'scryfall',
@@ -125,7 +125,7 @@ export const CardDataView = () => {
         } local database`}
       </button>}
     </section>
-    {dbStatus === "success" && <OracleTagImporter />}
+    {dbStatus === "success" && <TagImporter />}
     <section className='db-import'>
       <h4 className='row'>
         <span>import from</span>

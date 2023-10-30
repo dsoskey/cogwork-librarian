@@ -1,9 +1,7 @@
 import { cogDB, MANIFEST_ID, toManifest } from './db'
 import { downloadCards } from './populate'
 import * as Scry from 'scryfall-sdk'
-import { downloadOracleTags } from '../scryfall/tagger'
-import { invertTags } from '../memory/types/tag'
-import { invertCubes } from '../memory/types/cube'
+import { downloadIllustrationTags, downloadOracleTags } from '../scryfall/tagger'
 import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { BulkDataType } from 'scryfall-sdk/out/api/BulkData'
 import { ImportTarget } from '../../ui/data/cardDataView'
@@ -12,16 +10,23 @@ self.onmessage = (_event) => {
   const event = _event.data
 
   console.log('received event', event)
-  if (event.type === 'load') {
-    loadDb().catch(e => postMessage({ type: 'error', data: e.toString() }))
-  } else if (event.type === 'init') {
-    // idea: this event data has manifest OR type name to fetch
-    const { bulkType, targets } = event.data
-    initDb(bulkType ?? "default_cards", targets).catch(e => postMessage({ type: 'error', data: e.toString() }))
-  } else if (event.type === 'load-oracle-tags') {
-    loadOracleTags().catch(e => postMessage({ type: 'error', data: e.toString() }))
-  } else {
-    console.error("unknown db worker event")
+  switch (event.type) {
+    case 'load':
+      loadDb().catch(e => postMessage({ type: 'error', data: e.toString() }))
+      break;
+    case 'init': // idea: this event data has manifest OR type name to fetch
+      const { bulkType, targets } = event.data
+      initDb(bulkType ?? 'default_cards', targets).catch(e => postMessage({ type: 'error', data: e.toString() }))
+      break;
+    case 'load-oracle-tags':
+      loadOracleTags().catch(e => postMessage({ type: 'error', data: e.toString() }))
+      break;
+    case 'load-illustration-tags':
+      loadIllustrationTags().catch(e => postMessage({ type: 'error', data: e.toString() }))
+      break;
+    default:
+      console.error('unknown db worker event')
+      break;
   }
 }
 
@@ -30,6 +35,19 @@ async function loadDb() {
   console.debug("pulling collection")
   const manifest  = await cogDB.collection.get("the_one")
   postMessage({ type: 'manifest', data: manifest })
+
+  await cogDB.cube.each(({ key, oracle_ids }) => {
+    postMessage({ type: 'cube', data: { key, values: oracle_ids }})
+  })
+  postMessage({ type: "cube-end"})
+  await cogDB.oracleTag.each(({ label, oracle_ids }) => {
+    postMessage({ type: 'otag', data: { key: label, values: oracle_ids }})
+  })
+  postMessage({ type: "oracle-tag-end"})
+  await cogDB.illustrationTag.each(({ label, illustration_ids }) => {
+    postMessage({ type: 'atag', data: { key: label, values: illustration_ids }})
+  })
+  postMessage({ type: "illustration-tag-end"})
 
   const count = await cogDB.card.count()
   postMessage({ type: 'count', data: count })
@@ -51,15 +69,11 @@ async function initDb(type: BulkDataType, targets: ImportTarget[]) {
   const cards = await downloadCards(bulkDataDefinition)
   postMessage({ type: "downloaded-cards" })
 
-  const cubes = await cogDB.cube.toArray()
-  const invertedCubes = invertCubes(cubes)
-  postMessage({ type: "loaded-cubes" })
+  await loadOracleTags()
 
-  const oracleTags = await downloadOracleTags()
-  const invertedOracleTags = invertTags(oracleTags)
-  postMessage({ type: "downloaded-otags" })
+  await loadIllustrationTags()
 
-  const res = normCardList(cards, invertedCubes, invertedOracleTags)
+  const res = normCardList(cards, {}, {})
   postMessage({ type: "normed-cards", data: res.length })
 
   if (targets.find(it => it === 'memory')) {
@@ -85,7 +99,7 @@ async function initDb(type: BulkDataType, targets: ImportTarget[]) {
       }
     }
 
-    await cogDB.transaction("rw", cogDB.collection, cogDB.card, cogDB.oracleTag, async () => {
+    await cogDB.transaction("rw", cogDB.collection, cogDB.card, async () => {
       await cogDB.collection.put({
         ...manifest,
         id: MANIFEST_ID,
@@ -93,9 +107,6 @@ async function initDb(type: BulkDataType, targets: ImportTarget[]) {
       })
       await cogDB.card.clear()
       await cogDB.card.bulkPut(toSave)
-      postMessage({ type: "saved-cards" })
-      await cogDB.oracleTag.clear()
-      await cogDB.oracleTag.bulkPut(oracleTags)
     })
   }
 
@@ -104,23 +115,20 @@ async function initDb(type: BulkDataType, targets: ImportTarget[]) {
 
 async function loadOracleTags() {
   const tags = await downloadOracleTags()
-  const cardIdToTags = invertTags(tags)
+  postMessage({ type: "oracle-tag-downloaded", data: tags.length })
+  await cogDB.oracleTag.bulkPut(tags)
+  for (const tag of tags) {
+    postMessage({ type: "oracle-tag", data: { key: tag.label, values: tag.oracle_ids }})
+  }
+  postMessage({ type: 'oracle-tag-end' })
+}
 
-  postMessage({ type: "oracle-tags-downloaded", data: tags.length })
-  let index = 0
-  await cogDB.transaction("rw", cogDB.oracleTag, cogDB.card, async () => {
-    await cogDB.oracleTag.bulkPut(tags)
-    const cardCount = await cogDB.card.count()
-    postMessage({ type: "oracle-tags-put", data: cardCount })
-    await cogDB.card.toCollection().modify(card => {
-      card.oracle_tags = {}
-      for (const tag of cardIdToTags[card.oracle_id] ?? []) {
-        card.oracle_tags[tag] = true
-      }
-      index++
-      postMessage({ type: "oracle-tags-card-saved", data: { card, index }})
-    })
-  })
-
-  postMessage({ type: 'end' })
+async function loadIllustrationTags() {
+  const tags = await downloadIllustrationTags()
+  postMessage({ type: "illustration-tag-downloaded", data: tags.length })
+  await cogDB.illustrationTag.bulkPut(tags)
+  for (const tag of tags) {
+    postMessage({ type: "illustration-tag", data: { key: tag.label, values: tag.illustration_ids }})
+  }
+  postMessage({ type: 'illustration-tag-end' })
 }
