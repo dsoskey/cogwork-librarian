@@ -12,7 +12,7 @@ import { displayMessage } from '../../error'
 import { SearchOptions } from '../memory/types/searchOptions'
 import { QueryRunner } from '../memory/queryRunner'
 import { useMemo } from 'react'
-import { FilterProvider } from '../memory/filters'
+import { MemoryFilterProvider } from '../memory/filters'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]
@@ -30,7 +30,7 @@ export const useMemoryQueryRunner = ({
     useQueryCoordinator()
   const searchCards = useMemo(
     () => {
-      const filters = new FilterProvider({ cubes, otags, atags });
+      const filters = new MemoryFilterProvider({ cubes, otags, atags });
       return QueryRunner.generateSearchFunction(corpus, filters)
     },
     [corpus, cubes, atags, otags]

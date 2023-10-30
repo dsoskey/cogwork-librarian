@@ -1,6 +1,6 @@
 import {
   defaultOperation,
-  notNode, FilterNode, identity
+  notNode, FilterNode, identity, andNode, orNode
 } from './base'
 import { exactMatch, noReminderRegexMatch, noReminderTextMatch, regexMatch, textMatch } from './text'
 import { isVal } from './is'
@@ -33,13 +33,13 @@ import { oracleNode } from './oracle'
 import { NormedCard } from '../types/normedCard'
 import { printNode } from './print'
 import { FilterType } from '../types/filterKeyword'
-import { AstLeaf } from '../types/ast'
+import { AstLeaf, AstNode, BinaryNode, UnaryNode } from '../types/ast'
 
-interface Filters {
-  getFilter: (leaf: AstLeaf) => FilterNode
+export interface FilterProvider {
+  visitNode: (leaf: AstNode) => FilterNode
 }
 
-export class FilterProvider implements Filters {
+export class MemoryFilterProvider implements FilterProvider {
   // cubeId -> oracleId
   private readonly cubes: { [cubeId: string]: Set<string> }
   // otag -> oracleId
@@ -71,6 +71,26 @@ export class FilterProvider implements Filters {
         printing.card_faces.find(it=>tag?.has(it.illustration_id)) !== undefined
     }
   )
+
+  visitNode = (node: AstNode): FilterNode => {
+    if (node.hasOwnProperty("filter")) {
+      return this.getFilter(node as AstLeaf)
+    } else {
+      // @ts-ignore
+      switch (node.operator) {
+        case "negate":
+          return notNode(this.visitNode((node as UnaryNode).clause));
+        case "and":
+          return andNode(
+            this.visitNode((node as BinaryNode).left),
+            this.visitNode((node as BinaryNode).right));
+        case "or":
+          return orNode(
+            this.visitNode((node as BinaryNode).left),
+            this.visitNode((node as BinaryNode).right));
+      }
+    }
+  }
 
   getFilter = (leaf: AstLeaf): FilterNode => {
     switch (leaf.filter) {

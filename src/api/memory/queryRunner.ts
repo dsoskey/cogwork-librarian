@@ -4,13 +4,12 @@ import { SearchOptions } from './types/searchOptions'
 import { err, ok, Result } from 'neverthrow'
 import { Card } from 'scryfall-sdk'
 import { NearlyError, SearchError } from './types/error'
-import { andNode, FilterNode, notNode, orNode } from './filters/base'
-import { FilterProvider } from './filters'
+import { FilterProvider, MemoryFilterProvider } from './filters'
 import { chooseFilterFunc } from './filters/print'
 import { byName, sortFunc, SortOrder } from './filters/sort'
 import sortBy from 'lodash/sortBy'
 import { IllustrationTag, OracleTag } from './types/tag'
-import { BinaryNode, AstLeaf, UnaryNode, AstNode } from './types/ast'
+import { AstNode } from './types/ast'
 import { MQLParser } from './mql'
 
 export const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
@@ -57,7 +56,7 @@ export class QueryRunner {
     for (const tag of illustrationTags ?? []) {
       otags[tag.label] = new Set(tag.illustration_ids)
     }
-    this.filters = new FilterProvider({ cubes, otags, atags })
+    this.filters = new MemoryFilterProvider({ cubes, otags, atags })
     this.getParser = getParser ?? MQLParser
     this.defaultOptions = defaultOptions ?? { order: 'name' }
   }
@@ -76,27 +75,6 @@ export class QueryRunner {
     query: string,
     options: SearchOptions
   ): Result<Card[], SearchError> => {
-    const visitNode = (node: AstNode): FilterNode => {
-      if (node.hasOwnProperty("filter")) {
-        return filters.getFilter(node as AstLeaf)
-      } else {
-        // @ts-ignore
-        switch (node.operator) {
-          case "negate":
-            return notNode(visitNode((node as UnaryNode).clause));
-          case "and":
-            return andNode(
-              visitNode((node as BinaryNode).left),
-              visitNode((node as BinaryNode).right));
-          case "or":
-            return orNode(
-              visitNode((node as BinaryNode).left),
-              visitNode((node as BinaryNode).right));
-        }
-
-      }
-    }
-
     const parser = getParser();
     try {
       console.debug(`feeding ${query}`)
@@ -121,7 +99,7 @@ export class QueryRunner {
 
     // filter normedCards
     const { filterFunc, filtersUsed, printFilter } =
-      visitNode(parser.results[0] as AstNode);
+      filters.visitNode(parser.results[0] as AstNode);
 
     const filtered = []
     try {
