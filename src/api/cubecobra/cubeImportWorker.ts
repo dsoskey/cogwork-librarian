@@ -56,13 +56,16 @@ async function searchCubes(cubeIds: string[]) {
       source: "cubecobra",
       last_updated,
     }))
+  for (const cube of cubeDefinitions) {
+    postMessage({ type: "cube", data: { key: cube.key, values: cube.oracle_ids } })
+  }
 
   postMessage({ type: "save-to-db" })
 
   console.log(cubeDefinitions)
-  await cogDB.bulkUpsertCube(cubeDefinitions)
+  await cogDB.cube.bulkPut(cubeDefinitions)
 
-  postMessage({ type: "refresh-memory" })
+  postMessage({ type: "end" })
 }
 
 async function lookupCards(

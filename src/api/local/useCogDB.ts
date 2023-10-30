@@ -33,7 +33,8 @@ export interface CogDB {
   dbReport: QueryReport
   memory: NormedCard[]
   cubes: { [cubeId: string]: Set<string> }
-  setCubes: Setter<{ [cubeId: string]: Set<string> }>
+  addCubes: Setter<{ [cubeId: string]: Set<string> }>
+  removeCubes: (cubeIds: string[]) => Promise<void>
   otags: { [otag: string]: Set<string> }
   setOtags: Setter<{ [otag: string]: Set<string> }>
   atags: { [atag: string]: Set<string> }
@@ -54,7 +55,8 @@ const defaultDB: CogDB = {
   memStatus: 'unstarted',
   memory: [],
   cubes: {},
-  setCubes: () => console.error("CogDB.setCubes called without a provider!"),
+  addCubes: () => console.error("CogDB.addCubes called without a provider!"),
+  removeCubes: () => Promise.reject("CogDB.removeCubes called without a provider!"),
   otags: {},
   setAtags: () => console.error("CogDB.setOtags called without a provider!"),
   atags: {},
@@ -92,6 +94,23 @@ export const useCogDB = (): CogDB => {
   const rezzy = useRef<NormedCard[]>([])
 
   const [cubes, setCubes] = useState<{ [cubeId: string]: Set<string> }>({})
+  const addCubes = (toAdd: { [cubeId: string]: Set<string>}) => {
+    setCubes(prev => {
+      for (const key in toAdd) {
+        prev[key] = toAdd[key];
+      }
+      return prev;
+    })
+  }
+  const removeCubes = async (toRemove: string[]) => {
+    await cogDB.cube.bulkDelete(toRemove);
+    setCubes(prev => {
+      for (const key of toRemove) {
+        delete prev[key];
+      }
+      return prev;
+    });
+  }
   const cubeRes = useRef<{ [cubeId: string]: Set<string> }>({})
 
   const [otags, setOtags] = useState<{ [cubeId: string]: Set<string> }>({})
@@ -338,7 +357,8 @@ export const useCogDB = (): CogDB => {
     setManifest,
     memory,
     cubes,
-    setCubes,
+    addCubes,
+    removeCubes,
     atags,
     setOtags,
     otags,

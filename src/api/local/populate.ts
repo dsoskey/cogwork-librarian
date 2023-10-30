@@ -52,7 +52,7 @@ export const migrateCubes = async () => {
 
 
   for await (const cube of existingCubes) {
-    await cogDB.addCube(cube)
+    await cogDB.cube.put(cube)
     localStorage.removeItem(`${cube.key}${cubeNamespace}`)
   }
 }

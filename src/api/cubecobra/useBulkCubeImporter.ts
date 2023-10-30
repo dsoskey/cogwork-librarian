@@ -1,7 +1,6 @@
-import { createContext, useState } from 'react'
+import { createContext, useRef, useState } from 'react'
 import { CogDB } from '../local/useCogDB'
 import { Setter } from '../../types'
-import { cogDB as cogDBClient } from '../local/db'
 
 const RUNNING_STATES = [
   "querying-cubecobra",
@@ -18,7 +17,6 @@ export interface MissingCards {
 
 interface BulkCubeImporter {
   attemptImport: (cubeIds: string[]) => void
-  deleteCubes: (cubeIds: string[]) => Promise<void>
   status: string
   isRunning: boolean
   missingCubes: string[]
@@ -35,7 +33,6 @@ const defaultCubeImporter: BulkCubeImporter = {
   missingCards: { cubeToCard: {}, count: 0 },
   cubeIds: [],
   setCubeIds: () => console.error("BulkCubeImporterContext.setCubeIds called without a producer!"),
-  deleteCubes: () => Promise.reject("BulkCubeImporterContext.setCubeIds called without a producer!")
 }
 
 export const BulkCubeImporterContext = createContext(defaultCubeImporter)
@@ -47,7 +44,7 @@ export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
   const [missingCards, setMissingCards] = useState<MissingCards>({
     cubeToCard: {}, count: 0
   });
-
+  const cubeRes = useRef<{ [cubeId: string]: Set<string>}>({})
   const handleCubeCobraImport = (event: MessageEvent): any => {
     const {type, data} = event.data
     switch (type) {
@@ -72,9 +69,12 @@ export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
       case "save-to-db":
         setStatus("saving-to-db")
         break;
-      case "refresh-memory":
-        setStatus("refresh-memory")
-        cogDB.resetDB().then(() => setStatus(""))
+      case "cube":
+        cubeRes.current[data.key] = new Set(data.values)
+        break;
+      case "end":
+        setStatus("")
+        cogDB.addCubes(cubeRes.current);
         console.timeEnd("import from cubecobra")
         break;
       default:
@@ -97,13 +97,9 @@ export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
     const worker = new Worker(new URL("./cubeImportWorker.ts", import.meta.url))
     setStatus("querying-cubecobra")
     setMissingCubes([])
+    cubeRes.current = {}
     worker.onmessage = handleCubeCobraImport
     worker.postMessage({ type: "import", data: submittableCubeIds })
-  }
-
-  const deleteCubes = async (cubeIds) => {
-    await cogDBClient.bulkDeleteCube(cubeIds);
-    cogDB.resetDB();
   }
 
   return {
@@ -114,6 +110,5 @@ export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
     missingCards,
     cubeIds,
     setCubeIds,
-    deleteCubes,
   }
 }

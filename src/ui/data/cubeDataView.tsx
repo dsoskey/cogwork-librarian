@@ -15,7 +15,7 @@ import { CubeDefinitionTable } from './cubeDefinitionTable'
 
 export const CubeDataView = () => {
   const { addMessage, dismissMessage } = useContext(ToasterContext)
-  const { setMemory } = useContext(CogDBContext)
+  const { addCubes } = useContext(CogDBContext)
   const [cubeId, setCubeId] = useState("")
   const [error, setError] = useState("")
   const [foundCards, setFoundCards] = useState<NormedCard[]>([])
@@ -36,21 +36,8 @@ export const CubeDataView = () => {
       setShowConfirmation(true)
     } else {
       const oracle_ids = cards.map(it => it.oracle_id)
-      const oracleSet = new Set(oracle_ids)
-      await cogDB.addCube({ key, oracle_ids, source: "list", last_updated: new Date() })
-      setMemory(prev => {
-        for (const card of prev) {
-          if (card.cube_ids === undefined) {
-            card.cube_ids = {}
-          }
-          if (oracleSet.has(card.oracle_id)) {
-            card.cube_ids[key] = true
-          } else {
-            delete card.cube_ids[key]
-          }
-        }
-        return prev
-      })
+      await cogDB.cube.put({ key, oracle_ids, source: "list", last_updated: new Date() })
+      addCubes({ [key]: new Set(oracle_ids) })
       setCubeId("")
       setError("")
       setShowConfirmation(false)
