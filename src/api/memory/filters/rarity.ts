@@ -1,6 +1,6 @@
 import { FilterNode, defaultCompare, Operator } from './base'
 import { printNode } from './print'
-import { Rarity } from 'scryfall-sdk/out/api/Cards'
+import { Rarity } from 'scryfall-sdk'
 import { PrintingFilterTuple } from '../types/normedCard'
 
 export const rarityFilter =

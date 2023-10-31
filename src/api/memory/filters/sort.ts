@@ -1,6 +1,5 @@
 import { ObjectValues } from '../../../types'
-import { Card } from 'scryfall-sdk'
-import { Rarity } from 'scryfall-sdk/out/api/Cards'
+import { Card, Rarity } from 'scryfall-sdk'
 import { parsePowTou } from '../types/card'
 
 const SORT_ORDERS = {

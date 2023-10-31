@@ -3,7 +3,7 @@ import { ObjectValues } from '../../../types'
 import _groupBy from 'lodash/groupBy'
 import _pick from 'lodash/pick'
 import _omit from 'lodash/omit'
-import { CardFace } from 'scryfall-sdk/out/api/Cards'
+import { CardFace } from 'scryfall-sdk'
 
 export const DEFAULT_CARD_BACK_ID = "0aeebaf5-8c7d-4636-9e82-8c27447861f7"
 

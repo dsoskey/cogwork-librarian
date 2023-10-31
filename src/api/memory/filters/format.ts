@@ -1,4 +1,4 @@
-import { Format } from 'scryfall-sdk/out/api/Cards'
+import { Format } from 'scryfall-sdk'
 import { NormedCard } from '../types/normedCard'
 import { FilterNode } from './base'
 import { oracleNode } from './oracle'

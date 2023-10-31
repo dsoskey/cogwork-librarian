@@ -1,4 +1,4 @@
-import { Card } from 'scryfall-sdk/out/api/Cards'
+import { Card } from 'scryfall-sdk'
 import {
   QueryRunner as CoglibQueryRunner,
   QueryRunnerFunc,

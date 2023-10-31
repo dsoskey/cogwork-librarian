@@ -1,5 +1,5 @@
 import { FilterType } from './filterKeyword'
-import { Prices } from 'scryfall-sdk/out/api/Cards'
+import { Prices } from 'scryfall-sdk'
 import { Operator } from '../filters/base'
 
 export interface AstLeaf {
