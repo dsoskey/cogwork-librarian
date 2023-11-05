@@ -1,24 +1,9 @@
 import { EnrichedCard, SCORE_PRECISION } from '../../../api/queryRunnerCommon'
 import React, { useContext } from 'react'
 import './cardListView.css'
-import { ManaSymbol, toSplitCost } from '../../../api/memory/types/card'
-import { ManaIcon } from '../../card/manaSymbol'
 import { FlagContext } from '../../../flags'
+import { ManaCost } from '../../card/manaCost'
 
-interface ManaCostProps {
-  manaCost: string
-}
-export const ManaCost = ({ manaCost }: ManaCostProps) => {
-  const split = manaCost.split(" // ");
-
-  return <>
-    {toSplitCost(split[0]).map((it, index) => <ManaIcon key={index} symbol={it as ManaSymbol} />)}
-    {split.length > 1 && <>
-      <code>{" // "}</code>
-      {toSplitCost(split[1]).map((it, index) => <ManaIcon key={index} symbol={it as ManaSymbol} />)}
-      </>}
-    </>
-}
 
 interface CardListRowProps {
   card: EnrichedCard

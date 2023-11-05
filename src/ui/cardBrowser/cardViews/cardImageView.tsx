@@ -6,9 +6,11 @@ import { FlagContext } from '../../../flags'
 import { ScryfallIcon } from '../../component/scryfallIcon'
 import "./cardImageView.css"
 import { CardImage } from './cardImage'
+import { CardCustomRender } from '../../card/cardCustomRender'
 
 export interface CardImageViewProps {
   card: EnrichedCard
+  showRender: boolean
   revealDetails: boolean
   visibleDetails: string[]
   onAdd: () => void
@@ -32,6 +34,7 @@ export const CardImageView = ({
   onIgnore,
   card,
   revealDetails,
+  showRender,
   visibleDetails,
 }: CardImageViewProps) => {
   const { showDebugInfo } = useContext(FlagContext).flags
@@ -82,7 +85,8 @@ export const CardImageView = ({
       onMouseOver={handleHoverOn}
       onMouseLeave={handleHoverOff}
     >
-      <CardImage card={card.data} />
+      {showRender && <CardCustomRender card={card.data} />}
+      {!showRender && <CardImage card={card.data} />}
       {showDebugInfo && revealDetails && visibleDetails.includes(WEIGHT) &&
         <code className='card-weight'>{card.weight.toFixed(SCORE_PRECISION)}</code>}
       {hovered && <div className='hover-actions'>

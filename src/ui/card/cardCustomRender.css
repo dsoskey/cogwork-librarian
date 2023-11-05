@@ -1,0 +1,187 @@
+.custom-card-render {
+    position:relative;
+    aspect-ratio: var(--card-apect-ratio);
+    border-radius: var(--card-border-radius);
+    --w: peachpuff;
+    --w-text: #222;
+    --u: blue;
+    --b: purple;
+    --r: red;
+    --g: green;
+    --gold: goldenrod;
+    --c-a: brown;
+
+
+    --aftermath-front-height: 54.1569506726%;
+    --aftermath-back-height: calc(100% - 6% - var(--aftermath-front-height));
+    /* 100 / --aftermath-split */
+    --aftermath-front-width: 163.31738437%;
+    --aftermath-back-img-width: 257.934508816%;
+    --aftermath-split: 61.23046875%;
+}
+
+.custom-card-render.border {
+    background-color: black;
+    padding: 10px;
+}
+
+/* All frames */
+
+.custom-card-render .frame {
+    padding: var(--spacing-200);
+    display: flex;
+    flex-direction: column;
+}
+
+.custom-card-render .w {
+    background: var(--w);
+    color: var(--w-text);
+}
+.custom-card-render .u {
+    background: var(--u);
+}
+.custom-card-render .b {
+    background: var(--b);
+}
+.custom-card-render .r {
+    background: var(--r);
+}
+.custom-card-render .g {
+    background: var(--g);
+}
+.custom-card-render .br {
+    background: linear-gradient(90deg, var(--b), var(--r));
+}
+.custom-card-render .bu {
+    background: linear-gradient(90deg, var(--u), var(--b));
+}
+.custom-card-render .uw {
+    background: linear-gradient(90deg, var(--w), var(--u));
+    color: linear-gradient(90deg, var(--w-text), red);
+}
+.custom-card-render .gr {
+    background: linear-gradient(90deg, var(--r), var(--g));
+}
+.custom-card-render .gw {
+    background: linear-gradient(90deg, var(--g), var(--w));
+}
+.custom-card-render .bw {
+    background: linear-gradient(90deg, var(--w), var(--b));
+    color: linear-gradient(90deg, var(--w-text), red);
+}
+.custom-card-render .bg {
+    background: linear-gradient(90deg, var(--b), var(--g));
+}
+.custom-card-render .gu {
+    background: linear-gradient(90deg, var(--g), var(--u));
+}
+.custom-card-render .ru {
+    background: linear-gradient(90deg, var(--u), var(--r));
+}
+.custom-card-render .rw {
+    background: linear-gradient(90deg, var(--r), var(--w));
+}
+.custom-card-render .gold {
+    background: goldenrod;
+}
+.custom-card-render .brown {
+    background: var(--c-a);
+}
+.custom-card-render .c {
+    background: silver;
+    color: black;
+}
+
+.custom-card-render .top-box {
+    margin: var(--spacing-100);
+    display: flex;
+    flex-direction: row;
+}
+.custom-card-render .top-box .name {
+    flex: 1;
+}
+
+.custom-card-render .type-box {
+    margin: var(--spacing-100);
+    display: flex;
+    flex-direction: row;
+}
+.custom-card-render .type-box .type-line {
+    flex: 1;
+}
+
+/* normal frame */
+
+
+.custom-card-render .normal.frame {
+    aspect-ratio: inherit;
+}
+
+.custom-card-render .card-art {
+    height: 48%;
+    max-width: 100%;
+    background: radial-gradient(lawngreen, aqua);
+    border: black 2px inset;
+    align-self: center;
+}
+
+.custom-card-render .text-box {
+    height: 35%;
+    padding: var(--spacing-200);
+    font-size: .8em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.custom-card-render .flavor {
+    font-style: italic;
+}
+
+.custom-card-render .stat-box {
+    position: absolute;
+    padding: var(--spacing-200) var(--spacing-300);
+    border: black solid 2px;
+    border-radius: 2px;
+    bottom: 15px;
+    right: 25px;
+}
+
+/* Aftermath */
+
+.custom-card-render .aftermath-front {
+    height: var(--aftermath-front-height);
+}
+.custom-card-render .aftermath-back-placeholder {
+    height: var(--aftermath-back-height);
+}
+
+.custom-card-render .aftermath-back {
+    width: calc((var(--aftermath-back-height) - 1%) * 3.5/2.5);
+    height: calc(92% * 2.5/3.5);
+    position: absolute;
+    transform: rotate(90deg);
+    transform-origin: 136.5% 20.5%;
+    margin: var(--spacing-100);
+    box-sizing: border-box;
+    background: transparent;
+}
+
+.custom-card-render .aftermath-front img {
+    width: var(--aftermath-front-width);
+    overflow: hidden;
+    clip-path: polygon(0% 0%, var(--aftermath-split) 0%, var(--aftermath-split) 100%, 0% 100%);
+}
+
+.custom-card-render .aftermath-back img {
+    width: var(--aftermath-back-img-width);
+    position: relative;
+    left: calc(var(--aftermath-back-img-width) * -0.61);
+    overflow: hidden;
+    clip-path: polygon(100% 0%, var(--aftermath-split) 0%, var(--aftermath-split) 100%, 100% 100%);
+}
+
+.custom-card-render .aftermath-back .aftermath-back-text-box {
+    font-size: .75em;
+}
+

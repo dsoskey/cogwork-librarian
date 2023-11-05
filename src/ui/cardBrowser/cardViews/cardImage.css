@@ -1,5 +1,5 @@
 .card-image img {
-    clip-path: inset(0 0 0 0 round var(--card-radius));
+    clip-path: inset(0 0 0 0 round var(--card-border-radius));
     box-shadow: var(--spacing-200) var(--gray-68);
     position: relative;
     z-index: 1;

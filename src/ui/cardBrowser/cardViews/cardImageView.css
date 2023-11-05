@@ -2,8 +2,8 @@
     position: relative;
     margin-left: 0.75%;
     margin-bottom: var(--spacing-200);
-    aspect-ratio: 2.5/3.5;
-    border-radius: var(--card-radius);
+    aspect-ratio: var(--card-apect-ratio);
+    border-radius: var(--card-border-radius);
 }
 .card-view:focus-visible {
     outline: unset;

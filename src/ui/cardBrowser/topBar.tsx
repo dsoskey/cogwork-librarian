@@ -166,6 +166,7 @@ export const TopBar = ({
           <span>{" "}as:{" "}</span>
           <select value={displayType} onChange={event => setDisplayType(event.target.value as DisplayType)}>
             <option>cards</option>
+            <option>render</option>
             <option>list</option>
           </select>
         </label>}

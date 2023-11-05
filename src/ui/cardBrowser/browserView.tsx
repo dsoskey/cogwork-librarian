@@ -142,7 +142,7 @@ export const BrowserView = React.memo(({
 
         {showCards && <>
           <div className='result-container'>
-            {displayType === 'cards' && currentPage.map((card) => (
+            {(displayType === 'cards' || displayType === 'render') && currentPage.map((card) => (
               <CardImageView
                 onAdd={() => {
                   addCard(card.data.name)
@@ -160,6 +160,7 @@ export const BrowserView = React.memo(({
                 }}
                 key={card.data.id}
                 card={card}
+                showRender={displayType === "render"}
                 revealDetails={revealDetails}
                 visibleDetails={visibleDetails}
               />

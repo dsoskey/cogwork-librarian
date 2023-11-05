@@ -15,7 +15,8 @@
   --green: hsl(96, 100%, 69%);
   --light-red: hsl(0, 100%, 55%);
   --red: hsl(0, 100%, 37%);
-  --card-radius: 4.75% / 3.5%;
+  --card-border-radius: 4.75% / 3.5%;
+  --card-apect-ratio: 2.5/3.5;
 
   --spacing-100: 2px;
   --spacing-200: 4px;
