@@ -4,7 +4,7 @@ import { parsePowTou } from '../types/card'
 import { oracleNode } from './oracle'
 
 export const combatToCombatNode = (
-  field: OracleKeys,
+  field: OracleKeys | "defense",
   operator: Operator,
   rawTarget: number | 'power' | 'pow' | 'toughness' | 'tou'
 ): FilterNode => {

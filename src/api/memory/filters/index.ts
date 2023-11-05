@@ -166,10 +166,12 @@ export class MemoryFilterProvider implements FilterProvider {
         return powTouTotalOperation(leaf.operator, leaf.value)
       case FilterType.Loyalty:
         return combatToCombatNode('loyalty', leaf.operator, leaf.value)
+      case FilterType.Defense:
+        return combatToCombatNode('defense', leaf.operator, leaf.value)
       case FilterType.Layout:
         return oracleNode({
           filtersUsed: ["layout"],
-          filterFunc: defaultOperation('layout', leaf.operator, leaf.value),
+          filterFunc: defaultOperation('layout', "=", leaf.value),
         })
       case FilterType.Format:
         return formatMatch("legal", leaf.value)

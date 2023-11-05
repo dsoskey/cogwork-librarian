@@ -49,6 +49,7 @@ condition -> (
     toughCondition |
     powTouCondition |
     loyaltyCondition |
+    defenseCondition |
     layoutCondition |
     formatCondition |
     bannedCondition |
@@ -144,6 +145,9 @@ powTouCondition -> ("pt"i | "powtou"i) anyOperator integerValue
 
 loyaltyCondition -> ("loy"i | "loyalty"i) anyOperator integerValue
     {% ([_, [operator], value]) => ({ filter: FilterType.Loyalty, operator, value }) %}
+
+defenseCondition -> ("def"i | "defense"i) anyOperator integerValue
+    {% ([_, [operator], value]) => ({ filter: FilterType.Defense, operator, value }) %}
 
 layoutCondition -> ("layout"i) onlyEqualOperator stringValue
     {% ([_, [_op], value]) => ({ filter: FilterType.Layout, value }) %}
