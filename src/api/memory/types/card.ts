@@ -8,6 +8,7 @@ export const DOUBLE_FACED_LAYOUTS = [
   'meld',
   'double_sided',
   'double_faced_token',
+  'art_series'
 ]
 
 export const BASIC_LAND_TYPES = [

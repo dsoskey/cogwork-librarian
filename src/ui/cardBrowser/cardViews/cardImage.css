@@ -9,7 +9,7 @@
     left: 0;
 }
 
-.card-image .flip-button {
+.flip-button {
     position: absolute;
     z-index: 2;
     top: 11%;
@@ -20,6 +20,6 @@
     cursor: pointer;
 }
 
-.card-image .flip-button:hover {
+.flip-button:hover {
     color: whitesmoke;
 }

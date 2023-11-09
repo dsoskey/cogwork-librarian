@@ -11,6 +11,8 @@
     --gold: goldenrod;
     --c-a: brown;
 
+    --split-split: 50%;
+    --split-img-width: 200%;
 
     --aftermath-front-height: 54.1569506726%;
     --aftermath-back-height: calc(100% - 6% - var(--aftermath-front-height));
@@ -138,13 +140,44 @@
     font-style: italic;
 }
 
-.custom-card-render .stat-box {
+.custom-card-render .normal .stat-box {
     position: absolute;
+    bottom: 15px;
+    right: 25px;
+}
+
+.custom-card-render .stat-box {
     padding: var(--spacing-200) var(--spacing-300);
     border: black solid 2px;
     border-radius: 2px;
-    bottom: 15px;
-    right: 25px;
+}
+
+/* Split */
+
+.custom-card-render .split-frame {
+    height: calc(100% * 2.5/3.5);
+    width: calc(100% * 3.5/2.5);
+    display: flex;
+    flex-direction: row;
+    transform: rotate(-90deg);
+    transform-origin: 50% 70%;
+
+}
+
+.custom-card-render .split-frame > * {
+    flex: 1;
+}
+
+.custom-card-render .split-frame .split-left img {
+    width: var(--split-img-width);
+    clip-path: polygon(0% 0%, var(--split-split) 0%, var(--split-split) 100%, 0% 100%);
+}
+
+.custom-card-render .split-frame .split-right img {
+    width: var(--split-img-width);
+    position: relative;
+    left: -100%;
+    clip-path: polygon(100% 0%, var(--split-split) 0%, var(--split-split) 100%, 100% 100%);
 }
 
 /* Aftermath */
@@ -185,3 +218,19 @@
     font-size: .75em;
 }
 
+/* Flip */
+
+.custom-card-render .flip .flip-bottom {
+    transform: rotate(180deg);
+}
+
+.custom-card-render .flip .flip-set {
+    align-self: end;
+}
+
+.custom-card-render .flip .type-box {
+    align-items: center;
+}
+.custom-card-render .flip .type-line {
+    font-size: .9em;
+}
