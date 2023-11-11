@@ -1,11 +1,20 @@
 import { AdminPanel } from '../adminPanel'
 import { CoglibIcon } from './coglibIcon'
 import { Link } from 'react-router-dom'
-import { DatabaseLink } from '../queryForm/databaseSettings'
 import React, { useContext } from 'react'
 import { FlagContext } from '../../flags'
 import { useLocation } from 'react-router'
+import { CogDBContext } from '../../api/local/useCogDB'
 
+interface DatabaseLinkProps { active: boolean }
+
+const DatabaseLink = ({ active }: DatabaseLinkProps) => {
+  const { outOfDate } = useContext(CogDBContext)
+  return <Link to='/data/card' className={active ? "active-link" : ""}>
+    settings {outOfDate && <span className='alert'>!!</span>}
+  </Link>
+
+}
 export const Masthead = () => {
   const { adminMode } = useContext(FlagContext).flags
   const { pathname } = useLocation()

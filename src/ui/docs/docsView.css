@@ -1,3 +1,23 @@
+.docs-view {
+    position: relative;
+}
 .docs-view .single-section-docs {
     padding: var(--spacing-300);
+}
+
+.docs-view .docs-content {
+    margin: 0 var(--spacing-300);
+}
+
+.docs-view .docs-sidenav {
+    background: var(--darker-color);
+    position: fixed;
+    padding: var(--spacing-200);
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.docs-view .docs-sidenav li {
+
 }

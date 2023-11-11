@@ -4,15 +4,29 @@ import { DataSource, Setter, TaskStatus } from '../../types'
 import { ScryfallIcon } from '../component/scryfallIcon'
 import { CoglibIcon } from '../component/coglibIcon'
 import { InfoModal } from '../component/infoModal'
-import { DatabaseSettings } from './databaseSettings'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { DBStatusLoader } from '../component/dbStatusLoader'
+import { Link } from 'react-router-dom'
 
 const description: Record<DataSource, String> = {
   scryfall:
     'fetches from scryfall using its API. Supports full scryfall syntax, but larger query sets will take longer to process.',
   local:
     'processes queries against a local database of oracle cards. syntax support is incomplete, but it runs an order of magnitude faster than communicating with scryfall',
+}
+
+const DatabaseSettings = () => {
+  const { outOfDate } = useContext(CogDBContext)
+  return (
+    <div className='row'>
+      <Link to='/data/card'>
+        <button className='db-settings' title='settings'>
+          ⚙
+        </button>
+      </Link>
+      {outOfDate && <span className='alert'>DATABASE UPDATE REQUIRED</span>}
+    </div>
+  )
 }
 
 export interface QueryFormProps {
@@ -87,7 +101,7 @@ export const QueryForm = ({
               />
             </div>
             <label htmlFor={`source-local`}>local</label>
-            {<DatabaseSettings />}
+            <DatabaseSettings />
             <InfoModal
               title={<h2 className='row center'>
                 <CoglibIcon size={iconSize} />

@@ -26,6 +26,17 @@ export const renderer = {
       {children}
     </h2>
   },
+  h3: ({node, ...props}) => {
+    const { children, ...rest} = props;
+    const id = children.toString()
+      .replace(/ /g, "-")
+      .replace(/"/g, "")
+    return <h3 id={id} {...rest}>
+      <a href={`#${id}`}>#</a>
+      {" "}
+      {children}
+    </h3>
+  },
   td: ({node, ...props}) => {
     const { children, ...rest } = props;
     let component = children;
