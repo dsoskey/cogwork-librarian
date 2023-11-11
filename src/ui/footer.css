@@ -1,6 +1,6 @@
 .footer {
     max-width: 100% !important;
-    padding: 16px 4px;
+    padding: var(--spacing-400) var(--spacing-300);
     background: var(--darkest-color);
     color: var(--light-color);
     font-size: 0.8em;
@@ -9,19 +9,12 @@
 .footer .links {
     display: flex;
     flex-direction: row;
-    margin-left: var(--spacing-200);
 }
 .footer a,
 .footer a:visited {
     color: var(--light-color);
 }
 
-@media (max-width: 1024px) {
-    .footer {
-        padding-left: 8px;
-    }
-}
-
-.footer > :not(:first-child) {
-    padding-left: var(--spacing-200);
+.footer .iwroot {
+    margin-top: var(--spacing-300);
 }

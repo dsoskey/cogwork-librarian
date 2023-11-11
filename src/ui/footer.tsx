@@ -1,5 +1,6 @@
 import React from 'react'
 import "./footer.css"
+import { InnertubeWidget } from './component/innertubeWidget'
 
 export const Footer = () => {
   return (
@@ -36,6 +37,7 @@ export const Footer = () => {
           💡
         </div>
       </div>
+      <InnertubeWidget />
       <div className='legalese'>
         <p>
           portions of cogwork librarian are unofficial Fan Content permitted
