@@ -10,25 +10,25 @@ const widgetStyle = `
   --chain-fill:  #dd8903;
   --tube-stroke:  var(--blue);
 }
-  .iwroot {
-  font - family: Helvetica, Arial, sans-serif;
+.iwroot {
+  font-family: Helvetica, Arial, sans-serif;
 }
-  .iwroot .shadow {
+.iwroot .shadow {
   var(--shadow);
 }
-  .iwroot .buoy {
-  stroke - width: 2;
+.iwroot .buoy {
+  stroke-width: 2;
   stroke: var(--tube-stroke);
   fill: var(--tube-fill);
 }
-  .iwroot .tube {
+.iwroot .tube {
   stroke: var(--tube-stroke);
   fill: var(--tube-fill);
 }
-  .iwroot a:hover :is(.buoy) {
-  stroke - width: 3;
+.iwroot a:hover :is(.buoy) {
+  stroke-width: 3;
 }
-  .iwroot :is(.arrow, .innertube-text) {
+.iwroot :is(.arrow, .innertube-text) {
   fill: var(--tube-stroke);
 }
 `
