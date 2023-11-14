@@ -170,6 +170,7 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
     case 'serialized':
     case 'planeswalkerdeck':
     case 'setextension':
+      // @ts-ignore
       return printing.promo_types?.includes(value)
     case 'halo':
       // @ts-ignore

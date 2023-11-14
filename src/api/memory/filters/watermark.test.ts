@@ -1,17 +1,17 @@
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions } from './testData/_utils'
+import { defaultDataProvider, defaultOptions, names } from './testData/_utils'
 import { animateLand } from './testData/animateLand'
 import { bloodCrypt } from './testData/bloodCrypt'
 
 describe('watermark filter', function() {
   const corpus = [bloodCrypt, animateLand]
-  const queryRunner = new QueryRunner({ corpus, defaultOptions });
+  const queryRunner = new QueryRunner({ corpus, defaultOptions, dataProvider: defaultDataProvider });
 
   ["wm", 'watermark'].forEach(filterKeyword => {
-    it(`${filterKeyword} gets parsed properly`, () => {
-      const result = queryRunner.search(`${filterKeyword}:rakdos`)._unsafeUnwrap()
+    it(`${filterKeyword} gets parsed properly`, async () => {
+      const result = names(await queryRunner.search(`${filterKeyword}:rakdos`))
 
-      expect(result[0].id).toEqual(bloodCrypt.id)
+      expect(result).toEqual([bloodCrypt.name])
     })
   })
 })

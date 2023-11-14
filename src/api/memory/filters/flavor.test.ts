@@ -1,25 +1,22 @@
 import { gorillaTitan } from './testData/gorillaTitan'
 import { birdsOfParadise } from './testData/birdsOfParadise'
 import { emberethShieldbreaker } from './testData/emberethShieldbreaker'
-import { defaultOptions } from './testData/_utils'
+import { defaultDataProvider, defaultOptions, names } from './testData/_utils'
 import { QueryRunner } from '../queryRunner'
 
 describe("flavor filters", () => {
   const corpus = [gorillaTitan, birdsOfParadise, emberethShieldbreaker]
-  const queryRunner = new QueryRunner({ corpus, defaultOptions })
+  const queryRunner = new QueryRunner({ corpus, defaultOptions, dataProvider: defaultDataProvider })
 
-  it('should handle string searches', function() {
-    const result = queryRunner.search("flavor:banana")._unsafeUnwrap()
+  it('should handle string searches', async function() {
+    const result = names(await queryRunner.search("flavor:banana"))
 
-    expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(gorillaTitan.id)
+    expect(result).toEqual([gorillaTitan.name])
   })
 
-  it('should handle regex searches', function() {
-    const result = queryRunner.search('flavor:/".+"/')._unsafeUnwrap()
+  it('should handle regex searches', async function() {
+    const result = names(await queryRunner.search('flavor:/".+"/'))
 
-    expect(result.length).toEqual(2)
-    expect(result[0].id).toEqual(emberethShieldbreaker.id)
-    expect(result[1].id).toEqual(gorillaTitan.id)
+    expect(result).toEqual([emberethShieldbreaker.name, gorillaTitan.name])
   })
 })

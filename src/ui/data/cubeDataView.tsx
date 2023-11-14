@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react'
-import { CogDBContext } from '../../api/local/useCogDB'
 import { cogDB } from '../../api/local/db'
 import { NormedCard } from '../../api/memory/types/normedCard'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -15,7 +14,6 @@ import { CubeDefinitionTable } from './cubeDefinitionTable'
 
 export const CubeDataView = () => {
   const { addMessage, dismissMessage } = useContext(ToasterContext)
-  const { addCubes } = useContext(CogDBContext)
   const [cubeId, setCubeId] = useState("")
   const [error, setError] = useState("")
   const [foundCards, setFoundCards] = useState<NormedCard[]>([])
@@ -37,7 +35,6 @@ export const CubeDataView = () => {
     } else {
       const oracle_ids = cards.map(it => it.oracle_id)
       await cogDB.cube.put({ key, oracle_ids, source: "list", last_updated: new Date() })
-      addCubes({ [key]: new Set(oracle_ids) })
       setCubeId("")
       setError("")
       setShowConfirmation(false)

@@ -4,12 +4,13 @@ import { SearchOptions } from './types/searchOptions'
 import { errAsync, ResultAsync } from 'neverthrow'
 import { Card } from 'scryfall-sdk'
 import { NearlyError, SearchError } from './types/error'
-import { DataProvider, FilterProvider, MemoryFilterProvider } from './filters'
+import { FilterProvider, CachingFilterProvider } from './filters'
 import { chooseFilterFunc } from './filters/print'
 import { byName, sortFunc, SortOrder } from './filters/sort'
 import sortBy from 'lodash/sortBy'
 import { AstNode } from './types/ast'
 import { MQLParser } from './mql'
+import { DataProvider } from './filters/dataProvider'
 
 export const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
   const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
@@ -45,7 +46,7 @@ export class QueryRunner {
 
   constructor({ corpus, defaultOptions, dataProvider, getParser }: QueryRunnerParams) {
     this.corpus = normCardList(corpus);
-    this.filters = new MemoryFilterProvider(dataProvider)
+    this.filters = new CachingFilterProvider(dataProvider)
     this.getParser = getParser ?? MQLParser
     this.defaultOptions = defaultOptions ?? { order: 'name' }
   }

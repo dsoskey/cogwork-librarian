@@ -11,7 +11,7 @@ import { displayMessage } from '../../error'
 import { SearchOptions } from '../memory/types/searchOptions'
 import { QueryRunner } from '../memory/queryRunner'
 import { useMemo } from 'react'
-import { MemoryFilterProvider } from '../memory/filters'
+import { CachingFilterProvider } from '../memory/filters'
 import { cogDB } from './db'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
@@ -25,7 +25,7 @@ export const useMemoryQueryRunner = ({
   const { status, report, result, rawData, execute, errors } =
     useQueryCoordinator()
   const searchCards = useMemo(() => {
-    const filters = new MemoryFilterProvider(cogDB);
+    const filters = new CachingFilterProvider(cogDB);
     return QueryRunner.generateSearchFunction(corpus, filters)
   }, [corpus])
 

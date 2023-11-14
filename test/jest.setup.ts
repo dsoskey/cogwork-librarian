@@ -1,1 +1,1 @@
-console.log('setting up nothing!')
+global.fetch = jest.fn()

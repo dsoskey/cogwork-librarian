@@ -2,53 +2,44 @@ import { phantomBeast } from './testData/phantomBeast'
 import { preordain } from './testData/preordain'
 import { negate } from './testData/negate'
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions } from './testData/_utils'
+import { defaultDataProvider, defaultOptions, names } from './testData/_utils'
 
 
 describe('collectorNumber filter', function() {
   const corpus = [negate, phantomBeast, preordain]
-  const queryRunner = new QueryRunner({ corpus, defaultOptions });
+  const queryRunner = new QueryRunner({ corpus, defaultOptions, dataProvider: defaultDataProvider });
 
   ['cn', 'number'].forEach(filterKeyword => {
-    it(`${filterKeyword} parses <= properly`, () => {
-      const result = queryRunner.search(`${filterKeyword}<=69`)._unsafeUnwrap()
+    it(`${filterKeyword} parses <= properly`, async () => {
+      const result = names(await queryRunner.search(`${filterKeyword}<=69`))
 
-      expect(result.length).toEqual(2)
-      expect(result[0].id).toEqual(negate.id)
-      expect(result[1].id).toEqual(phantomBeast.id)
+      expect(result).toEqual([negate.name, phantomBeast.name])
     })
   })
 
-  it("parses < properly", () => {
-    const result = queryRunner.search('cn<69')._unsafeUnwrap()
+  it("parses < properly", async () => {
+    const result = names(await queryRunner.search('cn<69'))
 
-    expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(negate.id)
+    expect(result).toEqual([negate.name])
   })
-  it("parses >= properly", () => {
-    const result = queryRunner.search('cn>=69')._unsafeUnwrap()
+  it("parses >= properly", async () => {
+    const result = names(await queryRunner.search('cn>=69'))
 
-    expect(result.length).toEqual(2)
-    expect(result[0].id).toEqual(phantomBeast.id)
-    expect(result[1].id).toEqual(preordain.id)
+    expect(result).toEqual([phantomBeast.name, preordain.name])
   })
-  it("parses > properly", () => {
-    const result = queryRunner.search('cn>69')._unsafeUnwrap()
+  it("parses > properly", async () => {
+    const result = names(await queryRunner.search('cn>69'))
 
-    expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(preordain.id)
+    expect(result).toEqual([preordain.name])
   })
-  it("parses = properly", () => {
-    const result = queryRunner.search('cn=69')._unsafeUnwrap()
+  it("parses = properly", async () => {
+    const result = names(await queryRunner.search('cn=69'))
 
-    expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(phantomBeast.id)
+    expect(result).toEqual([phantomBeast.name])
   })
-  it("parses != properly", () => {
-    const result = queryRunner.search('cn!=69')._unsafeUnwrap()
+  it("parses != properly", async () => {
+    const result = names(await queryRunner.search('cn!=69'))
 
-    expect(result.length).toEqual(2)
-    expect(result[0].id).toEqual(negate.id)
-    expect(result[1].id).toEqual(preordain.id)
+    expect(result).toEqual([negate.name, preordain.name])
   })
 })

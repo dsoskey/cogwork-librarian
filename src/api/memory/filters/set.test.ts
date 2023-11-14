@@ -1,33 +1,30 @@
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions } from './testData/_utils'
+import { defaultDataProvider, defaultOptions, names } from './testData/_utils'
 import { preordain } from './testData/preordain'
 import { animateLand } from './testData/animateLand'
 
 const corpus = [preordain, animateLand]
-const queryRunner = new QueryRunner({ corpus, defaultOptions })
+const queryRunner = new QueryRunner({ corpus, defaultOptions, dataProvider: defaultDataProvider })
 
 describe('set filter', function() {
   ["s", "set", "e", "edition"].forEach(filterKeyword => {
-    it(`${filterKeyword} should match exact set codes`, function() {
-      const result = queryRunner.search(`${filterKeyword}:m11`)._unsafeUnwrap()
+    it(`${filterKeyword} should match exact set codes`, async function() {
+      const result = names(await queryRunner.search(`${filterKeyword}:m11`))
 
-      expect(result.length).toEqual(1)
-      expect(result[0].id).toEqual(preordain.id)
+      expect(result).toEqual([preordain.name])
     })
   })
-  it("should match exact set names", function() {
-    const result = queryRunner.search('set:"Magic 2011"')._unsafeUnwrap()
+  it("should match exact set names", async function() {
+    const result = names(await queryRunner.search('set:"Magic 2011"'))
 
-    expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(preordain.id)
+    expect(result).toEqual([preordain.name])
   })
 })
 
 describe('set-type filter', function() {
-  it("should match exact set types", function() {
-    const result = queryRunner.search("st:core")._unsafeUnwrap()
+  it("should match exact set types", async function() {
+    const result = names(await queryRunner.search("st:core"))
 
-    expect(result.length).toEqual(1)
-    expect(result[0].id).toEqual(preordain.id)
+    expect(result).toEqual([preordain.name])
   })
 })

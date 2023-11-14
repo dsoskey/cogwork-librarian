@@ -36,21 +36,14 @@ import { FilterType } from '../types/filterKeyword'
 import { AstLeaf, AstNode, BinaryNode, UnaryNode } from '../types/ast'
 import { fromPromise, okAsync, ResultAsync } from 'neverthrow'
 import { SearchError } from '../types/error'
-import { CubeDefinition } from '../types/cube'
-import { IllustrationTag, OracleTag } from '../types/tag'
+import { DataProvider } from './dataProvider'
 
 
 export interface FilterProvider {
   visitNode: (leaf: AstNode) => ResultAsync<FilterNode, SearchError>
 }
 
-export interface DataProvider {
-  getCube: (key: string) => Promise<CubeDefinition>
-  getOtag: (key: string) => Promise<OracleTag>
-  getAtag: (key: string) => Promise<IllustrationTag>
-}
-
-export class MemoryFilterProvider implements FilterProvider {
+export class CachingFilterProvider implements FilterProvider {
   private readonly provider: DataProvider
   // should these be cached?
   // cubeId -> oracleId

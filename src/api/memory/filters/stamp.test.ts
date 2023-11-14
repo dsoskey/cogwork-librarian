@@ -1,15 +1,15 @@
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions } from './testData/_utils'
+import { defaultDataProvider, defaultOptions, names } from './testData/_utils'
 import { animateLand } from './testData/animateLand'
 import { kroxaTitanOfDeathsHunger } from './testData/kroxaTitanOfDeathsHunger'
 
 describe('stamp filter', function() {
   const corpus = [kroxaTitanOfDeathsHunger, animateLand]
-  const queryRunner = new QueryRunner({ corpus, defaultOptions });
+  const queryRunner = new QueryRunner({ corpus, defaultOptions, dataProvider: defaultDataProvider });
 
-  it("gets parsed properly", () => {
-    const result = queryRunner.search('stamp:oval')._unsafeUnwrap()
+  it("gets parsed properly", async () => {
+    const result = names(await queryRunner.search('stamp:oval'))
 
-    expect(result[0].id).toEqual(kroxaTitanOfDeathsHunger.id)
+    expect(result).toEqual([kroxaTitanOfDeathsHunger.name])
   })
 })

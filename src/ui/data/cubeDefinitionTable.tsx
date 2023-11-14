@@ -5,7 +5,7 @@ import { PageControl } from '../cardBrowser/pageControl'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
 import { Modal } from '../component/modal'
 import { CubeCobraImportMessage } from './cubeCobraImporter'
-import { CogDBContext } from '../../api/local/useCogDB'
+import { cogDB } from '../../api/local/db'
 
 interface CubeDefinitionRowProps {
   cube: CubeDefinition
@@ -44,7 +44,6 @@ export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set())
   const checkRef = useRef<HTMLInputElement>()
   const { isRunning, attemptImport } = useContext(BulkCubeImporterContext);
-  const { removeCubes } = useContext(CogDBContext);
   const importCheckedCubeIds = () => {
     const toSubmit = cubes
       .filter(it => checkedIds.has(it.key) && it.source === "cubecobra")
@@ -64,7 +63,7 @@ export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
 
   const onDeleteClick = () => {
     setDeleting(true);
-    removeCubes(Array.from(checkedIds)).then(() => {
+    cogDB.cube.bulkDelete(Array.from(checkedIds)).then(() => {
       setShowDeleteModal(false);
       setCheckedIds(new Set());
     })

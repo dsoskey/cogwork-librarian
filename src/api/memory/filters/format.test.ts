@@ -1,19 +1,19 @@
 import { QueryRunner } from '../queryRunner'
-import { defaultOptions, names } from './testData/_utils'
+import { defaultDataProvider, defaultOptions, names } from './testData/_utils'
 import { preordain } from './testData/preordain'
 import { delverOfSecrets } from './testData/delverOfSecrets'
 import { emberethShieldbreaker } from './testData/emberethShieldbreaker'
 
 describe('format filters', function() {
   const corpus = [preordain, delverOfSecrets, emberethShieldbreaker]
-  const queryRunner = new QueryRunner({ corpus, defaultOptions });
-  it("handles banned cards", function() {
-    const result = names(queryRunner.search("banned:modern"))
+  const queryRunner = new QueryRunner({ corpus, defaultOptions, dataProvider: defaultDataProvider });
+  it("handles banned cards", async function() {
+    const result = names(await queryRunner.search("banned:modern"))
 
     expect(result).toEqual([preordain.name])
   })
-  it("handles restricted cards", function() {
-    const result = names(queryRunner.search("restricted:paupercommander"))
+  it("handles restricted cards", async function() {
+    const result = names(await queryRunner.search("restricted:paupercommander"))
 
     expect(result).toEqual([emberethShieldbreaker.name])
   })
