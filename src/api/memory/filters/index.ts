@@ -48,17 +48,17 @@ export class CachingFilterProvider implements FilterProvider {
   // should these be cached?
   // cubeId -> oracleId
   private readonly cubes: { [cubeId: string]: Set<string> }
-  private getCube = (cubeId: string): ResultAsync<Set<string>, SearchError> => {
-    if (this.cubes[cubeId]) {
-      return okAsync(this.cubes[cubeId])
+  private getCube = (key: string): ResultAsync<Set<string>, SearchError> => {
+    if (this.cubes[key]) {
+      return okAsync(this.cubes[key])
     }
-    return fromPromise(this.provider.getCube(cubeId)
+    return fromPromise(this.provider.getCube(key)
       .then(cube => {
         if (cube === undefined){
-          return Promise.reject({ query: '', message: `Couldn't find cube ${cubeId}`, errorOffset: 0 })
+          return Promise.reject({ query: '', message: `Couldn't find cube ${key}`, errorOffset: 0 })
         }
         const set = new Set(cube.oracle_ids)
-        this.cubes[cubeId] = set;
+        this.cubes[key] = set;
         return Promise.resolve(set)
       }),
       (it: SearchError) => it)
@@ -73,7 +73,7 @@ export class CachingFilterProvider implements FilterProvider {
     return fromPromise(this.provider.getOtag(key)
         .then(otag => {
           if (otag === undefined){
-            return Promise.reject({ query: '', message: `Couldn't find oracle tag ${otag}`, errorOffset: 0 })
+            return Promise.reject({ query: '', message: `Couldn't find oracle tag ${key}`, errorOffset: 0 })
           }
           const set = new Set(otag.oracle_ids)
           this.otags[key] = set;
@@ -91,7 +91,7 @@ export class CachingFilterProvider implements FilterProvider {
     return fromPromise(this.provider.getAtag(key)
         .then(atag => {
           if (atag === undefined){
-            return Promise.reject({ query: '', message: `Couldn't find oracle tag ${atag}`, errorOffset: 0 })
+            return Promise.reject({ query: '', message: `Couldn't find illustration tag ${key}`, errorOffset: 0 })
           }
           const set = new Set(atag.illustration_ids)
           this.atags[key] = set;
