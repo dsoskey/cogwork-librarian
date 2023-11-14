@@ -1,14 +1,13 @@
 import { Parser } from 'nearley'
 import { normCardList, NormedCard } from './types/normedCard'
 import { SearchOptions } from './types/searchOptions'
-import { err, ok, Result } from 'neverthrow'
+import { errAsync, ResultAsync } from 'neverthrow'
 import { Card } from 'scryfall-sdk'
 import { NearlyError, SearchError } from './types/error'
-import { FilterProvider, MemoryFilterProvider } from './filters'
+import { DataProvider, FilterProvider, MemoryFilterProvider } from './filters'
 import { chooseFilterFunc } from './filters/print'
 import { byName, sortFunc, SortOrder } from './filters/sort'
 import sortBy from 'lodash/sortBy'
-import { IllustrationTag, OracleTag } from './types/tag'
 import { AstNode } from './types/ast'
 import { MQLParser } from './mql'
 
@@ -32,10 +31,8 @@ type ParserProducer = () => Parser
 
 export interface QueryRunnerParams {
   corpus: Card[]
-  cubes?: { [cubeId: string]: Set<string> }
-  oracleTags?: OracleTag[]
-  illustrationTags?: IllustrationTag[]
   defaultOptions?: SearchOptions,
+  dataProvider: DataProvider
   getParser?: ParserProducer
 }
 
@@ -46,22 +43,14 @@ export class QueryRunner {
 
   private readonly filters: FilterProvider
 
-  constructor({ corpus, cubes, oracleTags, illustrationTags, defaultOptions, getParser }: QueryRunnerParams) {
+  constructor({ corpus, defaultOptions, dataProvider, getParser }: QueryRunnerParams) {
     this.corpus = normCardList(corpus);
-    const otags = {}
-    for (const tag of oracleTags ?? []) {
-      otags[tag.label] = new Set(tag.oracle_ids)
-    }
-    const atags = {}
-    for (const tag of illustrationTags ?? []) {
-      otags[tag.label] = new Set(tag.illustration_ids)
-    }
-    this.filters = new MemoryFilterProvider({ cubes, otags, atags })
+    this.filters = new MemoryFilterProvider(dataProvider)
     this.getParser = getParser ?? MQLParser
     this.defaultOptions = defaultOptions ?? { order: 'name' }
   }
 
-  search = (query: string, _options?: SearchOptions): Result<Card[], SearchError> => {
+  search = (query: string, _options?: SearchOptions): ResultAsync<Card[], SearchError> => {
     const options = _options ?? this.defaultOptions
     const func = QueryRunner.generateSearchFunction(this.corpus, this.filters, this.getParser)
     return func(query, options)
@@ -74,7 +63,7 @@ export class QueryRunner {
   ) => (
     query: string,
     options: SearchOptions
-  ): Result<Card[], SearchError> => {
+  ): ResultAsync<Card[], SearchError> => {
     const parser = getParser();
     try {
       console.debug(`feeding ${query}`)
@@ -90,63 +79,65 @@ export class QueryRunner {
     } catch (error) {
       const { message, offset } = error as NearlyError
       console.error(message)
-      return err({
+      return errAsync({
         query,
         errorOffset: offset ?? 0,
         message,
       })
     }
 
-    // filter normedCards
-    const { filterFunc, filtersUsed, printFilter } =
-      filters.visitNode(parser.results[0] as AstNode);
+    return filters.visitNode(parser.results[0] as AstNode)
+      .map(node => {
+        const { filtersUsed, printFilter, filterFunc } = node;
 
-    const filtered = []
-    try {
-      for (const card of corpus) {
-        if (filterFunc(card)) {
-          filtered.push(card)
-        }
-      }
-    } catch (e) {
-      console.error(e)
-      return err({
-        query,
-        errorOffset: 0, // how do i manage this??
-        message: `Filter error: ${e.message}`,
-      })
-    }
+        // filter normedCards
+        const filtered: NormedCard[] = []
+        // try {
+          for (const card of corpus) {
+            if (filterFunc(card)) {
+              filtered.push(card)
+            }
+          }
+        // } catch (e) {
+        //   console.error(e)
+        //   return err({
+        //     query,
+        //     errorOffset: 0, // how do i manage this??
+        //     message: `Filter error: ${e.message}`,
+        //   })
+        // }
 
-    const printFilterFunc = chooseFilterFunc(filtersUsed)
+        const printFilterFunc = chooseFilterFunc(filtersUsed)
 
-    // filter prints
-    const printFiltered: Card[] = filtered
-      .flatMap(printFilterFunc(printFilter))
-      .filter(it => it !== undefined)
+        // filter prints
+        const printFiltered: Card[] = filtered
+          .flatMap(printFilterFunc(printFilter))
+          .filter(it => it !== undefined)
 
-    // sort
-    const order: SortOrder = getOrder(filtersUsed, options)
-    const sorted = sortBy(printFiltered, [...sortFunc(order), byName]) as Card[]
+        // sort
+        const order: SortOrder = getOrder(filtersUsed, options)
+        const sorted = sortBy(printFiltered, [...sortFunc(order), byName]) as Card[]
 
-    // direction
-    const direction = getDirection(filtersUsed, options)
-    if (direction === 'auto') {
-      switch (order) {
-        case 'rarity':
-        case 'usd':
-        case 'tix':
-        case 'eur':
-        case 'edhrec':
+        // direction
+        const direction = getDirection(filtersUsed, options)
+        if (direction === 'auto') {
+          switch (order) {
+            case 'rarity':
+            case 'usd':
+            case 'tix':
+            case 'eur':
+            case 'edhrec':
+              sorted.reverse()
+              break
+            case 'released':
+            default:
+              break
+          }
+        } else if (direction === 'desc') {
           sorted.reverse()
-          break
-        case 'released':
-        default:
-          break
-      }
-    } else if (direction === 'desc') {
-      sorted.reverse()
-    }
+        }
 
-    return ok(sorted)
+        return sorted
+      })
   }
 }

@@ -77,7 +77,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
         report.markTimepoint('end')
         setResult(sorted)
         if (errors.length) {
-          reject("error thrown")
+          reject(`Query set returned ${errors.length} error${errors.length>1?"s":""}`)
         } else {
           resolve()
         }

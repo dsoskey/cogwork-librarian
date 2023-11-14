@@ -34,219 +34,291 @@ import { NormedCard } from '../types/normedCard'
 import { printNode } from './print'
 import { FilterType } from '../types/filterKeyword'
 import { AstLeaf, AstNode, BinaryNode, UnaryNode } from '../types/ast'
+import { fromPromise, okAsync, ResultAsync } from 'neverthrow'
+import { SearchError } from '../types/error'
+import { CubeDefinition } from '../types/cube'
+import { IllustrationTag, OracleTag } from '../types/tag'
+
 
 export interface FilterProvider {
-  visitNode: (leaf: AstNode) => FilterNode
+  visitNode: (leaf: AstNode) => ResultAsync<FilterNode, SearchError>
+}
+
+export interface DataProvider {
+  getCube: (key: string) => Promise<CubeDefinition>
+  getOtag: (key: string) => Promise<OracleTag>
+  getAtag: (key: string) => Promise<IllustrationTag>
 }
 
 export class MemoryFilterProvider implements FilterProvider {
+  private readonly provider: DataProvider
+  // should these be cached?
   // cubeId -> oracleId
   private readonly cubes: { [cubeId: string]: Set<string> }
-  // otag -> oracleId
-  private readonly otags: { [otag: string]: Set<string> }
-  // atag -> id
-  private readonly atags: { [atag: string]: Set<string> }
-
-  constructor({ cubes, otags, atags }) {
-    this.cubes = cubes;
-    this.otags = otags;
-    this.atags = atags;
+  private getCube = (cubeId: string): ResultAsync<Set<string>, SearchError> => {
+    if (this.cubes[cubeId]) {
+      return okAsync(this.cubes[cubeId])
+    }
+    return fromPromise(this.provider.getCube(cubeId)
+      .then(cube => {
+        if (cube === undefined){
+          return Promise.reject({ query: '', message: `Couldn't find cube ${cubeId}`, errorOffset: 0 })
+        }
+        const set = new Set(cube.oracle_ids)
+        this.cubes[cubeId] = set;
+        return Promise.resolve(set)
+      }),
+      (it: SearchError) => it)
   }
 
-  cubeFilter = (cubeKey: string) => oracleNode({
-    filtersUsed: ["cube"],
-    filterFunc: (card: NormedCard) => this.cubes[cubeKey]?.has(card.oracle_id)
-  })
-
-  otagFilter = (key: string) => oracleNode({
-    filtersUsed: ["otag"],
-    filterFunc: (card: NormedCard) => this.otags[key]?.has(card.oracle_id)
-  })
-
-  atagFilter = (key: string) => printNode(
-    ["atag"],
-    ({printing}) => {
-      const tag = this.atags[key]
-      return tag?.has(printing.illustration_id) ||
-        printing.card_faces.find(it=>tag?.has(it.illustration_id)) !== undefined
+  // otag -> oracleId
+  private readonly otags: { [otag: string]: Set<string> }
+  private getOtag = (key: string): ResultAsync<Set<string>, SearchError> => {
+    if (this.otags[key]) {
+      return okAsync(this.otags[key])
     }
-  )
+    return fromPromise(this.provider.getOtag(key)
+        .then(otag => {
+          if (otag === undefined){
+            return Promise.reject({ query: '', message: `Couldn't find oracle tag ${otag}`, errorOffset: 0 })
+          }
+          const set = new Set(otag.oracle_ids)
+          this.otags[key] = set;
+          return set
+        }),
+      (it: SearchError) => it)
+  }
 
-  visitNode = (node: AstNode): FilterNode => {
+  // atag -> id
+  private readonly atags: { [atag: string]: Set<string> }
+  private getAtag = (key: string): ResultAsync<Set<string>, SearchError> => {
+    if (this.atags[key]) {
+      return okAsync(this.atags[key])
+    }
+    return fromPromise(this.provider.getAtag(key)
+        .then(atag => {
+          if (atag === undefined){
+            return Promise.reject({ query: '', message: `Couldn't find oracle tag ${atag}`, errorOffset: 0 })
+          }
+          const set = new Set(atag.illustration_ids)
+          this.atags[key] = set;
+          return set
+        }),
+      (it: SearchError) => it)
+  }
+
+  constructor(provider: DataProvider) {
+    this.provider = provider
+    this.cubes = {}
+    this.otags = {}
+    this.atags = {}
+  }
+
+  cubeFilter = (cubeKey: string): ResultAsync<FilterNode, SearchError> =>
+    this.getCube(cubeKey).map(ids => {
+      return oracleNode({
+        filtersUsed: ['cube'],
+        filterFunc: (card: NormedCard) => ids.has(card.oracle_id)
+      })
+    })
+
+  otagFilter = (key: string): ResultAsync<FilterNode, SearchError> =>
+    this.getOtag(key).map(ids => {
+      return oracleNode({
+        filtersUsed: ['otag'],
+        filterFunc: (card: NormedCard) => ids.has(card.oracle_id)
+      })
+    })
+
+  atagFilter = (key: string): ResultAsync<FilterNode, SearchError> =>
+    this.getAtag(key).map(ids => {
+      return printNode(
+        ['atag'],
+        ({ printing }) => {
+          return ids.has(printing.illustration_id) ||
+            printing.card_faces.find(it => ids.has(it.illustration_id)) !== undefined
+        }
+      )
+    })
+
+  visitNode = (node: AstNode): ResultAsync<FilterNode, SearchError> => {
     if (node.hasOwnProperty("filter")) {
       return this.getFilter(node as AstLeaf)
     } else {
       // @ts-ignore
       switch (node.operator) {
         case "negate":
-          return notNode(this.visitNode((node as UnaryNode).clause));
+          return this.visitNode((node as UnaryNode).clause)
+            .map(notNode);
         case "and":
-          return andNode(
+          return ResultAsync.combine([
             this.visitNode((node as BinaryNode).left),
-            this.visitNode((node as BinaryNode).right));
+            this.visitNode((node as BinaryNode).right),
+          ]).map(([l, r])=> andNode(l, r))
         case "or":
-          return orNode(
+          return ResultAsync.combine([
             this.visitNode((node as BinaryNode).left),
-            this.visitNode((node as BinaryNode).right));
+            this.visitNode((node as BinaryNode).right),
+          ]).map(([l, r])=> orNode(l, r))
       }
     }
   }
 
-  getFilter = (leaf: AstLeaf): FilterNode => {
+  getFilter = (leaf: AstLeaf): ResultAsync<FilterNode, SearchError> => {
     switch (leaf.filter) {
       case FilterType.CmcInt:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["cmc"],
           filterFunc: defaultOperation("cmc", leaf.operator, leaf.value)
-        })
+        }))
       case FilterType.CmcOddEven:
-        return oddEvenFilter(leaf.value === "even")
+        return okAsync(oddEvenFilter(leaf.value === "even"))
       case FilterType.NameExact:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["exact"],
           filterFunc: exactMatch("name", leaf.value)
-        });
+        }));
       case FilterType.Name:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["name"],
           filterFunc: nameFilter(leaf.value)
-        })
+        }));
       case FilterType.NameRegex:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["name"],
           filterFunc: regexMatch('name', leaf.value)
-        })
+        }));
       case FilterType.ColorSet:
-        return colorMatch(leaf.operator, new Set(leaf.value))
+        return okAsync(colorMatch(leaf.operator, new Set(leaf.value)))
       case FilterType.ColorInt:
-        return colorCount(leaf.operator, leaf.value)
+        return okAsync(colorCount(leaf.operator, leaf.value))
       case FilterType.ColorIdentitySet:
-        return colorIdentityMatch(leaf.operator, new Set(leaf.value))
+        return okAsync(colorIdentityMatch(leaf.operator, new Set(leaf.value)))
       case FilterType.ColorIdentityInt:
-        return colorIdentityCount(leaf.operator, leaf.value)
+        return okAsync(colorIdentityCount(leaf.operator, leaf.value))
       case FilterType.Mana:
-        return manaCostMatch(leaf.operator, leaf.value)
+        return okAsync(manaCostMatch(leaf.operator, leaf.value))
       case FilterType.Oracle:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["oracle"],
           filterFunc: noReminderTextMatch('oracle_text', leaf.value),
-        })
+        }))
       case FilterType.OracleRegex:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["oracle"],
           filterFunc: noReminderRegexMatch('oracle_text', leaf.value),
-        })
+        }))
       case FilterType.FullOracle:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["full-oracle"],
           filterFunc: textMatch('oracle_text', leaf.value),
-        })
+        }))
       case FilterType.FullOracleRegex:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["full-oracle"],
           filterFunc: regexMatch('oracle_text', leaf.value),
-        })
+        }))
       case FilterType.Keyword:
-        return keywordMatch(leaf.value)
+        return okAsync(keywordMatch(leaf.value))
       case FilterType.Type:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["type"],
           filterFunc: textMatch('type_line', leaf.value),
-        })
+        }))
       case FilterType.TypeRegex:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["type-regex"],
           filterFunc: regexMatch('type_line', leaf.value),
-        })
+        }))
       case FilterType.Power:
-        return combatToCombatNode('power', leaf.operator, leaf.value)
+        return okAsync(combatToCombatNode('power', leaf.operator, leaf.value))
       case FilterType.Tough:
-        return combatToCombatNode('toughness', leaf.operator, leaf.value)
+        return okAsync(combatToCombatNode('toughness', leaf.operator, leaf.value))
       case FilterType.PowTou:
-        return powTouTotalOperation(leaf.operator, leaf.value)
+        return okAsync(powTouTotalOperation(leaf.operator, leaf.value))
       case FilterType.Loyalty:
-        return combatToCombatNode('loyalty', leaf.operator, leaf.value)
+        return okAsync(combatToCombatNode('loyalty', leaf.operator, leaf.value))
       case FilterType.Defense:
-        return combatToCombatNode('defense', leaf.operator, leaf.value)
+        return okAsync(combatToCombatNode('defense', leaf.operator, leaf.value))
       case FilterType.Layout:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["layout"],
           filterFunc: defaultOperation('layout', "=", leaf.value),
-        })
+        }))
       case FilterType.Format:
-        return formatMatch("legal", leaf.value)
+        return okAsync(formatMatch("legal", leaf.value))
       case FilterType.Banned:
-        return formatMatch("banned", leaf.value)
+        return okAsync(formatMatch("banned", leaf.value))
       case FilterType.Restricted:
-        return formatMatch("restricted", leaf.value)
+        return okAsync(formatMatch("restricted", leaf.value))
       case FilterType.Is:
-        return isVal(leaf.value)
+        return okAsync(isVal(leaf.value))
       case FilterType.Not:
-        return notNode(isVal(leaf.value))
+        return okAsync(notNode(isVal(leaf.value)))
       case FilterType.Prints:
-        return printCountFilter(leaf.operator, leaf.value)
+        return okAsync(printCountFilter(leaf.operator, leaf.value))
       case FilterType.In:
-        return inFilter(leaf.value)
+        return okAsync(inFilter(leaf.value))
       case FilterType.ProducesSet:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["produces"],
           filterFunc: producesMatch(leaf.operator, new Set(leaf.value)),
-        })
+        }))
       case FilterType.ProducesInt:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: ["produces"],
           filterFunc: producesMatchCount(leaf.operator, leaf.value),
-        })
+        }))
       case FilterType.Devotion:
-        return devotionOperation(leaf.operator, leaf.value)
+        return okAsync(devotionOperation(leaf.operator, leaf.value))
       case FilterType.Unique:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: [`unique:${leaf.value}`],
           filterFunc: identity(),
           inverseFunc: identity(),
-        })
+        }))
       case FilterType.Order:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: [`order:${leaf.value}`],
           filterFunc: identity(),
           inverseFunc: identity(),
-        })
+        }))
       case FilterType.Direction:
-        return oracleNode({
+        return okAsync(oracleNode({
           filtersUsed: [`direction:${leaf.value}`],
           filterFunc: identity(),
           inverseFunc: identity(),
-        })
+        }))
       case FilterType.Rarity:
-        return rarityFilterNode(leaf.operator, leaf.value)
+        return okAsync(rarityFilterNode(leaf.operator, leaf.value))
       case FilterType.Set:
-        return setNode(leaf.value)
+        return okAsync(setNode(leaf.value))
       case FilterType.SetType:
-        return setTypeNode(leaf.value)
+        return okAsync(setTypeNode(leaf.value))
       case FilterType.Artist:
-        return artistNode(leaf.value)
+        return okAsync(artistNode(leaf.value))
       case FilterType.CollectorNumber:
-        return collectorNumberNode(leaf.operator, leaf.value)
+        return okAsync(collectorNumberNode(leaf.operator, leaf.value))
       case FilterType.Border:
-        return borderNode(leaf.value)
+        return okAsync(borderNode(leaf.value))
       case FilterType.Date:
-        return dateNode(leaf.operator, leaf.value)
+        return okAsync(dateNode(leaf.operator, leaf.value))
       case FilterType.Price:
-        return priceNode(leaf.unit, leaf.operator, leaf.value)
+        return okAsync(priceNode(leaf.unit, leaf.operator, leaf.value))
       case FilterType.Frame:
-        return frameNode(leaf.value)
+        return okAsync(frameNode(leaf.value))
       case FilterType.Flavor:
-        return flavorMatch(leaf.value)
+        return okAsync(flavorMatch(leaf.value))
       case FilterType.FlavorRegex:
-        return flavorRegex(leaf.value)
+        return okAsync(flavorRegex(leaf.value))
       case FilterType.Game:
-        return gameNode(leaf.value)
+        return okAsync(gameNode(leaf.value))
       case FilterType.Language:
-        return languageNode(leaf.value)
+        return okAsync(languageNode(leaf.value))
       case FilterType.Stamp:
-        return stampFilter(leaf.value)
+        return okAsync(stampFilter(leaf.value))
       case FilterType.Watermark:
-        return watermarkFilter(leaf.value)
+        return okAsync(watermarkFilter(leaf.value))
       case FilterType.Cube:
         return this.cubeFilter(leaf.value)
       case FilterType.OracleTag:

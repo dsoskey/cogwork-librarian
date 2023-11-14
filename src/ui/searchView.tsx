@@ -32,9 +32,6 @@ export const SearchView = () => {
     local: useMemoryQueryRunner({
       getWeight: weightAlgorithms.zipf,
       corpus: cogDB.memory,
-      cubes: cogDB.cubes,
-      atags: cogDB.atags,
-      otags: cogDB.otags,
     }),
     scryfall: useScryfallQueryRunner({
       getWeight: weightAlgorithms.zipf,

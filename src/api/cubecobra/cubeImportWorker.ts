@@ -47,8 +47,6 @@ async function searchCubes(cubeIds: string[]) {
   postMessage({ type: "generate-cube-definitions" })
 
   const last_updated = new Date()
-  console.log(foundCubes)
-  console.log(nameToOracleId)
   const cubeDefinitions: CubeDefinition[] = Object.entries(foundCubes)
     .map(([key, names]) => ({
       key,
@@ -56,13 +54,9 @@ async function searchCubes(cubeIds: string[]) {
       source: "cubecobra",
       last_updated,
     }))
-  for (const cube of cubeDefinitions) {
-    postMessage({ type: "cube", data: { key: cube.key, values: cube.oracle_ids } })
-  }
 
   postMessage({ type: "save-to-db" })
 
-  console.log(cubeDefinitions)
   await cogDB.cube.bulkPut(cubeDefinitions)
 
   postMessage({ type: "end" })

@@ -36,19 +36,6 @@ async function loadDb() {
   const manifest  = await cogDB.collection.get("the_one")
   postMessage({ type: 'manifest', data: manifest })
 
-  await cogDB.cube.each(({ key, oracle_ids }) => {
-    postMessage({ type: 'cube', data: { key, values: oracle_ids }})
-  })
-  postMessage({ type: "cube-end"})
-  await cogDB.oracleTag.each(({ label, oracle_ids }) => {
-    postMessage({ type: 'otag', data: { key: label, values: oracle_ids }})
-  })
-  postMessage({ type: "oracle-tag-end"})
-  await cogDB.illustrationTag.each(({ label, illustration_ids }) => {
-    postMessage({ type: 'atag', data: { key: label, values: illustration_ids }})
-  })
-  postMessage({ type: "illustration-tag-end"})
-
   const count = await cogDB.card.count()
   postMessage({ type: 'count', data: count })
   await cogDB.card.each(card => {
@@ -117,9 +104,6 @@ async function loadOracleTags() {
   const tags = await downloadOracleTags()
   postMessage({ type: "oracle-tag-downloaded", data: tags.length })
   await cogDB.oracleTag.bulkPut(tags)
-  for (const tag of tags) {
-    postMessage({ type: "oracle-tag", data: { key: tag.label, values: tag.oracle_ids }})
-  }
   postMessage({ type: 'oracle-tag-end' })
 }
 
@@ -127,8 +111,5 @@ async function loadIllustrationTags() {
   const tags = await downloadIllustrationTags()
   postMessage({ type: "illustration-tag-downloaded", data: tags.length })
   await cogDB.illustrationTag.bulkPut(tags)
-  for (const tag of tags) {
-    postMessage({ type: "illustration-tag", data: { key: tag.label, values: tag.illustration_ids }})
-  }
   postMessage({ type: 'illustration-tag-end' })
 }

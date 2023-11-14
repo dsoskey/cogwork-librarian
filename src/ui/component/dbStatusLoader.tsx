@@ -1,4 +1,4 @@
-import { CogDBContext, DB_INIT_MESSAGES, DB_LOAD_MESSAGES } from '../../api/local/useCogDB'
+import { CogDBContext, DB_INIT_MESSAGES } from '../../api/local/useCogDB'
 import { Loader } from './loader'
 import React, { useContext } from 'react'
 
@@ -16,7 +16,7 @@ export const DBStatusLoader = () => {
       </div>
     </>}
     {dbStatus !== 'loading' && memStatus === "loading" && <>
-      <span>{DB_LOAD_MESSAGES[dbReport.complete]}</span>
+      <span>preparing the library...</span>
       {dbReport.totalCards > 0 && <Loader
         width="100%"
         count={dbReport.cardCount}

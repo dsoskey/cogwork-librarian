@@ -32,13 +32,6 @@ export interface CogDB {
   memStatus: TaskStatus
   dbReport: QueryReport
   memory: NormedCard[]
-  cubes: { [cubeId: string]: Set<string> }
-  addCubes: Setter<{ [cubeId: string]: Set<string> }>
-  removeCubes: (cubeIds: string[]) => Promise<void>
-  otags: { [otag: string]: Set<string> }
-  setOtags: Setter<{ [otag: string]: Set<string> }>
-  atags: { [atag: string]: Set<string> }
-  setAtags: Setter<{ [atag: string]: Set<string> }>
   setMemory: Setter<NormedCard[]>
   manifest: Manifest
   outOfDate: boolean
@@ -54,13 +47,6 @@ const defaultDB: CogDB = {
   dbStatus: 'unstarted',
   memStatus: 'unstarted',
   memory: [],
-  cubes: {},
-  addCubes: () => console.error("CogDB.addCubes called without a provider!"),
-  removeCubes: () => Promise.reject("CogDB.removeCubes called without a provider!"),
-  otags: {},
-  setAtags: () => console.error("CogDB.setOtags called without a provider!"),
-  atags: {},
-  setOtags: () => console.error("CogDB.setAtags called without a provider!"),
   dbReport: null,
   setMemory: () => console.error("CogDB.setMemory called without a provider!"),
   cardByName: () => {
@@ -92,32 +78,6 @@ export const useCogDB = (): CogDB => {
 
   const [memory, rawSetMemory] = useState<NormedCard[]>([])
   const rezzy = useRef<NormedCard[]>([])
-
-  const [cubes, setCubes] = useState<{ [cubeId: string]: Set<string> }>({})
-  const addCubes = (toAdd: { [cubeId: string]: Set<string>}) => {
-    setCubes(prev => {
-      for (const key in toAdd) {
-        prev[key] = toAdd[key];
-      }
-      return prev;
-    })
-  }
-  const removeCubes = async (toRemove: string[]) => {
-    await cogDB.cube.bulkDelete(toRemove);
-    setCubes(prev => {
-      for (const key of toRemove) {
-        delete prev[key];
-      }
-      return prev;
-    });
-  }
-  const cubeRes = useRef<{ [cubeId: string]: Set<string> }>({})
-
-  const [otags, setOtags] = useState<{ [cubeId: string]: Set<string> }>({})
-  const otagRes = useRef<{ [cubeId: string]: Set<string> }>({})
-
-  const [atags, setAtags] = useState<{ [cubeId: string]: Set<string> }>({})
-  const atagRes = useRef<{ [cubeId: string]: Set<string> }>({})
 
   const oracleToCard = useRef<{ [id: string]: NormedCard}>({})
   const nameToOracle = useRef<{ [name: string]: string }>({})
@@ -169,26 +129,10 @@ export const useCogDB = (): CogDB => {
           dbReport.addCardCount(index % 1000)
         }
         break
-      case 'otag':
-      case 'atag':
-      case 'cube': {
-        const ref = type === 'otag'?otagRes:(type==='atag'?atagRes:cubeRes)
-        const { key, values } = data
-        ref.current[key] = new Set(values)
-        break;
-      }
       case 'manifest':
         setManifest(data)
         break
-      case "cube-end":
-      case "oracle-tag-end":
-      case "illustration-tag-end":
-        dbReport.addComplete();
-        break;
       case 'end':
-        setCubes(cubeRes.current)
-        setOtags(otagRes.current)
-        setAtags(atagRes.current)
         rawSetMemory(rezzy.current)
         setMemStatus('success')
         setDbStatus('success')
@@ -242,16 +186,8 @@ export const useCogDB = (): CogDB => {
         if (index % 1000 === 0)
           dbReport.addCardCount(1000)
         break
-      case 'oracle-tag':
-      case 'illustration-tag': {
-        const res = type === "oracle-tag" ? otagRes : atagRes;
-        res.current[data.key] = new Set(data.values);
-        break;
-      }
       case 'memory-end':
         rawSetMemory(rezzy.current)
-        setOtags(otagRes.current)
-        setAtags(atagRes.current)
         setMemStatus('success')
         console.timeEnd(`loading mem`)
         dbReport.addComplete()
@@ -297,7 +233,6 @@ export const useCogDB = (): CogDB => {
         }
       })
     } else {
-      dbReport.reset(DB_LOAD_MESSAGES.length)
       console.debug("posting start message to worker")
       worker.onmessage = handleLoadDB
       worker.postMessage({ type: 'load' })
@@ -356,13 +291,6 @@ export const useCogDB = (): CogDB => {
     manifest,
     setManifest,
     memory,
-    cubes,
-    addCubes,
-    removeCubes,
-    atags,
-    setOtags,
-    otags,
-    setAtags,
     setMemory,
     resetDB,
     refreshDB,

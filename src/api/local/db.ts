@@ -50,6 +50,10 @@ export class TypedDexie extends Dexie {
   illustrationTag!: Table<IllustrationTag>
   history!: Table<QueryHistory>
 
+  getCube = (key: String) => this.cube.get(key)
+  getOtag = (key: String) => this.oracleTag.get({ label: key })
+  getAtag = (key: String) => this.illustrationTag.get({ label: key })
+
   constructor() {
     super('cogwork-librarian')
 

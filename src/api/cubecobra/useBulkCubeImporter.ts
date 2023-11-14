@@ -1,5 +1,4 @@
-import { createContext, useRef, useState } from 'react'
-import { CogDB } from '../local/useCogDB'
+import { createContext, useState } from 'react'
 import { Setter } from '../../types'
 
 const RUNNING_STATES = [
@@ -36,7 +35,7 @@ const defaultCubeImporter: BulkCubeImporter = {
 }
 
 export const BulkCubeImporterContext = createContext(defaultCubeImporter)
-export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
+export const useBulkCubeImporter = (): BulkCubeImporter => {
   const [cubeIds, setCubeIds] = useState<string[]>([]);
   const [status, setStatus] = useState<string>("scryfall-cards-missing");
   const isRunning = RUNNING_STATES.includes(status);
@@ -44,7 +43,6 @@ export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
   const [missingCards, setMissingCards] = useState<MissingCards>({
     cubeToCard: {}, count: 0
   });
-  const cubeRes = useRef<{ [cubeId: string]: Set<string>}>({})
   const handleCubeCobraImport = (event: MessageEvent): any => {
     const {type, data} = event.data
     switch (type) {
@@ -69,12 +67,8 @@ export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
       case "save-to-db":
         setStatus("saving-to-db")
         break;
-      case "cube":
-        cubeRes.current[data.key] = new Set(data.values)
-        break;
       case "end":
         setStatus("")
-        cogDB.addCubes(cubeRes.current);
         console.timeEnd("import from cubecobra")
         break;
       default:
@@ -97,7 +91,6 @@ export const useBulkCubeImporter = (cogDB: CogDB): BulkCubeImporter => {
     const worker = new Worker(new URL("./cubeImportWorker.ts", import.meta.url))
     setStatus("querying-cubecobra")
     setMissingCubes([])
-    cubeRes.current = {}
     worker.onmessage = handleCubeCobraImport
     worker.postMessage({ type: "import", data: submittableCubeIds })
   }
