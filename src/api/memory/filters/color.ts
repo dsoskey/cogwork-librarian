@@ -42,8 +42,14 @@ export const colorMatch = (operator: Operator, value: Set<string>): FilterNode =
               (it) => it.not.length > 0 && it.match.length === value.size
             ).length > 0
           )
-        // Scryfall adapts ":" to the context. in this context it acts as >=
+        // Scryfall adapts ":" to the context. in this context it acts as >= for non-colorless color sets
+        // For colorless, ":" acts as "="
         case ':':
+          if (value.size === 0) {
+            return faceMatchMap.filter(
+              (it) => it.match.length === value.size && it.not.length === 0
+            ).length > 0
+          }
         case '>=':
           return (
             faceMatchMap.filter((it) => it.match.length === value.size).length > 0
