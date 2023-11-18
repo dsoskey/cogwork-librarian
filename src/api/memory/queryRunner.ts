@@ -70,12 +70,16 @@ export class QueryRunner {
       console.debug(`feeding ${query}`)
       parser.feed(query)
       console.debug(`parsed`)
-      console.debug(parser.results)
       if (parser.results.length > 1) {
+        console.debug(parser.results)
         const uniqueParses = new Set(parser.results.map(it => JSON.stringify(it)))
         if (uniqueParses.size > 1) {
           console.warn('ambiguous parse!')
         }
+      } else if (parser.results.length === 1) {
+        console.debug(parser.results[0])
+      } else {
+        console.warn("no matched parses")
       }
     } catch (error) {
       const { message, offset } = error as NearlyError

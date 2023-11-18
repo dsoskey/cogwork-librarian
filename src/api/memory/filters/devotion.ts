@@ -5,11 +5,14 @@ import { isVal } from './is'
 import { oracleNode } from './oracle'
 
 
-export const devotionOperation = (operator: Operator, pips: string[]): FilterNode =>
-  oracleNode({
+export const devotionOperation = (operator: Operator, pips: string[]): FilterNode => {
+  const pip: ManaSymbol = pips[0].toLowerCase() as ManaSymbol
+  if (pips.filter(it => it !== pip).length) {
+    throw new Error("devotion filter requires a single type of mana symbol")
+  }
+  return oracleNode({
     filtersUsed: ['devotion'],
     filterFunc: (card: NormedCard) => {
-      const pip: ManaSymbol = pips[0].toLowerCase() as ManaSymbol
       const count = pips.length
       if (!(isVal('permanent').filterFunc(card))) return false
 
@@ -41,3 +44,4 @@ export const devotionOperation = (operator: Operator, pips: string[]): FilterNod
       return cardCosts.length > 0
     }
   })
+}

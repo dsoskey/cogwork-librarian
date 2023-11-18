@@ -16,7 +16,7 @@ export const flavorRegex = (value: string): FilterNode =>
   printNode(['flavor-regex'], ({ printing }) => {
     const regexp = new RegExp(substituteScryfallRegex(value))
     return (
-      regexp.test(printing.flavor_text) ||
-      printing.card_faces.filter((face) => regexp.test(face.flavor_text)).length > 0
+      regexp.test(printing.flavor_text?.toLowerCase()) ||
+      printing.card_faces.filter((face) => regexp.test(face.flavor_text?.toLowerCase())).length > 0
     )
   })

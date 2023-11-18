@@ -4,7 +4,7 @@
 
 @{%
 const { FilterType } = require('./types/filterKeyword')
-
+const { combineHybridSymbols } = require("./filters/mana")
 const { lexer } = require('./lexer')
 %}
 
@@ -17,7 +17,7 @@ filterStart -> _ filter _ {% ([, filter]) => {
 } %}
 
 filter ->
-      filter __ boolOperator clause {% ([left, _, operator, right]) => ({ operator, left, right }) %}
+      filter __ boolOperator clause {% ([left, _, operator, right]) => ({ operator, left, right, offset: left.offset }) %}
     | clause {% id %}
 
 clause -> "-":? (
@@ -25,7 +25,7 @@ clause -> "-":? (
     | condition
 ) {% ([negation, [clause]]) => {
     if (negation) {
-        return { operator: "negate", clause }
+        return { operator: "negate", clause, offset: negation.offset }
     }
     return clause
 } %}
@@ -88,14 +88,13 @@ condition -> (
 ) {% ([[condition]]) => condition %}
 
 cmcCondition ->
-    ("manavalue" | "mv" | "cmc") %operator integerValue
-        {% ([[kw], operator, value]) => {
-            console.log("woo hoo!")
-            console.log(kw)
-            return ({ filter: FilterType.CmcInt, operator: operator.value, value, offset: kw.offset })
-        } %} |
-    ("manavalue" | "mv" | "cmc") onlyEqualOperator ("even" | "odd")
-        {% ([[kw], _op, [value]]) => ({ filter: FilterType.CmcOddEven, value: value.value, offset: kw.offset }) %}
+    cmcFilter %operator integerValue {% ([{offset}, op, value]) =>
+       ({ filter: FilterType.CmcInt, operator: op.value, value, offset })
+    %} |
+    cmcFilter onlyEqualOperator ("even" | "odd") {% ([{offset}, _op, [{value}]]) =>
+        ({ filter: FilterType.CmcOddEven, value, offset })
+    %}
+cmcFilter -> ("manavalue" | "mv" | "cmc") {% id %}
 
 exactNameCondition -> "!":? stringValue
     {% ([op, string]) => ({
@@ -105,206 +104,202 @@ exactNameCondition -> "!":? stringValue
     }) %}
 
 nameCondition -> "name" onlyEqualOperator stringValue
-    {% ([kw, [_op], string]) => ({
-    filter: FilterType.Name,
-    value: string.value,
-    offset: kw.offset
-}) %}
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Name, value, offset }) %}
 
-nameRegexCondition -> "name" onlyEqualOperator %regex
-    {% ([kw, [_op], string]) => {
-    return ({ filter: FilterType.NameRegex, value: string.value, offset: kw.offset })
-} %}
+nameRegexCondition -> "name" onlyEqualOperator regexString
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.NameRegex, value, offset }) %}
 
 colorCondition ->
-    ("c" | "color") anyOperator colorCombinationValue {% ([[kw], [operator], colors]) => ({
-         filter: FilterType.ColorSet,
-         operator: operator.value,
-         value: colors.value,
-         offset: kw.offset
-    }) %} |
-    ("c" | "color") anyOperator integerValue {% ([[kw], [operator], value]) => ({
-        filter: FilterType.ColorInt,
-        operator: operator.value,
-        value,
-        offset: kw.offset
-    }) %}
+    colorFilter anyOperator colorCombinationValue {% ([{offset}, op, {value}]) =>
+        ({ filter: FilterType.ColorSet, operator: op.value, value, offset })
+    %} |
+    colorFilter anyOperator integerValue {% ([{offset}, op, value]) =>
+        ({ filter: FilterType.ColorInt, operator: op.value, value, offset })
+    %}
+colorFilter -> ("c" | "color") {% id %}
 
 colorIdentityCondition ->
-    ("ci" | "commander" | "identity" | "id") anyOperator colorCombinationValue
-    {% ([[kw], [op], colors]) => ({
-        filter: FilterType.ColorIdentitySet,
-        operator: op.value,
-        value:colors.value,
-        offset: kw.offset,
-    }) %} |
-    ("ci" | "commander" | "identity" | "id") anyOperator integerValue
-    {% ([[kw], [op], value]) => ({
-        filter: FilterType.ColorIdentityInt,
-        operator: op.value,
-        value,
-        offset: kw.offset,
-    }) %}
+    identityFilter anyOperator colorCombinationValue {% ([{offset}, op, {value}]) =>
+        ({ filter: FilterType.ColorIdentitySet, operator: op.value, value, offset })
+    %} |
+    identityFilter anyOperator integerValue {% ([{offset}, op, value]) =>
+        ({ filter: FilterType.ColorIdentityInt, operator: op.value, value, offset })
+     %}
+identityFilter -> ("ci" | "commander" | "identity" | "id") {% id %}
 
 manaCostCondition -> ("mana" | "m") %operator manaCostValue
-    {% ([[kw], operator, value]) => ({
-     filter: FilterType.Mana,
-     operator: operator.value,
-     value: value.value, offset: kw.offset }) %}
+    {% ([[{offset}], op, {value}]) => ({ filter: FilterType.Mana, operator: op.value, value, offset }) %}
 
-oracleCondition -> ("oracle" | "o" | "text") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Oracle, value }) %}
+oracleCondition -> oracleFilter onlyEqualOperator stringValue
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Oracle, value, offset }) %}
+oracleRegexCondition -> oracleFilter onlyEqualOperator regexString
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.OracleRegex, value, offset }) %}
+oracleFilter -> ("oracle" | "o" | "text") {% id %}
 
-oracleRegexCondition -> ("oracle" | "o" | "text") onlyEqualOperator regexString
-    {% ([_, [_op], value]) => ({ filter: FilterType.OracleRegex, value }) %}
-
-fullOracleCondition -> "fo" onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.FullOracle, value }) %}
-
-fullOracleRegexCondition -> "fo" onlyEqualOperator regexString
-    {% ([_, [_op], value]) => ({ filter: FilterType.FullOracleRegex, value }) %}
+fullOracleCondition -> fullOracleCondition onlyEqualOperator stringValue
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.FullOracle, value, offset }) %}
+fullOracleRegexCondition -> fullOracleCondition onlyEqualOperator regexString
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.FullOracleRegex, value, offset }) %}
+fullOracleCondition -> "fo" {% id %}
 
 keywordCondition -> ("kw" | "keyword") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Keyword, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Keyword, value, offset }) %}
 
 typeCondition -> ("t" | "type") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Type, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Type, value, offset }) %}
 
 typeRegexCondition -> ("t" | "type") onlyEqualOperator regexString
-    {% ([_, [_op], value]) => ({ filter: FilterType.TypeRegex, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.TypeRegex, value, offset }) %}
 
 powerCondition -> ("pow" | "power") anyOperator (integerValue | "tou" | "toughness")
-    {% ([_, [operator], [value]]) => ({ filter: FilterType.Power, operator, value }) %}
+    {% ([[{offset}], op, [value]]) => ({
+        filter: FilterType.Power,
+        operator: op.value,
+        value: value.value ?? value,
+        offset
+    }) %}
 
 toughCondition -> ("tou" | "toughness") anyOperator (integerValue | "pow" | "power")
-    {% ([_, [operator], [value]]) => ({ filter: FilterType.Tough, operator, value }) %}
+    {% ([[{offset}], op, [value]]) => ({
+        filter: FilterType.Tough,
+        operator: op.value,
+        value: value.value ?? value,
+        offset
+    }) %}
 
 powTouCondition -> ("pt" | "powtou") anyOperator integerValue
-    {% ([_, [operator], value]) => ({ filter: FilterType.PowTou, operator, value }) %}
+    {% ([[{offset}], op, value]) => ({ filter: FilterType.PowTou, operator: op.value, value, offset }) %}
 
 loyaltyCondition -> ("loy" | "loyalty") anyOperator integerValue
-    {% ([_, [operator], value]) => ({ filter: FilterType.Loyalty, operator, value }) %}
+    {% ([[{offset}], operator, value]) => ({ filter: FilterType.Loyalty, operator: operator.value, value, offset }) %}
 
 defenseCondition -> ("def" | "defense") anyOperator integerValue
-    {% ([_, [operator], value]) => ({ filter: FilterType.Defense, operator, value }) %}
+    {% ([[{offset}], op, value]) => ({ filter: FilterType.Defense, operator: op.value, value, offset }) %}
 
-layoutCondition -> ("layout") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Layout, value }) %}
+layoutCondition -> "layout" onlyEqualOperator stringValue
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Layout, value, offset }) %}
 
 formatCondition -> ("format" | "f") onlyEqualOperator formatValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Format, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Format, value, offset }) %}
 
-bannedCondition -> "banned" equalityOperator formatValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Banned, value }) %}
+bannedCondition -> "banned" onlyEqualOperator formatValue
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Banned, value, offset }) %}
 
-restrictedCondition -> "restricted" equalityOperator formatValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Restricted, value }) %}
+restrictedCondition -> "restricted" onlyEqualOperator formatValue
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Restricted, value, offset }) %}
 
 isCondition -> ("is" | "has") onlyEqualOperator isValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Is, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Is, value, offset }) %}
 
 notCondition -> "not" onlyEqualOperator isValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Not, value }) %}
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Not, value, offset }) %}
 
 printCountCondition -> "prints" anyOperator integerValue
-    {% ([_, [operator], value]) => ({ filter: FilterType.Prints, operator, value }) %}
+    {% ([{offset}, operator, value]) => ({ filter: FilterType.Prints, operator: operator.value, value, offset }) %}
 
 inCondition -> "in" onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.In, value }) %}
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.In, value, offset }) %}
 
 producesCondition ->
     "produces" anyOperator producesCombinationValue
-        {% ([_, [operator], value]) => ({ filter: FilterType.ProducesSet, operator, value }) %} |
+        {% ([{offset}, op, {value}]) => ({ filter: FilterType.ProducesSet, operator: op.value, value, offset })
+    %} |
     "produces" anyOperator integerValue
-        {% ([_, [operator], value]) => ({ filter: FilterType.ProducesInt, operator, value }) %}
+        {% ([{offset}, op, value]) => ({ filter: FilterType.ProducesInt, operator: op.value, value, offset }) %}
 
 devotionCondition -> "devotion" anyOperator devotionValue
-    {% ([_, [operator], [value]]) => ({ filter: FilterType.Devotion, operator, value }) %}
+    {% ([{offset}, op, {value}]) => ({ filter: FilterType.Devotion, operator: op.value, value, offset }) %}
 
 uniqueCondition -> "unique" onlyEqualOperator ("cards" | "prints" | "art")
-    {% ([_, [_op], value]) => ({ filter: FilterType.Unique, value }) %} |
-    "++" {% (_) => ({ filter: FilterType.Unique, value: "prints" }) %} |
-    "@@" {% (_) => ({ filter: FilterType.Unique, value: "art" }) %}
+    {% ([{offset}, _, [{value}]]) => ({ filter: FilterType.Unique, value, offset }) %} |
+    "++" {% ([{offset}]) => ({ filter: FilterType.Unique, value: "prints", offset }) %} |
+    "@@" {% ([{offset}]) => ({ filter: FilterType.Unique, value: "art", offset }) %}
 
 orderCondition -> "order" onlyEqualOperator orderValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Order, value }) %}
+    {% ([{offset}, _, [{value}]]) => ({ filter: FilterType.Order, value, offset }) %}
 
 directionCondition -> "direction" onlyEqualOperator ("asc" | "desc")
-    {% ([_, [_op], value]) => ({ filter: FilterType.Direction, value }) %}
+    {% ([{offset}, _, [{value}]]) => ({ filter: FilterType.Direction, value, offset }) %}
 
 # print-matters
 rarityCondition -> ("r" | "rarity") anyOperator rarityValue
-    {% ([_, [operator], value]) => ({ filter: FilterType.Rarity, operator, value }) %}
+    {% ([[{offset}], operator, value]) => ({ filter: FilterType.Rarity, operator: operator.value, value, offset }) %}
 
 setCondition -> ("s" | "set"| "e" | "edition") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Set, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Set, value, offset }) %}
 
 setTypeCondition -> "st" onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.SetType, value }) %}
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.SetType, value, offset }) %}
 
 artistCondition -> ("a" | "artist") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Artist, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Artist, value, offset }) %}
 
 collectorNumberCondition -> ("cn" | "number") anyOperator integerValue
-    {% ([_, [operator], value]) => ({ filter: FilterType.CollectorNumber, operator, value }) %}
+    {% ([[{offset}], operator, value]) => ({ filter: FilterType.CollectorNumber, operator: operator.value, value, offset }) %}
 
 borderCondition -> "border" onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Border, value }) %}
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Border, value, offset }) %}
 
 dateCondition -> ("date" | "year") anyOperator stringValue
-    {% ([_, [operator], value]) => ({ filter: FilterType.Date, operator, value }) %}
+    {% ([[{offset}], op, {value}]) => ({ filter: FilterType.Date, operator: op.value, value, offset }) %}
 
 priceCondition -> ("usd" | "eur" | "tix") anyOperator numberValue
-    {% ([[unit], [operator], value]) => ({ filter: FilterType.Price, unit, operator, value }) %}
+    {% ([[unit], op, value]) => ({
+        filter: FilterType.Price, unit: unit.value, operator: op.value, value, offset: unit.offset
+    }) %}
 
 frameCondition -> "frame" onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Frame, value }) %}
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Frame, value, offset }) %}
 
 flavorCondition -> ("flavor" | "ft") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Flavor, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Flavor, value, offset }) %}
 
 flavorRegexCondition -> ("flavor" | "ft") onlyEqualOperator regexString
-    {% ([_, [_op], value]) => ({ filter: FilterType.FlavorRegex, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.FlavorRegex, value, offset }) %}
 
 gameCondition -> "game" onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Game, value }) %}
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Game, value, offset }) %}
 
 languageCondition -> ("lang" | "language") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Language, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Language, value, offset }) %}
 
 stampCondition -> "stamp" onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Stamp, value }) %}
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Stamp, value, offset }) %}
 
 watermarkCondition -> ("wm" | "watermark") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Watermark, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Watermark, value, offset }) %}
 
-# Known issue: stringValue lowercases but cube keys are stored with original casing
-cubeCondition -> ("cube" | "ctag" | "tag") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.Cube, value }) %}
+cubeCondition -> ("cube" | "ctag" | "tag") onlyEqualOperator cubeValue
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Cube, value, offset }) %}
 
 oracleTagCondition -> ("function" | "oracletag" | "otag") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.OracleTag, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.OracleTag, value, offset }) %}
 
 artTagCondition -> ("art" | "arttag" | "atag") onlyEqualOperator stringValue
-    {% ([_, [_op], value]) => ({ filter: FilterType.IllustrationTag, value }) %}
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.IllustrationTag, value, offset }) %}
+
 
 # Values
-stringValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value %}
+stringValue -> (noQuoteStringValue | %dqstring | %sqstring) {% ([[token]]) => {
+    const { value, ...rest } = token
+    return { value: value.toLowerCase(), ...rest }
+}%}
 
-cubeValue -> (noQuoteStringValue | dqstring | sqstring) {% ([[value]]) => value %}
+cubeValue -> (noQuoteStringValue | %dqstring | %sqstring) {% ([[value]]) => value %}
 
-regexString -> "/" ([^/] {% id %} | "\/" {% id %}):* "/"  {% function(d) {return d[1].join(""); } %}
+regexString -> %regex {% function([token]) {
+    const { value, ...rest } = token
+    return { value: value.toLowerCase(), ...rest }
+} %}
 
 integerValue -> [0-9]:+ {% ([digits]) => parseInt(digits.join(''), 10) %}
 
 numberValue -> [0-9]:* ("." [0-9]:+):?
     {% ([preDec, dec]) => parseFloat(`${preDec.flat().join('')}${dec?.flat().join('')}`) %}
 
-anyOperator -> ":" | "=" | "!=" | "<>" | "<=" | "<" | ">=" | ">" {% id %}
+anyOperator -> (":" | "=" | "!=" | "<>" | "<=" | "<" | ">=" | ">") {% ([[token]]) => token %}
 
-equalityOperator -> ":" | "=" | "!=" | "<>" {% id %}
-
-onlyEqualOperator -> ":" | "=" {% id %}
+onlyEqualOperator -> (":" | "=") {% ([[token]]) => token %}
 
 formatValue -> (
     "standard" | "future" | "historic" | "pioneer" | "modern" | "legacy" | "paupercommander" |
@@ -337,6 +332,7 @@ isValue -> (
   | "tombstone" | "onlyprint" | "variation" | "watermark" | "ub" | "unique" | "placeholderimage"
 ) {% ([[category]]) => category %}
 
+# This somehow picks up restricted!=vintage
 noQuoteStringValue ->
   ("a" | "an" | "o") {% ([[value]]) => value %}
   | ([^aAoO\- \t\n"'\\\/=<>:!\+@]
@@ -347,62 +343,16 @@ noQuoteStringValue ->
     | "or" [^ \t\n"'\\=<>:]
     ) [^ \t\n"'\\=<>:]:* {% ([startChars, chars], _, reject) => {
     // hack: The lexer causes "or" to get picked up as a name search
-    if (startChars[0]?.type === "bool" || startChars[0]?.type === "regex") {
+    // todo: rework noQuoteString to play more nicely with lexer
+    const allChars = startChars.concat(chars)
+    const rejectTypes = ["bool", "regex", "operator"]
+    if (allChars.find(it => rejectTypes.includes(it.type))) {
         return reject;
     }
-    return { value: startChars.concat(chars).join(''), offset: startChars[0]?.offset ?? -1 }
+    return { value: allChars.join(''), offset: startChars[0]?.offset ?? -1 }
 } %}
 
-
-# https://github.com/dekkerglen/CubeCobra/blob/dfbe1bdea3020cf4c619d6c6b360efe8e78f100f/nearley/values.ne#L85
-comb1[A] -> null {% () => [] %}
-  | $A {% ([comb]) => {
-  console.log(comb)
-  return comb} %}
-
-comb2[A, B] -> null {% () => [] %}
-  | ( $A comb1[$B]
-    | $B comb1[$A]
-    ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
-
-comb3[A, B, C] -> null {% () => [] %}
-  | ( $A comb2[$B, $C]
-    | $B comb2[$A, $C]
-    | $C comb2[$A, $B]
-    ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
-
-comb4[A, B, C, D] -> null {% () => [] %}
-  | ( $A comb3[$B, $C, $D]
-    | $B comb3[$A, $C, $D]
-    | $C comb3[$A, $B, $D]
-    | $D comb3[$A, $B, $C]
-    ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
-
-comb5[A, B, C, D, E] -> null {% () => [] %}
-  | ( $A comb4[$B, $C, $D, $E]
-    | $B comb4[$A, $C, $D, $E]
-    | $C comb4[$A, $B, $D, $E]
-    | $D comb4[$A, $B, $C, $E]
-    | $E comb4[$A, $B, $C, $D]
-    ) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
-
-comb5NonEmpty[A, B, C, D, E] -> (
-    $A comb4[$B, $C, $D, $E]
-  | $B comb4[$A, $C, $D, $E]
-  | $C comb4[$A, $B, $D, $E]
-  | $D comb4[$A, $B, $C, $E]
-  | $E comb4[$A, $B, $C, $D]
-) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
-
-comb6NonEmpty[A, B, C, D, E, F] -> (
-    $A comb5[$B, $C, $D, $E, $F]
-  | $B comb5[$A, $C, $D, $E, $F]
-  | $C comb5[$A, $B, $D, $E, $F]
-  | $D comb5[$A, $B, $C, $E, $F]
-  | $E comb5[$A, $B, $C, $D, $F]
-  | $F comb5[$A, $B, $C, $D, $E]
-) {% ([[[a], rest]]) => [a, ...rest.map(([c]) => c)] %}
-
+# we never need offset from this
 colorCombinationKeyword ->
     "white" {% () => ['w'] %}
   | "blue" {% () => ['u'] %}
@@ -437,35 +387,45 @@ colorCombinationKeyword ->
   | ("rainbow" | "fivecolor")  {% () => ['w', 'u', 'b', 'r', 'g'] %}
 
 colorCombinationValue ->
-    ("c" | "brown" | "colorless")  {% () => [] %}
-  | colorCombinationKeyword {% id %}
+    ("c" | "brown" | "colorless")  {% ([[token]]) => ({ value: [], offset: token.offset }) %}
+  | colorCombinationKeyword {% ([value]) => ({ value }) %}
   | noQuoteStringValue {% ([token], _, reject) => {
-    console.log(token)
-    if (/[^wubrgc]/.test(token.value)) {
+    if (/[^wubrg]/.test(token.value)) {
         return reject
     }
     return { value: token.value.split(""), offset: token.offset }
   } %}
 
 producesCombinationValue ->
-    ("c" | "brown" | "colorless")  {% () => ['c'] %}
-  | colorCombinationKeyword {% id %}
-  | comb6NonEmpty["w", "u", "b", "r", "g", "c"] {% ([comb]) => comb.map((c) => c.toLowerCase()) %}
-
-manaCostValue -> manaSymbol:+ {% id %}
+    ("brown" | "colorless") {% ([[token]]) => ({ value: ['c'], offset: token.offset }) %}
+  | colorCombinationKeyword {% ([value]) => ({ value }) %}
   | noQuoteStringValue {% ([token], _, reject) => {
-    console.log(token)
+      if (/[^wubrgc]/.test(token.value)) {
+          return reject
+      }
+      return { value: token.value.split(""), offset: token.offset }
+    } %}
+
+devotionValue -> manaCostValue {% id %}
+
+manaCostValue -> manaSymbol:+ {% ([symbols]) => ({
+    value: symbols.map(it => it.value),
+    offset: symbols[0].offset
+}) %} |
+ noQuoteStringValue {% ([token], _, reject) => {
     if (/[^0-9xyzwubrgsc]/.test(token.value)) {
         return reject
     }
-    return { value: token.value.split(""), offset: token.offset }
+    return { value: token.value.split("") , offset: token.offset }
   } %}
 
 
-manaSymbol -> "{" innerManaSymbol "}" {% ([, inner]) => inner %}
+manaSymbol ->
+    "{" innerManaSymbol "}" {% ([brace, inner]) => ({ value: inner, offset: brace.offset }) %}
+  | purebredSymbol {% id %}
 
 innerManaSymbol -> [0-9]:+ {% ([digits]) => digits.join('') %}
-  | ("x" | "y" | "z" | "w" | "u" | "b" | "r" | "g" | "s" | "c")  {% ([[color]]) => color.value %}
+  | purebredSymbol {% (symbol) => symbol.value %}
   | ( "2" "/" ("w" | "u" | "b" | "r" | "g") 
     | "p" "/" ("w" | "u" | "b" | "r" | "g") 
     | "w" "/" ("2" | "p" | "u" | "b" | "r" | "g") 
@@ -475,10 +435,7 @@ innerManaSymbol -> [0-9]:+ {% ([digits]) => digits.join('') %}
     | "g" "/" ("2" | "p" | "w" | "u" | "b" | "r") 
     ) {% ([[color, , [secondColor]]]) => color + "/" + secondColor %}
 
-# todo finish
-devotionValue -> "w":+ | "u":+ | "b":+ | "r":+ | "g":+ {% id %}
-  | "w":+ | "u":+ | "b":+ | "r":+ | "g":+
-
+purebredSymbol -> ("x" | "y" | "z" | "w" | "u" | "b" | "r" | "g" | "s" | "c")  {% id %}
 
 rarityValue ->
     ("b" | "bonus")  {% () => "bonus" %} |

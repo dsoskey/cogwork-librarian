@@ -12,6 +12,7 @@ export const lexer = moo.states({
   main: {
     ws: /[ \t]+/,
     operator: [":","=","!=","<>","<=","<",">=",">"],
+    negate: "-",
     art: "@@",
     prints: "++",
     integer: /[0-9]+/,
@@ -30,8 +31,8 @@ export const lexer = moo.states({
   },
   manasymbol: {
     rbrace: { match: "}", pop: 1},
-    number: /[1-9]?[0-9]+/,
-    color: /[0-9xyzwubrgsc]/,
+    number: /[0-9]+/,
+    color: /[xyzwubrgsc]/,
     slash: "/",
   }
 })

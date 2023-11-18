@@ -2,20 +2,23 @@ import { FilterType } from './filterKeyword'
 import { Prices } from 'scryfall-sdk'
 import { Operator } from '../filters/base'
 
-export interface AstLeaf {
+interface AstNodeCommon {
+  offset: number
+}
+export interface AstLeaf extends AstNodeCommon {
   filter: FilterType
   unit?: keyof Prices
   operator?: Operator
   value: any
 }
 
-export interface BinaryNode {
+export interface BinaryNode extends AstNodeCommon {
   operator: "and" | "or"
   left: AstNode
   right: AstNode
 }
 
-export interface UnaryNode {
+export interface UnaryNode extends AstNodeCommon {
   operator: "negate"
   clause: AstNode
 }

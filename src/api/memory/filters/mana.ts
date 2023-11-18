@@ -4,6 +4,25 @@ import { toManaCost, toSplitCost } from '../types/card'
 import isEqual from 'lodash/isEqual'
 import { oracleNode } from './oracle'
 
+export function combineHybridSymbols(chars: string[]): string[] {
+  const result: string[] = [];
+  for (let i = 0; i < chars.length; i++){
+    const char = chars[i]
+    if (char === "/") {
+      if (i > 0 && chars[i-1] !== "/" && ! result[result.length - 1].includes("/") &&
+          i < chars.length - 1 && chars[i+1] !== "/"
+      ) {
+        const left = result.pop()
+        const right = chars[++i];
+        result.push(`${left}/${right}`)
+      }
+    } else {
+      result.push(char);
+    }
+  }
+  return result
+}
+
 // optimization opportunity
 export const manaCostMatch =
   (operator: Operator, value: string[]): FilterNode => oracleNode({
