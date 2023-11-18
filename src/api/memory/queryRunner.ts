@@ -84,6 +84,7 @@ export class QueryRunner {
     } catch (error) {
       const { message, offset } = error as NearlyError
       console.error(message)
+      // TODO: process message
       return errAsync({
         query,
         errorOffset: offset ?? 0,
@@ -92,6 +93,7 @@ export class QueryRunner {
     }
 
     return filters.visitNode(parser.results[0] as AstNode)
+      .mapErr(err => ({ ...err, query }))
       .map(node => {
         const { filtersUsed, printFilter, filterFunc } = node;
 
