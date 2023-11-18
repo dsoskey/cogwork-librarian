@@ -1,4 +1,5 @@
 import { OPERATORS } from './api/memory/filters/base'
+import { SearchError } from './api/memory/types/error'
 
 export interface CogError {
   // query that caused the error
@@ -10,12 +11,9 @@ export interface CogError {
 }
 
 const opsFirstLetter = Object.values(OPERATORS).map((it) => it[0])
-export const displayMessage = (
-  query: string,
-  index: number,
-  offset: number,
-) => {
-  let baseMessage = `syntax error for query ${index + 1} at col ${
+export const displayMessage = (error: SearchError, index: number) => {
+  const { type, errorOffset: offset, query } = error;
+  let baseMessage = `${type} error for query ${index + 1} at col ${
     offset + 1
   }.`
   if (offset > 0 && opsFirstLetter.includes(query[offset])) {
@@ -26,11 +24,11 @@ export const displayMessage = (
     baseMessage = `unknown keyword "${badKeyword}" in query ${index + 1}`
   }
 
-  return baseMessage + columnShower(query, offset)
+  return `${baseMessage}\n\t${columnShower(query, offset)}\n\t${error.message}`
 }
 
 
 
 export function columnShower (query: string, offset: number): string {
-  return `\n\t${query}\n\t${' '.repeat(offset)}^`
+  return `${query}\n\t${' '.repeat(offset)}^`
 }

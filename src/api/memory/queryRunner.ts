@@ -82,18 +82,19 @@ export class QueryRunner {
         console.warn("no matched parses")
       }
     } catch (error) {
-      const { message, offset } = error as NearlyError
+      const { message, token } = error as NearlyError
       console.error(message)
       // TODO: process message
       return errAsync({
         query,
-        errorOffset: offset ?? 0,
-        message,
+        errorOffset: token?.offset ?? 0,
+        message: "",
+        type: "syntax"
       })
     }
 
     return filters.visitNode(parser.results[0] as AstNode)
-      .mapErr(err => ({ ...err, query }))
+      .mapErr(err => ({ ...err, query, type: "parse" }))
       .map(node => {
         const { filtersUsed, printFilter, filterFunc } = node;
 

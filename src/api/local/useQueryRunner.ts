@@ -57,12 +57,12 @@ export const useMemoryQueryRunner = ({
       })
       .mapErr(error => {
         report.addError()
-        const { query, errorOffset, message } = error
+        const { query, message } = error
         // better error handling is coming, i swear
         return {
           query,
           debugMessage: message,
-          displayMessage: displayMessage(query, index, errorOffset) + "\n" + message,
+          displayMessage: displayMessage(error, index),
         }
       })
   }

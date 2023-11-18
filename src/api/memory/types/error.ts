@@ -1,5 +1,6 @@
 export interface NearlyError extends Error {
   offset: number
+  token: { offset: number }
 }
 
 export interface FilterError {
@@ -11,4 +12,5 @@ export interface SearchError {
   query: string
   errorOffset: number
   message: string
+  type: string
 }
