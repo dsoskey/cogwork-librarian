@@ -9,6 +9,7 @@ import { CardImage } from './cardImage'
 import { CardCustomRender } from '../../card/cardCustomRender'
 
 export interface CardImageViewProps {
+  className?: string
   card: EnrichedCard
   showRender: boolean
   revealDetails: boolean
@@ -36,6 +37,7 @@ export const CardImageView = ({
   revealDetails,
   showRender,
   visibleDetails,
+  className,
 }: CardImageViewProps) => {
   const { showDebugInfo } = useContext(FlagContext).flags
   const [hovered, setHovered] = useState(false)
@@ -79,7 +81,7 @@ export const CardImageView = ({
 
 
   return (
-    <div className='card-view' ref={cardViewRef}
+    <div className={`card-view ${className}`} ref={cardViewRef}
       tabIndex={-1}
       onKeyDown={handleKeyPress}
       onMouseOver={handleHoverOn}

@@ -13,6 +13,12 @@
     .card-view {
         width: 24%;
     }
+    .card-view._6 {
+        width: 15.8%;
+    }
+    .card-view._8 {
+        width: 11.7%;
+    }
 }
 @media (max-width: 1024px) and (min-width: 768px) {
     .card-view {

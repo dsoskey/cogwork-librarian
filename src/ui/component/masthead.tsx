@@ -11,7 +11,7 @@ interface DatabaseLinkProps { active: boolean }
 const DatabaseLink = ({ active }: DatabaseLinkProps) => {
   const { outOfDate } = useContext(CogDBContext)
   return <Link to='/data/card' className={active ? "active-link" : ""}>
-    settings {outOfDate && <span className='alert'>!!</span>}
+    data {outOfDate && <span className='alert'>!!</span>}
   </Link>
 
 }

@@ -147,9 +147,6 @@ const NormalCardRender = ({ card, flipped }: CardCustomRenderProps) => {
   } = activeFace;
   const colorClass = useMemo(() => getColorClass(activeFace), [activeFace])
   const statClass = `stat-box ${colorClass}`
-  if (activeFace.image_uris === undefined) {
-    console.log(card)
-  }
 
   return <div className={`normal frame ${colorClass}`}>
     <div className='top-box'>
@@ -157,7 +154,7 @@ const NormalCardRender = ({ card, flipped }: CardCustomRenderProps) => {
       {mana_cost && <span>{<ManaCost manaCost={mana_cost} />}</span>}
     </div>
     <div className='card-art'>
-      <img src={activeFace.image_uris.art_crop} alt="" height="100%" width="100%" />
+      <img src={activeFace.image_uris?.art_crop} alt="" height="100%" width="100%" />
     </div>
     <div className='type-box'>
       <span className='type-line'>{type_line}</span>
@@ -176,7 +173,6 @@ export const CardCustomRender = ({ card }: CardCustomRenderProps) => {
   const [flipped, setFlipped] = useState(false)
   let framedComponent
   switch (card.layout) {
-
     case 'split':
       if (card.keywords.includes("Aftermath")) {
         framedComponent = <AftermathCardRender card={card} />

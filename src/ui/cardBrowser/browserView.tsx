@@ -63,6 +63,7 @@ export const BrowserView = React.memo(({
   } = useDebugDetails()
 
   const [pageSize] = useLocalStorage('page-size', PAGE_SIZE)
+  const [cardsPerRow] = useLocalStorage('cards-per-row', 4)
   const [page, _setPage] = useState(0)
   const setPage = (n: number) => {
     _setPage(n)
@@ -144,6 +145,7 @@ export const BrowserView = React.memo(({
           <div className='result-container'>
             {(displayType === 'cards' || displayType === 'render') && currentPage.map((card) => (
               <CardImageView
+                className={`_${cardsPerRow}`}
                 onAdd={() => {
                   addCard(card.data.name)
                   const id = addMessage(`Added ${card.data.name} to saved cards`, false)
