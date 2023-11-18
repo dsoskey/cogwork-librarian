@@ -77,7 +77,16 @@ export const TextEditor = ({
   const linker = useRef<HTMLPreElement>()
   const [revealLinks, setRevealLinks] = useState<boolean>(false)
 
-  const showLinks = (event) => {
+  const handleDown = (event) => {
+    if (event.key === "ArrowDown") {
+      const cursorIndex = controller.current.selectionStart ?? 0
+      const lastIndex = value.lastIndexOf("\n")
+      const onLastLine = lastIndex < cursorIndex
+      if (onLastLine) {
+        event.preventDefault();
+      }
+    }
+
     if (LINK_KEYS.includes(event.key)) {
       setRevealLinks(true)
     }
@@ -141,7 +150,7 @@ export const TextEditor = ({
     return () => controller.current?.removeEventListener('scroll', onScroll)
   }, [])
   return (
-    <div className='query-editor' onKeyDown={showLinks} onKeyUp={hideLinks}>
+    <div className='query-editor' onKeyDown={handleDown} onKeyUp={hideLinks}>
       <MultiQueryActionBar
         queries={queries}
         copyText={copyText}
