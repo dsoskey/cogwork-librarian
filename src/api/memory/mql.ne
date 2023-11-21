@@ -60,10 +60,12 @@ condition -> (
     isCondition |
     notCondition |
     printCountCondition |
+    paperPrintCountCondition |
     inCondition |
     rarityCondition |
     setCondition |
     setTypeCondition |
+    blockCondition |
     artistCondition |
     borderCondition |
     collectorNumberCondition |
@@ -84,7 +86,9 @@ condition -> (
     devotionCondition |
     oracleTagCondition |
     artTagCondition |
-    exactNameCondition
+    exactNameCondition |
+    newCondition |
+    preferCondition
 ) {% ([[condition]]) => condition %}
 
 cmcCondition ->
@@ -197,6 +201,9 @@ notCondition -> "not" onlyEqualOperator isValue
 printCountCondition -> "prints" anyOperator integerValue
     {% ([{offset}, operator, value]) => ({ filter: FilterType.Prints, operator: operator.value, value, offset }) %}
 
+paperPrintCountCondition -> "paperprints" anyOperator integerValue
+    {% ([{offset}, operator, value]) => ({ filter: FilterType.PaperPrints, operator: operator.value, value, offset }) %}
+
 inCondition -> "in" onlyEqualOperator stringValue
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.In, value, offset }) %}
 
@@ -230,6 +237,9 @@ setCondition -> ("s" | "set"| "e" | "edition") onlyEqualOperator stringValue
 
 setTypeCondition -> "st" onlyEqualOperator stringValue
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.SetType, value, offset }) %}
+
+blockCondition -> ("b" | "block") onlyEqualOperator stringValue
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Block, value, offset }) %}
 
 artistCondition -> ("a" | "artist") onlyEqualOperator stringValue
     {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Artist, value, offset }) %}
@@ -269,6 +279,12 @@ stampCondition -> "stamp" onlyEqualOperator stringValue
 watermarkCondition -> ("wm" | "watermark") onlyEqualOperator stringValue
     {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Watermark, value, offset }) %}
 
+newCondition -> "new" onlyEqualOperator newValue
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.New, value, offset }) %}
+
+preferCondition -> "prefer" onlyEqualOperator preferValue
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Prefer, value, offset }) %}
+
 cubeCondition -> ("cube" | "ctag" | "tag") onlyEqualOperator cubeValue
     {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Cube, value, offset }) %}
 
@@ -277,7 +293,6 @@ oracleTagCondition -> ("function" | "oracletag" | "otag") onlyEqualOperator stri
 
 artTagCondition -> ("art" | "arttag" | "atag") onlyEqualOperator stringValue
     {% ([[{offset}], _, {value}]) => ({ filter: FilterType.IllustrationTag, value, offset }) %}
-
 
 # Values
 stringValue -> (noQuoteStringValue | %dqstring | %sqstring) {% ([[token]]) => {
@@ -447,3 +462,8 @@ rarityValue ->
 
 orderValue -> ("artist" | "cmc" | "power" | "toughness" | "set" | "name" | "usd" | "tix" | "eur" | "rarity" | "color" | "released" | "spoiled" | "edhrec" | "penny" | "review") 
     {% id %}
+
+newValue -> ("rarity" | "flavor" | "art" | "artist" | "frame" | "language" | "game" | "paper" | "mtgo" | "arena" | "nonfoil" | "foil")
+ {% ([[it]]) => it %}
+
+preferValue -> ("oldest" | "newest" | "usd-low" | "usd-high" | "eur-low" | "eur-high" | "tix-low" | "tix-high") {% ([[it]]) => it %}

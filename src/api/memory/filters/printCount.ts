@@ -9,3 +9,12 @@ export const printCountFilter = (operator: Operator, count: number): FilterNode 
     }
   })
 }
+
+export const paperPrintCount = (operator: Operator, count: number) : FilterNode => {
+  return oracleNode({
+    filtersUsed: ['paperprints'],
+    filterFunc: (card) => {
+      return defaultCompare(card.printings.filter(it => !it.digital).length, operator, count)
+    }
+  })
+}

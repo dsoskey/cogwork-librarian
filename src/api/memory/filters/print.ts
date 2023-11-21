@@ -1,6 +1,7 @@
 import { Filter, FilterNode } from './base'
 import { Card } from 'scryfall-sdk'
 import { NormedCard, Printing, PrintingFilterTuple } from '../types/normedCard'
+import { maxBy, minBy } from 'lodash'
 
 export const printNode = (
   filtersUsed: string[],
@@ -42,15 +43,36 @@ const showAllFilter = new Set([
   'year',
 ])
 
-export const findPrinting =
+export const findPrinting = (prefer?: string) =>
   (filterFunc: Filter<PrintingFilterTuple>) =>
     (card: NormedCard): Card | undefined => {
       const { printings, ...rest } = card
-      const maybePrint = printings.find(printing => filterFunc({ printing, card }))
-      if (maybePrint !== undefined) {
+
+      const maybePrints = printings.filter(printing => filterFunc({ printing, card }))
+      if (maybePrints.length) {
+        let print;
+        switch (prefer) {
+          case "usd-low":
+          case "usd-high":
+          case "eur-low":
+          case "eur-high":
+          case "tix-low":
+          case "tix-high": {
+            const [field, dir] = prefer.split("-")
+            const func = dir === "low" ? minBy : maxBy
+            print = func(maybePrints, it => Number.parseFloat(it.prices[field]))
+            break;
+          }
+          case "newest":
+            print = maybePrints[maybePrints.length - 1];
+            break;
+          case "oldest":
+          default:
+            print = maybePrints[0]
+        }
         return Card.construct(<Card>{
           ...rest,
-          ...maybePrint,
+          ...print,
         })
       }
       return undefined
@@ -103,6 +125,9 @@ export const uniqueArts =
 
 export const chooseFilterFunc = (filtersUsed: string[]) => {
   const firstUnique = filtersUsed.find(filter => filter.startsWith('unique:'))
+  const firstPrefer = filtersUsed
+    .find(filter => filter.startsWith('prefer:'))
+    ?.replace('prefer:', '') ?? undefined;
   if (firstUnique !== undefined) {
     const funcKey = firstUnique.replace('unique:', '')
     switch (funcKey) {
@@ -111,11 +136,10 @@ export const chooseFilterFunc = (filtersUsed: string[]) => {
       case 'art':
         return uniqueArts
       case 'cards':
-        return findPrinting
+        return findPrinting(firstPrefer)
       default:
         throw Error(`unknown print filter function ${funcKey}`)
     }
   }
-
-  return findPrinting
+  return findPrinting(firstPrefer)
 }

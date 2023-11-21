@@ -1,7 +1,4 @@
-import {
-  defaultOperation,
-  notNode, FilterNode, identity, andNode, orNode
-} from './base'
+import { andNode, defaultOperation, FilterNode, identity, identityNode, notNode, orNode } from './base'
 import { exactMatch, noReminderRegexMatch, noReminderTextMatch, regexMatch, textMatch } from './text'
 import { isVal } from './is'
 import { devotionOperation } from './devotion'
@@ -28,7 +25,7 @@ import { borderNode } from './border'
 import { collectorNumberNode } from './collectorNumber'
 import { oddEvenFilter } from './manavalue'
 import { nameFilter } from './name'
-import { printCountFilter } from './printCount'
+import { paperPrintCount, printCountFilter } from './printCount'
 import { oracleNode } from './oracle'
 import { NormedCard } from '../types/normedCard'
 import { printNode } from './print'
@@ -37,6 +34,8 @@ import { AstLeaf, AstNode, BinaryNode, UnaryNode } from '../types/ast'
 import { errAsync, fromPromise, okAsync, ResultAsync } from 'neverthrow'
 import { FilterError } from '../types/error'
 import { DataProvider } from './dataProvider'
+import { newFilter } from './new'
+import { Block } from '../../local/db'
 
 
 export interface FilterProvider {
@@ -100,6 +99,16 @@ export class CachingFilterProvider implements FilterProvider {
       (it: FilterError) => it)
   }
 
+  private getBlock = (key:string): ResultAsync<Block, FilterError> => {
+    return fromPromise(this.provider.getBlock(key)
+      .then(block => {
+        if (block === undefined) {
+          return Promise.reject({ message: `Couldn't find block ${key}`, errorOffset: 0 })
+        }
+        return block
+      }), (it: FilterError) => it)
+  }
+
   constructor(provider: DataProvider) {
     this.provider = provider
     this.cubes = {}
@@ -132,6 +141,13 @@ export class CachingFilterProvider implements FilterProvider {
             printing.card_faces.find(it => ids.has(it.illustration_id)) !== undefined
         }
       )
+    })
+
+  blockFilter = (key: string): ResultAsync<FilterNode, FilterError> =>
+    this.getBlock(key).map(block => {
+      return printNode(
+        ['block'],
+        ({ printing }) => block.set_codes.includes(printing.set))
     })
 
   visitNode = (node: AstNode): ResultAsync<FilterNode, FilterError> => {
@@ -249,6 +265,8 @@ export class CachingFilterProvider implements FilterProvider {
           return okAsync(isVal(leaf.value))
         case FilterType.Not:
           return okAsync(notNode(isVal(leaf.value)))
+        case FilterType.PaperPrints:
+          return okAsync(paperPrintCount(leaf.operator, leaf.value))
         case FilterType.Prints:
           return okAsync(printCountFilter(leaf.operator, leaf.value))
         case FilterType.In:
@@ -322,6 +340,16 @@ export class CachingFilterProvider implements FilterProvider {
         case FilterType.IllustrationTag:
           return this.atagFilter(leaf.value)
             .mapErr(({ message }) => ({ message, errorOffset: leaf.offset }))
+        case FilterType.Block:
+          return this.blockFilter(leaf.value)
+            .mapErr(({ message }) => ({ message, errorOffset: leaf.offset }))
+        case FilterType.New:
+          return okAsync(newFilter(leaf.value))
+        case FilterType.Prefer:
+          return okAsync({
+            ...identityNode(),
+            filtersUsed: [`prefer:${leaf.value}`],
+          })
       }
     } catch (e) {
       return errAsync({

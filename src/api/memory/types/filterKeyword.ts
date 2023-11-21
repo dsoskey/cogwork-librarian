@@ -51,19 +51,19 @@ export const keywords = {
   // Requires tagging data
   function: 'function', oracletag: 'oracletag', otag: 'otag',
   art: 'art', arttag: 'arttag', atag: 'atag',
-} as const
-
-export const keywordsToImplement = {
   // https://discord.com/channels/291498816459243521/361685936179904513/1104796430830411777
   new: 'new', // rarity, flavor, art, artist, frame, language, game, paper, mtgo, arena, nonfoil, foil
   // its not: etched, masterpiece, promo, border, stamp
   prefer: 'prefer',
   // Requires set data
   b: 'b', block: 'block',
-  // these affect scryfall's UI behavior. are they needed here?
-  include: 'include', // maybe this one overrides a similar scryfall default?
-  // display: 'display', is display needed?
   paperprints: 'paperprints',
+} as const
+
+export const keywordsToImplement = {
+  // these affect scryfall's UI behavior. are they needed here?
+  // include: 'include', // maybe this one overrides a similar scryfall default?
+  // display: 'display', is display needed?
 } as const
 
 const all = {
@@ -103,6 +103,7 @@ export enum FilterType {
   Is,
   Not,
   Prints,
+  PaperPrints,
   In,
   ProducesSet,
   ProducesInt,
@@ -127,5 +128,8 @@ export enum FilterType {
   Watermark,
   Cube,
   OracleTag,
-  IllustrationTag
+  IllustrationTag,
+  New,
+  Prefer,
+  Block,
 }

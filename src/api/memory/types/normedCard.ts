@@ -3,6 +3,7 @@ import { ObjectValues } from '../../../types'
 import _groupBy from 'lodash/groupBy'
 import _pick from 'lodash/pick'
 import _omit from 'lodash/omit'
+import _sortBy from 'lodash/sortBy'
 import { CardFace } from 'scryfall-sdk'
 
 export const DEFAULT_CARD_BACK_ID = "0aeebaf5-8c7d-4636-9e82-8c27447861f7"
@@ -103,11 +104,11 @@ export const normCardList = (cardList: Card[]): NormedCard[] => {
   const result: NormedCard[] = []
 
   for (const oracleId in cardsByOracle) {
-    const cards = cardsByOracle[oracleId]
+    // sorting by released at is needed for new and prefer filters
+    const cards = _sortBy(cardsByOracle[oracleId], it => new Date(it.released_at), "set")
     const normed = {
       ...(_omit(cards[0], ignorePaths)) as Omit<Card, PrintKeys>,
-      printings: cards.map((it) => _pick(it, printPaths) as Printing
-      ),
+      printings: cards.map((it) => _pick(it, printPaths) as Printing),
       card_faces: cards[0].card_faces,
     }
     result.push(normed)

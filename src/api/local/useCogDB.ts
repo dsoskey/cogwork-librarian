@@ -22,6 +22,8 @@ export const DB_INIT_MESSAGES = [
   "preparing oracle tags...",
   "downloading illustration tags...",
   "preparing illustration tags...",
+  "downloading set data...",
+  "preparing set data...",
   "preparing card entries...",
   "loading cards to memory...",
   "persisting cards to database. search is ready, but don't leave the page or make data changes",
@@ -174,6 +176,8 @@ export const useCogDB = (): CogDB => {
       case "oracle-tag-end":
       case "illustration-tag-downloaded":
       case "illustration-tag-end":
+      case "blocks-downloaded":
+      case "blocks-end":
         dbReport.addComplete()
         break
       case "normed-cards":

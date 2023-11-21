@@ -80,8 +80,9 @@ export const TextEditor = ({
   const handleDown = (event) => {
     if (event.key === "ArrowDown") {
       const cursorIndex = controller.current.selectionStart ?? 0
+      const cursorEnd = controller.current.selectionEnd ?? 0
       const lastIndex = value.lastIndexOf("\n")
-      const onLastLine = lastIndex < cursorIndex
+      const onLastLine = lastIndex < cursorIndex || lastIndex < cursorEnd
       if (onLastLine) {
         event.preventDefault();
       }

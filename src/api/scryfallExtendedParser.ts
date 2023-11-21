@@ -187,7 +187,7 @@ export function parseQuerySet(
         })
       }
 
-      selectedQueries.push(splittered.map(it => it._unsafeUnwrap()).join(" "))
+      selectedQueries.push(splittered.map(it => it._unsafeUnwrap()).join(" ").trim())
     }
     currentIndex++
   }

@@ -7,7 +7,6 @@ import { syntaxDocs } from './syntaxDocs'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended' | 'scryfall-extended-multi'
 const keywordRegex = Object.values(keywords).join('|')
-const toImplementRegex = Object.values(keywordsToImplement).join('|')
 
 console.debug(`local supports ${Object.values(keywords).length} keywords`)
 console.debug(
@@ -30,24 +29,12 @@ export const scryfall: Grammar = {
     alias: 'deleted',
     greedy: true,
   },
-  'not-local-negation': {
-    pattern: new RegExp(`-(${toImplementRegex})(?=(${operators}))`, 'i'),
-    alias: ['deleted', 'limited'],
-    greedy: true,
-  },
   use: {
     pattern: /(^|\s)@(use|u):\w+(?=( |\n|$))/,
     alias: 'extension',
   },
   keyword: {
     pattern: new RegExp(`(^|\\b)(${keywordRegex})(?=(${operators}))`, 'i'),
-  },
-  'not-local-keyword': {
-    pattern: new RegExp(
-      `(^|\\b)(${toImplementRegex})(?=(${operators}))`,
-      'i'
-    ),
-    alias: ['keyword', 'limited'],
   },
   'unrecognized-keyword': {
     pattern: new RegExp(`(^|\\b)(\\w+)(?=(${operators}))`, 'i'),

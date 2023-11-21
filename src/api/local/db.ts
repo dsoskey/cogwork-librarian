@@ -22,6 +22,12 @@ export interface QueryHistory {
   executedAt: Date
 }
 
+export interface Block {
+  block_code: string
+  block: string
+  set_codes: string[]
+}
+
 export const MANIFEST_ID = 'the_one'
 export type Manifest = Omit<Collection, 'blob'>
 
@@ -38,7 +44,7 @@ export const toManifest = (
 })
 
 export class TypedDexie extends Dexie {
-  LAST_UPDATE = new Date('2023-06-24')
+  LAST_UPDATE = new Date('2023-11-20')
 
   collection!: Table<Collection>
 
@@ -48,11 +54,20 @@ export class TypedDexie extends Dexie {
 
   oracleTag!: Table<OracleTag>
   illustrationTag!: Table<IllustrationTag>
+  block!: Table<Block>
   history!: Table<QueryHistory>
 
   getCube = (key: String) => this.cube.get(key)
   getOtag = (key: String) => this.oracleTag.get({ label: key })
   getAtag = (key: String) => this.illustrationTag.get({ label: key })
+  getBlock = (key: string) => this.block
+    .get({ block_code: key })
+    .then(it => {
+      if (it === undefined) {
+        return this.block.get({ block: key })
+      }
+      return it
+    })
 
   constructor() {
     super('cogwork-librarian')
@@ -121,6 +136,10 @@ export class TypedDexie extends Dexie {
 
     this.version(8).stores({
       illustrationTag: 'id, label'
+    })
+
+    this.version(9).stores({
+      block: "block_code, block"
     })
   }
 }

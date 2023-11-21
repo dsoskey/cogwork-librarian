@@ -7,7 +7,7 @@ import { MemoryDataProvider } from '../dataProvider'
 export const defaultOptions: SearchOptions = { order: 'name' }
 
 export const defaultDataProvider = new MemoryDataProvider({
-  cubes: [], atags: [], otags: [],
+  cubes: [], atags: [], otags: [], blocks: [],
 })
 
 export const names = (result: Result<Card[], SearchError>) =>

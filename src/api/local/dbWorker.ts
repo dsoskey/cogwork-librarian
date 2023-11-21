@@ -5,6 +5,7 @@ import { downloadIllustrationTags, downloadOracleTags } from '../scryfall/tagger
 import { normCardList, NormedCard } from '../memory/types/normedCard'
 import { BulkDataType } from 'scryfall-sdk/out/api/BulkData'
 import { ImportTarget } from '../../ui/data/cardDataView'
+import { downloadSets } from '../scryfall/set'
 
 self.onmessage = (_event) => {
   const event = _event.data
@@ -56,9 +57,9 @@ async function initDb(type: BulkDataType, targets: ImportTarget[]) {
   const cards = await downloadCards(bulkDataDefinition)
   postMessage({ type: "downloaded-cards" })
 
-  await loadOracleTags()
-
-  await loadIllustrationTags()
+  await loadOracleTags();
+  await loadIllustrationTags();
+  await loadBlocks();
 
   const res = normCardList(cards)
   postMessage({ type: "normed-cards", data: res.length })
@@ -112,4 +113,13 @@ async function loadIllustrationTags() {
   postMessage({ type: "illustration-tag-downloaded", data: tags.length })
   await cogDB.illustrationTag.bulkPut(tags)
   postMessage({ type: 'illustration-tag-end' })
+}
+
+async function loadBlocks() {
+  const sets = await downloadSets()
+  console.log(sets)
+  postMessage({ type: "blocks-downloaded", data: sets.length })
+  await cogDB.block.bulkPut(sets)
+  postMessage({ type: "blocks-end" })
+
 }
