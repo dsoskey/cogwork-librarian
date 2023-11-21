@@ -102,7 +102,7 @@ export const BrowserView = React.memo(({
 
 
   const downloadButton = <div><button onClick={() => {
-    const blob = new Blob([JSON.stringify(result)], {
+    const blob = new Blob([JSON.stringify(result.map(it => it.data))], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob)

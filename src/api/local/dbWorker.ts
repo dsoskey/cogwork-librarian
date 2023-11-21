@@ -117,7 +117,6 @@ async function loadIllustrationTags() {
 
 async function loadBlocks() {
   const sets = await downloadSets()
-  console.log(sets)
   postMessage({ type: "blocks-downloaded", data: sets.length })
   await cogDB.block.bulkPut(sets)
   postMessage({ type: "blocks-end" })

@@ -24,7 +24,7 @@ export const App = () => {
 
   const cogDB = useCogDB()
   const listImporter = useListImporter(cogDB)
-  const bulkCubeImporter = useBulkCubeImporter(cogDB)
+  const bulkCubeImporter = useBulkCubeImporter()
 
   const project = useProject()
 
