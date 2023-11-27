@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { Modal } from './component/modal'
 import { Flag, FLAG_NAMES, FlagContext } from '../flags'
+import { LexerTester } from './lexerTester'
 
 export const AdminPanel = ({ children }) => {
   const { flags, setFlag } = useContext(FlagContext)
@@ -25,6 +26,9 @@ export const AdminPanel = ({ children }) => {
           </label>
         })}
       </div>
+
+      <h3>lexer tester</h3>
+      <LexerTester />
     </Modal>
   </div>
 }

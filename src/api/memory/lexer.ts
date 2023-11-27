@@ -21,7 +21,7 @@ export const lexer = moo.states({
     rparen: ")",
     lbrace: { match: "{", push: "manasymbol" },
     bang: "!",
-    regex: { match: /\/(?:\\[\/\\]|[^\n\/\\])*\//, value: s =>s.slice(1, -1) },
+    regex: { match: /\/(?:\\[\/\\a-zA-Z]|[^\n\/\\])*\//, value: s =>s.slice(1, -1) },
     dqstring: { match: /"(?:\\["\\]|[^\n"\\])*"/, value: s => s.slice(1, -1) },
     sqstring: { match: /'(?:\\['\\]|[^\n'\\])*'/, value: s => s.slice(1, -1) },
     word: { match: /[a-zA-z\-]+/, type: caseInsensitiveKeywords({
