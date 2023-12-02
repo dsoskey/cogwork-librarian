@@ -77,6 +77,65 @@ const printMattersFields = new Set<IsValue>([
   'serialized',
   'setextension',
   'placeholderimage',
+  'scroll',
+  'poster',
+  'boosterfun',
+  'brawldeck',
+  'rebalanced',
+  'duels',
+  'embossed',
+  'moonlitland',
+  'openhouse',
+  'boxtopper',
+  'promopack',
+  'gilded',
+  'playpromo',
+  'setpromo',
+  'fnm',
+  'mediainsert',
+  'wizardsplaynetwork',
+  'bundle',
+  'concept',
+  'halofoil',
+  'godzillaseries',
+  'neonink',
+  'instore',
+  'arenaleague',
+  'starterdeck',
+  'confettifoil',
+  'textured',
+  'convention',
+  'themepack',
+  'commanderparty',
+  'bringafriend',
+  'plastic',
+  'alchemy',
+  'gameday',
+  'intropack',
+  'draculaseries',
+  'silverfoil',
+  'datestamped',
+  'league',
+  'doublerainbow',
+  'release',
+  'draftweekend',
+  'event',
+  'surgefoil',
+  'schinesealtart',
+  'playerrewards',
+  'storechampionship',
+  'giftbox',
+  'galaxyfoil',
+  'glossy',
+  'stepandcompleat',
+  'oilslick',
+  'tourney',
+  'premiereshop',
+  'judgegift',
+  'thick',
+  'jpwalker',
+  'prerelease',
+  'planeswalkerdeck',
 ])
 export function printMatters(value: IsValue): boolean {
   return printMattersFields.has(value)
@@ -160,16 +219,65 @@ export const isPrintVal = (value: IsValue) => ({ printing, card }: PrintingFilte
       return printing.attraction_lights?.length > 0
     case 'back':
       return printing.card_back_id !== DEFAULT_CARD_BACK_ID
+    case 'scroll':
+    case 'poster':
+    case 'boosterfun':
+    case 'brawldeck':
+    case 'rebalanced':
+    case 'duels':
+    case 'embossed':
+    case 'moonlitland':
+    case 'openhouse':
+    case 'boxtopper':
+    case 'promopack':
+    case 'gilded':
+    case 'playpromo':
+    case 'setpromo':
+    case 'fnm':
+    case 'mediainsert':
+    case 'wizardsplaynetwork':
+    case 'bundle':
+    case 'concept':
+    case 'halofoil':
+    case 'godzillaseries':
+    case 'neonink':
+    case 'instore':
+    case 'arenaleague':
     case 'starterdeck':
-    case 'buyabox':
-    case 'prerelease':
+    case 'confettifoil':
+    case 'textured':
+    case 'convention':
+    case 'themepack':
+    case 'commanderparty':
+    case 'bringafriend':
+    case 'plastic':
+    case 'alchemy':
     case 'gameday':
-    case 'datestamped':
     case 'intropack':
+    case 'draculaseries':
+    case 'silverfoil':
+    case 'datestamped':
+    case 'league':
+    case 'doublerainbow':
     case 'release':
-    case 'serialized':
+    case 'draftweekend':
+    case 'event':
+    case 'surgefoil':
+    case 'schinesealtart':
+    case 'playerrewards':
+    case 'storechampionship':
+    case 'giftbox':
+    case 'galaxyfoil':
+    case 'glossy':
+    case 'stepandcompleat':
+    case 'oilslick':
+    case 'tourney':
+    case 'premiereshop':
+    case 'judgegift':
+    case 'thick':
+    case 'jpwalker':
+    case 'prerelease':
     case 'planeswalkerdeck':
-    case 'setextension':
       // @ts-ignore
       return printing.promo_types?.includes(value)
     case 'halo':
