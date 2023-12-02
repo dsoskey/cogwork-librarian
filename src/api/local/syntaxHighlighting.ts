@@ -16,7 +16,7 @@ const operators = Object.values(OPERATORS).join('|')
 
 const scryfallRegex = {
   scryfallCharSet: {
-    pattern: /\\(spt|spp|smm|smr|sm|sc|ss)/,
+    pattern: /\\(spt|spp|smh|smp|smm|smr|sm|sc|ss)/,
     alias: 'class-name',
   },
   ...Prism.languages.regex,
