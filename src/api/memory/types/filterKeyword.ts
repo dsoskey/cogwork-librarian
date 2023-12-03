@@ -84,6 +84,7 @@ export enum FilterType {
   ColorIdentitySet,
   ColorIdentityInt,
   Mana,
+  ManaRegex,
   Oracle,
   OracleRegex,
   FullOracle,

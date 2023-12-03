@@ -39,6 +39,7 @@ condition -> (
     colorCondition |
     colorIdentityCondition |
     manaCostCondition |
+    manaCostRegexCondition |
     nameCondition |
     nameRegexCondition |
     oracleCondition |
@@ -133,6 +134,9 @@ identityFilter -> ("ci" | "commander" | "identity" | "id") {% id %}
 
 manaCostCondition -> ("mana" | "m") %operator manaCostValue
     {% ([[{offset}], op, {value}]) => ({ filter: FilterType.Mana, operator: op.value, value, offset }) %}
+
+manaCostRegexCondition -> ("mana" | "m") onlyEqualOperator regexString
+    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.ManaRegex, value, offset }) %}
 
 oracleCondition -> oracleFilter onlyEqualOperator stringValue
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.Oracle, value, offset }) %}

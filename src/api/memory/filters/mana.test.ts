@@ -1,10 +1,11 @@
 import { davrielsWithering } from './testData/davrielsWithering'
 import { kroxaTitanOfDeathsHunger } from './testData/kroxaTitanOfDeathsHunger'
-import { QueryRunner } from '../queryRunner'
-import { defaultDataProvider, defaultOptions, names } from './testData/_utils'
+import { defaultRunner, names } from './testData/_utils'
 import { preordain } from './testData/preordain'
 import { darkConfidant } from './testData/darkConfidant'
 import { combineHybridSymbols } from './mana'
+import { gitaxianProbe } from './testData/gitaxianProbe'
+import { delverOfSecrets } from './testData/delverOfSecrets'
 
 describe("combineHybridSymbols", function() {
   it("should not combine an existing hybrid symbol", function () {
@@ -37,7 +38,7 @@ describe("combineHybridSymbols", function() {
 describe('mana filter', function() {
 
   const corpus = [preordain, davrielsWithering, darkConfidant, kroxaTitanOfDeathsHunger]
-  const queryRunner = new QueryRunner({ corpus, defaultOptions, dataProvider: defaultDataProvider })
+  const queryRunner = defaultRunner(corpus)
   it('should handle exact match', async function() {
     const result = names(await queryRunner.search("mana=rb"))
 
@@ -76,4 +77,17 @@ describe('mana filter', function() {
     expect(result).toEqual(defaultResult)
   })
   it.todo("should handle mixed symbols (aka r{r/u})")
+})
+
+describe('Mana regex filter', function() {
+  const corpus = [gitaxianProbe, delverOfSecrets, davrielsWithering]
+  const queryRunner = defaultRunner(corpus)
+  it('should handle typical regexes', async function() {
+    const result = names(await queryRunner.search("mana:/u/"))
+    expect(result).toEqual([delverOfSecrets.name, gitaxianProbe.name])
+  })
+  it('should substitute special regex escapes like \\smp', async function() {
+    const result = names(await queryRunner.search("mana:/\\smp/"))
+    expect(result).toEqual([gitaxianProbe.name])
+  })
 })

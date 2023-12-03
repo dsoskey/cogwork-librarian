@@ -41,6 +41,9 @@ export function newFilter(value: NewValue): FilterNode {
       case 'language':
         getField = (current) => current.lang;
         break;
+      case 'nonfoil':
+      case 'foil':
+        getField = (current) => current[value]
     }
     return _isEqual(card.printings.find(it => getField(it) !== undefined && getField(it) === getField(printing)), printing)
   })

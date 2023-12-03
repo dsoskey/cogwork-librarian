@@ -208,6 +208,11 @@ export class CachingFilterProvider implements FilterProvider {
           return okAsync(colorIdentityCount(leaf.operator, leaf.value))
         case FilterType.Mana:
           return okAsync(manaCostMatch(leaf.operator, leaf.value))
+        case FilterType.ManaRegex:
+          return okAsync(oracleNode({
+            filtersUsed: ['mana-regex'],
+            filterFunc: regexMatch("mana_cost", leaf.value)
+          }))
         case FilterType.Oracle:
           return okAsync(oracleNode({
             filtersUsed: ["oracle"],
