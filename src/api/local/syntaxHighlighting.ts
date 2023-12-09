@@ -117,6 +117,10 @@ export const scryfallExtendedMulti: Grammar = {
     // pattern: /(\n|^)\s*#.*(?=\n|$)/,
     pattern: /@(include|i|defaultMode|dm|defaultWeight|dw|alias|a):\w+/
   },
+  venn: {
+    pattern: /@(venn|v)/,
+    alias: ["extension"]
+  },
   // 'base-query': {
   //   // pattern: /(?:^|\n\n+|(\n|^)\s*#.*(\n|$))(?!\s*#).*(\n|$)/,
   //   pattern: /(^|\n\n+)(?!\s*#).*(?=\n|$)/,

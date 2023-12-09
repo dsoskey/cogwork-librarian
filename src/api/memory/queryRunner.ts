@@ -1,7 +1,7 @@
 import { Parser } from 'nearley'
 import { normCardList, NormedCard } from './types/normedCard'
 import { SearchOptions } from './types/searchOptions'
-import { errAsync, ResultAsync } from 'neverthrow'
+import { errAsync, okAsync, ResultAsync } from 'neverthrow'
 import { Card } from 'scryfall-sdk'
 import { NearlyError, SearchError } from './types/error'
 import { FilterProvider, CachingFilterProvider } from './filters'
@@ -11,6 +11,13 @@ import sortBy from 'lodash/sortBy'
 import { AstNode } from './types/ast'
 import { MQLParser } from './mql'
 import { DataProvider } from './filters/dataProvider'
+
+interface VennDiagram {
+  cards: Card[]
+  leftIds: Set<string>
+  bothIds: Set<string>
+  rightIds: Set<string>
+}
 
 export const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
   const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
@@ -57,14 +64,7 @@ export class QueryRunner {
     return func(query, options)
   }
 
-  static generateSearchFunction = (
-    corpus: NormedCard[],
-    filters: FilterProvider,
-    getParser: ParserProducer = MQLParser
-  ) => (
-    query: string,
-    options: SearchOptions
-  ): ResultAsync<Card[], SearchError> => {
+  static parseFilterNode = (getParser: ParserProducer, query): ResultAsync<Parser, SearchError> => {
     const parser = getParser();
     try {
       console.debug(`feeding ${query}`)
@@ -92,11 +92,22 @@ export class QueryRunner {
         type: "syntax"
       })
     }
+    return okAsync(parser)
+  }
 
-    return filters.visitNode(parser.results[0] as AstNode)
+  static generateSearchFunction = (
+    corpus: NormedCard[],
+    filters: FilterProvider,
+    getParser: ParserProducer = MQLParser
+  ) => (
+    query: string,
+    options: SearchOptions
+  ): ResultAsync<Card[], SearchError> => {
+    return QueryRunner.parseFilterNode(getParser, query)
+      .andThen(parser => filters.visitNode(parser.results[0] as AstNode))
       .mapErr(err => ({ ...err, query, type: "parse" }))
       .map(node => {
-        const { filtersUsed, printFilter, filterFunc } = node;
+        const { filtersUsed, filterFunc } = node;
 
         // filter normedCards
         const filtered: NormedCard[] = []
@@ -115,12 +126,10 @@ export class QueryRunner {
         //   })
         // }
 
-        const printFilterFunc = chooseFilterFunc(filtersUsed)
+        const printFilterFunc = chooseFilterFunc(node)
 
         // filter prints
-        const printFiltered: Card[] = filtered
-          .flatMap(printFilterFunc(printFilter))
-          .filter(it => it !== undefined)
+        const printFiltered: Card[] = filtered.flatMap(printFilterFunc)
 
         // sort
         const order: SortOrder = getOrder(filtersUsed, options)
@@ -148,4 +157,98 @@ export class QueryRunner {
         return sorted
       })
   }
+
+  static generateVennDiagram = (
+    corpus: NormedCard[],
+    filters: FilterProvider,
+    getParser: ParserProducer = MQLParser
+  ) => (
+    left: string, right: string,
+    options: SearchOptions
+  ): ResultAsync<VennDiagram, SearchError> => {
+    const leftParser = QueryRunner.parseFilterNode(getParser, left)
+      .andThen(p => filters.visitNode(p.results[0] as AstNode))
+      .mapErr(err => ({ ...err, query:left, type: "parse" }))
+    const rightParser = QueryRunner.parseFilterNode(getParser, right)
+      .andThen(p => filters.visitNode(p.results[0] as AstNode))
+      .mapErr(err => ({ ...err, query: right, type: "parse" }))
+
+    return ResultAsync.combine([leftParser, rightParser])
+      .andThen(([leftParser, rightParser]) => {
+        const leftOracles: Set<string> = new Set()
+        const rightOracles: Set<string> = new Set()
+        const union: NormedCard[] = []
+
+        for (const card of corpus) {
+          const isLeft = leftParser.filterFunc(card)
+          const isRight = rightParser.filterFunc(card)
+
+          if (isLeft || isRight) {
+            union.push(card)
+          }
+          if (isRight) {
+            rightOracles.add(card.oracle_id)
+          }
+          if (isLeft) {
+            leftOracles.add(card.oracle_id)
+          }
+        }
+
+        const leftPrintFilter = chooseFilterFunc(leftParser)
+        const rightPrintFilter = chooseFilterFunc(rightParser)
+
+        const leftIds: Set<string> = new Set()
+        const bothIds: Set<string> = new Set()
+        const rightIds: Set<string> = new Set()
+        const unionPrints: Card[] = []
+        for (const card of union) {
+          const matchedLeft  = leftPrintFilter(card)
+          for (const c of matchedLeft) {
+            if (leftOracles.has(c.oracle_id)) {
+              unionPrints.push(c)
+              leftIds.add(c.id)
+            }
+          }
+          const matchedRight = rightPrintFilter(card)
+          for (const c of matchedRight) {
+            if (rightOracles.has(c.oracle_id)) {
+              if (leftIds.has(c.id)) {
+                bothIds.add(c.id)
+                leftIds.delete(c.id)
+              } else {
+                unionPrints.push(c)
+                rightIds.add(c.id)
+              }
+            }
+          }
+        }
+
+        const combinedFiltersUsed = [...leftParser.filtersUsed, ...rightParser.filtersUsed]
+        const order: SortOrder = getOrder(combinedFiltersUsed, options)
+        const sorted = sortBy(unionPrints, [...sortFunc(order), byName]) as Card[]
+
+        // direction
+        const direction = getDirection(combinedFiltersUsed, options)
+        if (direction === 'auto') {
+          switch (order) {
+            case 'rarity':
+            case 'usd':
+            case 'tix':
+            case 'eur':
+            case 'edhrec':
+              sorted.reverse()
+              break
+            case 'released':
+            default:
+              break
+          }
+        } else if (direction === 'desc') {
+          sorted.reverse()
+        }
+
+        return okAsync({ cards: sorted, leftIds, rightIds, bothIds })
+      })
+  }
+
+
 }

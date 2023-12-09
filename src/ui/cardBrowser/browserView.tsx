@@ -8,17 +8,40 @@ import { QueryReport } from '../../api/useReporter'
 import { PageControl } from './pageControl'
 import { useViewportListener } from '../../viewport'
 import { TopBar } from './topBar'
-import { ActiveCollection, DisplayType } from './types'
+import { ActiveCollection, CardDisplayInfo, DisplayType } from './types'
 import { useDebugDetails } from './useDebugDetails'
 import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { CardJsonView } from './cardViews/cardJsonView'
 import { CardListView } from './cardViews/cardListView'
 import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
+import { RunStrategy } from '../../api/scryfallExtendedParser'
+import { useVennControl, VennControl } from './vennControl'
+
+const typeToExt = {
+  "application/json": "json",
+  "text/plain": "txt",
+}
+
+const handleDownload = (text: string, type: string) => {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob)
+  const now = new Date()
+
+  const link = document.createElement("a")
+  link.href = url;
+  link.download = `coglib-results-${now.toISOString().replace(/:/g, "-")}.${typeToExt[type]??"txt"}`
+  document.body.append(link);
+  link.click();
+
+  URL.revokeObjectURL(url)
+  link.remove()
+}
 
 interface BrowserViewProps {
   status: TaskStatus
   result: Array<EnrichedCard>
+  runStrategy: RunStrategy
   report: QueryReport
   source: DataSource
   addCard: (name: string) => void
@@ -31,6 +54,7 @@ export const BrowserView = React.memo(({
   addCard,
   addIgnoredId,
   ignoredIds,
+  runStrategy,
   result,
   status,
   source,
@@ -40,16 +64,26 @@ export const BrowserView = React.memo(({
   const { addMessage, dismissMessage } = useContext(ToasterContext)
   const viewport = useViewportListener()
   const [activeCollection, setActiveCollection] = useState<ActiveCollection>('search')
+  const vc = useVennControl()
   const [displayType, setDisplayType] = useLocalStorage<DisplayType>('display-type', 'cards')
   const topOfResults = useRef<HTMLDivElement>()
 
-  const cards: Record<ActiveCollection, EnrichedCard[]> = useMemo(() => {
+  const cards: CardDisplayInfo = useMemo(() => {
     const ignoredIdSet = new Set(ignoredIds)
-    return {
-      search: result.filter((it) => !ignoredIdSet.has(it.data.oracle_id)),
-      ignore: result.filter((it) => ignoredIdSet.has(it.data.oracle_id)),
+    const displayInfo: CardDisplayInfo = { bothCount: 0, ignore: [], leftCount: 0, rightCount: 0, search: [] }
+    for (const card of result) {
+      displayInfo.bothCount += card.both ? 1:0
+      displayInfo.leftCount += card.left ? 1:0
+      displayInfo.rightCount += card.right ? 1:0
+      const ignored = ignoredIdSet.has(card.data.oracle_id)
+      if (runStrategy === RunStrategy.Venn ? !ignored && vc.activeSections.find(sec => card[sec]) : !ignored) {
+        displayInfo.search.push(card)
+      } else if (ignored) {
+        displayInfo.ignore.push(card)
+      }
     }
-  }, [result, ignoredIds])
+    return displayInfo
+  }, [result, ignoredIds, vc.activeSections])
   const activeCards = useMemo(
     () => cards[activeCollection],
     [activeCollection, cards]
@@ -67,19 +101,17 @@ export const BrowserView = React.memo(({
   const [page, _setPage] = useState(0)
   const setPage = (n: number) => {
     _setPage(n)
-    setTimeout(() => {
-      topOfResults.current?.scrollIntoView({
-        block: "start",
-        inline: "nearest",
-        behavior: "smooth"
-      })
-    }, 100)
+    topOfResults.current?.scrollIntoView({
+      block: "start",
+      inline: "nearest",
+      behavior: "smooth"
+    })
   }
   const lowerBound = page * pageSize + 1
   const upperBound = (page + 1) * pageSize
   useEffect(() => {
     setPage(0)
-  }, [result])
+  }, [result, vc.activeSections])
   const currentPage = useMemo(
     () => activeCards.slice(lowerBound - 1, upperBound),
     [activeCards, lowerBound, upperBound]
@@ -92,6 +124,9 @@ export const BrowserView = React.memo(({
     return null
   }
 
+  const vennControl = runStrategy === RunStrategy.Venn ?
+    <VennControl {...vc} cards={cards} />: null;
+
   const pageControl = showCards ? <PageControl
     page={page}
     setPage={setPage}
@@ -100,29 +135,22 @@ export const BrowserView = React.memo(({
     cardCount={activeCards.length}
   /> : null
 
-
-  const downloadButton = <div><button onClick={() => {
-    const blob = new Blob([JSON.stringify(result.map(it => it.data))], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob)
-    const now = new Date()
-
-    const link = document.createElement("a")
-    link.href = url;
-    link.download = `coglib-results-${now.toISOString().replace(/:/g, "-")}.json`
-    document.body.append(link);
-    link.click();
-
-    URL.revokeObjectURL(url)
-    link.remove()
-  }}>download json</button></div>
+  const downloadButton = <div>
+    <span>download:&nbsp;</span>
+    <button onClick={() => handleDownload(result.map(it => it.data.name).join("\n"), 'text/plain')}>
+      card names
+    </button>
+    <button onClick={() => handleDownload(JSON.stringify(result.map(it => it.data)), 'application/json')}>
+      json
+    </button>
+  </div>
 
   return <div className='results' ref={topOfResults}>
-      <div className='column content'>
+      <div className='content'>
         <TopBar
           pageControl={pageControl}
           downloadButton={downloadButton}
+          vennControl={vennControl}
           errors={errors}
           source={source}
           status={status}
@@ -143,7 +171,7 @@ export const BrowserView = React.memo(({
 
         {showCards && <>
           <div className='result-container'>
-            {(displayType === 'cards' || displayType === 'render') && currentPage.map((card) => (
+            {(displayType === 'cards' || displayType === 'render') && currentPage.map((card, index) => (
               <CardImageView
                 className={`_${cardsPerRow}`}
                 onAdd={() => {
@@ -160,7 +188,7 @@ export const BrowserView = React.memo(({
                     dismissMessage(id)
                   }, DISMISS_TIMEOUT_MS)
                 }}
-                key={card.data.id}
+                key={index}
                 card={card}
                 showRender={displayType === "render"}
                 revealDetails={revealDetails}

@@ -1,51 +1,55 @@
 import { Card } from 'scryfall-sdk'
 import {
+  EnrichedCard,
+  injectPrefix,
   QueryRunner as CoglibQueryRunner,
   QueryRunnerFunc,
-  QueryRunnerProps,
-  weightAlgorithms,
+  QueryRunnerProps
 } from '../queryRunnerCommon'
 import { useQueryCoordinator } from '../useQueryCoordinator'
 import { NormedCard } from '../memory/types/normedCard'
 import { displayMessage } from '../../error'
 import { SearchOptions } from '../memory/types/searchOptions'
 import { QueryRunner } from '../memory/queryRunner'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { CachingFilterProvider } from '../memory/filters'
 import { cogDB } from './db'
+import { RunStrategy } from '../scryfallExtendedParser'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]
 }
-export const useMemoryQueryRunner = ({
-  getWeight = weightAlgorithms.uniform,
-  injectPrefix,
-  corpus,
-}: MemoryQueryRunnerProps): CoglibQueryRunner => {
-  const { status, report, result, rawData, execute, errors } =
+export const useMemoryQueryRunner = ({ corpus }: MemoryQueryRunnerProps): CoglibQueryRunner => {
+  const { status, report, result, rawData, execute, aggregateVenn, errors } =
     useQueryCoordinator()
+  const [runStrategy, setRunStrategy] = useState<RunStrategy>(RunStrategy.Search)
   const searchCards = useMemo(() => {
     const filters = new CachingFilterProvider(cogDB);
     return QueryRunner.generateSearchFunction(corpus, filters)
+  }, [corpus])
+  const generateVennDiagram = useMemo(() => {
+    const filters = new CachingFilterProvider(cogDB);
+    return QueryRunner.generateVennDiagram(corpus, filters)
   }, [corpus])
 
   const runQuery: QueryRunnerFunc = (
     query: string,
     index: number,
     options: SearchOptions,
-    injectPrefixx?: (query: string) => string,
-    getWeightt?: (index: number) => number
+    injectPrefix: (query: string) => string,
+    getWeight: (index: number) => number
   ) => {
     if (corpus.length === 0) {
       console.warn(`ran query against an empty corpus: ${query}`)
       return
     }
-    const weight = getWeightt ? getWeightt(index) : getWeight(index)
-    const preparedQuery = injectPrefixx ? injectPrefixx(query) : injectPrefix(query)
+    setRunStrategy(RunStrategy.Search)
+    const weight = getWeight(index)
+    const preparedQuery = injectPrefix(query)
     rawData.current[preparedQuery] = []
     return searchCards(preparedQuery, options)
       .map(cardResult => {
-        const cards = cardResult.map((card: Card) => ({
+        const cards: EnrichedCard[] = cardResult.map((card: Card) => ({
           data: card,
           weight,
           matchedQueries: [query],
@@ -67,8 +71,49 @@ export const useMemoryQueryRunner = ({
       })
   }
 
+  const runVennQuery = (left: string, right: string, sub: string, options: SearchOptions, weight: number, index: number) => {
+    if (corpus.length === 0) {
+      console.warn(`ran query against an empty corpus\nintersect(${left})(${right})\n${sub}`)
+      return
+    }
+
+    setRunStrategy(RunStrategy.Venn)
+
+    const preparedLeft = injectPrefix(left)(sub)
+    const preparedRight = injectPrefix(right)(sub)
+
+    return generateVennDiagram(preparedLeft, preparedRight, options)
+      .map(diagram => {
+        const { cards, leftIds, bothIds, rightIds } = diagram
+
+        rawData.current[sub] = cards.map((card: Card) => ({
+          data: card,
+          weight,
+          matchedQueries: [sub],
+          left: leftIds.has(card.id),
+          both: bothIds.has(card.id),
+          right: rightIds.has(card.id),
+        }))
+        report.addCardCount(cards.length)
+        report.addComplete()
+        return sub;
+      })
+      .mapErr(error => {
+        report.addError()
+        const { query, message } = error
+        // better error handling is coming, i swear
+        return {
+          query,
+          debugMessage: message,
+          displayMessage: displayMessage(error, index),
+        }
+      })
+  }
+
   return {
     run: execute(runQuery),
+    generateVenn: aggregateVenn(runVennQuery),
+    runStrategy,
     result,
     status,
     report,

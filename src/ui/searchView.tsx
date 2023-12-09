@@ -2,7 +2,6 @@ import { QueryForm } from './queryForm/queryForm'
 import { BrowserView } from './cardBrowser/browserView'
 import React, { useContext, useState } from 'react'
 import { ProjectContext } from '../api/useProject'
-import { weightAlgorithms } from '../api/queryRunnerCommon'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 import { DataSource } from '../types'
 import { useMemoryQueryRunner } from '../api/local/useQueryRunner'
@@ -11,7 +10,7 @@ import { CogDBContext } from '../api/local/useCogDB'
 import { SavedCards } from './savedCards'
 import { Masthead } from './component/masthead'
 import { Footer } from './footer'
-import { parseQuerySet } from '../api/scryfallExtendedParser'
+import { parseQuerySet, RunStrategy } from '../api/scryfallExtendedParser'
 import { CogError } from '../error'
 import { INTRO_EXAMPLE } from '../api/example'
 import { SearchOptions } from '../api/memory/types/searchOptions'
@@ -29,13 +28,8 @@ export const SearchView = () => {
 
   const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
   const queryRunner = {
-    local: useMemoryQueryRunner({
-      getWeight: weightAlgorithms.zipf,
-      corpus: cogDB.memory,
-    }),
-    scryfall: useScryfallQueryRunner({
-      getWeight: weightAlgorithms.zipf,
-    }),
+    local: useMemoryQueryRunner({ corpus: cogDB.memory }),
+    scryfall: useScryfallQueryRunner({}),
   }[source]
   const [extendedParseError, setExtendedParseError] = useState<CogError[]>([])
   const errorsToDisplay = extendedParseError.length > 0 ? extendedParseError : queryRunner.errors
@@ -51,14 +45,21 @@ export const SearchView = () => {
     setExtendedParseError([])
 
     parseQuerySet(rawQueries, baseIndex)
-      .map(({ queries, getWeight, injectPrefix }) => {
+      .map(({ strategy, queries, getWeight, injectPrefix }) => {
         const executedAt = new Date();
-        queryRunner.run(queries, options, injectPrefix, getWeight)
-          .then(() =>
+        let promise
+        if (strategy === RunStrategy.Venn && queryRunner.generateVenn !== undefined) {
+          const [left, right, ...rest] = queries
+          promise = queryRunner.generateVenn(left, right, rest, options, getWeight)
+        } else {
+          promise = queryRunner.run(queries, options, injectPrefix, getWeight)
+        }
+        promise.then(() =>
             cogDBClient.history.put({
               rawQueries,
               baseIndex,
               source,
+              strategy,
               executedAt,
             })
           ).catch(error => {
@@ -67,6 +68,7 @@ export const SearchView = () => {
               rawQueries,
               baseIndex,
               source,
+              strategy,
               errorText: error.toString(),
               executedAt,
             })
@@ -102,6 +104,7 @@ export const SearchView = () => {
         addIgnoredId={addIgnoredId}
         ignoredIds={ignoredIds}
         source={source}
+        runStrategy={queryRunner.runStrategy ?? RunStrategy.Search}
       />
       <Footer />
     </div>

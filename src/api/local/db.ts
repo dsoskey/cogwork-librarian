@@ -4,6 +4,7 @@ import { NormedCard } from '../memory/types/normedCard'
 import { CubeDefinition } from '../memory/types/cube'
 import { IllustrationTag, OracleTag } from '../memory/types/tag'
 import { DataSource } from '../../types'
+import { RunStrategy } from '../scryfallExtendedParser'
 
 export interface Collection {
   id: string
@@ -19,6 +20,7 @@ export interface QueryHistory {
   baseIndex: number
   errorText?: string
   source: DataSource
+  strategy?: RunStrategy
   executedAt: Date
 }
 

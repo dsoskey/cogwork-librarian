@@ -3,12 +3,17 @@ import { format } from 'date-fns'
 import { injectPrefix, weightAlgorithms } from './queryRunnerCommon'
 import { CogError, columnShower } from '../error'
 
-type QueryMode = "allsub" | "basesub"
+type QueryMode = "allsub" | "basesub" | "venn"
 type QueryWeight = "uniform" | "zipf"
 
 interface Alias {
   name: string
   query: string
+}
+
+interface Venn {
+  left: string
+  right: string
 }
 
 interface QueryEnvironment {
@@ -20,6 +25,7 @@ interface QueryEnvironment {
 
 export const USE_REGEXP = /^@(u|use):/
 export const ALIAS_REGEXP = /^@(a|alias):/
+export const VENN_REGEXP = /^@(v|venn)/
 const DEFAULT_MODE: QueryMode = "basesub"
 const DEFAULT_WEIGHT: QueryWeight = "zipf"
 
@@ -42,6 +48,28 @@ function parseAlias(alias: string): Result<Alias, AliasError> {
   return ok<Alias>({
     name: alias.substring(0, firstLeftParen),
     query: alias.substring(firstLeftParen)
+  })
+}
+
+function parseVenn(venn: string): Result<Venn, AliasError> {
+  const leftMatch = venn.match(/\(.*\)\(\s*/);
+  if (leftMatch == null) {
+    return err({ message: "too few domains", offset: 5 })
+  }
+  if (leftMatch.length > 1) {
+    return err({ message: "too many domains", offset: venn.indexOf(leftMatch[1]) })
+  }
+  const left = leftMatch[0].slice(1, -2)
+  const rightRaw = venn.substring(leftMatch.index + leftMatch[0].length - 1)
+  if (rightRaw[0] !== "(") {
+    return err({ message: "right domain missing opening parentheses", offset: leftMatch.index + leftMatch[0].length })
+  }
+  if (rightRaw[rightRaw.length-1] !== ")") {
+    return err({ message: "right domain missing closing parentheses", offset: venn.length - 1 })
+  }
+  return ok<Venn>({
+    left,
+    right: rightRaw.slice(1, -1),
   })
 }
 
@@ -132,7 +160,9 @@ export function parseEnv(lines: string[]): Result<QueryEnvironment, CogError> {
     defaultWeight: defaultWeight ?? DEFAULT_WEIGHT,
   })
 }
+export enum RunStrategy { Search, Venn }
 interface ParsedQuerySet {
+  strategy: RunStrategy,
   queries: string[]
   injectPrefix: (query: string) => string
   getWeight: (index: number) => number
@@ -200,12 +230,22 @@ export function parseQuerySet(
   }
 
   let [base, ...sub] = selectedQueries
-  if (queryEnv.defaultMode === 'allsub') {
+  if (VENN_REGEXP.test(base)) {
+    return parseVenn(base)
+      .map(({left, right}) => ({
+        strategy: RunStrategy.Venn,
+        queries: [left, right, ...sub],
+        injectPrefix: ()=>"",
+        getWeight: weightAlgorithms[queryEnv.defaultWeight],
+      }))
+      .mapErr(e => ({ query: base, displayMessage: `syntax error for venn diagram query.\n${e.message}`}))
+  } else if (queryEnv.defaultMode === 'allsub') {
     base = ""
     sub = selectedQueries
   }
 
   return ok({
+    strategy: RunStrategy.Search,
     queries: sub,
     injectPrefix: injectPrefix(base),
     getWeight: weightAlgorithms[queryEnv.defaultWeight],

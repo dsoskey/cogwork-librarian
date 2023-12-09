@@ -1,6 +1,7 @@
 .topbar {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     background-color: var(--dark-color);
     padding: var(--spacing-200);
     border-bottom: solid 1px var(--gray-68);
@@ -13,6 +14,15 @@
         z-index: 3;
         top: -1px;
     }
+    .topbar > * {
+        flex: 1
+    }
+}
+
+@media (max-width: 768px) {
+    .topbar {
+        flex-wrap: wrap;
+    }
 }
 
 .topbar .result-info {
@@ -23,7 +33,6 @@
     display: flex;
     flex-direction: column;
     align-items: end;
-    flex: 1;
 }
 
 .topbar .display-type {
@@ -40,4 +49,20 @@
     top: 0;
     left: 0;
     margin: var(--spacing-200);
+}
+.venn {
+    color: var(--darker-color)
+}
+
+.venn * {
+    cursor: pointer;
+}
+
+.venn .bordered {
+    stroke: var(--darker-color);
+    stroke-width: 2;
+}
+
+.venn :focus-visible {
+    outline-color: var(--dark-color);
 }

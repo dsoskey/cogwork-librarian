@@ -316,6 +316,7 @@ th, td {
   padding-right: 0;
 }
 
+.query-editor .labels .venn,
 .query-editor .labels .base {
   background-color: var(--darkest-color);
 }
@@ -546,6 +547,8 @@ th, td {
 }
 
 .results .content {
+  display: flex;
+  flex-direction: column;
   flex: 1;
 }
 

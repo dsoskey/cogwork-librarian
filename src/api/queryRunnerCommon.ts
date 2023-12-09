@@ -3,6 +3,7 @@ import { TaskStatus } from 'src/types'
 import { QueryReport } from 'src/api/useReporter'
 import { ResultAsync } from 'neverthrow'
 import { CogError } from '../error'
+import { RunStrategy } from './scryfallExtendedParser'
 
 export type QueryRunnerFunc = (
   query: string,
@@ -12,12 +13,23 @@ export type QueryRunnerFunc = (
   getWeight?: (index:number) => number,
 ) => ResultAsync<string, CogError>
 
+export type VennRunnerFunc = (
+  left: string,
+  right: string,
+  sub: string,
+  options: SearchOptions,
+  weight: number, index: number
+) => ResultAsync<string, CogError>
+
 export type ErrorMap = { [key: string]: CogError }
 
 export interface EnrichedCard {
   weight: number
   data: Scry.Card
   matchedQueries: string[]
+  left?: boolean
+  right?: boolean
+  both?: boolean
 }
 
 export interface QueryRunnerProps {
@@ -36,10 +48,16 @@ export interface QueryRunner extends QueryHandler {
   run: (
     queries: string[],
     options: SearchOptions,
-    injectPrefix?: (query:string) => string,
-    getWeight?: (index:number) => number,
+    injectPrefix: (query:string) => string,
+    getWeight: (index:number) => number,
   ) => Promise<void>
+  generateVenn?: (
+    left: string, right: string, subs: string[],
+    options: SearchOptions,
+    getWeight: (index:number) => number,
+  ) => Promise<void>,
   result: Array<EnrichedCard>
+  runStrategy?: RunStrategy
   status: TaskStatus
   report: QueryReport
 }

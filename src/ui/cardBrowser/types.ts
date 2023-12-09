@@ -1,4 +1,5 @@
 import { ObjectValues } from '../../types'
+import { EnrichedCard } from '../../api/queryRunnerCommon'
 
 export const displayTypes = {
   cards: 'cards',
@@ -13,3 +14,11 @@ export const activeCollections = {
   ignore: 'ignore',
 } as const
 export type ActiveCollection = ObjectValues<typeof activeCollections>
+
+export type VennSection = "left"|"right"|"both"
+interface ExtraInfo {
+  leftCount: number
+  rightCount: number
+  bothCount: number
+}
+export type CardDisplayInfo = Record<ActiveCollection, EnrichedCard[]> & ExtraInfo

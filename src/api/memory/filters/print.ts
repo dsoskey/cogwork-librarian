@@ -45,7 +45,7 @@ const showAllFilter = new Set([
 
 export const findPrinting = (prefer?: string) =>
   (filterFunc: Filter<PrintingFilterTuple>) =>
-    (card: NormedCard): Card | undefined => {
+    (card: NormedCard): Card[] => {
       const { printings, ...rest } = card
 
       const maybePrints = printings.filter(printing => filterFunc({ printing, card }))
@@ -70,12 +70,12 @@ export const findPrinting = (prefer?: string) =>
           default:
             print = maybePrints[0]
         }
-        return Card.construct(<Card>{
+        return [Card.construct(<Card>{
           ...rest,
           ...print,
-        })
+        })]
       }
-      return undefined
+      return []
     }
 
 export const allPrintings =
@@ -123,7 +123,8 @@ export const uniqueArts =
     }
 
 
-export const chooseFilterFunc = (filtersUsed: string[]) => {
+export const chooseFilterFunc = (filterNode: FilterNode) => {
+  const { filtersUsed, printFilter } = filterNode
   const firstUnique = filtersUsed.find(filter => filter.startsWith('unique:'))
   const firstPrefer = filtersUsed
     .find(filter => filter.startsWith('prefer:'))
@@ -132,14 +133,14 @@ export const chooseFilterFunc = (filtersUsed: string[]) => {
     const funcKey = firstUnique.replace('unique:', '')
     switch (funcKey) {
       case 'prints':
-        return allPrintings
+        return allPrintings(printFilter)
       case 'art':
-        return uniqueArts
+        return uniqueArts(printFilter)
       case 'cards':
-        return findPrinting(firstPrefer)
+        return findPrinting(firstPrefer)(printFilter)
       default:
         throw Error(`unknown print filter function ${funcKey}`)
     }
   }
-  return findPrinting(firstPrefer)
+  return findPrinting(firstPrefer)(printFilter)
 }
