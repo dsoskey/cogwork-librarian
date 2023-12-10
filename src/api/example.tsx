@@ -66,6 +66,20 @@ export const ALIAS_EXAMPLE: string[] = [
   "",
   "@use:importantTypes o:/other .* you control/"
 ]
+
+export const VENN_EXAMPLE: string[] = [
+  "# Use a venn diagram search to show the similarities and differences of two base queries.",
+  "# Format: @venn(<LEFT_QUERY>)(<RIGHT_QUERY>)",
+  "@venn(t:creature)(t:artifact)",
+  "# You can filter the base domains further, just like any other query set.",
+  `o:"+1/+1 counter"`,
+  "ci:gw c>0",
+  "",
+  "# This is especially helpful for comparing cube lists.",
+  "# See the 'data' tab to manage your cube lists.",
+  "@venn(cube:soskgy)(cube:blue-cube)",
+]
+
 export const queryExamples: QueryExample[] = [
   {
     title: "tutorial 1: introduction",
@@ -78,6 +92,12 @@ export const queryExamples: QueryExample[] = [
     description: "paste this into your query editor to make it interactive",
     prefix: ALIAS_EXAMPLE[0],
     queries: ALIAS_EXAMPLE.slice(1)
+  },
+  {
+    title: "tutorial 3: venn diagram search",
+    description: "paste this into your query editor to make it interactive",
+    prefix: VENN_EXAMPLE[0],
+    queries: VENN_EXAMPLE.slice(1)
   },
   KNIGHTS_EXAMPLE,
   {
