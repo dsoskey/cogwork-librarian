@@ -81,7 +81,7 @@ export const CardImageView = ({
 
 
   return (
-    <div className={`card-view ${className}`} ref={cardViewRef}
+    <div className={`card-view ${card.data.set} ${className}`} ref={cardViewRef}
       tabIndex={-1}
       onKeyDown={handleKeyPress}
       onMouseOver={handleHoverOn}

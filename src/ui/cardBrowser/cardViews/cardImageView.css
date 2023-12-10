@@ -5,6 +5,9 @@
     aspect-ratio: var(--card-apect-ratio);
     border-radius: var(--card-border-radius);
 }
+.card-view.lea img {
+    clip-path: inset(0 0 0 0 round 7% / 5.5%);
+}
 .card-view:focus-visible {
     outline: unset;
 }
