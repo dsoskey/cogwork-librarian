@@ -101,11 +101,13 @@ export const BrowserView = React.memo(({
   const [page, _setPage] = useState(0)
   const setPage = (n: number) => {
     _setPage(n)
-    topOfResults.current?.scrollIntoView({
-      block: "start",
-      inline: "nearest",
-      behavior: "smooth"
-    })
+    setTimeout(() => {
+      topOfResults.current?.scrollIntoView({
+        block: "start",
+        inline: "nearest",
+        behavior: "smooth"
+      })
+    }, 100)
   }
   const lowerBound = page * pageSize + 1
   const upperBound = (page + 1) * pageSize
