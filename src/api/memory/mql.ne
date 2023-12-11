@@ -322,7 +322,7 @@ onlyEqualOperator -> (":" | "=") {% ([[token]]) => token %}
 
 formatValue -> (
     "standard" | "future" | "historic" | "pioneer" | "modern" | "legacy" | "paupercommander" |
-    "pauper" |"vintage" | "penny" | "commander" | "brawl" | "duel" | "oldschool"
+    "pauper" |"vintage" | "penny" | "commander" | "brawl" | "duel" | "oldschool" | "timeless"
 ) {% ([[format]]) => format %}
 
 isValue -> (
