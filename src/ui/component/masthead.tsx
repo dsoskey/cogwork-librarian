@@ -36,7 +36,7 @@ export const Masthead = () => {
 
         <Link to='/examples' className={topPath === "examples" ? "active-link" : ""}>examples</Link>
 
-        <Link to='/user-guide' className={topPath === "user-guide" ? "active-link" : ""}>syntax guide</Link>
+        <Link to='/user-guide' className={topPath === "user-guide" ? "active-link" : ""}>user guide</Link>
 
       </div>
     </div>

@@ -6,8 +6,12 @@ interface BasicSyntaxSectionProps {
   exampleMd: string;
 }
 export const BasicSyntaxSection = ({ textMd, exampleMd }: BasicSyntaxSectionProps) => {
-  return <div className='basic-syntax-root'>
-    <MDDoc>{textMd}</MDDoc>
-    <MDDoc className='example'>{exampleMd}</MDDoc>
-  </div>
+  const [title, ...rest] = textMd.split("\n\n")
+  return <>
+    <MDDoc>{title}</MDDoc>
+    <div className='basic-syntax-root'>
+      <div><MDDoc>{rest.join("\n\n")}</MDDoc></div>
+      <MDDoc className='example'>{exampleMd}</MDDoc>
+    </div>
+  </>
 }

@@ -13,14 +13,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { SearchView } from './ui/searchView'
 import { Masthead } from './ui/component/masthead'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
-import { SyntaxDocs } from './ui/docs/syntaxDocs'
 import { HistoryView } from './ui/historyView'
 import { DocsView } from './ui/docs/docsView'
 import { FlagContext } from './flags'
 
 export const App = () => {
   const { pathname } = useLocation()
-  const { docsUpdate } = useContext(FlagContext).flags;
+  const { } = useContext(FlagContext).flags;
 
   const cogDB = useCogDB()
   const listImporter = useListImporter(cogDB)
@@ -56,7 +55,7 @@ export const App = () => {
                     />
                     <Route path='/about-me' element={<AppInfo />} />
                     <Route path='/examples' element={<ExampleGallery />} />
-                    <Route path='/user-guide' element={docsUpdate ? <DocsView /> : <SyntaxDocs />} />
+                    <Route path='/user-guide/*' element={<DocsView />} />
                     <Route path='/history' element={<HistoryView />} />
                     <Route element={<div>404'ed!</div>} />
                   </Routes>

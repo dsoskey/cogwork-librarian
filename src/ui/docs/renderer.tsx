@@ -6,6 +6,11 @@ import { ScryfallIcon } from '../component/scryfallIcon'
 import { CoglibIcon } from '../component/coglibIcon'
 import { Components } from 'react-markdown/lib/ast-to-react'
 
+export const idificate = (idifiable: any) =>
+  idifiable.toString()
+    .replace(/ /g, "-")
+    .replace(/"/g, "")
+
 export const renderer = {
   a: ({node, ...props}) => {
     const { href, children, ...rest} = props
@@ -17,9 +22,7 @@ export const renderer = {
   },
   h2: ({node, ...props}) => {
     const { children, ...rest} = props;
-    const id = children.toString()
-      .replace(/ /g, "-")
-      .replace(/"/g, "")
+    const id = idificate(children)
     return <h2 id={id} {...rest}>
       <a href={`#${id}`}>#</a>
       {" "}
@@ -28,9 +31,7 @@ export const renderer = {
   },
   h3: ({node, ...props}) => {
     const { children, ...rest} = props;
-    const id = children.toString()
-      .replace(/ /g, "-")
-      .replace(/"/g, "")
+    const id = idificate(children)
     return <h3 id={id} {...rest}>
       <a href={`#${id}`}>#</a>
       {" "}
@@ -70,9 +71,10 @@ interface MCDocProps {
  * default config for Document section in ReactMarkdown.
  */
 export const MDDoc = ({ children, className }: MCDocProps) => {
-  return <div className={className}><ReactMarkdown
+  return <ReactMarkdown
+    className={className}
     remarkPlugins={[remarkGfm]}
     components={renderer}>
     {children}
-  </ReactMarkdown></div>
+  </ReactMarkdown>
 }

@@ -1,23 +1,32 @@
 .docs-view {
     position: relative;
+    display: flex;
+    flex-direction: row;
 }
 .docs-view .single-section-docs {
-    padding: var(--spacing-300);
+    /*padding: var(--spacing-300);*/
 }
 
 .docs-view .docs-content {
     margin: 0 var(--spacing-300);
+    flex: 5;
 }
 
 .docs-view .docs-sidenav {
     background: var(--darker-color);
-    position: fixed;
+    position: sticky;
     padding: var(--spacing-200);
-    right: 0;
+    border-bottom: 1px solid var(--gray-68);
+    border-right: 1px solid var(--gray-68);
+    box-shadow: 2px 2px 2px 0 var(--gray-68-shadow);
+    height: fit-content;
     top: 0;
-    bottom: 0;
+    flex: 1;
 }
 
-.docs-view .docs-sidenav li {
+
+.docs-view .docs-sidenav ul {
+    padding-left: 10px;
+    list-style: none;
 
 }

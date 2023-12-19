@@ -1,4 +1,4 @@
-### Database basics
+## Database basics
 
 Cogwork Librarian stores cards, oracle/illustration tags, and cube lists in a local database.
 By default, it loads the "Default Cards" [bulk data](https://scryfall.com/docs/api/bulk-data) file from Scryfall

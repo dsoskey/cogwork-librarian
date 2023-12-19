@@ -109,6 +109,10 @@ th, td {
 
 /* classnames */
 
+.root {
+  height: 100vh;
+}
+
 @media (min-width: 769px) {
   .root {
     flex-direction: column;
