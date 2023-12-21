@@ -3,7 +3,6 @@ import {
 } from '../../api/memory/types/filterKeyword'
 import React from 'react'
 import { syntaxDocs } from '../../api/local/syntaxDocs'
-import "./scryfallSyntaxDocs.css"
 import { BasicSyntaxSection } from './basicSyntaxSection'
 import nameText from '../../../docs/name/text.md'
 import nameExample from '../../../docs/name/example.md'
