@@ -11,7 +11,7 @@ interface ExampleSectionProps {
 export const ExampleSection = ({ example }: ExampleSectionProps) => {
   return <div>
     <div className='row center'>
-      <h3>{example.title}</h3>
+      <h4>{example.title}</h4>
       <CopyToClipboardButton copyText={[example.prefix, ...example.queries].join('\n')} />
     </div>
     {example.description !== undefined && (
@@ -37,7 +37,7 @@ export const DocsExample = ({ example }: ExampleSectionProps) => {
   const id = `#${idificate(example.title)}`
   return <div>
     <div className='row center'>
-      <h2 id={id}><a href={id}>#</a> {example.title}</h2>
+      <h3 id={id}><a href={id}>#</a> {example.title}</h3>
     </div>
     {example.description !== undefined && (
       <p>{example.description}</p>
@@ -45,14 +45,11 @@ export const DocsExample = ({ example }: ExampleSectionProps) => {
     <div className='example-query'>
           <pre className='language-none'>
             <code>
-              {multiQueryInfo(rankInfo)([
-                example.prefix,
-                ...example.queries,
-              ]).join('\n')}
+              {multiQueryInfo(rankInfo)(example.queries).join('\n')}
             </code>
           </pre>
       <pre className='language-scryfall-extended-multi'>
-        <code>{[example.prefix, ...example.queries].join('\n')}</code>
+        <code>{example.queries.join('\n')}</code>
       </pre>
     </div>
   </div>

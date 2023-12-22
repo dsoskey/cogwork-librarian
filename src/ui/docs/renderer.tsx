@@ -8,6 +8,7 @@ import { Components } from 'react-markdown/lib/ast-to-react'
 
 export const idificate = (idifiable: any) =>
   idifiable.toString()
+    .toLowerCase()
     .replace(/ /g, "-")
     .replace(/"/g, "")
 

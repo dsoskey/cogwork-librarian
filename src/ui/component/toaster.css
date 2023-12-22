@@ -13,7 +13,7 @@
 }
 
 .toaster-message {
-    border-radius: 2px;
+    border-radius: var(--border-radius);
     border: 2px solid var(--dark-color);
     background-color: var(--light-color);
     color: var(--dark-color);

@@ -36,13 +36,13 @@ export const INTRO_EXAMPLE: string[] = [
   "t:land o:sacrifice",
   "",
   "# A query set with multiple queries uses the base/sub model.",
-  "# The base query becomes the domain for all subqueries.",
+  "# The base query is the domain for all subqueries.",
   SAVAI_SACRIFICE_EXAMPLE.prefix,
   "# Each subquery is weighted by its rank and ",
   "# contribute to the result ordering.",
   ...SAVAI_SACRIFICE_EXAMPLE.queries,
   "",
-  `# See "about me" and "syntax guide" for more info`
+  `# See the "about me" and "user guide" pages for more info`
 ]
 
 export const ALIAS_EXAMPLE: string[] = [
@@ -81,24 +81,6 @@ export const VENN_EXAMPLE: string[] = [
 ]
 
 export const queryExamples: QueryExample[] = [
-  {
-    title: "tutorial 1: introduction",
-    description: "paste this into your query editor to make it interactive",
-    prefix: INTRO_EXAMPLE[0],
-    queries: INTRO_EXAMPLE.slice(1),
-  },
-  {
-    title: "tutorial 2: aliases",
-    description: "paste this into your query editor to make it interactive",
-    prefix: ALIAS_EXAMPLE[0],
-    queries: ALIAS_EXAMPLE.slice(1)
-  },
-  {
-    title: "tutorial 3: venn diagram search",
-    description: "paste this into your query editor to make it interactive",
-    prefix: VENN_EXAMPLE[0],
-    queries: VENN_EXAMPLE.slice(1)
-  },
   KNIGHTS_EXAMPLE,
   {
     title: 'ketria spellslinger',
@@ -119,12 +101,12 @@ export const queryExamples: QueryExample[] = [
     title: 'generic planeswalker reanimation',
     description: (
       <>
-        in the main query, use <code className='language-regex'>.*</code> to
+        in the base query, use <code className='language-regex'>.*</code> to
         match for any text in the reanimation ability. the subqueries filter out
         most reanimation spells whose text doesn't mention planeswalkers or
         permanents. this query is easier to assemble than one that accounts for
         all reanimation variants in the regex, and it still filters out ~80% of
-        the cards of the main query (385 {'-->'} 47 pre-ONE)
+        the cards of the base query (385 {'-->'} 47 pre-ONE)
       </>
     ),
     prefix: 'o:/return .* from (your|a) graveyard to the battlefield/',
@@ -137,7 +119,7 @@ export const queryExamples: QueryExample[] = [
         this query uses a full oracle text search (
         <code className='language-scryfall'>fo:</code>), which includes reminder
         text. this ensures toxic, proliferate, and infect are included in the
-        main query
+        base query
       </>
     ),
     prefix: 'fo:counter ci:bwug',

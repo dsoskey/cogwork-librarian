@@ -16,12 +16,12 @@ import { MDDoc } from './renderer'
 import isText from '../../../docs/is/text.md'
 import { Link } from 'react-router-dom'
 
-export const ScryfallSyntaxDocs = () => {
+export const SyntaxDocs = () => {
   return <div className='user-guide-root'>
-    <h1>Scryfall Query Syntax</h1>
+    <h2>Query syntax</h2>
     <p>
-      cogwork librarian's local processor uses a reverse-engineered
-      variant of Scryfall's syntax. This page only covers Scryfall syntax;
+      cogwork librarian's local query processor uses a reverse-engineered
+      variant of Scryfall's syntax. This page only covers Scryfall-compatible syntax;
       see <Link to="/user-guide/extended-syntax">our extended syntax guide</Link>
       {' '}for more information on cogwork librarian's extra search features.
       please{' '}

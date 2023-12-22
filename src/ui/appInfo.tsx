@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react'
 import { FlagContext } from '../flags'
 import "./appInfo.css"
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
-import { BaseSubExplanation } from './docs/baseSubExplanation'
 
 export const AppInfo = () => {
   const { setFlag } = useContext(FlagContext)
@@ -32,7 +31,7 @@ export const AppInfo = () => {
 
   return (
     <div className='app-info-root'>
-      <h3>what is this thing???</h3>
+      <h2>what is cogwork librarian?</h2>
       <p>
         <span onClick={tryLock}>cogwork librarian</span> wants to help you brainstorm and build cubes, battle
         boxes, and other custom magic formats. craft more complex queries to
@@ -42,11 +41,10 @@ export const AppInfo = () => {
         card format to power the most custom environments with scryfall's
         syntax.
       </p>
-      <br />
 
-      <h3>
+      <h2>
         why should i use cogwork librarian? why not use scryfall directly?
-      </h3>
+      </h2>
       <p>
         for the average one-off search query, scryfall is more than sufficient.
         cogwork librarian offers some key advantages over scryfall:
@@ -71,16 +69,11 @@ export const AppInfo = () => {
           use a custom data set.
         </li>
       </ol>
-      <br />
 
-
-      <BaseSubExplanation />
-      <br />
-
-      <h3>
+      <h2>
         okay all of those are great but it's not enough for me yet. what else
         will cogwork librarian do in the future?
-      </h3>
+      </h2>
       <p>
         while nothing on this list is a guarantee, here are some features i'm
         looking to implement:
@@ -95,9 +88,8 @@ export const AppInfo = () => {
         <li>project import/export with per-project saved/ignored lists</li>
         <li>shareable search links</li>
       </ul>
-      <br/>
 
-      <h3>this looks cool<span onClick={clickPin2}>!</span> how can i contribute?</h3>
+      <h2>this looks cool<span onClick={clickPin2}>!</span> how can i contribute?</h2>
       <p>
         at the moment, i need people to test cogwork librarian. try it out for
         your next cube project and see if it helps you level up your queries.{' '}

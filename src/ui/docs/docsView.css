@@ -24,9 +24,47 @@
     flex: 1;
 }
 
+.docs-view .docs-sidenav h4 {
+    padding-left: var(--spacing-300);
+}
 
 .docs-view .docs-sidenav ul {
-    padding-left: 10px;
+    padding-left: var(--spacing-400);
     list-style: none;
+    margin: var(--spacing-200);
+}
 
+.user-guide-cards {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+}
+
+.landing-card {
+    text-decoration: none;
+    border: 1px solid var(--light-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-200) var(--spacing-300);
+    display: flex;
+    flex-direction: column;
+    margin: 0 var(--spacing-200);
+}
+
+.docs-view code {
+    color: var(--blue-mid-alpha);
+    background-color: var(--darker-color);
+    padding: var(--spacing-100);
+    border-radius: var(--border-radius);
+}
+
+.docs-sidenav :is(a.active, a:hover, a:focus-visible),
+.landing-card:hover, .landing-card:focus-visible {
+    border-color: var(--blue);
+    color: var(--blue);
+}
+
+.landing-card h4 {
+    text-decoration: underline solid 1px;
+    margin-top: var(--spacing-200);
+    margin-bottom: var(--spacing-200);
 }

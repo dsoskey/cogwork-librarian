@@ -9,7 +9,7 @@ const injectPrefix = _injectPrefix(EXAMPLE.prefix)
 
 export const BaseSubExplanation = () => {
   return <>
-    <h2 id="basesub"><a href="#basesub">#</a> how does the base/sub query model work?</h2>
+    <h3 id="basesub"><a href="#basesub">#</a> how does the base/sub query model work?</h3>
     <p>
       the base/sub query model helps you curate complex searches with
       minimal syntax. it uses a custom 3-step algorithm on top of scryfall's
@@ -23,7 +23,7 @@ export const BaseSubExplanation = () => {
       <li>aggregate cards by total query weight</li>
     </ol>
 
-    <h3>1. combine the base query with each subquery</h3>
+    <h4>1. combine the base query with each subquery</h4>
     <p>starting from an input like this:</p>
     <div className='example-query'>
       <pre className='language-none labels'>
@@ -48,9 +48,9 @@ export const BaseSubExplanation = () => {
       to see in each subquery.
     </p>
 
-    <h3>
+    <h4>
       2. weigh each query, assigning that weight to each card in the query
-    </h3>
+    </h4>
     <p>
       once prepared, each query is weighed by its order in the list of
       queries (first being highest)
@@ -73,7 +73,7 @@ export const BaseSubExplanation = () => {
       </pre>
     </div>
 
-    <h3>3. aggregate cards by total query weight</h3>
+    <h4>3. aggregate cards by total query weight</h4>
     <p>
       cards in multiple queries get their combined weight, so their final
       placement rises above cards that matched fewer or lower placed queries

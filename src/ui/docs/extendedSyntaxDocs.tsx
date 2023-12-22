@@ -1,6 +1,6 @@
 import React from 'react'
 import { DocsExample } from './exampleSection'
-import { queryExamples } from '../../api/example'
+import { ALIAS_EXAMPLE, VENN_EXAMPLE } from '../../api/example'
 import syntaxExtensions from "../../../docs/syntaxExtensions/intro.md"
 import rank from "../../../docs/syntaxExtensions/rank.md"
 import include from "../../../docs/syntaxExtensions/include.md"
@@ -13,7 +13,8 @@ export const ExtendedSyntaxDocs = () => {
   return <div>
     <MDDoc>{syntaxExtensions}</MDDoc>
     <DocsExample example={{
-      ...queryExamples[1],
+      prefix: "",
+      queries: ALIAS_EXAMPLE,
       title: "@alias & @use",
       description: <MDDoc>{aliasDesc}</MDDoc>
     }} />
@@ -21,7 +22,8 @@ export const ExtendedSyntaxDocs = () => {
     <MDDoc>{rank}</MDDoc>
     <MDDoc>{include}</MDDoc>
     <DocsExample example={{
-      ...queryExamples[2],
+      prefix: "",
+      queries: VENN_EXAMPLE,
       title: "@venn diagram search",
       description: undefined
     }} />

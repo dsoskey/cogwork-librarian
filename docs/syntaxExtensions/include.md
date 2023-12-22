@@ -1,4 +1,4 @@
-## @include
+### @include
 
 Add `@include:stdlib` in its own paragraph to make the following aliases available for use.
 

@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { useProject, ProjectContext } from './api/useProject'
 import { Footer } from './ui/footer'
-import { ExampleGallery } from './ui/docs/exampleGallery'
 import { AppInfo } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
 import { Route, Routes, useLocation } from 'react-router'
@@ -54,7 +53,6 @@ export const App = () => {
                       element={<SavedCards savedCards={project.savedCards} setSavedCards={project.setSavedCards} />}
                     />
                     <Route path='/about-me' element={<AppInfo />} />
-                    <Route path='/examples' element={<ExampleGallery />} />
                     <Route path='/user-guide/*' element={<DocsView />} />
                     <Route path='/history' element={<HistoryView />} />
                     <Route element={<div>404'ed!</div>} />

@@ -1,5 +1,5 @@
 import { DocsExample } from './exampleSection'
-import { queryExamples } from '../../api/example'
+import { INTRO_EXAMPLE } from '../../api/example'
 import { BaseSubExplanation } from './baseSubExplanation'
 import { MDDoc } from './renderer'
 import dbBasicsText from '../../../docs/gettingStarted/dbBasics.md'
@@ -19,7 +19,7 @@ export const GettingStartedDocs = () => {
     by using the keyboard shortcut <code>CTRL + ENTER</code> while the cursor is within the query set.
   </p>
   return <div>
-    <h1>Getting Started</h1>
+    <h2>Getting started</h2>
     <p>Brainstorming in Cogwork Librarian is broken up into 3 core pieces:</p>
     <ol>
       <li>Query editor</li>
@@ -27,7 +27,7 @@ export const GettingStartedDocs = () => {
       <li>Saved and ignored cards</li>
     </ol>
 
-    <DocsExample example={{ ...queryExamples[0], title: "Editor Basics", description }} />
+    <DocsExample example={{ prefix: "", queries: INTRO_EXAMPLE.slice(0, -2), title: "Editor Basics", description }} />
 
     <BaseSubExplanation/>
 

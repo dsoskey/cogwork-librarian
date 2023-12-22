@@ -15,6 +15,7 @@
   --green: hsl(96, 100%, 69%);
   --light-red: hsl(0, 100%, 55%);
   --red: hsl(0, 100%, 37%);
+  --border-radius: 2px;
   --card-border-radius: 4.75% / 3.5%;
   --card-apect-ratio: 2.5/3.5;
 
@@ -75,9 +76,7 @@ fieldset {
   border: none;
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3, h4 {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
 }
@@ -220,7 +219,7 @@ th, td {
   transition-property: color, background-color;
   transition-duration: 100ms;
   transition-timing-function: ease-out;
-  border-radius: 2px;
+  border-radius: var(--border-radius);
 }
 
 .data-view-root .input-link.active-link,
@@ -281,9 +280,6 @@ th, td {
   flex: 1;
 }
 
-.example-content {
-  margin: var(--spacing-300);
-}
 .example-content button {
   height: unset;
 }

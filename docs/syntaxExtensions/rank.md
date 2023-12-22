@@ -1,4 +1,4 @@
-## @defaultRank
+### @defaultRank
 
 `@defaultRank` changes how the aggregator weighs each subquery in a query-set.
 this directive should be placed in its own paragraph.
