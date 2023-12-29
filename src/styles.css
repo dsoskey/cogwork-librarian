@@ -51,11 +51,13 @@ button {
   border-bottom-color: var(--dark-color);
   border-right-color: var(--dark-color);
   color: var(--blue-mid-alpha);
+  cursor: pointer;
 }
 
 button:disabled {
   background-color: var(--darker-color);
   color: var(--blue-low-alpha);
+  cursor: unset;
 }
 
 input {
@@ -485,6 +487,33 @@ th, td {
 
 .db-import .scryfall-option .size {
   margin-left: var(--spacing-200);
+}
+
+.scryfall-input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+}
+.scryfall-input * {
+  cursor: inherit;
+}
+.scryfall-input input[type=radio] {
+  appearance: none;
+  height: 20px;
+  background-color: transparent;
+  translate: 0 -.2em;
+  border-radius: 100%;
+}
+.scryfall-input label.checked {
+  color: var(--blue);
+}
+.scryfall-input input[type=radio]::before {
+  content: url("./ui/component/scryfallIcon.svg");
+  position:relative;
+}
+.scryfall-input input[type=radio]:checked::before {
+  content: url("./ui/component/scryfallIconChecked.svg");
 }
 
 .db-import .file {
