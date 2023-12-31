@@ -24,12 +24,14 @@ const displayFullQuery = (history: QueryHistory) => history.rawQueries.map((line
     return `${prefix} ${line}`
   }).join('\n');
 
-const HistoryItem = ({ history }) => {
+interface HistoryItemProps {
+  history: QueryHistory
+}
+const HistoryItem = ({ history }: HistoryItemProps) => {
   const [expanded, setExpanded] = useState<boolean>(false)
 
   const truncatedQuery = displayQuery(history);
   useHighlightPrism([expanded]);
-
 
   return <div className='column history-item'>
     <div className='query-label row'>
@@ -37,7 +39,7 @@ const HistoryItem = ({ history }) => {
       <button onClick={() => setExpanded(prev => !prev)}>
         {expanded ? 'show query set' : 'show full text'}
       </button>
-      <CopyToClipboardButton copyText={history.rawQueries} >copy full text</CopyToClipboardButton>
+      <CopyToClipboardButton copyText={history.rawQueries.join("\n")} >copy full text</CopyToClipboardButton>
     </div>
     <pre className='history language-scryfall-extended-multi'>
       <code>{expanded ? displayFullQuery(history) : truncatedQuery.join("\n")}</code>
@@ -52,10 +54,10 @@ export const HistoryView = () => {
   const history = useLiveQuery(() => cogDB.history
     .orderBy("executedAt")
     .reverse()
-    .limit(limit)
     .offset(page * limit)
+    .limit(limit)
     .toArray()
-  );
+    , [page]);
   const count = useLiveQuery(() => cogDB.history.count())
 
   return <div className='history-view'>
@@ -63,7 +65,9 @@ export const HistoryView = () => {
     {history !== undefined && <>
       <div className='row baseline route-header'>
         <h2>query history</h2>
-        {count > limit && <PageControl page={page} setPage={setPage} upperBound={upperBound} pageSize={limit} cardCount={count} />}
+        {count > 0 && <span>({upperBound - limit + 1}-{upperBound} of {count})</span>}
+        {count > limit && <>
+          <PageControl page={page} setPage={setPage} upperBound={upperBound} pageSize={limit} cardCount={count} /></>}
       </div>
       {history.map(it => <HistoryItem key={it.executedAt.toISOString()} history={it} />)}
       {count > limit && <PageControl page={page} setPage={setPage} upperBound={upperBound} pageSize={limit} cardCount={count} />}
