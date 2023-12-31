@@ -34,16 +34,21 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
 
   return <div className='scryfall-import'>
     {bulkDataDefinitions.map((it) => (
-      <div key={it.uri} className='scryfall-option'>
-        <input
-          id={`source-${it.type}`}
-          type='radio'
-          value={it.type}
-          checked={it.type === targetDefinition?.type}
-          onChange={() => setTargetDefinition(it)}
-        />
-        <label htmlFor={`source-${it.type}`}>{it.name}</label>
-        <code className='size'>{humanFileSize(it.size)}</code>
+      <div key={it.uri} className="scryfall-option">
+        <div className='scryfall-input'>
+          <input
+            id={`source-${it.type}`}
+            type='radio'
+            value={it.type}
+            checked={it.type === targetDefinition?.type}
+            onChange={() => setTargetDefinition(it)}
+          />
+          <label className={it.type === targetDefinition?.type ? "checked" : ""} htmlFor={`source-${it.type}`}>
+            {it.name}
+            <code className='size'>{humanFileSize(it.size)}</code>
+          </label>
+        </div>
+
         <div>{it.description}</div>
       </div>
     ))}

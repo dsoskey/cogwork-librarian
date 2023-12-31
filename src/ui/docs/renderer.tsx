@@ -6,11 +6,15 @@ import { ScryfallIcon } from '../component/scryfallIcon'
 import { CoglibIcon } from '../component/coglibIcon'
 import { Components } from 'react-markdown/lib/ast-to-react'
 
+export const titleificate = (titleable: string) => {
+  const [title] = titleable.split("\n\n")
+  return title.replace(/^#+\s+/, "")
+}
 export const idificate = (idifiable: any) =>
   idifiable.toString()
     .toLowerCase()
     .replace(/ /g, "-")
-    .replace(/"/g, "")
+    .replace(/["\/]/g, "")
 
 export const renderer = {
   a: ({node, ...props}) => {
@@ -20,15 +24,6 @@ export const renderer = {
     } else {
       return <a href={href} {...rest}>{children}</a>
     }
-  },
-  h2: ({node, ...props}) => {
-    const { children, ...rest} = props;
-    const id = idificate(children)
-    return <h2 id={id} {...rest}>
-      <a href={`#${id}`}>#</a>
-      {" "}
-      {children}
-    </h2>
   },
   h3: ({node, ...props}) => {
     const { children, ...rest} = props;

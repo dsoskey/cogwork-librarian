@@ -1,4 +1,4 @@
-### Regular Expressions
+### Regular expressions
 
 Most filters that operate on text can use a regular expression (aka RegEx) instead of a string.
 This enables you to match complex text patterns within card fields, like 

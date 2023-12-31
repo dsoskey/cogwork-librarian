@@ -12,6 +12,10 @@
     flex: 5;
 }
 
+.docs-content h3 {
+    font-size: 1.25em;
+}
+
 .docs-view .docs-sidenav {
     background: var(--darker-color);
     position: sticky;

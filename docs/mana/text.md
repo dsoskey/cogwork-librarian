@@ -1,4 +1,4 @@
-## mana
+### mana
 
 Filter cards by their mana cost `mana`. specify simple symbols as standalone characters (`W`, `2`, `S`, etc.)
 and complex symbols inside curly braces (`{w/r}`, `{2/b}`, `{u/p}`).

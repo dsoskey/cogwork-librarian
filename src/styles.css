@@ -201,7 +201,7 @@ th, td {
   align-items: start;
 }
 
-.masthead .page-title {
+.masthead #page-title {
   margin-left: var(--spacing-200);
   margin-top: 0;
   margin-bottom: 0;

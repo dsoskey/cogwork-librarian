@@ -9,7 +9,11 @@ const injectPrefix = _injectPrefix(EXAMPLE.prefix)
 
 export const BaseSubExplanation = () => {
   return <>
-    <h3 id="basesub"><a href="#basesub">#</a> how does the base/sub query model work?</h3>
+    <h3 id="basesub-query-model">
+      <a href="#basesub-query-model">#</a>
+      {" "}
+      how does the base/sub query model work?
+    </h3>
     <p>
       the base/sub query model helps you curate complex searches with
       minimal syntax. it uses a custom 3-step algorithm on top of scryfall's

@@ -1,4 +1,4 @@
-# Keyboard Shortcuts
+## Keyboard Shortcuts
 
 _Note: on MacOS you can also use_ `CMD` _wherever you would use_ `Ctrl`
 

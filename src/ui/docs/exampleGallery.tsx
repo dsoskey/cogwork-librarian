@@ -9,7 +9,7 @@ export const ExampleGallery = () => {
   const { showDebugInfo } = useContext(FlagContext).flags
 
   return <div className='example-content'>
-    <h3 id="query-examples"><a href="#query-examples">#</a> query examples</h3>
+    <h3 id="example-queries"><a href="#example-queries">#</a> Example queries</h3>
     {queryExamples.map((example) => <ExampleSection key={example.title} example={example} />)}
     {showDebugInfo && (
       <pre className='language-scryfall-extended'>

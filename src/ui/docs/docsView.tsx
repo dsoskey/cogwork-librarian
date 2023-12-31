@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { MDDoc } from './renderer'
 import keyboardShortcuts from '../../../docs/keyboardShortcuts.md'
 import "./docsView.css"
@@ -9,6 +9,7 @@ import { GettingStartedDocs } from './gettingStartedDocs'
 import { Link } from 'react-router-dom'
 import { ExtendedSyntaxDocs } from './extendedSyntaxDocs'
 import { AdvancedTechniqueDocs } from './advancedTechniqueDocs'
+import { NavBar } from './navBar'
 
 const LandingCard = ({ title, href, description }) => {
   return <Link to={href} className='landing-card'>
@@ -49,44 +50,19 @@ const LandingPage = () => {
   </div>
 }
 export const DocsView = () => {
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
+  const shouldScroll = useRef(false);
+  useEffect(() => {
+    if (shouldScroll.current) {
+      const element = document.getElementById(hash ? hash.slice(1) : "page-title");
+      element?.scrollIntoView({ behavior: 'smooth' });
+    }
+    shouldScroll.current = true
+  }, [hash]);
+
   useHighlightPrism([pathname])
   return <div className='docs-view'>
-    <nav className='docs-sidenav'>
-      <section>
-        <h3>Guides</h3>
-        <h4><Link to="/user-guide/getting-started">Getting started</Link></h4>
-        <ul>
-          <li>Editor basics</li>
-          <li>Base/Sub explanation</li>
-          <li>Search results</li>
-          <li>Saved cards</li>
-          <li>Data management</li>
-        </ul>
-        <h4><Link to="/user-guide/advanced-techniques">Advanced query techniques</Link></h4>
-        <ul>
-          <li>Regular expressions</li>
-          <li>Example queries</li>
-        </ul>
-      </section>
-
-      <section>
-        <h3>Reference</h3>
-        <h4><Link to="/user-guide/keyboard-shortcuts">Keyboard shortcuts</Link></h4>
-        <h4><Link to="/user-guide/query-syntax">Query syntax</Link></h4>
-        <ul>
-          <li>each filter section</li>
-        </ul>
-        <h4><Link to="/user-guide/syntax-extension">Syntax extensions</Link></h4>
-        <ul>
-          <li>@alias & @use</li>
-          <li>@defaultMode</li>
-          <li>@defaultRank</li>
-          <li>@include</li>
-          <li>@venn</li>
-        </ul>
-      </section>
-    </nav>
+    <NavBar />
     <div className='docs-content'>
       <p className='alert'>these docs are under active construction!</p>
       <Routes>

@@ -1,4 +1,4 @@
-## is
+### is
 
 The `is` filter is a collection of premade queries that are supported by Scryfall.
 Some filters read better with the alias `has`, which is equivalent to `is`.

@@ -25,7 +25,7 @@ export const Masthead = () => {
     {!adminMode && <CoglibIcon size='3em' />}
 
     <div>
-      <h1 className='page-title'>cogwork librarian</h1>
+      <h1 id='page-title'>cogwork librarian</h1>
       <div className='row'>
 
         <Link to='/' className={pathname === "/" ? "active-link" : ""}>search</Link>

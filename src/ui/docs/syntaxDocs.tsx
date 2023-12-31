@@ -10,11 +10,22 @@ import colorText from '../../../docs/color/text.md'
 import colorExample from '../../../docs/color/example.md'
 import manaText from '../../../docs/mana/text.md'
 import manaExample from '../../../docs/mana/example.md'
+import typeText from '../../../docs/type/text.md'
+import typeExample from '../../../docs/type/example.md'
 import andorText from '../../../docs/andOr/text.md'
 import andorExample from '../../../docs/andOr/example.md'
-import { MDDoc } from './renderer'
+import { MDDoc, titleificate } from './renderer'
 import isText from '../../../docs/is/text.md'
 import { Link } from 'react-router-dom'
+
+export const syntaxSectionTitles = [
+  nameText,
+  colorText,
+  manaText,
+  typeText,
+  andorText,
+  isText,
+].map(titleificate);
 
 export const SyntaxDocs = () => {
   return <div className='user-guide-root'>
@@ -39,8 +50,7 @@ export const SyntaxDocs = () => {
     <BasicSyntaxSection textMd={nameText} exampleMd={nameExample} />
     <BasicSyntaxSection textMd={colorText} exampleMd={colorExample} />
     <BasicSyntaxSection textMd={manaText} exampleMd={manaExample} />
-    {/* Mana Cost cmcCondition manaCostCondition */}
-    {/* Type typeCondition typeRegexCondition */}
+    <BasicSyntaxSection textMd={typeText} exampleMd={typeExample} />
     {/* Text box oracleCondition oracleRegexCondition fullOracleCondition fullOracleRegexCondition keywordCondition */}
     {/* Power, toughness, loyalty, defense powerCondition toughCondition powTouCondition */}
     {/* Layout */}

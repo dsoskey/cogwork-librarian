@@ -1,4 +1,4 @@
-## colors and color identity
+### colors and color identity
 
 Filter cards by specific colors or number of colors with `color`.
 Specify colors with WUBRG, color name (blue), or color combination nickname (boros, cabaretti, necra, etc.).

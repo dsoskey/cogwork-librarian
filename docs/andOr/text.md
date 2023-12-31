@@ -1,4 +1,4 @@
-## "and" and "or" operators
+### "and" and "or" operators
 
 Combine multiple queries with a space, `and`, or `or`.
 A space is equivalent to `and`. `and` requires a card match both operands to be included in the query.
