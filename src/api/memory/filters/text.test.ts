@@ -9,6 +9,7 @@ import { elvishPromenade } from './testData/elvishPromenade'
 import { ramunapRuins } from './testData/ramunapRuins'
 import { seasideHaven } from './testData/seasideHaven'
 import { asymmetrySage } from './testData/asymmetrySage'
+import { phyrexianWalker } from './testData/phyrexianWalker'
 
 describe('text filters', function() {
   const queryRunner = new QueryRunner({ corpus: [
@@ -21,6 +22,7 @@ describe('text filters', function() {
     ramunapRuins,
     seasideHaven,
     asymmetrySage,
+    phyrexianWalker,
   ], defaultOptions, dataProvider: defaultDataProvider })
   describe('name filter', function() {
     it("should do a name search when no keyword is present", async () => {
@@ -91,6 +93,26 @@ describe('text filters', function() {
       const result = names(await queryRunner.search("o:/sacrifice a.*:/"))
 
       expect(result).toEqual([ramunapRuins.name, seasideHaven.name])
+    })
+  })
+  describe("oracle text count", function () {
+    it('should filter cards by word count', async function() {
+      const result = names(await queryRunner.search(`o>4`))
+
+      expect(result).toEqual([
+        ancientStirrings.name,
+        asymmetrySage.name,
+        elvishPromenade.name,
+        preordain.name,
+        ramunapRuins.name,
+        seasideHaven.name,
+        spinerockKnoll.name]
+      )
+    })
+    it("should consider cards with no text having 0 words", async function() {
+      const result = names(await queryRunner.search(`o=0`))
+
+      expect(result).toEqual([phyrexianWalker.name])
     })
   })
   describe('full oracle text filter', function() {

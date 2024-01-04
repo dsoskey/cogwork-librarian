@@ -3,9 +3,6 @@
     display: flex;
     flex-direction: row;
 }
-.docs-view .single-section-docs {
-    /*padding: var(--spacing-300);*/
-}
 
 .docs-view .docs-content {
     margin: 0 var(--spacing-300);

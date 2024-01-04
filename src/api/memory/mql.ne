@@ -44,8 +44,10 @@ condition -> (
     nameRegexCondition |
     oracleCondition |
     oracleRegexCondition |
+    oracleCountCondition |
     fullOracleCondition |
     fullOracleRegexCondition |
+    fullOracleCountCondition |
     keywordCondition |
     typeCondition |
     typeRegexCondition |
@@ -139,15 +141,29 @@ manaCostRegexCondition -> ("mana" | "m") onlyEqualOperator regexString
     {% ([[{offset}], _, {value}]) => ({ filter: FilterType.ManaRegex, value, offset }) %}
 
 oracleCondition -> oracleFilter onlyEqualOperator stringValue
-    {% ([{offset}, _, {value}]) => ({ filter: FilterType.Oracle, value, offset }) %}
+    {% ([{offset}, _, {value}], _1, reject) => {
+        if (!Number.isNaN(Number.parseInt(value))) {
+            return reject
+        }
+        return { filter: FilterType.Oracle, value, offset }
+    } %}
 oracleRegexCondition -> oracleFilter onlyEqualOperator regexString
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.OracleRegex, value, offset }) %}
+oracleCountCondition -> oracleFilter anyOperator integerValue
+    {% ([{offset}, op, value]) => ({ filter: FilterType.OracleCount, value, operator: op.value, offset }) %}
 oracleFilter -> ("oracle" | "o" | "text") {% id %}
 
 fullOracleCondition -> fullOracleCondition onlyEqualOperator stringValue
-    {% ([{offset}, _, {value}]) => ({ filter: FilterType.FullOracle, value, offset }) %}
+    {% ([{offset}, _, {value}], _1, reject) => {
+        if (!Number.isNaN(Number.parseInt(value))) {
+            return reject
+        }
+        return { filter: FilterType.FullOracle, value, offset }
+    } %}
 fullOracleRegexCondition -> fullOracleCondition onlyEqualOperator regexString
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.FullOracleRegex, value, offset }) %}
+fullOracleCountCondition -> fullOracleCondition anyOperator integerValue
+    {% ([{offset}, op, value]) => ({ filter: FilterType.FullOracleCount, value, operator: op.value, offset }) %}
 fullOracleCondition -> "fo" {% id %}
 
 keywordCondition -> ("kw" | "keyword") onlyEqualOperator stringValue

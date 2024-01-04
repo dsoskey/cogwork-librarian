@@ -80,6 +80,21 @@ export const VENN_EXAMPLE: string[] = [
   "@venn(cube:soskgy)(cube:blue-cube)",
 ]
 
+export const INCLUDE_EXAMPLE = {
+  title: "Bar cube",
+  prefix: "# cogwork librarian offers several pre-built aliases for convenience",
+  queries: [
+    "# enable them by adding `@include:stdlib` on its own paragraph",
+    "@include:stdlib",
+    "",
+    "# bar is one of them. it searches for cards that fit the",
+    "# Bar Cube brewer's guide",
+    "@u:bar",
+    "o<=10",
+    "usd<1 o<=20",
+  ]
+}
+
 export const queryExamples: QueryExample[] = [
   KNIGHTS_EXAMPLE,
   {
@@ -96,6 +111,7 @@ export const queryExamples: QueryExample[] = [
       'c>=gu',
     ],
   },
+  INCLUDE_EXAMPLE,
   SAVAI_SACRIFICE_EXAMPLE,
   {
     title: 'generic planeswalker reanimation',

@@ -1,5 +1,5 @@
 import { NormedCard, OracleKeys } from '../types/normedCard'
-import { Filter } from './base'
+import { defaultCompare, Filter, Operator } from './base'
 import { anyFaceContains, anyFaceRegexMatch, noReminderText, replaceNamePlaceholder } from '../types/card'
 
 export const textMatch =
@@ -25,6 +25,21 @@ export const noReminderTextMatch =
         replaceNamePlaceholder(value, card.name),
         noReminderText
       )
+
+export const oracleTextCount = (operator: Operator, count: number, transform = (it) => it) =>
+  (card: NormedCard) => {
+    const getCount = (it) => {
+      const transed = transform(it??"")
+      return transed.length ? transed.split(/\s+/).length : 0
+    }
+    let wordCount;
+    if (card.oracle_text !== undefined) {
+      wordCount = getCount(card.oracle_text)
+    } else {
+      wordCount = card.card_faces.map(it => getCount(it.oracle_text)).reduce((l,r) => l+r)
+    }
+    return defaultCompare(wordCount, operator, count)
+  }
 
 /* Raw paste from Scryfall discord
 \spt

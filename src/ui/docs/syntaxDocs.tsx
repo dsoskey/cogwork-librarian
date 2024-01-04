@@ -4,18 +4,22 @@ import {
 import React from 'react'
 import { syntaxDocs } from '../../api/local/syntaxDocs'
 import { BasicSyntaxSection } from './basicSyntaxSection'
-import nameText from '../../../docs/name/text.md'
-import nameExample from '../../../docs/name/example.md'
-import colorText from '../../../docs/color/text.md'
-import colorExample from '../../../docs/color/example.md'
-import manaText from '../../../docs/mana/text.md'
-import manaExample from '../../../docs/mana/example.md'
-import typeText from '../../../docs/type/text.md'
-import typeExample from '../../../docs/type/example.md'
-import andorText from '../../../docs/andOr/text.md'
-import andorExample from '../../../docs/andOr/example.md'
+import nameText from '../../../docs/syntaxReference/name/text.md'
+import nameExample from '../../../docs/syntaxReference/name/example.md'
+import colorText from '../../../docs/syntaxReference/color/text.md'
+import colorExample from '../../../docs/syntaxReference/color/example.md'
+import manaText from '../../../docs/syntaxReference/mana/text.md'
+import manaExample from '../../../docs/syntaxReference/mana/example.md'
+import typeText from '../../../docs/syntaxReference/type/text.md'
+import typeExample from '../../../docs/syntaxReference/type/example.md'
+import textBoxText from '../../../docs/syntaxReference/textBox/text.md'
+import textBoxExample from '../../../docs/syntaxReference/textBox/example.md'
+import combatBoxText from '../../../docs/syntaxReference/combatBox/text.md'
+import combatBoxExample from '../../../docs/syntaxReference/combatBox/example.md'
+import andorText from '../../../docs/syntaxReference/andOr/text.md'
+import andorExample from '../../../docs/syntaxReference/andOr/example.md'
 import { MDDoc, titleificate } from './renderer'
-import isText from '../../../docs/is/text.md'
+import isText from '../../../docs/syntaxReference/is/text.md'
 import { Link } from 'react-router-dom'
 
 export const syntaxSectionTitles = [
@@ -23,6 +27,8 @@ export const syntaxSectionTitles = [
   colorText,
   manaText,
   typeText,
+  textBoxText,
+  combatBoxText,
   andorText,
   isText,
 ].map(titleificate);
@@ -51,8 +57,8 @@ export const SyntaxDocs = () => {
     <BasicSyntaxSection textMd={colorText} exampleMd={colorExample} />
     <BasicSyntaxSection textMd={manaText} exampleMd={manaExample} />
     <BasicSyntaxSection textMd={typeText} exampleMd={typeExample} />
-    {/* Text box oracleCondition oracleRegexCondition fullOracleCondition fullOracleRegexCondition keywordCondition */}
-    {/* Power, toughness, loyalty, defense powerCondition toughCondition powTouCondition */}
+    <BasicSyntaxSection textMd={textBoxText} exampleMd={textBoxExample} />
+    <BasicSyntaxSection textMd={combatBoxText} exampleMd={combatBoxExample} />
     {/* Layout */}
     {/* Format */}
     {/* Artist */}

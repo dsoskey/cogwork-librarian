@@ -1,5 +1,5 @@
 import { andNode, defaultOperation, FilterNode, identity, identityNode, notNode, orNode } from './base'
-import { exactMatch, noReminderRegexMatch, noReminderTextMatch, regexMatch, textMatch } from './text'
+import { exactMatch, noReminderRegexMatch, noReminderTextMatch, oracleTextCount, regexMatch, textMatch } from './text'
 import { isVal } from './is'
 import { devotionOperation } from './devotion'
 import { combatToCombatNode, powTouTotalOperation } from './combat'
@@ -36,6 +36,7 @@ import { FilterError } from '../types/error'
 import { DataProvider } from './dataProvider'
 import { newFilter } from './new'
 import { Block } from '../../local/db'
+import { noReminderText } from '../types/card'
 
 
 export interface FilterProvider {
@@ -223,6 +224,11 @@ export class CachingFilterProvider implements FilterProvider {
             filtersUsed: ["oracle"],
             filterFunc: noReminderRegexMatch('oracle_text', leaf.value),
           }))
+        case FilterType.OracleCount:
+          return okAsync(oracleNode({
+            filtersUsed: ["oracle"],
+            filterFunc: oracleTextCount(leaf.operator, leaf.value, noReminderText),
+          }))
         case FilterType.FullOracle:
           return okAsync(oracleNode({
             filtersUsed: ["full-oracle"],
@@ -232,6 +238,11 @@ export class CachingFilterProvider implements FilterProvider {
           return okAsync(oracleNode({
             filtersUsed: ["full-oracle"],
             filterFunc: regexMatch('oracle_text', leaf.value),
+          }))
+        case FilterType.FullOracleCount:
+          return okAsync(oracleNode({
+            filtersUsed: ["full-oracle"],
+            filterFunc: oracleTextCount(leaf.operator, leaf.value),
           }))
         case FilterType.Keyword:
           return okAsync(keywordMatch(leaf.value))

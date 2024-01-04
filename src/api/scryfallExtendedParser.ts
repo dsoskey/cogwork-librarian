@@ -150,6 +150,10 @@ export function parseEnv(lines: string[]): Result<QueryEnvironment, CogError> {
         case "stdlib":
           aliases.released = { name: "released", query: `date<=${format(now, "yyyy-MM-dd")}` }
           aliases.newest = { name: "newest", query: `order:released direction:desc` }
+          aliases.bar = {
+            name: "bar",
+            query: `-fo:token (-fo:/\\bcounters?\\b/ or fo:/counter (it|up to|target|that|all)/) game:paper -has:back -is:dfc -is:extra -fo:/\\bnote\\b/`,
+          }
       }
     }
   }
