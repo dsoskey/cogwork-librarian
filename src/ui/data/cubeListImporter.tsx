@@ -1,19 +1,20 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { Setter } from '../../types'
 import { NormedCard } from '../../api/memory/types/normedCard'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { ProjectContext } from '../../api/useProject'
 
 export interface CubeListImporterProps {
+  cardsToImport: string[]
+  setCardsToImport: Setter<string[]>
   setCards: Setter<NormedCard[]>
   setError: Setter<string>
   loader: React.ReactNode
   children: React.ReactNode
 }
-export const CubeListImporter = ({ setCards, setError, loader, children }: CubeListImporterProps) => {
+export const CubeListImporter = ({ setCards, setError, loader, children, setCardsToImport, cardsToImport }: CubeListImporterProps) => {
   const listImporter = useContext(ListImporterContext)
   const project = useContext(ProjectContext)
-  const [cardsToImport, setCardsToImport] = useState<string[]>([])
   const useSavedCards = () => {
     setCardsToImport(project.savedCards)
   }

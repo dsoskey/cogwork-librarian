@@ -1,16 +1,31 @@
 import React, { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { CubeDefinition } from '../../api/memory/types/cube'
+import { CUBE_SOURCE_TO_LABEL, CubeDefinition, CubeSource } from '../../api/memory/types/cube'
 import "./cubeDefinitionTable.css"
+import cubeartisanImage from "./cubeartisan-favicon.ico"
+import cubecobraImage from "./cubecobra-favicon.ico"
 import { PageControl } from '../cardBrowser/pageControl'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
 import { Modal } from '../component/modal'
-import { CubeCobraImportMessage } from './cubeCobraImporter'
+import { BulkImportMessage } from './bulkCubeSiteImporter'
 import { cogDB } from '../../api/local/db'
+import { groupBy } from 'lodash'
 
 interface CubeDefinitionRowProps {
   cube: CubeDefinition
   checked: boolean
   onChecked: (checked: boolean) => void
+}
+
+const SourceIcon = ({ source }: { source: CubeSource }) => {
+  const label = CUBE_SOURCE_TO_LABEL[source]
+  switch (source) {
+    case 'list':
+      return <span title={label}>📄</span>
+    case 'cubecobra':
+      return <img src={cubecobraImage} alt={label} title={label} height="100%" />
+    case 'cubeartisan':
+      return <img src={cubeartisanImage} alt={label} title={label} height="100%" />
+  }
 }
 
 const CubeDefinitionRow = ({ cube, checked, onChecked }: CubeDefinitionRowProps) => {
@@ -30,9 +45,14 @@ const CubeDefinitionRow = ({ cube, checked, onChecked }: CubeDefinitionRowProps)
            rel='noreferrer'
            target='_blank'>{key}</a>
       }
-      {source !== "cubecobra" && key}
+      {source === "cubeartisan" &&
+        <a href={`https://cubeartisan.net/cube/${key}/overview`}
+           rel='noreferrer'
+           target='_blank'>{key}</a>
+      }
+      {source === "list" && key}
     </td>
-    <td>{source ?? "list"}</td>
+    <td><SourceIcon source={source??"list"} /></td>
     <td>{last_updated?.toLocaleString() ?? "~"}</td>
   </tr>
 }
@@ -43,18 +63,18 @@ interface CubeDefinitionTableProps {
 export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set())
   const checkRef = useRef<HTMLInputElement>()
-  const { isRunning, attemptImport } = useContext(BulkCubeImporterContext);
+  const { isRunning, attemptRefresh } = useContext(BulkCubeImporterContext);
   const importCheckedCubeIds = () => {
     const toSubmit = cubes
-      .filter(it => checkedIds.has(it.key) && it.source === "cubecobra")
-      .map(it => it.key);
+      .filter(it => checkedIds.has(it.key) && it.source !== "list")
 
     if (toSubmit.length === 0) {
-      console.warn("no selected cubes are from cubecobra. ignoring...");
+      console.warn("no selected cubes are from refreshable sources. ignoring...");
       return;
     }
 
-    attemptImport(toSubmit);
+    const bySource = groupBy(toSubmit, "source")
+    attemptRefresh(bySource);
   }
 
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -139,13 +159,13 @@ export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
               delete
             </button>
             <button onClick={importCheckedCubeIds} disabled={isRunning}>
-              refresh from cubecobra
+              refresh from source
             </button>
             <div className='message'>{checkedIds.size}{" cube"}{checkedIds.size > 1 && "s"}{" selected  "}</div>
           </>}
         </div>
       </div>
-      <CubeCobraImportMessage/>
+      <BulkImportMessage/>
       <table>
         <thead>
           <tr>
@@ -186,23 +206,25 @@ export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
         open={showDeleteModal}
         title={<h2>Confirm Delete</h2>}
         onClose={() => setShowDeleteModal(false)}>
-        <div className="column">
+        <div>
           <p>{"you are about to delete "}
             {checkedIds.size}
             {" cube"}{checkedIds.size > 1 && "s"}{": "}
             {Array.from(checkedIds).join(", ")}
             {". Type and press 'delete' to proceed."}
           </p>
-          <input
-            placeholder="delete"
-            value={confirmText}
-            onChange={event => setConfirmText(event.target.value)}
-          />
-          <div><button
-            disabled={confirmText !== "delete" || deleting}
-            onClick={onDeleteClick}>
-            {deleting ? "deleting" : "delete"}
-          </button></div>
+          <div className="row">
+            <input
+              placeholder="delete"
+              value={confirmText}
+              onChange={event => setConfirmText(event.target.value)}
+            />
+            <button
+              disabled={confirmText !== "delete" || deleting}
+              onClick={onDeleteClick}>
+              {deleting ? "deleting" : "delete"}
+            </button>
+          </div>
         </div>
       </Modal>
     </div>

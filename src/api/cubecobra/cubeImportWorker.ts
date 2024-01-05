@@ -1,26 +1,32 @@
-import { importCube } from './cubeListImport'
-import { CubeDefinition } from '../memory/types/cube'
+import { importCubeCobra } from './cubeListImport'
+import { CubeDefinition, ExternalCubeSource } from '../memory/types/cube'
 import { cogDB } from '../local/db'
 import { isOracleVal } from '../memory/filters/is'
 import { not } from '../memory/filters/base'
 import * as Scry from 'scryfall-sdk'
 import { normCardList, NormedCard } from '../memory/types/normedCard'
+import { importCubeArtisan } from '../cubeartisan/cubeListImport'
 
 
 self.onmessage = (_event) => {
   const event = _event.data
-
   if (event.type === "import") {
     searchCubes(event.data).catch(e => postMessage({ type: 'error', data: e.toString() }))
   }
 }
 
-async function searchCubes(cubeIds: string[]) {
+interface SearchInput {
+  cubeIds: string[]
+  source: ExternalCubeSource
+}
+
+async function searchCubes({ cubeIds, source }: SearchInput) {
   const foundCubes: { [cubeId: string]: string[] } = {}
   const foundNames = new Set<string>()
   const missingCubes: string[] = []
 
-  const results = await Promise.allSettled(cubeIds.map(importCube))
+  const importCubes = source === "cubecobra" ? importCubeCobra : importCubeArtisan
+  const results = await Promise.allSettled(cubeIds.map(importCubes))
   for (let i = 0; i < results.length; i++) {
     const cubeId = cubeIds[i]
     const result = results[i]
@@ -51,7 +57,7 @@ async function searchCubes(cubeIds: string[]) {
     .map(([key, names]) => ({
       key,
       oracle_ids: names.map(it => nameToOracleId[it]).filter(it => it !== undefined),
-      source: "cubecobra",
+      source,
       last_updated,
     }))
 

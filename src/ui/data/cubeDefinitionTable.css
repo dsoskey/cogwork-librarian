@@ -38,6 +38,7 @@
 .cube-definitions th,
 .cube-definitions td {
     width: 33%;
+    height: 20px;
 }
 
 .cube-definitions th:nth-child(1),
@@ -49,6 +50,10 @@
 .cube-definitions td.notfound {
     width: unset;
     text-align: center;
+}
+
+.cube-definitions td img {
+    align-self: center;
 }
 
 .cube-definitions .page-numbers {

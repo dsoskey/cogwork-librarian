@@ -3,8 +3,11 @@
     flex-direction: row;
 }
 
-.basic-syntax-root > div {
+.basic-syntax-root > * {
     flex: 1;
+}
+
+.basic-syntax-root > div {
     padding: var(--spacing-300);
 }
 

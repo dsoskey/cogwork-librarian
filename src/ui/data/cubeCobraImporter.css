@@ -1,8 +1,0 @@
-.cubecobra-import {
-    display: flex;
-    flex-direction: column;
-}
-
-.cubecobra-import .cards-to-import {
-    max-width: 50%;
-}

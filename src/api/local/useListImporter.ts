@@ -7,6 +7,7 @@ import { CogDB } from './useCogDB'
 
 interface ListImporter {
   attemptImport: (rawCards: string[], restart: boolean) => Promise<NormedCard[]>
+  abandonImport: () => void
   result: NormedCard[]
   missing: string[]
   setMissing: Setter<string[]>
@@ -18,6 +19,7 @@ const defaultListImporter: ListImporter = {
   attemptImport: () => Promise.reject("ListImporter.attemptImport called without a provider!"),
   result: [],
   missing: [],
+  abandonImport: () => console.error("ListImporter.abandonImport called without a provider!"),
   setMissing: () => console.error("ListImporter.setMissing called without a provider!"),
   status: 'unstarted',
   report: undefined,
@@ -84,5 +86,9 @@ export const useListImporter = (cogDb: CogDB): ListImporter => {
     })
   }
 
-  return { attemptImport: run, result, missing, setMissing, status, report }
+  const abandonImport = () => {
+    setStatus("success")
+  }
+
+  return { attemptImport: run, abandonImport, result, missing, setMissing, status, report }
 }

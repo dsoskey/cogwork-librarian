@@ -2,8 +2,7 @@ import React, { useContext, useState } from 'react'
 import { cogDB } from '../../api/local/db'
 import { NormedCard } from '../../api/memory/types/normedCard'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { ImportSource, sourceToLabel } from './cardDataView'
-import { BulkCubeCobraImporter } from './cubeCobraImporter'
+import { BulkCubeSiteImporter } from './bulkCubeSiteImporter'
 import { isFunction } from 'lodash'
 import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { ListImporterContext } from '../../api/local/useListImporter'
@@ -11,13 +10,21 @@ import { Loader } from '../component/loader'
 import { CubeListImporter } from './cubeListImporter'
 import { Setter } from '../../types'
 import { CubeDefinitionTable } from './cubeDefinitionTable'
+import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
+import { CubeSource, CUBE_SOURCE_OPTIONS, CUBE_SOURCE_TO_LABEL } from '../../api/memory/types/cube'
 
 export const CubeDataView = () => {
   const { addMessage, dismissMessage } = useContext(ToasterContext)
+
   const [cubeId, setCubeId] = useState("")
+  const [cardsToImport, setCardsToImport] = useState<string[]>([])
+
   const [error, setError] = useState("")
   const [foundCards, setFoundCards] = useState<NormedCard[]>([])
-  const [importType, setImportType] = useState<ImportSource>("cubeCobra")
+
+  const { source, setSource } = useContext(BulkCubeImporterContext)
+  const [importType, setImportType] = useState<CubeSource>(source)
+
   const listImporter = useContext(ListImporterContext)
 
   const existingCubes = useLiveQuery(() => cogDB.cube.toArray())
@@ -25,6 +32,7 @@ export const CubeDataView = () => {
   const [showConfirmation, setShowConfirmation] = useState(false)
 
   const saveCubeToDB = async (cards: NormedCard[]) => {
+    listImporter.abandonImport()
     const key = cubeId.trim()
     if (key.length === 0) {
       setError("cube id must not be blank")
@@ -36,6 +44,7 @@ export const CubeDataView = () => {
       const oracle_ids = cards.map(it => it.oracle_id)
       await cogDB.cube.put({ key, oracle_ids, source: "list", last_updated: new Date() })
       setCubeId("")
+      setCardsToImport([])
       setError("")
       setShowConfirmation(false)
       const id = addMessage(`successfully added ${cubeId} to cube list`, false)
@@ -95,23 +104,28 @@ export const CubeDataView = () => {
 
     <CubeDefinitionTable cubes={existingCubes} />
 
-    <h4 className='row'>
+    <h4 className='row baseline'>
       <span>import from</span>
-      {["cubeCobra", "text"].map(source => (<label key={source}
-        className={`input-link ${source === importType ? "active-link" : ""}`}
+      {CUBE_SOURCE_OPTIONS.map(sourceOption => (<label key={sourceOption}
+        className={`input-link ${sourceOption === importType ? "active-link" : ""}`}
       >
         <input
-          id={`import-${source}`}
+          id={`import-${sourceOption}`}
           type='radio'
-          value={source}
-          checked={source === importType}
-          onChange={() => setImportType(source as ImportSource)}
+          value={sourceOption}
+          checked={sourceOption === importType}
+          onChange={() => {
+            setImportType(sourceOption)
+            if (sourceOption !== "list") setSource(sourceOption)
+          }}
         />
-        {sourceToLabel[source]}
+        {CUBE_SOURCE_TO_LABEL[sourceOption]}
       </label>))}
     </h4>
-    {importType === "cubeCobra" && <BulkCubeCobraImporter />}
-    {importType === "text" && <CubeListImporter
+    {importType !== "list" && <BulkCubeSiteImporter />}
+    {importType === "list" && <CubeListImporter
+      cardsToImport={cardsToImport}
+      setCardsToImport={setCardsToImport}
       setCards={setCards}
       setError={setError}
       loader={loader}

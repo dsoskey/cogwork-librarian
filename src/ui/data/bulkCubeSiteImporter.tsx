@@ -1,6 +1,5 @@
 import React, { useContext } from 'react'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
-import "./cubeCobraImporter.css"
 
 const REPORT_URL_BASE = "https://github.com/dsoskey/cogwork-librarian/issues/new?assignees=&labels=bug&projects=&title=failed+cubecobra+import&body=during+bulk+import+these+cards+were+not+found%0A```%0A"
 
@@ -13,7 +12,7 @@ const encodeObject = (obj: {[u:string]:string[]}) => Object.entries(obj)
     return`${cubeId}${NL}${cards}`
   }).join(NL)
 export const CUBE_IMPORT_MESSAGES = {
-  "querying-cubecobra": "downloading cube lists...",
+  "querying-cubesite": "downloading cube lists...",
   "finding-oracle-ids": "finding associated cards...",
   "scryfall-lookup": "querying scryfall for cards not in the database...",
   "generating-cube-definitions": "generating cube definitions...",
@@ -21,7 +20,7 @@ export const CUBE_IMPORT_MESSAGES = {
   "refresh-memory": "reloading memory...",
 }
 
-export const CubeCobraImportMessage = () => {
+export const BulkImportMessage = () => {
   const { missingCards, missingCubes, status } = useContext(BulkCubeImporterContext)
   return <div className='row'>
     {CUBE_IMPORT_MESSAGES[status]?.length > 0 && <div>{CUBE_IMPORT_MESSAGES[status]}</div>}
@@ -37,10 +36,10 @@ export const CubeCobraImportMessage = () => {
       </span>}
   </div>
 }
-export const BulkCubeCobraImporter = () => {
-  const { cubeIds, setCubeIds,  attemptImport, isRunning } = useContext(BulkCubeImporterContext)
+export const BulkCubeSiteImporter = () => {
+  const { cubeIds, setCubeIds, attemptImport, isRunning } = useContext(BulkCubeImporterContext)
 
-  return <div className='cubecobra-import'>
+  return <div className='cubesite-import'>
     <textarea
       className='cards-to-import coglib-prism-theme'
       placeholder='enter one cube id per line'
@@ -51,6 +50,6 @@ export const BulkCubeCobraImporter = () => {
     <div className='row'>
       <button onClick={() => attemptImport(cubeIds)} disabled={isRunning}>import cubes</button>
     </div>
-    <CubeCobraImportMessage />
+    <BulkImportMessage />
   </div>
 }

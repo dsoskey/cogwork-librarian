@@ -1,5 +1,39 @@
 /* global */
 
+/*
+  --dark-color: hsl(207, 87%, 30%);
+  --darker-color: hsl(207, 87%, 20%);
+  --darker-color-subdued: hsl(206, 87%, 20%);
+  --darkest-color: hsl(207, 86%, 12%);
+  --light-color: hsl(19, 100%, 76%);
+  --gray-68: hsl(0, 0%, 27%);
+  --gray-68-shadow: hsla(0, 0%, 27%, 0.5);
+  --gray-42: hsl(0, 0%, 50%);
+  --blue: hsl(312, 100%, 69%);
+  --blue-low-alpha: hsla(312, 100%, 69%, 50%);
+  --blue-mid-alpha: hsla(312, 100%, 69%, 75%);
+  --green: hsl(96, 100%, 69%);
+  --light-red: hsl(339, 100%, 55%);
+  --red: hsl(339, 100%, 37%);
+*/
+
+/*
+  --dark-color: hsl(132, 32%, 27%);
+  --darker-color: hsl(132, 32%, 20%);
+  --darker-color-subdued: hsl(131, 20%, 20%);
+  --darkest-color: hsl(132, 31%, 12%);
+  --light-color: hsl(341, 41%, 88%);
+  --gray-68: hsl(0, 0%, 27%);
+  --gray-68-shadow: hsla(0, 0%, 27%, 0.5);
+  --gray-42: hsl(0, 0%, 50%);
+  --blue: hsl(344, 100%, 69%);
+  --blue-low-alpha: hsla(344, 100%, 69%, 50%);
+  --blue-mid-alpha: hsla(344, 100%, 69%, 75%);
+  --green: hsl(96, 100%, 69%);
+  --light-red: hsl(0, 100%, 55%);
+  --red: hsl(0, 100%, 37%);
+ */
+
 :root {
   --dark-color: hsl(25, 32%, 27%);
   --darker-color: hsl(25, 32%, 20%);
@@ -105,6 +139,7 @@ tbody tr:nth-child(even) {
 }
 
 th, td {
+  text-align: start;
   padding: var(--spacing-200);
 }
 
@@ -173,11 +208,13 @@ th, td {
 .column {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-200);
 }
 
 .row {
   display: flex;
   flex-direction: row;
+  gap: var(--spacing-200);
 }
 
 .column.center,
@@ -187,13 +224,6 @@ th, td {
 
 .row.baseline {
   align-items: baseline;
-}
-
-.row > :not(dialog):not(:first-child)  {
-  margin-left: 4px;
-}
-.column > :not(dialog):not(:first-child)  {
-  margin-top: 4px;
 }
 
 .masthead {
@@ -329,8 +359,7 @@ th, td {
 .query-editor .run-query-button {
   background-color: transparent;
   border: 0;
-  padding: 0;
-  padding-right: var(--spacing-100);
+  padding: 0 var(--spacing-100) 0 0;
   margin: 0;
   top: .15em;
   position: relative;

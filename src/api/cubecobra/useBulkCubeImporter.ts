@@ -1,5 +1,6 @@
 import { createContext, useState } from 'react'
 import { Setter } from '../../types'
+import { CubeDefinition, ExternalCubeSource } from '../memory/types/cube'
 
 const RUNNING_STATES = [
   "querying-cubecobra",
@@ -16,26 +17,34 @@ export interface MissingCards {
 
 interface BulkCubeImporter {
   attemptImport: (cubeIds: string[]) => void
+  attemptRefresh: (cubeIds: { [key: string]: CubeDefinition[] }) => void
   status: string
   isRunning: boolean
   missingCubes: string[]
   missingCards: MissingCards
   cubeIds: string[]
   setCubeIds: Setter<string[]>
+  source: ExternalCubeSource
+  setSource: Setter<ExternalCubeSource>
 }
 
 const defaultCubeImporter: BulkCubeImporter = {
   attemptImport: () => console.error("BulkCubeImporterContext.attemptImport without a producer!"),
+  attemptRefresh: () => console.error("BulkCubeImporterContext.attemptRefresh without a producer!"),
   status: "importer dont work!",
   isRunning: false,
   missingCubes: [],
   missingCards: { cubeToCard: {}, count: 0 },
   cubeIds: [],
   setCubeIds: () => console.error("BulkCubeImporterContext.setCubeIds called without a producer!"),
+  source: "cubecobra",
+  setSource: () => console.error("BulkCubeImporterContext.setSource called without a producer!"),
 }
 
 export const BulkCubeImporterContext = createContext(defaultCubeImporter)
 export const useBulkCubeImporter = (): BulkCubeImporter => {
+  const [source, setSource] = useState<ExternalCubeSource>("cubeartisan")
+  const timerName = `import from ${source}`
   const [cubeIds, setCubeIds] = useState<string[]>([]);
   const [status, setStatus] = useState<string>("scryfall-cards-missing");
   const isRunning = RUNNING_STATES.includes(status);
@@ -43,13 +52,13 @@ export const useBulkCubeImporter = (): BulkCubeImporter => {
   const [missingCards, setMissingCards] = useState<MissingCards>({
     cubeToCard: {}, count: 0
   });
-  const handleCubeCobraImport = (event: MessageEvent): any => {
+  const handleCubeImport = (event: MessageEvent): any => {
     const {type, data} = event.data
     switch (type) {
       case "error-missing-cubes":
         setStatus("error-missing-cubes")
         setMissingCubes(data)
-        console.timeEnd("import from cubecobra")
+        console.timeEnd(timerName)
         break;
       case "scryfall-cards-missing":
         setStatus("scryfall-cards-missing")
@@ -69,7 +78,7 @@ export const useBulkCubeImporter = (): BulkCubeImporter => {
         break;
       case "end":
         setStatus("")
-        console.timeEnd("import from cubecobra")
+        console.timeEnd(timerName)
         break;
       default:
         console.log(event.data)
@@ -86,22 +95,40 @@ export const useBulkCubeImporter = (): BulkCubeImporter => {
     }
 
     console.debug("starting cube import worker")
-    console.time("import from cubecobra")
+    console.time(timerName)
     // @ts-ignore
     const worker = new Worker(new URL("./cubeImportWorker.ts", import.meta.url))
     setStatus("querying-cubecobra")
     setMissingCubes([])
-    worker.onmessage = handleCubeCobraImport
-    worker.postMessage({ type: "import", data: submittableCubeIds })
+    worker.onmessage = handleCubeImport
+    worker.postMessage({ type: "import", data: { cubeIds: submittableCubeIds, source } })
+  }
+
+  const attemptRefresh = (cubesBySource: { [key: string]: CubeDefinition[] }) => {
+    if (Object.keys(cubesBySource).length === 0) return;
+
+    console.debug("starting cube import worker")
+    // @ts-ignore
+    const worker = new Worker(new URL("./cubeImportWorker.ts", import.meta.url))
+    setStatus("querying-cubecobra")
+    setMissingCubes([])
+    worker.onmessage = handleCubeImport
+    for (let [cubeSource, cubes] of Object.entries(cubesBySource)) {
+      const submittableCubeIds = cubes.map(it => it.key)
+      worker.postMessage({ type: "import", data: { cubeIds: submittableCubeIds, source: cubeSource } })
+    }
   }
 
   return {
     attemptImport,
+    attemptRefresh,
     status,
     isRunning,
     missingCubes,
     missingCards,
     cubeIds,
     setCubeIds,
+    source,
+    setSource,
   }
 }
