@@ -50,7 +50,8 @@ const CubeDefinitionRow = ({ cube, checked, onChecked }: CubeDefinitionRowProps)
            rel='noreferrer'
            target='_blank'>{key}</a>
       }
-      {source === "list" && key}
+      {/* backwards compatibility for earlier text imports*/}
+      {(source ?? "list") === "list" && key}
     </td>
     <td><SourceIcon source={source??"list"} /></td>
     <td>{last_updated?.toLocaleString() ?? "~"}</td>
