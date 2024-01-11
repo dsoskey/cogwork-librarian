@@ -26,7 +26,7 @@ export const SearchView = () => {
   const { addIgnoredId, addCard, savedCards, ignoredIds, setSavedCards } = useContext(ProjectContext)
   const [rawQueries, setRawQueries] = useLocalStorage<string[]>('queries', INTRO_EXAMPLE)
 
-  const [source, setSource] = useLocalStorage<DataSource>('source', 'scryfall')
+  const [source, setSource] = useLocalStorage<DataSource>('source', 'local')
   const queryRunner = {
     local: useMemoryQueryRunner({ corpus: cogDB.memory }),
     scryfall: useScryfallQueryRunner({}),

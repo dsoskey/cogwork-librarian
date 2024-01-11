@@ -490,8 +490,13 @@ rarityValue ->
     ("u" | "uncommon")  {% () => "uncommon" %} |
     ("c" | "common")  {% () => "common" %}
 
-orderValue -> ("artist" | "cmc" | "power" | "toughness" | "set" | "name" | "usd" | "tix" | "eur" | "rarity" | "color" | "released" | "spoiled" | "edhrec" | "penny" | "review") 
+orderValue -> ("artist" | orderMv | "power" | "toughness" | "set" | "name" | "usd" | "tix" | "eur" | "rarity" | "color" | "released" | "spoiled" | "edhrec" | "penny" | "review")
     {% id %}
+
+orderMv -> ("cmc" | "mv") {% ([token]) => {
+    return { ...token, value: "cmc" }
+} %}
+
 
 newValue -> ("rarity" | "flavor" | "art" | "artist" | "frame" | "language" | "game" | "paper" | "mtgo" | "arena" | "nonfoil" | "foil")
  {% ([[it]]) => it %}

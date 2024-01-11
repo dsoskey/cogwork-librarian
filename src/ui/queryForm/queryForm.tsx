@@ -12,7 +12,7 @@ const description: Record<DataSource, String> = {
   scryfall:
     'fetches from scryfall using its API. Supports full scryfall syntax, but larger query sets will take longer to process.',
   local:
-    'processes queries against a local database of oracle cards. syntax support is incomplete, but it runs an order of magnitude faster than communicating with scryfall',
+    'processes queries against a local database of oracle cards, so it runs an order of magnitude faster than communicating with scryfall',
 }
 
 const DatabaseSettings = () => {
@@ -66,6 +66,30 @@ export const QueryForm = ({
 
       <div className='row center execute-controls'>
         <label><strong>data source:</strong></label>
+        <div className={`source-option row center ${source === 'local' ? 'selected' : ''}`}>
+          <div className='radio-button-holder'>
+            <CoglibIcon
+              size={iconSize}
+              isActive={source === 'local'}
+            />
+            <input
+              id={`source-local`}
+              type='radio'
+              value='local'
+              checked={source === 'local'}
+              onChange={() => setSource('local')}
+            />
+          </div>
+          <label htmlFor={`source-local`}>local</label>
+          <DatabaseSettings />
+          <InfoModal
+            title={<h2 className='row center'>
+              <CoglibIcon size={iconSize} />
+              <span>data source: local</span>
+            </h2>}
+            info={description['local']}
+          />
+        </div>
         <div className={`source-option row center ${source === 'scryfall' ? 'selected' : ''}`}>
           <div className='radio-button-holder'>
             <ScryfallIcon
@@ -86,30 +110,7 @@ export const QueryForm = ({
             <span>data source: scryfall</span>
           </h2>} info={description['scryfall']} />
         </div>
-        <div className={`source-option row center ${source === 'local' ? 'selected' : ''}`}>
-            <div className='radio-button-holder'>
-              <CoglibIcon
-                size={iconSize}
-                isActive={source === 'local'}
-              />
-              <input
-                id={`source-local`}
-                type='radio'
-                value='local'
-                checked={source === 'local'}
-                onChange={() => setSource('local')}
-              />
-            </div>
-            <label htmlFor={`source-local`}>local</label>
-            <DatabaseSettings />
-            <InfoModal
-              title={<h2 className='row center'>
-                <CoglibIcon size={iconSize} />
-                <span>data source: local</span>
-              </h2>}
-              info={description['local']}
-            />
-          </div>
+
 
         <DBStatusLoader />
       </div>
