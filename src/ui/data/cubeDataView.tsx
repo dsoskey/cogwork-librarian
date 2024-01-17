@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { cogDB } from '../../api/local/db'
-import { NormedCard } from '../../api/memory/types/normedCard'
+import { NormedCard } from '../../api/mql/types/normedCard'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BulkCubeSiteImporter } from './bulkCubeSiteImporter'
 import { isFunction } from 'lodash'
@@ -11,7 +11,7 @@ import { CubeListImporter } from './cubeListImporter'
 import { Setter } from '../../types'
 import { CubeDefinitionTable } from './cubeDefinitionTable'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
-import { CubeSource, CUBE_SOURCE_OPTIONS, CUBE_SOURCE_TO_LABEL } from '../../api/memory/types/cube'
+import { CubeSource, CUBE_SOURCE_OPTIONS, CUBE_SOURCE_TO_LABEL } from '../../api/mql/types/cube'
 
 export const CubeDataView = () => {
   const { addMessage, dismissMessage } = useContext(ToasterContext)

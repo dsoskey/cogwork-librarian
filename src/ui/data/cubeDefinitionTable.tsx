@@ -1,5 +1,5 @@
 import React, { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { CUBE_SOURCE_TO_LABEL, CubeDefinition, CubeSource } from '../../api/memory/types/cube'
+import { CUBE_SOURCE_TO_LABEL, CubeDefinition, CubeSource } from '../../api/mql/types/cube'
 import "./cubeDefinitionTable.css"
 import cubeartisanImage from "./cubeartisan-favicon.ico"
 import cubecobraImage from "./cubecobra-favicon.ico"

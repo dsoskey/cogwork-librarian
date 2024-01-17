@@ -5,7 +5,7 @@ import { Setter, TaskStatus } from '../../types'
 import { Manifest, MANIFEST_ID } from '../../api/local/db'
 import { Loader } from '../component/loader'
 import { ProjectContext } from '../../api/useProject'
-import { NormedCard } from '../../api/memory/types/normedCard'
+import { NormedCard } from '../../api/mql/types/normedCard'
 import { ImportTarget } from './cardDataView'
 
 export interface CardListImporterProps {

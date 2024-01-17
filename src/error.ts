@@ -1,5 +1,5 @@
-import { OPERATORS } from './api/memory/filters/base'
-import { SearchError } from './api/memory/types/error'
+import { OPERATORS } from './api/mql/filters/base'
+import { SearchError } from './api/mql/types/error'
 
 export interface CogError {
   // query that caused the error

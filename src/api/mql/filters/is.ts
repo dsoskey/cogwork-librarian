@@ -13,6 +13,7 @@ import { oracleNode } from './oracle'
 import { textMatch } from './text'
 import { parsePowTou } from '../types/card'
 import { printNode } from './print'
+import { Card } from 'scryfall-sdk'
 
 export const isPrintPrefix = `is-print:`
 

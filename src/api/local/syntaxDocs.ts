@@ -1,4 +1,4 @@
-import { FilterKeyword } from '../memory/types/filterKeyword'
+import { FilterKeyword } from '../mql/types/filterKeyword'
 
 export const syntaxDocs: Record<FilterKeyword, string> = {
   '!': 'https://scryfall.com/docs/syntax#exact',

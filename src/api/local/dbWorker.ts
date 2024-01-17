@@ -2,7 +2,7 @@ import { cogDB, MANIFEST_ID, toManifest } from './db'
 import { downloadCards } from './populate'
 import * as Scry from 'scryfall-sdk'
 import { downloadIllustrationTags, downloadOracleTags } from '../scryfall/tagger'
-import { normCardList, NormedCard } from '../memory/types/normedCard'
+import { normCardList, NormedCard } from '../mql/types/normedCard'
 import { BulkDataType } from 'scryfall-sdk/out/api/BulkData'
 import { ImportTarget } from '../../ui/data/cardDataView'
 import { downloadSets } from '../scryfall/set'
@@ -71,7 +71,7 @@ async function initDb(type: BulkDataType, targets: ImportTarget[]) {
       postMessage({ type: 'card', data: { card, index } })
     }
   }
-  postMessage({ type: 'memory-end' })
+  postMessage({ type: 'mql-end' })
 
   if (targets.find(it => it === 'db')) {
     const toSave: NormedCard[] = []

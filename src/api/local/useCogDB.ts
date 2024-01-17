@@ -2,11 +2,11 @@ import { createContext, SetStateAction, useEffect, useRef, useState } from 'reac
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, isScryfallManifest, Manifest } from './db'
 import { migrateCubes, putFile } from './populate'
-import { NormedCard } from '../memory/types/normedCard'
+import { NormedCard } from '../mql/types/normedCard'
 import { QueryReport, useReporter } from '../useReporter'
 import { ImportTarget } from '../../ui/data/cardDataView'
 import { isFunction } from 'lodash'
-import { isOracleVal } from '../memory/filters/is'
+import { isOracleVal } from '../mql/filters/is'
 
 export const DB_LOAD_MESSAGES = [
   "loading cubes...",

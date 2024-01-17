@@ -1,6 +1,6 @@
 import {
   keywords,
-} from '../../api/memory/types/filterKeyword'
+} from '../../api/mql/types/filterKeyword'
 import React from 'react'
 import { syntaxDocs } from '../../api/local/syntaxDocs'
 import { BasicSyntaxSection } from './basicSyntaxSection'

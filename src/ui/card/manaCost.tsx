@@ -1,4 +1,4 @@
-import { ManaSymbol, toSplitCost } from '../../api/memory/types/card'
+import { ManaSymbol, toSplitCost } from '../../api/mql/types/card'
 import { ManaIcon } from './manaSymbol'
 import React from 'react'
 

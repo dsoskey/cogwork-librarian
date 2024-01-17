@@ -1,8 +1,8 @@
 import React from 'react'
 import Prism, { Environment, Grammar } from 'prismjs'
 import 'prismjs/components/prism-regex.js'
-import { keywords, keywordsToImplement } from '../memory/types/filterKeyword'
-import { OPERATORS } from '../memory/filters/base'
+import { keywords, keywordsToImplement } from '../mql/types/filterKeyword'
+import { OPERATORS } from '../mql/filters/base'
 import { syntaxDocs } from './syntaxDocs'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended' | 'scryfall-extended-multi'

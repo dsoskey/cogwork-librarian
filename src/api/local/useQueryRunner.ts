@@ -7,12 +7,12 @@ import {
   QueryRunnerProps
 } from '../queryRunnerCommon'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { NormedCard } from '../memory/types/normedCard'
+import { NormedCard } from '../mql/types/normedCard'
 import { displayMessage } from '../../error'
-import { SearchOptions } from '../memory/types/searchOptions'
-import { QueryRunner } from '../memory/queryRunner'
+import { SearchOptions } from '../mql/types/searchOptions'
+import { QueryRunner } from '../mql/queryRunner'
 import { useMemo, useState } from 'react'
-import { CachingFilterProvider } from '../memory/filters'
+import { CachingFilterProvider } from '../mql/filters'
 import { cogDB } from './db'
 import { RunStrategy } from '../scryfallExtendedParser'
 

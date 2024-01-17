@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { Setter } from '../../types'
-import { NormedCard } from '../../api/memory/types/normedCard'
+import { NormedCard } from '../../api/mql/types/normedCard'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { ProjectContext } from '../../api/useProject'
 

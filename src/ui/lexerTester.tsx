@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
-import { lexer } from '../api/memory/lexer'
+import { lexer } from '../api/mql/lexer'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 
 export const LexerTester = () => {

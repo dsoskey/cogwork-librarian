@@ -13,7 +13,7 @@ import { Footer } from './footer'
 import { parseQuerySet, RunStrategy } from '../api/scryfallExtendedParser'
 import { CogError } from '../error'
 import { INTRO_EXAMPLE } from '../api/example'
-import { SearchOptions } from '../api/memory/types/searchOptions'
+import { SearchOptions } from '../api/mql/types/searchOptions'
 import { cogDB as cogDBClient } from '../api/local/db'
 
 const options: SearchOptions = {

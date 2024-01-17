@@ -1,8 +1,8 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import { NormedCard } from '../memory/types/normedCard'
-import { CubeDefinition } from '../memory/types/cube'
-import { IllustrationTag, OracleTag } from '../memory/types/tag'
+import { NormedCard } from '../mql/types/normedCard'
+import { CubeDefinition } from '../mql/types/cube'
+import { IllustrationTag, OracleTag } from '../mql/types/tag'
 import { DataSource } from '../../types'
 import { RunStrategy } from '../scryfallExtendedParser'
 

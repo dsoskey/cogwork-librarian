@@ -68,7 +68,7 @@ export const narcomoeba = Card.construct({
     "nonfoil",
     "foil"
   ],
-  "flavor_text": "It was created by the Iquati as a living memory—one that objects to being forgotten.",
+  "flavor_text": "It was created by the Iquati as a living mql—one that objects to being forgotten.",
   "frame": "future",
   "games": [
     "paper",

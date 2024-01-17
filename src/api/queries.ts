@@ -1,4 +1,4 @@
-import { isValues } from './memory/types/card'
+import { isValues } from './mql/types/card'
 
 export const displayQueries = [
   'o=/whenever ~ deals/',

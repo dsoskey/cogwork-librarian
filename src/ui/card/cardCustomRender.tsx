@@ -1,6 +1,6 @@
 import { Card, CardFace } from 'scryfall-sdk'
 import React, { useMemo, useState } from 'react'
-import { DOUBLE_FACED_LAYOUTS } from '../../api/memory/types/card'
+import { DOUBLE_FACED_LAYOUTS } from '../../api/mql/types/card'
 import "./cardCustomRender.css"
 import { ManaCost } from './manaCost'
 

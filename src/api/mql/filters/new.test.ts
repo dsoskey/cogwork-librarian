@@ -28,6 +28,8 @@ describe('new filter', function() {
   it('should handle artist filter', async function() {
     const result = (await queryRunner.search("new:artist"))._unsafeUnwrap();
 
+    expect(result.length).toEqual(2)
+
   });
 
   it('should handle frame filter', async function() {

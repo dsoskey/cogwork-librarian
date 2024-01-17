@@ -1,4 +1,4 @@
-import { IllustrationTag, OracleTag } from '../memory/types/tag'
+import { IllustrationTag, OracleTag } from '../mql/types/tag'
 
 // TODO: This will have to change at some point
 const BASE_URL = "https://api.scryfall.com/private/tags/"
