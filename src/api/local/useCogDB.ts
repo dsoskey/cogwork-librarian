@@ -7,6 +7,7 @@ import { QueryReport, useReporter } from '../useReporter'
 import { ImportTarget } from '../../ui/data/cardDataView'
 import { isFunction } from 'lodash'
 import { isOracleVal } from '../mql/filters/is'
+import { useLocalStorage } from './useLocalStorage'
 
 export const DB_LOAD_MESSAGES = [
   "loading cubes...",
@@ -35,13 +36,14 @@ export interface CogDB {
   dbReport: QueryReport
   memory: NormedCard[]
   setMemory: Setter<NormedCard[]>
+  loadFilter: string
+  setLoadFilter: Setter<string>
   manifest: Manifest
   outOfDate: boolean
   setManifest: Setter<Manifest>
   saveToDB: (manifest?: Manifest, cards?: NormedCard[]) => Promise<void>
   resetDB: () => Promise<void>
-  refreshDB: () => Promise<void>
-  loadManifest: (manifest: Manifest, targets: ImportTarget[]) => Promise<void>
+  loadManifest: (manifest: Manifest, targets: ImportTarget[], filter: string) => Promise<void>
   cardByName: (name: string, fuzzy?: boolean) => (NormedCard | undefined)
 }
 
@@ -60,11 +62,13 @@ const defaultDB: CogDB = {
     name: '',
     type: '',
     lastUpdated: new Date(),
+    filter: '',
   },
   setManifest: () => console.error("CogDB.setManifest called without a provider!"),
+  loadFilter: "",
+  setLoadFilter: () => console.error("CogDB.setLoadFilter called without a provider!"),
   saveToDB: () => Promise.reject("CogDB.saveToDB called without a provider!"),
   resetDB: () => Promise.reject("CogDB.resetDB called without a provider!"),
-  refreshDB: () => Promise.reject("CogDB.refreshDB called without a provider!"),
   loadManifest: () => Promise.reject("CogDB.loadManifest called without a provider!"),
   outOfDate: false,
 }
@@ -106,11 +110,13 @@ export const useCogDB = (): CogDB => {
     res.forEach(addCardToIndex)
   }
 
+  const [loadFilter, setLoadFilter] = useLocalStorage<string>("load-filter", "")
   const [manifest, setManifest] = useState<Manifest>({
     id: 'loading',
     name: 'loading',
     type: 'loading',
     lastUpdated: new Date(),
+    filter: "",
   })
 
   const handleLoadDB = (event: MessageEvent): any => {
@@ -233,13 +239,13 @@ export const useCogDB = (): CogDB => {
         type: 'init',
         data: {
           bulkType: 'default_cards',
-          targets: ['memory', 'db']
+          targets: ['memory', 'db'],
         }
       })
     } else {
       console.debug("posting start message to worker")
       worker.onmessage = handleLoadDB
-      worker.postMessage({ type: 'load' })
+      worker.postMessage({ type: 'load', data: { filter: loadFilter } })
     }
 
   }
@@ -256,7 +262,7 @@ export const useCogDB = (): CogDB => {
     }
   }
 
-  const loadManifest = async (manifest: Manifest, targets: ImportTarget[]) => {
+  const loadManifest = async (manifest: Manifest, targets: ImportTarget[], filter: string) => {
     if (!isScryfallManifest(manifest.type)) {
       throw Error("don't try to refresh the db with a non-scryfall manifest")
     }
@@ -273,11 +279,7 @@ export const useCogDB = (): CogDB => {
 
     console.debug('refreshing db')
     worker.onmessage = handleInitDB
-    worker.postMessage({ type: 'init', data: { bulkType: manifest.type, targets } })
-  }
-
-  const refreshDB = async () => {
-    await loadManifest(manifest, ['memory', 'db'])
+    worker.postMessage({ type: 'init', data: { bulkType: manifest.type, targets, filter } })
   }
 
   useEffect(() => { resetDB() }, [])
@@ -297,10 +299,11 @@ export const useCogDB = (): CogDB => {
     memory,
     setMemory,
     resetDB,
-    refreshDB,
     loadManifest,
     dbReport,
     outOfDate: (manifest?.lastUpdated ?? EPOCH) < cogDB.LAST_UPDATE,
     cardByName,
+    loadFilter,
+    setLoadFilter
   }
 }

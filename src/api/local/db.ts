@@ -12,6 +12,7 @@ export interface Collection {
   type: string
   blob: Blob
   lastUpdated: Date
+  filter: string
 }
 
 export interface QueryHistory {
@@ -37,12 +38,14 @@ export const isScryfallManifest = (s: string): boolean =>
   ["oracle_cards", "unique_artwork", "default_cards", "all_cards", "rulings"].includes(s)
 
 export const toManifest = (
-  bulkDataDefinition: BulkDataDefinition
+  bulkDataDefinition: BulkDataDefinition,
+  filter: string = ""
 ): Manifest => ({
   ...bulkDataDefinition,
   id: MANIFEST_ID,
   name: bulkDataDefinition.uri,
   lastUpdated: new Date(),
+  filter: filter.trim(),
 })
 
 export class TypedDexie extends Dexie {
@@ -142,6 +145,17 @@ export class TypedDexie extends Dexie {
 
     this.version(9).stores({
       block: "block_code, block"
+    })
+
+    this.version(10).stores({
+      collection: "id, name, last_updated, filter"
+    }).upgrade(trans  => {
+      return trans.table("collection").toCollection()
+        .modify(c => {
+          if (c.filter === undefined) {
+            c.filter = ""
+          }
+        })
     })
   }
 }

@@ -594,8 +594,8 @@ export const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
         card.layout === 'double_faced_token' ||
         card.layout === 'emblem' ||
         card.layout === 'planar' ||
-        card.type_line.includes("Vanguard") ||
-        card.type_line.includes("Scheme")
+        card.type_line?.includes("Vanguard") ||
+        card.type_line?.includes("Scheme")
     // not found on/derived from card json
     case 'frenchvanilla': // this is gonna be a big parse :(((((((((((((((((((((
     case 'spikey':

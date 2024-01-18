@@ -29,8 +29,9 @@ const LoaderButton = ({ vh, vw, count, total }) => {
 }
 
 export const QuerySetButton = () => {
-  const { cardCount, totalCards } = useContext(CogDBContext).dbReport;
+  const { dbReport, memStatus } = useContext(CogDBContext);
+  const { cardCount, totalCards } = dbReport;
   const viewWidth = 100;
   const viewHeight = 100;
-  return <LoaderButton vw={viewWidth} vh={viewHeight} count={cardCount} total={totalCards} />
+  return <LoaderButton vw={viewWidth} vh={viewHeight} count={cardCount} total={memStatus === "success" ? cardCount : totalCards} />
 }

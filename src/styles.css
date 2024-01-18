@@ -288,10 +288,12 @@ th, td {
   word-break: normal;
   word-wrap: normal;
   line-height: 1.5;
-  padding: 1em;
-  margin: 0.5em 0;
   overflow: auto;
   border: none;
+}
+textarea.coglib-prism-theme {
+  padding: 1em;
+  margin: 0.5em 0;
 }
 
 .search-view-root {
@@ -330,6 +332,12 @@ th, td {
   grid-template-columns: auto auto 1fr;
   grid-template-rows: 1fr;
   grid-template-areas: 'labels brown overlap';
+}
+
+.query-input > code[class*="language-"] {
+  white-space: nowrap;
+  padding: 1px;
+  border-radius: unset;
 }
 
 .query-editor pre, .query-editor textarea {

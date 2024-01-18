@@ -1,0 +1,11 @@
+label.form-field {
+    display: block;
+    width: fit-content;
+    margin: var(--spacing-300) 0;
+}
+
+label.form-field .description {
+    font-style: italic;
+    font-size: .9em;
+}
+

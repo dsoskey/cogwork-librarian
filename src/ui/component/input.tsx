@@ -34,36 +34,25 @@ export const Input = ({ value, onChange, language }: InputProps) => {
   useHighlightPrism([value])
 
   useEffect(() => {
-    controller.current.addEventListener('scroll', onScroll)
-    return () => controller.current.removeEventListener('scroll', onScroll)
+    controller.current?.addEventListener('scroll', onScroll)
+    return () => controller.current?.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
-    <div className='query-editor' onKeyDown={showLinks} onKeyUp={hideLinks}>
-      <pre
-        ref={linker}
+    <div className='query-editor query-input' onKeyDown={showLinks} onKeyUp={hideLinks}>
+      <code ref={linker}
         tabIndex={-1}
-        aria-hidden // Is this an accessibility issue with the links? also consider
-        className={`language-${language ?? 'none'} links ${
+        aria-hidden
+        className={`language-${language ?? 'none'} links match-braces ${
           revealLinks ? 'show' : 'hide'
-        }`}
-      >
-        <code className='match-braces'>{value}</code>
-      </pre>
+        }`}>{value}</code>
       <input
         ref={controller}
         className='controller coglib-prism-theme'
         value={value}
         onChange={onChange}
       />
-
-      <pre
-        ref={faker}
-        tabIndex={-1}
-        className={`language-${language ?? 'none'} display`}
-      >
-        <code className='match-braces'>{value}</code>
-      </pre>
+      <code ref={faker} className={`language-${language ?? 'none'} display match-braces`}>{value}</code>
     </div>
   )
 }

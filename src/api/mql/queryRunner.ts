@@ -11,6 +11,7 @@ import sortBy from 'lodash/sortBy'
 import { AstNode } from './types/ast'
 import { MQLParser } from './mql'
 import { DataProvider } from './filters/dataProvider'
+import { FilterNode } from './filters/base'
 
 interface VennDiagram {
   cards: Card[]
@@ -58,13 +59,13 @@ export class QueryRunner {
     this.defaultOptions = defaultOptions ?? { order: 'name' }
   }
 
-  search = (query: string, _options?: SearchOptions): ResultAsync<Card[], SearchError> => {
-    const options = _options ?? this.defaultOptions
+  search = (query: string, _options?: Partial<SearchOptions>): ResultAsync<Card[], SearchError> => {
+    const options: SearchOptions = { ...this.defaultOptions, ..._options }
     const func = QueryRunner.generateSearchFunction(this.corpus, this.filters, this.getParser)
     return func(query, options)
   }
 
-  static parseFilterNode = (getParser: ParserProducer, query): ResultAsync<Parser, SearchError> => {
+  static parseFilterNode = (getParser: ParserProducer, filters: FilterProvider, query): ResultAsync<FilterNode, SearchError> => {
     const parser = getParser();
     try {
       console.debug(`feeding ${query}`)
@@ -93,6 +94,8 @@ export class QueryRunner {
       })
     }
     return okAsync(parser)
+      .andThen(parser => filters.visitNode(parser.results[0] as AstNode))
+      .mapErr(err => ({ ...err, query, type: "parse" }))
   }
 
   static generateSearchFunction = (
@@ -103,9 +106,7 @@ export class QueryRunner {
     query: string,
     options: SearchOptions
   ): ResultAsync<Card[], SearchError> => {
-    return QueryRunner.parseFilterNode(getParser, query)
-      .andThen(parser => filters.visitNode(parser.results[0] as AstNode))
-      .mapErr(err => ({ ...err, query, type: "parse" }))
+    return QueryRunner.parseFilterNode(getParser, filters, query)
       .map(node => {
         const { filtersUsed, filterFunc } = node;
 
@@ -166,22 +167,18 @@ export class QueryRunner {
     left: string, right: string,
     options: SearchOptions
   ): ResultAsync<VennDiagram, SearchError> => {
-    const leftParser = QueryRunner.parseFilterNode(getParser, left)
-      .andThen(p => filters.visitNode(p.results[0] as AstNode))
-      .mapErr(err => ({ ...err, query:left, type: "parse" }))
-    const rightParser = QueryRunner.parseFilterNode(getParser, right)
-      .andThen(p => filters.visitNode(p.results[0] as AstNode))
-      .mapErr(err => ({ ...err, query: right, type: "parse" }))
+    const leftNode = QueryRunner.parseFilterNode(getParser, filters, left)
+    const rightNode = QueryRunner.parseFilterNode(getParser, filters, right)
 
-    return ResultAsync.combine([leftParser, rightParser])
-      .andThen(([leftParser, rightParser]) => {
+    return ResultAsync.combine([leftNode, rightNode])
+      .andThen(([leftNode, rightNode]) => {
         const leftOracles: Set<string> = new Set()
         const rightOracles: Set<string> = new Set()
         const union: NormedCard[] = []
 
         for (const card of corpus) {
-          const isLeft = leftParser.filterFunc(card)
-          const isRight = rightParser.filterFunc(card)
+          const isLeft = leftNode.filterFunc(card)
+          const isRight = rightNode.filterFunc(card)
 
           if (isLeft || isRight) {
             union.push(card)
@@ -194,8 +191,8 @@ export class QueryRunner {
           }
         }
 
-        const leftPrintFilter = chooseFilterFunc(leftParser)
-        const rightPrintFilter = chooseFilterFunc(rightParser)
+        const leftPrintFilter = chooseFilterFunc(leftNode)
+        const rightPrintFilter = chooseFilterFunc(rightNode)
 
         const leftIds: Set<string> = new Set()
         const bothIds: Set<string> = new Set()
@@ -223,7 +220,7 @@ export class QueryRunner {
           }
         }
 
-        const combinedFiltersUsed = [...leftParser.filtersUsed, ...rightParser.filtersUsed]
+        const combinedFiltersUsed = [...leftNode.filtersUsed, ...rightNode.filtersUsed]
         const order: SortOrder = getOrder(combinedFiltersUsed, options)
         const sorted = sortBy(unionPrints, [...sortFunc(order), byName]) as Card[]
 

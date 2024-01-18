@@ -6,6 +6,9 @@ import * as Scry from 'scryfall-sdk'
 import { CogDBContext, DB_INIT_MESSAGES } from '../../api/local/useCogDB'
 import { ImportTarget } from './cardDataView'
 import { Loader } from '../component/loader'
+import { useLocalStorage } from '../../api/local/useLocalStorage'
+import { Input } from '../component/input'
+import { FormField } from '../component/formField'
 
 export interface ScryfallImporterProps {
   importTargets: ImportTarget[]
@@ -13,12 +16,10 @@ export interface ScryfallImporterProps {
 export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
   const { memStatus, dbStatus, dbReport, loadManifest } = useContext(CogDBContext)
 
-  const [targetDefinition, setTargetDefinition] = useState<
-    BulkDataDefinition | undefined
-  >()
-  const [bulkDataDefinitions, setBulkDataDefinitions] = useState<
-    BulkDataDefinition[]
-  >([])
+  const [targetDefinition, setTargetDefinition] = useState<BulkDataDefinition | undefined>();
+  const [bulkDataDefinitions, setBulkDataDefinitions] = useState<BulkDataDefinition[]>([]);
+  const [filter, setFilter] = useLocalStorage<string>("db-import-filter", "is:extra");
+
   useEffect(() => {
     Scry.BulkData.definitions().then((definitions) => {
       setBulkDataDefinitions(definitions.filter((it) => it.type !== 'rulings'))
@@ -28,7 +29,7 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
 
   const importFromScryfall = async () => {
     if (targetDefinition) {
-      await loadManifest(toManifest(targetDefinition), importTargets)
+      await loadManifest(toManifest(targetDefinition), importTargets, filter)
     }
   }
 
@@ -62,6 +63,12 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
         />}
       </div>
     </>}
+    <FormField
+      title="import filter"
+      description="cards that match this filter will be loaded into the database during importing"
+    >
+      <Input onChange={e => setFilter(e.target.value)} value={filter} language="scryfall" />
+    </FormField>
     <button
       disabled={dbStatus === 'loading' || memStatus === 'loading' || targetDefinition === undefined}
       onClick={importFromScryfall}

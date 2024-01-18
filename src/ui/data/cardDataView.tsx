@@ -7,6 +7,9 @@ import { CardListImporter } from './cardListImporter'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB } from '../../api/local/db'
 import { TagImporter } from './tagImporter'
+import { Input } from '../component/input'
+import { FormField } from '../component/formField'
+import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 
 export const IMPORT_SOURCE = {
   scryfall: 'scryfall',
@@ -49,8 +52,30 @@ const TargetCheckbox = ({ importTargets, setImportTargets, target }: TargetCheck
   </label>
 }
 
+const ManifestView = ({ manifest }) => {
+  useHighlightPrism([manifest.filter]);
+  return <>
+    <div>
+      <strong>source:</strong> <code>{manifest.name}</code>
+    </div>
+    <div>
+      <strong>type:</strong> <code>{manifest.type}</code>
+    </div>
+    <div>
+      <strong>last updated:</strong>{' '}
+      <code>{dateString(manifest.lastUpdated)}</code>
+    </div>
+    <div>
+      <strong>import filter:</strong>{' '}
+      {manifest.filter
+        ? <code className="language-scryfall">{manifest.filter}</code>
+        : <code>No filter</code>}
+    </div>
+  </>
+}
+
 export const CardDataView = () => {
-  const { dbStatus, memStatus, manifest, outOfDate, saveToDB, resetDB } = useContext(CogDBContext)
+  const { dbStatus, memStatus, manifest, outOfDate, saveToDB, resetDB, loadFilter, setLoadFilter } = useContext(CogDBContext)
   const dbManifest = useLiveQuery(async () => cogDB.collection.get("the_one"))
   const dbDirty = dbManifest === undefined || manifest.id === 'loading'
     ? false
@@ -70,29 +95,11 @@ export const CardDataView = () => {
       <div className='row'>
         <div>
           <h4>in memory {dbImportStatus === 'loading' && '(importing...)'}</h4>
-          <div>
-            <strong>source:</strong> <code>{manifest.name}</code>
-          </div>
-          <div>
-            <strong>type:</strong> <code>{manifest.type}</code>
-          </div>
-          <div>
-            <strong>last updated:</strong>{' '}
-            <code>{dateString(manifest.lastUpdated)}</code>
-          </div>
+          <ManifestView manifest={manifest} />
         </div>
         {dbDirty && dbManifest && <div>
           <h4>in database</h4>
-          <div>
-            <strong>source:</strong> <code>{dbManifest.name}</code>
-          </div>
-          <div>
-            <strong>type:</strong> <code>{dbManifest.type}</code>
-          </div>
-          <div>
-            <strong>last updated:</strong>{' '}
-            <code>{dateString(dbManifest.lastUpdated)}</code>
-          </div>
+          <ManifestView manifest={dbManifest} />
         </div>}
       </div>
 
@@ -110,6 +117,12 @@ export const CardDataView = () => {
           in-memory data set hasn't been saved to database yet
         </div>
       )}
+      <FormField
+        title="in-memory filter"
+        description="load cards that match this query into memory on page load">
+        <Input onChange={e => setLoadFilter(e.target.value)} value={loadFilter} language="scryfall"/>
+      </FormField>
+      <button onClick={() => window.location.reload()}>reload page</button>
       <button
         disabled={dbStatus === 'loading' || memStatus === 'loading' || !dbDirty}
         onClick={() => saveToDB()}
