@@ -335,7 +335,7 @@ textarea.coglib-prism-theme {
 }
 
 .query-input > code[class*="language-"] {
-  white-space: nowrap;
+  white-space: pre;
   padding: 1px;
   border-radius: unset;
 }
