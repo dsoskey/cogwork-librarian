@@ -18,7 +18,7 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
 
   const [targetDefinition, setTargetDefinition] = useState<BulkDataDefinition | undefined>();
   const [bulkDataDefinitions, setBulkDataDefinitions] = useState<BulkDataDefinition[]>([]);
-  const [filter, setFilter] = useLocalStorage<string>("db-import-filter", "is:extra");
+  const [filter, setFilter] = useLocalStorage<string>("db-import-filter-1", "-is:extra ++");
 
   useEffect(() => {
     Scry.BulkData.definitions().then((definitions) => {
