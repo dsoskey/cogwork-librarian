@@ -79,6 +79,7 @@ export const CardImageView = ({
     }
   }
 
+  const href = card.data.scryfall_uri.replace(/\?.*$/, '')
 
   return (
     <div className={`card-view ${card.data.set} ${className}`} ref={cardViewRef}
@@ -86,6 +87,11 @@ export const CardImageView = ({
       onKeyDown={handleKeyPress}
       onMouseOver={handleHoverOn}
       onMouseLeave={handleHoverOff}
+      onAuxClick={e => {
+        if (e.button === 1) {
+          window.open(href, "_blank");
+        }
+      }}
     >
       {showRender && <CardCustomRender card={card.data} />}
       {!showRender && <CardImage card={card.data} />}
