@@ -1,0 +1,16 @@
+.project-tab {
+    padding: var(--spacing-100);
+    border: var(--dark-color) inset 2px;
+}
+
+.project-tab.active {
+    color: var(--darker-color);
+    background-color: var(--blue);
+    border: var(--blue) inset 2px;
+}
+
+.project-tab .project-action {
+    width: 1.75em;
+    height: 1.75em;
+    font-weight: bold;
+}

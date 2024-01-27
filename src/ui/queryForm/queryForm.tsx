@@ -7,6 +7,8 @@ import { InfoModal } from '../component/infoModal'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { DBStatusLoader } from '../component/dbStatusLoader'
 import { Link } from 'react-router-dom'
+import { ProjectContext } from '../../api/local/useProjectDao'
+import { ProjectTabs } from './projectTabs'
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -32,8 +34,6 @@ const DatabaseSettings = () => {
 export interface QueryFormProps {
   status: TaskStatus
   execute: (startIndex: number) => void
-  queries: string[]
-  setQueries: Setter<string[]>
   source: DataSource
   setSource: Setter<DataSource>
 }
@@ -41,11 +41,10 @@ export interface QueryFormProps {
 export const QueryForm = ({
   status,
   execute,
-  queries,
-  setQueries,
   source,
   setSource,
 }: QueryFormProps) => {
+  const { queries, setQueries } = useContext(ProjectContext);
   const { memStatus } = useContext(CogDBContext)
   // something about prism overrides the state update for this css class
 
@@ -54,6 +53,7 @@ export const QueryForm = ({
   const iconSize = 30
   return (
     <div className='query-form'>
+      <ProjectTabs />
       <div className={source}>
         <TextEditor
           queries={queries}

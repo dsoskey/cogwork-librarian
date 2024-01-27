@@ -19,6 +19,7 @@ export interface QueryHistory {
   id?: string
   rawQueries: string[],
   baseIndex: number
+  projectPath: string;
   errorText?: string
   source: DataSource
   strategy?: RunStrategy
@@ -29,6 +30,29 @@ export interface Block {
   block_code: string
   block: string
   set_codes: string[]
+}
+
+// name, count
+export interface CardEntry {
+  name: string
+  quantity: number
+  // Set code
+  set?: string
+  // Collector number
+  cn?: string
+}
+
+export interface Project {
+  path: string;
+  savedCards: CardEntry[];
+  ignoredCards: string[];
+  queries: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ProjectFolder {
+  path: string;
 }
 
 export const MANIFEST_ID = 'the_one'
@@ -61,6 +85,8 @@ export class TypedDexie extends Dexie {
   illustrationTag!: Table<IllustrationTag>
   block!: Table<Block>
   history!: Table<QueryHistory>
+  project!: Table<Project>
+  projectFolder!: Table<ProjectFolder>
 
   getCube = (key: String) => this.cube.get(key)
   getOtag = (key: String) => this.oracleTag.get({ label: key })
@@ -154,6 +180,19 @@ export class TypedDexie extends Dexie {
         .modify(c => {
           if (c.filter === undefined) {
             c.filter = ""
+          }
+        })
+    })
+
+    this.version(11).stores({
+      history: '++id, executedAt, project',
+      project: 'path, createdAt, updatedAt',
+      projectFolder: 'path',
+    }).upgrade(trans => {
+      return trans.table("history").toCollection()
+        .modify(h => {
+          if (h.projectPath === undefined) {
+            h.projectPath = ""
           }
         })
     })

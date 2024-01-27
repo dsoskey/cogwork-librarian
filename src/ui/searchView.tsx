@@ -1,7 +1,8 @@
 import { QueryForm } from './queryForm/queryForm'
 import { BrowserView } from './cardBrowser/browserView'
 import React, { useContext, useState } from 'react'
-import { ProjectContext } from '../api/useProject'
+import { ProjectContext as ProjectContextV1 } from '../api/useProject'
+import { ProjectContext } from '../api/local/useProjectDao'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 import { DataSource } from '../types'
 import { useMemoryQueryRunner } from '../api/local/useQueryRunner'
@@ -12,7 +13,6 @@ import { Masthead } from './component/masthead'
 import { Footer } from './footer'
 import { parseQuerySet, RunStrategy } from '../api/scryfallExtendedParser'
 import { CogError } from '../error'
-import { INTRO_EXAMPLE } from '../api/example'
 import { SearchOptions } from '../api/mql/types/searchOptions'
 import { cogDB as cogDBClient } from '../api/local/db'
 
@@ -20,11 +20,15 @@ const options: SearchOptions = {
   order: 'cmc',
   dir: 'auto',
 }
+
 export const SearchView = () => {
   const cogDB = useContext(CogDBContext)
 
-  const { addIgnoredId, addCard, savedCards, ignoredIds, setSavedCards } = useContext(ProjectContext)
-  const [rawQueries, setRawQueries] = useLocalStorage<string[]>('queries', INTRO_EXAMPLE)
+  const { queries, currentPath } = useContext(ProjectContext)
+  const {
+    savedCards, setSavedCards, addCard,
+    ignoredIds, addIgnoredId,
+  } = useContext(ProjectContextV1)
 
   const [source, setSource] = useLocalStorage<DataSource>('source', 'local')
   const queryRunner = {
@@ -38,13 +42,13 @@ export const SearchView = () => {
 
   const execute = (baseIndex: number) => {
     console.debug(`submitting query at line ${baseIndex}`)
-    if (baseIndex < 0 || baseIndex >= rawQueries.length) {
+    if (baseIndex < 0 || baseIndex >= queries.length) {
       console.error("baseIndex is out of bounds")
       return
     }
     setExtendedParseError([])
 
-    parseQuerySet(rawQueries, baseIndex)
+    parseQuerySet(queries, baseIndex)
       .map(({ strategy, queries, getWeight, injectPrefix }) => {
         const executedAt = new Date();
         let promise
@@ -56,21 +60,23 @@ export const SearchView = () => {
         }
         promise.then(() =>
             cogDBClient.history.put({
-              rawQueries,
+              rawQueries: queries,
               baseIndex,
               source,
               strategy,
               executedAt,
+              projectPath: currentPath,
             })
           ).catch(error => {
             console.error(error)
             cogDBClient.history.put({
-              rawQueries,
+              rawQueries: queries,
               baseIndex,
               source,
               strategy,
               errorText: error.toString(),
               executedAt,
+              projectPath: currentPath,
             })
           })
       })
@@ -90,8 +96,6 @@ export const SearchView = () => {
       <QueryForm
         status={queryRunner.status}
         execute={execute}
-        queries={rawQueries}
-        setQueries={setRawQueries}
         source={source}
         setSource={setSource}
       />

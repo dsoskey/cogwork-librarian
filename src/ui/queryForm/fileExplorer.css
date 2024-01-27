@@ -1,0 +1,16 @@
+.file-explorer {
+    list-style: none;
+    padding-left: var(--spacing-400);
+}
+
+.file-explorer :is(ul, li) {
+    list-style: inherit;
+}
+
+.file-explorer ul {
+    padding-left: var(--spacing-300);
+}
+
+.file-explorer .none {
+    display: none;
+}

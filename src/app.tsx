@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
-import { useProject, ProjectContext } from './api/useProject'
+import { useProject, ProjectContext as ProjectContextV1 } from './api/useProject'
 import { Footer } from './ui/footer'
 import { AppInfo } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
@@ -15,6 +15,7 @@ import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/us
 import { HistoryView } from './ui/historyView'
 import { DocsView } from './ui/docs/docsView'
 import { FlagContext } from './flags'
+import { ProjectContext, useProjectDao } from './api/local/useProjectDao'
 
 export const App = () => {
   const { pathname } = useLocation()
@@ -24,7 +25,8 @@ export const App = () => {
   const listImporter = useListImporter(cogDB)
   const bulkCubeImporter = useBulkCubeImporter()
 
-  const project = useProject()
+  const projectv1 = useProject()
+  const project = useProjectDao()
 
   const [messages, setMessages] = useState<ToasterMessage[]>([])
   const addMessage = (text: string, dismissible: boolean) => {
@@ -40,29 +42,31 @@ export const App = () => {
     <CogDBContext.Provider value={cogDB}>
       <ListImporterContext.Provider value={listImporter}>
         <BulkCubeImporterContext.Provider value={bulkCubeImporter}>
-          <ProjectContext.Provider value={project}>
-            <ToasterContext.Provider value={{ messages, addMessage, dismissMessage }}>
-              <div className='root'>
-                {pathname === "/" && <SearchView />}
-                {pathname !== "/" && <>
-                  <Masthead/>
-                  <Routes>
-                    <Route path='/data/*' element={<DataView />}/>
-                    <Route
-                      path='/saved'
-                      element={<SavedCards savedCards={project.savedCards} setSavedCards={project.setSavedCards} />}
-                    />
-                    <Route path='/about-me' element={<AppInfo />} />
-                    <Route path='/user-guide/*' element={<DocsView />} />
-                    <Route path='/history' element={<HistoryView />} />
-                    <Route element={<div>404'ed!</div>} />
-                  </Routes>
-                  <Footer />
-                </>}
-                <Toaster />
-              </div>
-            </ToasterContext.Provider>
-          </ProjectContext.Provider>
+          <ProjectContextV1.Provider value={projectv1}>
+            <ProjectContext.Provider value={project}>
+              <ToasterContext.Provider value={{ messages, addMessage, dismissMessage }}>
+                <div className='root'>
+                  {pathname === "/" && <SearchView />}
+                  {pathname !== "/" && <>
+                    <Masthead/>
+                    <Routes>
+                      <Route path='/data/*' element={<DataView />}/>
+                      <Route
+                        path='/saved'
+                        element={<SavedCards savedCards={projectv1.savedCards} setSavedCards={projectv1.setSavedCards} />}
+                      />
+                      <Route path='/about-me' element={<AppInfo />} />
+                      <Route path='/user-guide/*' element={<DocsView />} />
+                      <Route path='/history' element={<HistoryView />} />
+                      <Route element={<div>404'ed!</div>} />
+                    </Routes>
+                    <Footer />
+                  </>}
+                  <Toaster />
+                </div>
+              </ToasterContext.Provider>
+            </ProjectContext.Provider>
+          </ProjectContextV1.Provider>
         </BulkCubeImporterContext.Provider>
       </ListImporterContext.Provider>
     </CogDBContext.Provider>

@@ -177,6 +177,11 @@ th, td {
   transition-timing-function: ease-in-out;
 }
 
+.inverted {
+  background-color: var(--blue);
+  color: var(--darker-color);
+}
+
 @media (min-width: 769px) and (max-width: 1024px) {
   .cogwork-librarian.show {
     width: 66%;
