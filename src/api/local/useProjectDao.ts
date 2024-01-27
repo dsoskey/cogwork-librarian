@@ -86,7 +86,11 @@ export function useProjectDao(): ProjectDao {
   }
 
   const createFolder = async (path: string) => {
-    await cogDB.projectFolder.add({ path })
+    try {
+      await cogDB.projectFolder.add({ path })
+    } catch (e) {
+      throw Error(`a folder already exists at ${path}`)
+    }
     return { path }
   }
 
@@ -106,7 +110,11 @@ export function useProjectDao(): ProjectDao {
       createdAt: now,
       updatedAt: now,
     }
-    await cogDB.project.add(newProject);
+    try {
+      await cogDB.project.add(newProject);
+    } catch (e) {
+      throw Error(`a project already exists at ${path}`)
+    }
     loadMemory(newProject);
     return newProject;
   }
