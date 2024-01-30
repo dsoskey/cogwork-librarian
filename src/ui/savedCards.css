@@ -12,6 +12,7 @@
 
 .saved-cards-root .card-entry-editor {
     position: relative;
+    color: var(--light-color)
 }
 
 .saved-cards-root .card-entry-editor:focus-visible {

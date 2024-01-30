@@ -182,20 +182,6 @@ export function useProjectDao(): ProjectDao {
     await cogDB.project.delete(path);
   }
 
-  useEffect(() => {
-    (async () => {
-      const folderCount = await cogDB.projectFolder.count();
-      if (folderCount === 0) {
-        await createFolder("") // root folder
-      }
-      const projectCount = await cogDB.projectFolder.count();
-      if (projectCount === 0) {
-        await createProject(currentPath)
-        await saveMemory()
-      }
-    })()
-  }, [])
-
   const setSavedCards = keepUpdated(_setSavedCards, _setUpdatedAt)
   const addCard = (card: Card) => {
     setSavedCards((prev) => {
@@ -204,6 +190,25 @@ export function useProjectDao(): ProjectDao {
       return next;
     })
   }
+
+  useEffect(() => {
+    (async () => {
+      const folderCount = await cogDB.projectFolder.count();
+      if (folderCount === 0) {
+        await createFolder("") // root folder
+      }
+      const projectCount = await cogDB.project.count();
+      if (projectCount === 0) {
+        await createProject(currentPath)
+        const raw = localStorage.getItem('saved-cards.coglib.sosk.watch')
+        if (raw) {
+          const oldSavedCards = JSON.parse(raw).map(it => ({ name: it }))
+          setSavedCards(oldSavedCards);
+        }
+        await saveMemory()
+      }
+    })()
+  }, [])
 
   return {
     createFolder,
