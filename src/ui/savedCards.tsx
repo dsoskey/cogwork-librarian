@@ -1,10 +1,11 @@
-import React, { KeyboardEvent } from 'react'
+import React, { KeyboardEvent, useState } from 'react'
 import "./savedCards.css"
 import { CopyToClipboardButton } from './component/copyToClipboardButton'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
 import { CardEntry, parseEntry, serializeEntry } from '../api/local/types/cardEntry'
 import { ProjectDao } from '../api/local/useProjectDao'
+import { Modal } from './component/modal'
 
 type PropsKeys = "currentPath" | "savedCards" | "setSavedCards" | "currentLine" | "setCurrentLine" | "currentIndex" | "setCurrentIndex" 
 export type SavedCardsEditorProps = Pick<ProjectDao, PropsKeys>
@@ -58,6 +59,18 @@ export function SavedCardsEditor(props: SavedCardsEditorProps) {
     currentLine, setCurrentLine
   } = props
 
+  const oldSaved = localStorage.getItem("saved-cards.coglib.sosk.watch")
+  const [migrateOpen, setMigrateOpen] = useState<boolean>(false);
+  const handleMigration = () => {
+    const parsed = JSON.parse(oldSaved);
+    if (parsed.length > 0) {
+      setSavedCards(parsed.map(parseEntry))
+      setCurrentIndex(0);
+      setCurrentLine(parsed[0])
+    }
+    localStorage.removeItem("saved-cards.coglib.sosk.watch")
+    setMigrateOpen(false)
+  }
   const syncLine = (card: CardEntry, index: number) => {
     const newEntry = parseEntry(currentLine);
     if (savedCards[currentIndex] !== undefined && !isEqual(newEntry, savedCards[currentIndex])) {
@@ -146,6 +159,8 @@ export function SavedCardsEditor(props: SavedCardsEditorProps) {
         break;
     }
   }
+
+
   return <div className='saved-cards-root'>
     <div className='row center'>
       <h2>saved cards</h2>
@@ -154,6 +169,27 @@ export function SavedCardsEditor(props: SavedCardsEditorProps) {
         copyText={savedCards.map(serializeEntry).join('\n')}
       />
     </div>
+    {oldSaved && <div>
+      <p className='alert'>
+        saved cards are now associated with projects.
+        you have a saved card list that predates projects.
+      </p>
+      <button onClick={() => setMigrateOpen(true)}>migrate saved cards</button>
+      <Modal open={migrateOpen} title={<h3>migrate saved cards</h3>} onClose={() => setMigrateOpen(false)}>
+        <div className='column'>
+          <textarea
+            className='language-none coglib-prism-theme'
+            value={JSON.parse(oldSaved).join("\n")}
+            readOnly
+            spellCheck={false}
+          />
+          <div className='row center'>
+            <CopyToClipboardButton copyText={JSON.parse(oldSaved)?.join("\n")} />
+            <button onClick={handleMigration}>move to current project</button>
+          </div>
+        </div>
+      </Modal>
+    </div>}
     {savedCards.map((card, index) =>
       <CardEntryEditor
         key={currentPath + index}

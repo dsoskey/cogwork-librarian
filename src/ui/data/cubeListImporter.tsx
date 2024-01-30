@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { Setter } from '../../types'
 import { NormedCard } from '../../api/mql/types/normedCard'
 import { ListImporterContext } from '../../api/local/useListImporter'
-import { ProjectContext } from '../../api/useProject'
+import { ProjectContext } from '../../api/local/useProjectDao'
 
 export interface CubeListImporterProps {
   cardsToImport: string[]
@@ -16,7 +16,7 @@ export const CubeListImporter = ({ setCards, setError, loader, children, setCard
   const listImporter = useContext(ListImporterContext)
   const project = useContext(ProjectContext)
   const useSavedCards = () => {
-    setCardsToImport(project.savedCards)
+    setCardsToImport(project.savedCards.map(it => it.name))
   }
   const importList = () => {
     listImporter.attemptImport(cardsToImport, true)

@@ -4,9 +4,9 @@ import { CogDBContext } from '../../api/local/useCogDB'
 import { Setter, TaskStatus } from '../../types'
 import { Manifest, MANIFEST_ID } from '../../api/local/db'
 import { Loader } from '../component/loader'
-import { ProjectContext } from '../../api/useProject'
 import { NormedCard } from '../../api/mql/types/normedCard'
 import { ImportTarget } from './cardDataView'
+import { ProjectContext } from '../../api/local/useProjectDao'
 
 export interface CardListImporterProps {
   importTargets: ImportTarget[]
@@ -39,7 +39,7 @@ export const CardListImporter = ({
   }
 
   const useSavedCards = () => {
-    setCardsToImport(project.savedCards)
+    setCardsToImport(project.savedCards.map(it => it.name))
   }
 
   const doTry = (target: string[], restart: boolean) => {

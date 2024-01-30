@@ -3,6 +3,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    /*gap: var(--spacing-200);*/
 }
 
 .saved-cards-root h2 {

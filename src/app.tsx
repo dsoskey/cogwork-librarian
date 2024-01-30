@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
-import { useProject, ProjectContext as ProjectContextV1 } from './api/useProject'
 import { Footer } from './ui/footer'
 import { AppInfo } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
@@ -25,7 +24,6 @@ export const App = () => {
   const listImporter = useListImporter(cogDB)
   const bulkCubeImporter = useBulkCubeImporter()
 
-  const projectv1 = useProject()
   const project = useProjectDao()
 
   const [messages, setMessages] = useState<ToasterMessage[]>([])
@@ -42,7 +40,6 @@ export const App = () => {
     <CogDBContext.Provider value={cogDB}>
       <ListImporterContext.Provider value={listImporter}>
         <BulkCubeImporterContext.Provider value={bulkCubeImporter}>
-          <ProjectContextV1.Provider value={projectv1}>
             <ProjectContext.Provider value={project}>
               <ToasterContext.Provider value={{ messages, addMessage, dismissMessage }}>
                 <div className='root'>
@@ -66,7 +63,6 @@ export const App = () => {
                 </div>
               </ToasterContext.Provider>
             </ProjectContext.Provider>
-          </ProjectContextV1.Provider>
         </BulkCubeImporterContext.Provider>
       </ListImporterContext.Provider>
     </CogDBContext.Provider>
