@@ -38,16 +38,21 @@ const ProjectTab = ({ canClose, onClose, path, selected, setSelected }: ProjectT
   const [editing, setEditing] = useState<boolean>(false)
   const [_, project] = splitPath(path);
 
-  return <div className={`project-tab row center ${selected ? "active":""}`}>
-    {canClose && <button onClick={onClose} title='close'>X</button>}
-    {editing && <input onClick={() => setEditing(false)} value={path} onChange={() => {}}/>}
-    {!editing && <div onClick={() => {
-      if (selected) {
-        setEditing(true)
-      } else {
-        setSelected()
-      }
-    }}>{project}</div>}
+  const onClick = () => {
+    if (selected) {
+      // setEditing(true)
+    } else {
+      setSelected()
+    }
+  }
+
+  return <div onClick={onClick} className={`project-tab row center ${selected ? "active":""}`}>
+    {canClose && <button onClick={event => {
+      event.stopPropagation();
+      onClose()
+    }} title='close'>X</button>}
+    {/*{editing && <input onClick={() => setEditing(false)} value={path} onChange={() => {}}/>}*/}
+    {!editing && <div>{project}</div>}
   </div>
 }
 
@@ -235,7 +240,7 @@ export const ProjectTabs = () => {
 
   return <>
     <div className="row center">
-      <strong>recent projects: </strong>
+      <strong>projects: </strong>
       {tabState.active.map((it, i) =>
         <ProjectTab
           key={i}

@@ -63,8 +63,8 @@ function keepUpdated<S>(setter: Setter<S>, updateSetter: Setter<Date>) {
 }
 export function useProjectDao(): ProjectDao {
   const [updatedAt, _setUpdatedAt] = useLocalStorage<Date>("project.updatedAt", new Date());
-  const [initialPath, setInitialPath] = useLocalStorage<string>("project.initialPath", "/project-1");
-  const [currentPath, _setCurrentPath] = useLocalStorage<string>("project.currentPath", "/project-1");
+  const [initialPath, setInitialPath] = useLocalStorage<string>("project.initialPath", "/my-project");
+  const [currentPath, _setCurrentPath] = useLocalStorage<string>("project.currentPath", "/my-project");
   const [queries, _setQueries] = useLocalStorage<string[]>('queries', INTRO_EXAMPLE)
   const [savedCards, _setSavedCards] = useLocalStorage<CardEntry[]>('project.savedCards', [{ name: "" }])
   const [currentIndex, setCurrentIndex] = useState<number | undefined>(
@@ -187,6 +187,11 @@ export function useProjectDao(): ProjectDao {
       const folderCount = await cogDB.projectFolder.count();
       if (folderCount === 0) {
         await createFolder("") // root folder
+      }
+      const projectCount = await cogDB.projectFolder.count();
+      if (projectCount === 0) {
+        await createProject(currentPath)
+        await saveMemory()
       }
     })()
   }, [])
