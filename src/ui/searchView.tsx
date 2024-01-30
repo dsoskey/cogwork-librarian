@@ -8,7 +8,7 @@ import { DataSource } from '../types'
 import { useMemoryQueryRunner } from '../api/local/useQueryRunner'
 import { useScryfallQueryRunner } from '../api/scryfall/useQueryRunner'
 import { CogDBContext } from '../api/local/useCogDB'
-import { SavedCards } from './savedCards'
+import { SavedCardsEditor } from './savedCards'
 import { Masthead } from './component/masthead'
 import { Footer } from './footer'
 import { parseQuerySet, RunStrategy } from '../api/scryfallExtendedParser'
@@ -23,12 +23,9 @@ const options: SearchOptions = {
 
 export const SearchView = () => {
   const cogDB = useContext(CogDBContext)
-
-  const { queries, currentPath } = useContext(ProjectContext)
-  const {
-    savedCards, setSavedCards, addCard,
-    ignoredIds, addIgnoredId,
-  } = useContext(ProjectContextV1)
+  const project = useContext(ProjectContext)
+  const { queries, currentPath, addCard } = project
+  const { ignoredIds, addIgnoredId } = useContext(ProjectContextV1)
 
   const [source, setSource] = useLocalStorage<DataSource>('source', 'local')
   const queryRunner = {
@@ -114,7 +111,7 @@ export const SearchView = () => {
     </div>
 
     {<div className={`saved-cards-floater ${showSavedCards ? "show" : "hide"}`}>
-      {showSavedCards && <SavedCards savedCards={savedCards} setSavedCards={setSavedCards} />}
+      {showSavedCards && <SavedCardsEditor {...project} />}
     </div>}
   </div>;
 }

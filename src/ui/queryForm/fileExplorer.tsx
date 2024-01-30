@@ -4,6 +4,11 @@ import { Setter } from '../../types'
 import { defaultFunction } from '../../api/context'
 
 export const RESERVED_PATH = ".path"
+export enum PathType { File, Dir }
+export interface Path {
+  path: string
+  type: PathType
+}
 export function buildTree(dirs: string[], projs: string[]): Object {
   const result = {}
   for (const dir of dirs) {
@@ -30,9 +35,9 @@ export function buildTree(dirs: string[], projs: string[]): Object {
 }
 
 export interface ExplorerCtx {
-  onPathSelected: Setter<string>
-  selectedPath: string
-  selectable: Set<Selectable>
+  onPathSelected: Setter<Path>
+  selectedPath: Path
+  selectable: Set<PathType>
   canCreateDir?: boolean
   createNewDir: () => void
   createDirParent: string | undefined
@@ -47,7 +52,7 @@ const ExplorerContext = createContext<ExplorerCtx>({
   newDir: '',
   onPathSelected: defaultFunction("ExplorerContext.onPathSelected"),
   selectable: undefined,
-  selectedPath: '',
+  selectedPath: { path: '', type: PathType.File },
   setCreateDirParent: defaultFunction("ExplorerContext.setCreateDirParent"),
   setNewDir: defaultFunction("ExplorerContext.setNewDir")
 })
@@ -58,13 +63,13 @@ interface ExplorerLeafProps {
 }
 const ExplorerLeaf = ({ path, text }: ExplorerLeafProps) => {
   const { onPathSelected, selectedPath, selectable } = useContext(ExplorerContext)
-  const canSelect = selectable.has(Selectable.File);
+  const canSelect = selectable.has(PathType.File);
   const onClick = () => {
     if (canSelect) {
-      onPathSelected(path)
+      onPathSelected({ path, type: PathType.File })
     }
   }
-  return <li onClick={onClick} className={`project ${canSelect ? "selectable": "" } ${selectedPath === path ? "inverted" : ""}`}>{text}</li>
+  return <li onClick={onClick} className={`project ${canSelect ? "selectable": "" } ${selectedPath?.path === path ? "inverted" : ""}`}>{text}</li>
 }
 
 interface ExplorerBranchProps {
@@ -78,15 +83,15 @@ const ExplorerBranch = ({ tree, text }: ExplorerBranchProps) => {
   const { [RESERVED_PATH]: path, ...rest } = tree;
   const keys = Object.keys(rest);
   const [open, setOpen] = useState<boolean>(text === "")
-  const canSelect = selectable.has(Selectable.Dir)
+  const canSelect = selectable.has(PathType.Dir)
   const isCreateDirParent = path === createDirParent;
   const onClick = () => {
     if (canSelect) {
-      onPathSelected(path)
+      onPathSelected({ path, type: PathType.Dir })
     }
   }
   return <li>
-    <span onClick={onClick} className={`folder ${canSelect ? "selectable": "" } ${selectedPath === path ? "inverted" : ""}`}>
+    <span onClick={onClick} className={`folder ${canSelect ? "selectable": "" } ${selectedPath?.path === path ? "inverted" : ""}`}>
       {text}/&nbsp;
       {keys.length > 0 && <button
         title={open ? `collapse ${path}` : `expand ${path}`}
@@ -120,9 +125,10 @@ const ExplorerBranch = ({ tree, text }: ExplorerBranchProps) => {
   </li>
 }
 
-enum Selectable { File, Dir }
-export const SELECT_FILE = new Set([Selectable.File])
-export const SELECT_DIR = new Set([Selectable.Dir])
+
+export const SELECT_FILE = new Set([PathType.File])
+export const SELECT_DIR = new Set([PathType.Dir])
+export const SELECT_ALL = new Set([PathType.File, PathType.Dir])
 interface FileExplorerProps extends ExplorerCtx {
   dirPaths: string[]
   filePaths: string[]

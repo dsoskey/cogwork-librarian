@@ -2,10 +2,17 @@ import React, { useContext, useReducer, useState } from 'react'
 import { Modal } from '../component/modal'
 import { ProjectContext, splitPath } from '../../api/local/useProjectDao'
 import { FormField } from '../component/formField'
-import "./projectTabs.css";
+import './projectTabs.css'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB } from '../../api/local/db'
-import { ExplorerCtx, FileExplorer, RESERVED_PATH, SELECT_DIR, SELECT_FILE } from './fileExplorer'
+import {
+  ExplorerCtx,
+  FileExplorer,
+  Path,
+  PathType,
+  RESERVED_PATH,
+  SELECT_ALL,
+} from './fileExplorer'
 import { Setter } from '../../types'
 
 const ProjectExplorer = (props: ExplorerCtx) => {
@@ -53,129 +60,109 @@ interface ProjectModalProps {
   setModalState: Setter<ModalState>
   dispatchTabState: (any) => void
 }
+
 const ProjectModal = ({ modalState, setModalState, dispatchTabState }: ProjectModalProps) => {
   const { createProject, createFolder, openProject } = useContext(ProjectContext);
-  const [folderToSubmit, setFolderToSubmit] = useState<string>("")
   const [error, setError] = useState<string>("")
   const [projectToSubmit, setProjectToSubmit] = useState<string>("my-project");
-  const [selectedPath, setSelectedPath] = useState<string | undefined>(undefined);
+  const [selectedPath, setSelectedPath] = useState<Path | undefined>({ path: "", type: PathType.Dir });
   const [createDirParent, setCreateDirParent] = useState<string | undefined>(undefined);
   const [newDir, setNewDir] = useState<string>("");
 
-  let modalTitle;
-  let modalChildren;
-  switch (modalState) {
-    case ModalState.Closed:
-      break;
-    case ModalState.New: {
-      const onClick = () => {
-        const toSubmit = projectToSubmit.trim()
-        if (toSubmit.length === 0) {
-          setError("empty project name");
-          return;
-        } else if (toSubmit.includes("/")) {
-          setError("project name can't include '/'");
-          return;
-        } else if (toSubmit === RESERVED_PATH) {
-          setError(`${RESERVED_PATH} is a reserved name; choose something else`)
-          return
-        } else {
-          setError("")
-        }
-        const path = `${folderToSubmit}/${toSubmit}`;
-        createProject(path)
-          .then((project) => {
-            setModalState(ModalState.Closed);
-            dispatchTabState({ type: "new", path: project.path })
-          })
-          .catch(e => {
-            console.error(e);
-            setError(e.message)
-          })
-      }
-      const createNewDir = () => {
-        const toSubmit = newDir.trim();
-        if (toSubmit.length === 0) {
-          setError("empty folder name");
-          return;
-        } else if (toSubmit.includes("/")) {
-          setError("folder can't include '/'");
-          return;
-        } else if (toSubmit === RESERVED_PATH) {
-          setError(`${RESERVED_PATH} is a reserved name; choose something else`)
-          return
-        } else {
-          setError("")
-        }
-        const path = `${createDirParent}/${toSubmit}`
-        createFolder(path)
-          .then(() => {
-            setCreateDirParent(undefined)
-            setNewDir("")
-          })
-          .catch(e => {
-            console.error(e);
-            setError(e.message);
-          })
-      }
-      modalTitle= "New project"
-      modalChildren = <div>
-        <div>Project folder</div>
-        <ProjectExplorer
-          selectedPath={folderToSubmit}
-          onPathSelected={setFolderToSubmit}
-          selectable={SELECT_DIR}
-          canCreateDir
-          createDirParent={createDirParent} setCreateDirParent={setCreateDirParent}
-          newDir={newDir} setNewDir={setNewDir}
-          createNewDir={createNewDir}
-        />
-        <FormField
-          title="project name"
-          description="projects must be uniquely named within their folder">
-          {<input value={projectToSubmit} onChange={e => setProjectToSubmit(e.target.value)} />}
-        </FormField>
-        {error && <div className='alert'>{error}</div>}
-        <button onClick={onClick}>Create project</button>
-      </div>
-      break;
+  const onCreateFolderClick = () => {
+    const toSubmit = newDir.trim();
+    if (toSubmit.length === 0) {
+      setError("empty folder name");
+      return;
+    } else if (toSubmit.includes("/")) {
+      setError("folder can't include '/'");
+      return;
+    } else if (toSubmit === RESERVED_PATH) {
+      setError(`${RESERVED_PATH} is a reserved name; choose something else`)
+      return
+    } else {
+      setError("")
     }
+    const path = `${createDirParent}/${toSubmit}`
+    createFolder(path)
+      .then(() => {
+        setCreateDirParent(undefined)
+        setNewDir("")
+      })
+      .catch(e => {
+        console.error(e);
+        setError(e.message);
+      })
+  }
 
-    case ModalState.Open: {
-      const onClick = () => {
-        openProject(selectedPath)
-          .then((project) => {
-            setModalState(ModalState.Closed);
-            dispatchTabState({ type: "open", path: project.path })
-          })
-          .catch(console.error)
-      }
-      modalTitle = "Open project"
-      modalChildren = <div>
-        <ProjectExplorer
-          selectedPath={selectedPath}
-          onPathSelected={setSelectedPath}
-          selectable={SELECT_FILE}
-          createDirParent={createDirParent} setCreateDirParent={setCreateDirParent}
-          newDir={newDir} setNewDir={setNewDir}
-          createNewDir={() => {}}
-        />
-        <button disabled={selectedPath === undefined} onClick={onClick}>Open project</button>
-      </div>
-      break;
+  let canCreateProject = selectedPath?.type === PathType.Dir
+  const onCreateProjectClick = () => {
+    const toSubmit = projectToSubmit.trim()
+    if (toSubmit.length === 0) {
+      setError("empty project name");
+      return;
+    } else if (toSubmit.includes("/")) {
+      setError("project name can't include '/'");
+      return;
+    } else if (toSubmit === RESERVED_PATH) {
+      setError(`${RESERVED_PATH} is a reserved name; choose something else`)
+      return
+    } else {
+      setError("")
     }
+    const path = `${selectedPath.path}/${toSubmit}`;
+    createProject(path)
+      .then((project) => {
+        setModalState(ModalState.Closed);
+        dispatchTabState({ type: "new", path: project.path })
+      })
+      .catch(e => {
+        console.error(e);
+        setError(e.message)
+      })
+  }
+
+  let canOpenProject = selectedPath?.type === PathType.File
+  const onOpenClick = () => {
+    openProject(selectedPath.path)
+      .then((project) => {
+        setModalState(ModalState.Closed);
+        dispatchTabState({ type: "open", path: project.path })
+      })
+      .catch(console.error)
   }
 
   return <Modal
     open={modalState !== ModalState.Closed}
-    title={<h2>{modalTitle}</h2>}
+    title={<h2>Manage projects</h2>}
     onClose={() => {
       setModalState(ModalState.Closed)
       setError("")
     }}
-    children={modalChildren}
-  />
+  >
+    <ProjectExplorer
+      canCreateDir
+      selectable={SELECT_ALL}
+      createNewDir={onCreateFolderClick}
+      selectedPath={selectedPath} onPathSelected={setSelectedPath}
+      createDirParent={createDirParent} setCreateDirParent={setCreateDirParent}
+      newDir={newDir} setNewDir={setNewDir} />
+
+    <FormField
+      title="project name"
+      description="projects must be uniquely named within their folder">
+      {<input
+        value={projectToSubmit}
+        disabled={!canCreateProject}
+        onChange={e => setProjectToSubmit(e.target.value)}
+      />}
+    </FormField>
+    {error && <div className='alert'>{error}</div>}
+    <button onClick={onCreateProjectClick} disabled={!canCreateProject}>Create project</button>
+    <button disabled={!canOpenProject} onClick={onOpenClick}>Open project</button>
+  </Modal>
 }
+
 function reducer(state: { active: string[], selectedIndex: number }, action) {
   let result;
   switch (action.type) {
@@ -267,10 +254,9 @@ export const ProjectTabs = () => {
               .catch(console.error)
           }}
       />)}
-      <button className="project-action" onClick={() => setModalState(ModalState.Open)} title='open project'>📂</button>
-      {tabState.active.length < maxOpenProjects &&
-        <button className="project-action" onClick={() => setModalState(ModalState.New)} title='new project'>✚</button>
-      }
+      <button className="project-action" onClick={() => setModalState(ModalState.Open)} title='manage projects'>
+        manage projects
+      </button>
     </div>
     <ProjectModal
       modalState={modalState}

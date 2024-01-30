@@ -6,7 +6,7 @@ import { AppInfo } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
 import { Route, Routes, useLocation } from 'react-router'
 import { DataView } from './ui/data/dataView'
-import { SavedCards } from './ui/savedCards'
+import { SavedCardsEditor } from './ui/savedCards'
 import { ToasterMessage, Toaster, ToasterContext } from './ui/component/toaster'
 import { v4 as uuidv4 } from 'uuid';
 import { SearchView } from './ui/searchView'
@@ -53,7 +53,7 @@ export const App = () => {
                       <Route path='/data/*' element={<DataView />}/>
                       <Route
                         path='/saved'
-                        element={<SavedCards savedCards={projectv1.savedCards} setSavedCards={projectv1.setSavedCards} />}
+                        element={<SavedCardsEditor {...project} />}
                       />
                       <Route path='/about-me' element={<AppInfo />} />
                       <Route path='/user-guide/*' element={<DocsView />} />

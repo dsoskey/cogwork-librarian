@@ -9,3 +9,11 @@
     margin-top: 0;
     margin-bottom: 0;
 }
+
+.saved-cards-root .card-entry-editor {
+    position: relative;
+}
+
+.saved-cards-root .card-entry-editor:focus-visible {
+    z-index: 10;
+}

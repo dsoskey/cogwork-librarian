@@ -17,6 +17,7 @@ import { CardListView } from './cardViews/cardListView'
 import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { RunStrategy } from '../../api/scryfallExtendedParser'
 import { useVennControl, VennControl } from './vennControl'
+import { Card } from 'scryfall-sdk'
 
 const typeToExt = {
   "application/json": "json",
@@ -44,7 +45,7 @@ interface BrowserViewProps {
   runStrategy: RunStrategy
   report: QueryReport
   source: DataSource
-  addCard: (name: string) => void
+  addCard: (card: Card) => void
   addIgnoredId: (id: string) => void
   ignoredIds: string[]
   errors: CogError[]
@@ -177,7 +178,7 @@ export const BrowserView = React.memo(({
               <CardImageView
                 className={`_${cardsPerRow}`}
                 onAdd={() => {
-                  addCard(card.data.name)
+                  addCard(card.data)
                   const id = addMessage(`Added ${card.data.name} to saved cards`, false)
                   setTimeout(() => {
                     dismissMessage(id)
