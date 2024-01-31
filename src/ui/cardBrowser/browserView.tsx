@@ -18,25 +18,12 @@ import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { RunStrategy } from '../../api/scryfallExtendedParser'
 import { useVennControl, VennControl } from './vennControl'
 import { Card } from 'scryfall-sdk'
+import { downloadText } from '../download'
 
-const typeToExt = {
-  "application/json": "json",
-  "text/plain": "txt",
-}
-
-const handleDownload = (text: string, type: string) => {
-  const blob = new Blob([text], { type });
-  const url = URL.createObjectURL(blob)
+const handleDownload = (text: string, ext: string) => {
   const now = new Date()
-
-  const link = document.createElement("a")
-  link.href = url;
-  link.download = `coglib-results-${now.toISOString().replace(/:/g, "-")}.${typeToExt[type]??"txt"}`
-  document.body.append(link);
-  link.click();
-
-  URL.revokeObjectURL(url)
-  link.remove()
+  const fileName = `coglib-results-${now.toISOString().replace(/:/g, "-")}`
+  downloadText(text, fileName, ext)
 }
 
 interface BrowserViewProps {
@@ -140,10 +127,10 @@ export const BrowserView = React.memo(({
 
   const downloadButton = <div>
     <span>download:&nbsp;</span>
-    <button onClick={() => handleDownload(result.map(it => it.data.name).join("\n"), 'text/plain')}>
+    <button onClick={() => handleDownload(result.map(it => it.data.name).join("\n"), 'txt')}>
       card names
     </button>
-    <button onClick={() => handleDownload(JSON.stringify(result.map(it => it.data)), 'application/json')}>
+    <button onClick={() => handleDownload(JSON.stringify(result.map(it => it.data)), 'json')}>
       json
     </button>
   </div>

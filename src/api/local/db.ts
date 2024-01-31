@@ -5,7 +5,7 @@ import { CubeDefinition } from '../mql/types/cube'
 import { IllustrationTag, OracleTag } from '../mql/types/tag'
 import { DataSource } from '../../types'
 import { RunStrategy } from '../scryfallExtendedParser'
-import { CardEntry } from './types/cardEntry'
+import { Project } from './types/project'
 
 export interface Collection {
   id: string
@@ -31,15 +31,6 @@ export interface Block {
   block_code: string
   block: string
   set_codes: string[]
-}
-
-export interface Project {
-  path: string;
-  savedCards: CardEntry[];
-  ignoredCards: string[];
-  queries: string[];
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface ProjectFolder {

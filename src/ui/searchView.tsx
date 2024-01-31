@@ -24,7 +24,7 @@ const options: SearchOptions = {
 export const SearchView = () => {
   const cogDB = useContext(CogDBContext)
   const project = useContext(ProjectContext)
-  const { queries, currentPath, addCard } = project
+  const { queries, addCard } = project
   const { ignoredIds, addIgnoredId } = useIgnoreList()
 
   const [source, setSource] = useLocalStorage<DataSource>('source', 'local')
@@ -62,7 +62,7 @@ export const SearchView = () => {
               source,
               strategy,
               executedAt,
-              projectPath: currentPath,
+              projectPath: project.path,
             })
           ).catch(error => {
             console.error(error)
@@ -73,7 +73,7 @@ export const SearchView = () => {
               strategy,
               errorText: error.toString(),
               executedAt,
-              projectPath: currentPath,
+              projectPath: project.path,
             })
           })
       })

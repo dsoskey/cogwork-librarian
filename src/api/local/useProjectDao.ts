@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from 'react'
-import { cogDB, Project, ProjectFolder } from './db'
+import { cogDB, ProjectFolder } from './db'
 import { useLocalStorage } from './useLocalStorage'
 import { INTRO_EXAMPLE } from '../example'
 import { Setter } from '../../types'
@@ -7,17 +7,20 @@ import { defaultFunction, defaultPromise } from '../context'
 import { Card } from 'scryfall-sdk'
 import cloneDeep from 'lodash/cloneDeep'
 import { CardEntry, parseEntry, serializeEntry } from './types/cardEntry'
+import { Project } from './types/project'
 
 
 export interface ProjectDao {
   createFolder: (path: string) => Promise<ProjectFolder>
-  deleteFolder: (path: string) => Promise<void>
+  // returns paths that were deleted.
+  deleteFolder: (path: string) => Promise<Set<string>>
   createProject: (path: string) => Promise<Project>
   openProject: (path: string) => Promise<Project>
-  deleteProject: (path: string) => Promise<void>
+  // returns paths that were deleted.
+  deleteProject: (path: string) => Promise<Set<string>>
   queries: string[]
   setQueries: Setter<string[]>
-  currentPath: string;
+  path: string;
   currentLine: string;
   setCurrentLine: Setter<string>
   currentIndex: number
@@ -42,7 +45,7 @@ const defaultDao: ProjectDao = {
   savedCards: [],
   setSavedCards: defaultFunction("ProjectDao.setQueries"),
   addCard: defaultFunction("ProjectDao.addCard"),
-  currentPath: ""
+  path: ""
 }
 
 // todo: move to path utility file?
@@ -135,11 +138,22 @@ export function useProjectDao(): ProjectDao {
     return { path }
   }
 
+  // todo: handle the current project being deleted.
   const deleteFolder = async (path: string) => {
-    await cogDB.transaction("rw", cogDB.projectFolder, cogDB.project, () => {
-      cogDB.projectFolder.delete(path);
-      cogDB.project.where("path").startsWith(path).delete()
+    if (initialPath.startsWith(path)) {
+      throw Error(`Can't delete ${path} with active project ${initialPath}. switch to a different project to proceed`)
+    }
+    const deleted: Set<string> = new Set();
+    await cogDB.transaction("rw", cogDB.projectFolder, cogDB.project, async () => {
+      await cogDB.projectFolder.where("path").startsWith(path).delete();
+      const projectsToDelete = await cogDB.project.where("path").startsWith(path);
+      projectsToDelete.each(it => {
+        deleted.add(it.path)
+      });
+      projectsToDelete.delete()
     })
+
+    return deleted;
   }
 
   const createProject = async (path: string) => {
@@ -178,8 +192,13 @@ export function useProjectDao(): ProjectDao {
     return toOpen;
   }
 
+  // todo: handle the current project being deleted.
   const deleteProject = async (path: string) => {
+    if (path === initialPath) {
+      throw Error("can't delete the active project. switch to a different one first.")
+    }
     await cogDB.project.delete(path);
+    return new Set([path]);
   }
 
   const setSavedCards = keepUpdated(_setSavedCards, _setUpdatedAt)
@@ -218,7 +237,7 @@ export function useProjectDao(): ProjectDao {
     deleteProject,
     queries, setQueries: keepUpdated(_setQueries, _setUpdatedAt),
     savedCards, setSavedCards, addCard,
-    currentPath,
+    path: currentPath,
     currentLine, setCurrentLine,
     currentIndex, setCurrentIndex,
   }

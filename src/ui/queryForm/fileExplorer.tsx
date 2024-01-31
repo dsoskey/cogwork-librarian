@@ -5,6 +5,16 @@ import { defaultFunction } from '../../api/context'
 
 export const RESERVED_PATH = ".path"
 export enum PathType { File, Dir }
+export const PATH_TYPE_STRINGS = {
+  [PathType.File]: {
+    noun: "project",
+    deleteError: "It's the active project. Switch to a different project before deleting this one."
+  },
+  [PathType.Dir]: {
+    noun: "",
+    deleteError: "It contains the active project. Switch to a different project before deleting this folder."
+  },
+}
 export interface Path {
   path: string
   type: PathType

@@ -7,7 +7,7 @@ import { CardEntry, parseEntry, serializeEntry } from '../api/local/types/cardEn
 import { ProjectDao } from '../api/local/useProjectDao'
 import { Modal } from './component/modal'
 
-type PropsKeys = "currentPath" | "savedCards" | "setSavedCards" | "currentLine" | "setCurrentLine" | "currentIndex" | "setCurrentIndex" 
+type PropsKeys = "path" | "savedCards" | "setSavedCards" | "currentLine" | "setCurrentLine" | "currentIndex" | "setCurrentIndex"
 export type SavedCardsEditorProps = Pick<ProjectDao, PropsKeys>
 
 interface CardEntryEditorProps extends Pick<ProjectDao, "currentLine" | "setCurrentLine">{
@@ -54,7 +54,7 @@ function CardEntryEditor(props: CardEntryEditorProps) {
 
 export function SavedCardsEditor(props: SavedCardsEditorProps) {
   const {
-    currentPath, savedCards, setSavedCards,
+    path, savedCards, setSavedCards,
     currentIndex, setCurrentIndex,
     currentLine, setCurrentLine
   } = props
@@ -192,7 +192,7 @@ export function SavedCardsEditor(props: SavedCardsEditorProps) {
     </div>}
     {savedCards.map((card, index) =>
       <CardEntryEditor
-        key={currentPath + index}
+        key={path + index}
         editing={index === currentIndex}
         card={card}
         onKeyDown={onKeyDown(index)}

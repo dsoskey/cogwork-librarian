@@ -85,7 +85,6 @@ export const AppInfo = () => {
           full scryfall syntax support for in-memory filtering, potentially as
           a standalone code library
         </li>
-        <li>project import/export with per-project saved/ignored lists</li>
         <li>shareable search links</li>
       </ul>
 

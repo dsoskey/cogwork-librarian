@@ -8,12 +8,14 @@ import { cogDB } from '../../api/local/db'
 import {
   ExplorerCtx,
   FileExplorer,
-  Path,
-  PathType,
-  RESERVED_PATH,
-  SELECT_ALL,
+  Path, PATH_TYPE_STRINGS,
+  PathType, RESERVED_PATH,
+  SELECT_ALL
 } from './fileExplorer'
 import { Setter } from '../../types'
+import { downloadText } from '../download'
+import { Project, serializeProject } from '../../api/local/types/project'
+import { useConfirmDelete } from './useConfirmDelete'
 
 const ProjectExplorer = (props: ExplorerCtx) => {
   const projects = useLiveQuery(() => cogDB.project.toArray())
@@ -50,7 +52,7 @@ const ProjectTab = ({ canClose, onClose, path, selected, setSelected }: ProjectT
     {canClose && <button onClick={event => {
       event.stopPropagation();
       onClose()
-    }} title='close'>X</button>}
+    }} title='save and close'>X</button>}
     {/*{editing && <input onClick={() => setEditing(false)} value={path} onChange={() => {}}/>}*/}
     {!editing && <div>{project}</div>}
   </div>
@@ -67,13 +69,37 @@ interface ProjectModalProps {
 }
 
 const ProjectModal = ({ modalState, setModalState, dispatchTabState }: ProjectModalProps) => {
-  const { createProject, createFolder, openProject } = useContext(ProjectContext);
+  const project = useContext(ProjectContext);
   const [error, setError] = useState<string>("")
   const [projectToSubmit, setProjectToSubmit] = useState<string>("my-project");
-  const [selectedPath, setSelectedPath] = useState<Path | undefined>({ path: "", type: PathType.Dir });
+  const [selectedPath, setSelectedPath] = useState<Path>({ path: "", type: PathType.Dir });
   const [createDirParent, setCreateDirParent] = useState<string | undefined>(undefined);
   const [newDir, setNewDir] = useState<string>("");
-
+  const confirmer = useConfirmDelete();
+  const [deleting, setDeleting] = useState<boolean>(false)
+  const onDeleteClick = () => {
+    if (selectedPath.path === "") {
+      setError("cant fully delete root, only clear its contents")
+      return;
+    }
+    setDeleting(true)
+    let func: (path: string) => Promise<Set<string>>;
+    switch (selectedPath.type) {
+      case PathType.Dir:
+        func = project.deleteFolder
+        break;
+      case PathType.File:
+        func = project.deleteProject
+    }
+    func(selectedPath.path)
+      .then(paths => {
+        console.log(paths, "have been deleted. you should do something about it")
+        dispatchTabState({ type: "delete", paths })
+        confirmer.hide();
+      })
+      .catch(e => confirmer.setError(e.message))
+      .finally(() => setDeleting(false))
+  }
   const onCreateFolderClick = () => {
     const toSubmit = newDir.trim();
     if (toSubmit.length === 0) {
@@ -89,7 +115,7 @@ const ProjectModal = ({ modalState, setModalState, dispatchTabState }: ProjectMo
       setError("")
     }
     const path = `${createDirParent}/${toSubmit}`
-    createFolder(path)
+    project.createFolder(path)
       .then(() => {
         setCreateDirParent(undefined)
         setNewDir("")
@@ -116,7 +142,7 @@ const ProjectModal = ({ modalState, setModalState, dispatchTabState }: ProjectMo
       setError("")
     }
     const path = `${selectedPath.path}/${toSubmit}`;
-    createProject(path)
+    project.createProject(path)
       .then((project) => {
         setModalState(ModalState.Closed);
         dispatchTabState({ type: "new", path: project.path })
@@ -129,7 +155,7 @@ const ProjectModal = ({ modalState, setModalState, dispatchTabState }: ProjectMo
 
   let canOpenProject = selectedPath?.type === PathType.File
   const onOpenClick = () => {
-    openProject(selectedPath.path)
+    project.openProject(selectedPath.path)
       .then((project) => {
         setModalState(ModalState.Closed);
         dispatchTabState({ type: "open", path: project.path })
@@ -137,10 +163,29 @@ const ProjectModal = ({ modalState, setModalState, dispatchTabState }: ProjectMo
       .catch(console.error)
   }
 
+  const onExportClick = async () => {
+    let toExport: Project;
+    if (selectedPath.path === project.path) {
+      const now = new Date();
+      toExport = { ...project, ignoredCards: [], createdAt: now, updatedAt: now }
+    } else {
+      toExport = await cogDB.project.get(selectedPath.path);
+    }
+
+    if (toExport) {
+      downloadText(
+        serializeProject(toExport),
+        splitPath(selectedPath.path)[1],
+        "md"
+      )
+    }
+  }
+
   return <Modal
     open={modalState !== ModalState.Closed}
     title={<h2>Manage projects</h2>}
     onClose={() => {
+      confirmer.hide();
       setModalState(ModalState.Closed)
       setError("")
     }}
@@ -164,7 +209,39 @@ const ProjectModal = ({ modalState, setModalState, dispatchTabState }: ProjectMo
     </FormField>
     {error && <div className='alert'>{error}</div>}
     <button onClick={onCreateProjectClick} disabled={!canCreateProject}>Create project</button>
+    {/*<button onClick={onCreateProjectClick} disabled={!canCreateProject}>Import project</button>*/}
     <button disabled={!canOpenProject} onClick={onOpenClick}>Open project</button>
+    <button disabled={!canOpenProject} onClick={onExportClick}>Export project</button>
+    <button onClick={() => {
+      if (project.path.startsWith(selectedPath.path)) {
+        setError(selectedPath.path === ""
+          ? "can't delete the root folder."
+          : `can't delete ${selectedPath.path}. ${PATH_TYPE_STRINGS[selectedPath.type].deleteError}`)
+      } else {
+        confirmer.show()
+      }
+    }}>Delete {PATH_TYPE_STRINGS[selectedPath.type].noun}</button>
+    {confirmer.confirming && <div>
+      <p>
+        {"you are about to delete the "}{PATH_TYPE_STRINGS[selectedPath.type].noun}{" "}{selectedPath.path}
+        {selectedPath.type === PathType.Dir && " and all projects and folders inside it"}
+        {". Type and press delete below to confirm."}
+      </p>
+      {confirmer.error.length > 0 && <p className='alert'>{confirmer.error}</p>}
+      <div className="row">
+        <input
+          placeholder="delete"
+          value={confirmer.confirmText}
+          onChange={event => confirmer.setConfirmText(event.target.value)}
+        />
+        <button
+          disabled={confirmer.confirmText !== "delete" || deleting}
+          onClick={onDeleteClick}>
+          {deleting ? "deleting" : "delete"}
+        </button>
+        <button onClick={confirmer.hide}>cancel</button>
+      </div>
+    </div>}
   </Modal>
 }
 
@@ -199,7 +276,7 @@ function reducer(state: { active: string[], selectedIndex: number }, action) {
       }
       break;
     case "close": {
-      const index = action.index;
+      const { index } = action;
       let selectedIndex = state.selectedIndex;
       if (index === selectedIndex) {
         selectedIndex = index === 0 ? index : index - 1;
@@ -208,6 +285,16 @@ function reducer(state: { active: string[], selectedIndex: number }, action) {
         selectedIndex,
         // @ts-ignore
         active: state.active.toSpliced(index, 1),
+      }
+      break;
+    }
+    case "delete": {
+      const paths = action.paths as Set<string>;
+      const nextActive = state.active.filter((it => it === state.active[selectedIndex] || !paths.has(it)));
+      const selectedIndex = nextActive.findIndex(it => it === state.active[selectedIndex]);
+      result = {
+        selectedIndex,
+        active: nextActive,
       }
       break;
     }
@@ -221,7 +308,9 @@ function reducer(state: { active: string[], selectedIndex: number }, action) {
 
 export const ProjectTabs = () => {
   const maxOpenProjects = 5;
-  const { openProject, currentPath } = useContext(ProjectContext);
+  const project = useContext(ProjectContext)
+  const { openProject, path } = project;
+  const [_, title] = splitPath(path)
   const [modalState, setModalState] = useState<ModalState>(ModalState.Closed)
   const [tabState, dispatchTabState] = useReducer(reducer, "tab-state.coglib.sosk.watch", (key) => {
     const storageResult = localStorage.getItem(key);
@@ -230,7 +319,7 @@ export const ProjectTabs = () => {
     }
 
     const initial = {
-      active: [currentPath],
+      active: [path],
       selectedIndex: 0,
     }
     localStorage.setItem(key, JSON.stringify(initial))
@@ -259,9 +348,14 @@ export const ProjectTabs = () => {
               .catch(console.error)
           }}
       />)}
-      <button className="project-action" onClick={() => setModalState(ModalState.Open)} title='manage projects'>
+      <button onClick={() => setModalState(ModalState.Open)} title='manage projects'>
         manage projects
       </button>
+      <button onClick={() => {
+        const now = new Date();
+        const text = serializeProject({ createdAt: now, updatedAt: now, ...project, ignoredCards: [] });
+        downloadText(text, title, "md")
+      }}>export {title}</button>
     </div>
     <ProjectModal
       modalState={modalState}
