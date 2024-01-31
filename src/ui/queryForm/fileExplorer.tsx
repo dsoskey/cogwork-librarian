@@ -11,7 +11,7 @@ export const PATH_TYPE_STRINGS = {
     deleteError: "It's the active project. Switch to a different project before deleting this one."
   },
   [PathType.Dir]: {
-    noun: "",
+    noun: "folder",
     deleteError: "It contains the active project. Switch to a different project before deleting this folder."
   },
 }

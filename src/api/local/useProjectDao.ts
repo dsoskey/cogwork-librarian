@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useEffect, useState } from 'react'
 import { cogDB, ProjectFolder } from './db'
 import { useLocalStorage } from './useLocalStorage'
 import { INTRO_EXAMPLE } from '../example'
@@ -80,7 +80,7 @@ export function useProjectDao(): ProjectDao {
   )
 
   const [ignoredIds, _setIgnoredIds] = useLocalStorage<string[]>('ignore-list', [])
-  const loadMemory = (project: Project) => {
+  const loadMemory = useCallback((project: Project) => {
     setInitialPath(project.path);
     _setCurrentPath(project.path);
     _setQueries(project.queries);
@@ -93,7 +93,11 @@ export function useProjectDao(): ProjectDao {
     }
     _setIgnoredIds(project.ignoredCards);
     _setUpdatedAt(project.updatedAt);
-  }
+  }, [
+    currentIndex, setInitialPath,
+    _setCurrentPath, _setQueries, _setSavedCards,
+    setCurrentLine, setCurrentIndex, _setIgnoredIds, _setUpdatedAt
+  ])
   const saveMemory = async () => {
     if (initialPath !== currentPath) {
       // handle move
