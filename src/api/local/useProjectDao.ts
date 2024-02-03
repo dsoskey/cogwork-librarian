@@ -14,7 +14,8 @@ export interface ProjectDao {
   createFolder: (path: string) => Promise<ProjectFolder>
   // returns paths that were deleted.
   deleteFolder: (path: string) => Promise<Set<string>>
-  createProject: (path: string) => Promise<Project>
+  newProject: (path: string) => Promise<Project>
+  importProject: (project: Project) => Promise<Project>
   openProject: (path: string) => Promise<Project>
   // returns paths that were deleted.
   deleteProject: (path: string) => Promise<Set<string>>
@@ -37,7 +38,8 @@ const defaultDao: ProjectDao = {
   setCurrentLine: defaultFunction("ProjectDao.setCurrentLine"),
   createFolder: defaultPromise("ProjectDao.createFolder"),
   deleteFolder: defaultPromise("ProjectDao.deleteFolder"),
-  createProject: defaultPromise("ProjectDao.createProject"),
+  newProject: defaultPromise("ProjectDao.newProject"),
+  importProject: defaultPromise("ProjectDao.importProject"),
   openProject: defaultPromise("ProjectDao.openProject"),
   deleteProject: defaultPromise("ProjectDao.deleteProject"),
   queries: [],
@@ -160,13 +162,24 @@ export function useProjectDao(): ProjectDao {
     return deleted;
   }
 
-  const createProject = async (path: string) => {
+  const _createProject = async (project: Project) => {
     await saveMemory();
+    const { path } = project;
     const [folder, _] = splitPath(path);
     const folderExists = await cogDB.projectFolder.get(folder);
     if (!folderExists) {
       throw Error(`folder ${folder} does not exist`);
     }
+    try {
+      await cogDB.project.add(project);
+    } catch (e) {
+      throw Error(`a project already exists at ${path}`)
+    }
+    loadMemory(project);
+    return project;
+  }
+
+  const newProject = async (path: string) => {
     const now = new Date();
     const newProject: Project = {
       path: path,
@@ -176,13 +189,23 @@ export function useProjectDao(): ProjectDao {
       createdAt: now,
       updatedAt: now,
     }
-    try {
-      await cogDB.project.add(newProject);
-    } catch (e) {
-      throw Error(`a project already exists at ${path}`)
+    return _createProject(newProject);
+  }
+  const importProject = async (project: Project) => {
+    const folderParts = project.path.split("/")
+    folderParts.pop();
+    const toCreate: ProjectFolder[] = [];
+    let currentPath = folderParts[0];
+    for (let i = 1; i < folderParts.length; i++){
+      const part = folderParts[i]
+      if (part === "") {
+        throw Error("Invalid path. Only root folder name can be an empty string")
+      }
+      currentPath = `${currentPath}/${part}`;
+      toCreate.push({ path: currentPath });
     }
-    loadMemory(newProject);
-    return newProject;
+    await cogDB.projectFolder.bulkPut(toCreate);
+    return _createProject(project);
   }
 
   const openProject = async (path: string) => {
@@ -222,7 +245,7 @@ export function useProjectDao(): ProjectDao {
       }
       const projectCount = await cogDB.project.count();
       if (projectCount === 0) {
-        await createProject(currentPath)
+        await newProject(currentPath)
         const raw = localStorage.getItem('saved-cards.coglib.sosk.watch')
         if (raw) {
           const oldSavedCards = JSON.parse(raw).map(it => ({ name: it }))
@@ -236,7 +259,8 @@ export function useProjectDao(): ProjectDao {
   return {
     createFolder,
     deleteFolder,
-    createProject,
+    newProject,
+    importProject,
     openProject,
     deleteProject,
     queries, setQueries: keepUpdated(_setQueries, _setUpdatedAt),

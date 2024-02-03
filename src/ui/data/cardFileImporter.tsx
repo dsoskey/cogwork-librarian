@@ -43,10 +43,11 @@ export const CardFileImporter = ({
 
   const processFileText = async (file: File): Promise<void> => {
     proposedManifest.current = {
+      filter: '',
       id: MANIFEST_ID,
       name: file.name,
       type: 'file',
-      lastUpdated: new Date(),
+      lastUpdated: new Date()
     }
     const content = await file.text()
     let cards: NormedCard[]

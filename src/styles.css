@@ -78,20 +78,39 @@ body {
   outline: 2px inset var(--blue);
 }
 
+.button-like,
 button {
   background-color: var(--dark-color);
   border-top-color: var(--gray-42);
   border-left-color: var(--gray-42);
-  border-bottom-color: var(--dark-color);
-  border-right-color: var(--dark-color);
+  border-bottom-color: var(--darker-color);
+  border-right-color: var(--darker-color);
   color: var(--blue-mid-alpha);
   cursor: pointer;
+  border-width: 2px;
+  border-style: solid;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 1px 4px;
+  font-family: system-ui, sans-serif;
+  font-size: .8333333em;
 }
 
 button:disabled {
-  background-color: var(--darker-color);
-  color: var(--blue-low-alpha);
   cursor: unset;
+}
+.button-like.disabled,
+.button-like:disabled {
+  cursor: default;
+}
+
+.button-like.disabled,
+.button-like:disabled,
+button:disabled {
+  background-color: var(--darker-color);
+  border-bottom-color: var(--darkest-color);
+  border-right-color: var(--darkest-color);
+  color: var(--blue-low-alpha);
 }
 
 input {

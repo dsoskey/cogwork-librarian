@@ -14,3 +14,24 @@
     height: 1.75em;
     font-weight: bold;
 }
+
+.file-label {
+    display: inline-grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: 'overlap';
+}
+
+.file-label > * {
+    grid-area: overlap;
+}
+
+.file-label:has(input[type=file]:focus-visible) {
+    outline: 2px inset var(--blue);
+}
+
+.file-label input[type=file] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
