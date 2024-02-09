@@ -1,5 +1,13 @@
 import { andNode, defaultOperation, FilterNode, identity, identityNode, notNode, orNode } from './base'
-import { exactMatch, noReminderRegexMatch, noReminderTextMatch, oracleTextCount, regexMatch, textMatch } from './text'
+import {
+  exactMatch,
+  flavorTextCount,
+  noReminderRegexMatch,
+  noReminderTextMatch,
+  oracleTextCount,
+  regexMatch,
+  textMatch
+} from './text'
 import { isVal } from './is'
 import { devotionOperation } from './devotion'
 import { combatToCombatNode, powTouTotalOperation } from './combat'
@@ -339,6 +347,8 @@ export class CachingFilterProvider implements FilterProvider {
           return okAsync(flavorMatch(leaf.value))
         case FilterType.FlavorRegex:
           return okAsync(flavorRegex(leaf.value))
+        case FilterType.FlavorCount:
+          return okAsync(printNode(["flavor-text"], flavorTextCount(leaf.operator, leaf.value)))
         case FilterType.Game:
           return okAsync(gameNode(leaf.value))
         case FilterType.Language:

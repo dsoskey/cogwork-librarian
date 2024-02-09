@@ -112,18 +112,15 @@ export const TopBar = ({
         {errors.length > 0 && <SearchError report={report} source={source} errors={errors}/>}
         {status === 'success' && (<>
           <div>
-            {searchCount > 0 &&
-              `${lowerBound} – ${Math.min(
-                upperBound,
-                searchCount
-              )} of ${searchCount} cards. ignored ${ignoreCount} cards`}
+            {searchCount > 0 && `${lowerBound} – ${Math.min(upperBound, searchCount)} of ${searchCount} cards`}
+            {searchCount > 0 && ignoreCount > 0 && `. ignored ${ignoreCount} cards`}
             {searchCount === 0 &&
               "0 cards found. We'll have more details on that soon :)"}
           </div>
           {report.start && report.end && (
             <div>
-              {source} query ran in {(report.end - report.start) / 1000}{' '}
-              seconds
+              {source} query ran in {(report.end - report.start) / 1000}
+              {' '}seconds
             </div>
           )}
           {showDebugInfo && <div>

@@ -125,6 +125,7 @@ export enum FilterType {
   Frame,
   Flavor,
   FlavorRegex,
+  FlavorCount,
   Game,
   Language,
   Stamp,

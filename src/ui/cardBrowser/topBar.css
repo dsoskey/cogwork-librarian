@@ -50,19 +50,19 @@
     left: 0;
     margin: var(--spacing-200);
 }
-.venn {
+.topbar .venn {
     color: var(--darker-color)
 }
 
-.venn * {
+.topbar .venn * {
     cursor: pointer;
 }
 
-.venn .bordered {
+.topbar .venn .bordered {
     stroke: var(--darker-color);
     stroke-width: 2;
 }
 
-.venn :focus-visible {
+.topbar .venn :focus-visible {
     outline-color: var(--dark-color);
 }

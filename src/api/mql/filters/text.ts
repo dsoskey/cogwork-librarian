@@ -1,4 +1,4 @@
-import { NormedCard, OracleKeys } from '../types/normedCard'
+import { NormedCard, OracleKeys, PrintingFilterTuple } from '../types/normedCard'
 import { defaultCompare, Filter, Operator } from './base'
 import { anyFaceContains, anyFaceRegexMatch, noReminderText, replaceNamePlaceholder } from '../types/card'
 
@@ -37,6 +37,21 @@ export const oracleTextCount = (operator: Operator, count: number, transform = (
       wordCount = getCount(card.oracle_text)
     } else {
       wordCount = card.card_faces.map(it => getCount(it.oracle_text)).reduce((l,r) => l+r)
+    }
+    return defaultCompare(wordCount, operator, count)
+  }
+
+export const flavorTextCount = (operator: Operator, count: number) =>
+  (tuple: PrintingFilterTuple) => {
+    const {printing} = tuple;
+    const getCount = (it) => {
+      return (it ?? "").length ? it.split(/\s+/).length : 0
+    }
+    let wordCount;
+    if (printing.flavor_text !== undefined) {
+      wordCount = getCount(printing.flavor_text)
+    } else {
+      wordCount = printing.card_faces.map(it => getCount(it.flavor_text)).reduce((l,r) => l+r)
     }
     return defaultCompare(wordCount, operator, count)
   }

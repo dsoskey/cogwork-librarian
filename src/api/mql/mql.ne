@@ -76,6 +76,7 @@ condition -> (
     frameCondition |
     flavorCondition |
     flavorRegexCondition |
+    flavorCountCondition |
     gameCondition |
     languageCondition |
     priceCondition |
@@ -95,13 +96,13 @@ condition -> (
 ) {% ([[condition]]) => condition %}
 
 cmcCondition ->
-    cmcFilter %operator integerValue {% ([{offset}, op, value]) =>
+    cmcFilter %operator %integer {% ([{offset}, op, {value}]) =>
        ({ filter: FilterType.CmcInt, operator: op.value, value, offset })
     %} |
     cmcFilter onlyEqualOperator ("even" | "odd") {% ([{offset}, _op, [{value}]]) =>
         ({ filter: FilterType.CmcOddEven, value, offset })
     %}
-cmcFilter -> ("manavalue" | "mv" | "cmc") {% id %}
+cmcFilter -> ("manavalue" | "mv" | "cmc") {% ([[token]]) => token %}
 
 exactNameCondition -> "!":? stringValue
     {% ([op, string]) => ({
@@ -120,19 +121,19 @@ colorCondition ->
     colorFilter anyOperator colorCombinationValue {% ([{offset}, op, {value}]) =>
         ({ filter: FilterType.ColorSet, operator: op.value, value, offset })
     %} |
-    colorFilter anyOperator integerValue {% ([{offset}, op, value]) =>
+    colorFilter anyOperator %integer {% ([{offset}, op, {value}]) =>
         ({ filter: FilterType.ColorInt, operator: op.value, value, offset })
     %}
-colorFilter -> ("c" | "color") {% id %}
+colorFilter -> ("c" | "color") {% ([[token]]) => token %}
 
 colorIdentityCondition ->
     identityFilter anyOperator colorCombinationValue {% ([{offset}, op, {value}]) =>
         ({ filter: FilterType.ColorIdentitySet, operator: op.value, value, offset })
     %} |
-    identityFilter anyOperator integerValue {% ([{offset}, op, value]) =>
+    identityFilter anyOperator %integer {% ([{offset}, op, {value}]) =>
         ({ filter: FilterType.ColorIdentityInt, operator: op.value, value, offset })
      %}
-identityFilter -> ("ci" | "commander" | "identity" | "id") {% id %}
+identityFilter -> ("ci" | "commander" | "identity" | "id") {% ([[token]]) => token %}
 
 manaCostCondition -> ("mana" | "m") %operator manaCostValue
     {% ([[{offset}], op, {value}]) => ({ filter: FilterType.Mana, operator: op.value, value, offset }) %}
@@ -141,30 +142,32 @@ manaCostRegexCondition -> ("mana" | "m") onlyEqualOperator regexString
     {% ([[{offset}], _, {value}]) => ({ filter: FilterType.ManaRegex, value, offset }) %}
 
 oracleCondition -> oracleFilter onlyEqualOperator stringValue
-    {% ([{offset}, _, {value}], _1, reject) => {
-        if (!Number.isNaN(Number.parseInt(value))) {
+    {% ([{offset}, _, v], _1, reject) => {
+        const {value} = v;
+        if (v.type === "nqstring" && /^\d+$/.test(value.toString())) {
             return reject
         }
         return { filter: FilterType.Oracle, value, offset }
     } %}
 oracleRegexCondition -> oracleFilter onlyEqualOperator regexString
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.OracleRegex, value, offset }) %}
-oracleCountCondition -> oracleFilter anyOperator integerValue
-    {% ([{offset}, op, value]) => ({ filter: FilterType.OracleCount, value, operator: op.value, offset }) %}
-oracleFilter -> ("oracle" | "o" | "text") {% id %}
+oracleCountCondition -> oracleFilter anyOperator %integer
+    {% ([{offset}, op, {value}]) => ({ filter: FilterType.OracleCount, value, operator: op.value, offset }) %}
+oracleFilter -> ("oracle" | "o" | "text") {% ([[token]]) => token %}
 
-fullOracleCondition -> fullOracleCondition onlyEqualOperator stringValue
-    {% ([{offset}, _, {value}], _1, reject) => {
-        if (!Number.isNaN(Number.parseInt(value))) {
+fullOracleCondition -> fullOracleFilter onlyEqualOperator stringValue
+    {% ([{offset}, _, v], _1, reject) => {
+        const {value} = v;
+        if (v.type === "nqstring" && /^\d+$/.test(value.toString())) {
             return reject
         }
         return { filter: FilterType.FullOracle, value, offset }
     } %}
-fullOracleRegexCondition -> fullOracleCondition onlyEqualOperator regexString
+fullOracleRegexCondition -> fullOracleFilter onlyEqualOperator regexString
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.FullOracleRegex, value, offset }) %}
-fullOracleCountCondition -> fullOracleCondition anyOperator integerValue
-    {% ([{offset}, op, value]) => ({ filter: FilterType.FullOracleCount, value, operator: op.value, offset }) %}
-fullOracleCondition -> "fo" {% id %}
+fullOracleCountCondition -> fullOracleFilter anyOperator %integer
+    {% ([{offset}, op, {value}]) => ({ filter: FilterType.FullOracleCount, value, operator: op.value, offset }) %}
+fullOracleFilter -> "fo" {% id %}
 
 keywordCondition -> ("kw" | "keyword") onlyEqualOperator stringValue
     {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Keyword, value, offset }) %}
@@ -175,7 +178,7 @@ typeCondition -> ("t" | "type") onlyEqualOperator stringValue
 typeRegexCondition -> ("t" | "type") onlyEqualOperator regexString
     {% ([[{offset}], _, {value}]) => ({ filter: FilterType.TypeRegex, value, offset }) %}
 
-powerCondition -> ("pow" | "power") anyOperator (integerValue | "tou" | "toughness")
+powerCondition -> ("pow" | "power") anyOperator (%integer | "tou" | "toughness")
     {% ([[{offset}], op, [value]]) => ({
         filter: FilterType.Power,
         operator: op.value,
@@ -183,7 +186,7 @@ powerCondition -> ("pow" | "power") anyOperator (integerValue | "tou" | "toughne
         offset
     }) %}
 
-toughCondition -> ("tou" | "toughness") anyOperator (integerValue | "pow" | "power")
+toughCondition -> ("tou" | "toughness") anyOperator (%integer | "pow" | "power")
     {% ([[{offset}], op, [value]]) => ({
         filter: FilterType.Tough,
         operator: op.value,
@@ -191,14 +194,14 @@ toughCondition -> ("tou" | "toughness") anyOperator (integerValue | "pow" | "pow
         offset
     }) %}
 
-powTouCondition -> ("pt" | "powtou") anyOperator integerValue
-    {% ([[{offset}], op, value]) => ({ filter: FilterType.PowTou, operator: op.value, value, offset }) %}
+powTouCondition -> ("pt" | "powtou") anyOperator %integer
+    {% ([[{offset}], op, {value}]) => ({ filter: FilterType.PowTou, operator: op.value, value, offset }) %}
 
-loyaltyCondition -> ("loy" | "loyalty") anyOperator integerValue
-    {% ([[{offset}], operator, value]) => ({ filter: FilterType.Loyalty, operator: operator.value, value, offset }) %}
+loyaltyCondition -> ("loy" | "loyalty") anyOperator %integer
+    {% ([[{offset}], operator, {value}]) => ({ filter: FilterType.Loyalty, operator: operator.value, value, offset }) %}
 
-defenseCondition -> ("def" | "defense") anyOperator integerValue
-    {% ([[{offset}], op, value]) => ({ filter: FilterType.Defense, operator: op.value, value, offset }) %}
+defenseCondition -> ("def" | "defense") anyOperator %integer
+    {% ([[{offset}], op, {value}]) => ({ filter: FilterType.Defense, operator: op.value, value, offset }) %}
 
 layoutCondition -> "layout" onlyEqualOperator stringValue
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.Layout, value, offset }) %}
@@ -218,11 +221,11 @@ isCondition -> ("is" | "has") onlyEqualOperator isValue
 notCondition -> "not" onlyEqualOperator isValue
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.Not, value, offset }) %}
 
-printCountCondition -> "prints" anyOperator integerValue
-    {% ([{offset}, operator, value]) => ({ filter: FilterType.Prints, operator: operator.value, value, offset }) %}
+printCountCondition -> "prints" anyOperator %integer
+    {% ([{offset}, operator, {value}]) => ({ filter: FilterType.Prints, operator: operator.value, value, offset }) %}
 
-paperPrintCountCondition -> "paperprints" anyOperator integerValue
-    {% ([{offset}, operator, value]) => ({ filter: FilterType.PaperPrints, operator: operator.value, value, offset }) %}
+paperPrintCountCondition -> "paperprints" anyOperator %integer
+    {% ([{offset}, operator, {value}]) => ({ filter: FilterType.PaperPrints, operator: operator.value, value, offset }) %}
 
 inCondition -> "in" onlyEqualOperator stringValue
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.In, value, offset }) %}
@@ -231,8 +234,8 @@ producesCondition ->
     "produces" anyOperator producesCombinationValue
         {% ([{offset}, op, {value}]) => ({ filter: FilterType.ProducesSet, operator: op.value, value, offset })
     %} |
-    "produces" anyOperator integerValue
-        {% ([{offset}, op, value]) => ({ filter: FilterType.ProducesInt, operator: op.value, value, offset }) %}
+    "produces" anyOperator %integer
+        {% ([{offset}, op, {value}]) => ({ filter: FilterType.ProducesInt, operator: op.value, value, offset }) %}
 
 devotionCondition -> "devotion" anyOperator devotionValue
     {% ([{offset}, op, {value}]) => ({ filter: FilterType.Devotion, operator: op.value, value, offset }) %}
@@ -264,8 +267,8 @@ blockCondition -> ("b" | "block") onlyEqualOperator stringValue
 artistCondition -> ("a" | "artist") onlyEqualOperator stringValue
     {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Artist, value, offset }) %}
 
-collectorNumberCondition -> ("cn" | "number") anyOperator integerValue
-    {% ([[{offset}], operator, value]) => ({ filter: FilterType.CollectorNumber, operator: operator.value, value, offset }) %}
+collectorNumberCondition -> ("cn" | "number") anyOperator %integer
+    {% ([[{offset}], operator, {value}]) => ({ filter: FilterType.CollectorNumber, operator: operator.value, value, offset }) %}
 
 borderCondition -> "border" onlyEqualOperator stringValue
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.Border, value, offset }) %}
@@ -273,19 +276,27 @@ borderCondition -> "border" onlyEqualOperator stringValue
 dateCondition -> ("date" | "year") anyOperator stringValue
     {% ([[{offset}], op, {value}]) => ({ filter: FilterType.Date, operator: op.value, value, offset }) %}
 
-priceCondition -> ("usd" | "eur" | "tix") anyOperator numberValue
-    {% ([[unit], op, value]) => ({
+priceCondition -> ("usd" | "eur" | "tix") anyOperator (%integer | %decimal)
+    {% ([[unit], op, [{value}]]) => ({
         filter: FilterType.Price, unit: unit.value, operator: op.value, value, offset: unit.offset
     }) %}
 
 frameCondition -> "frame" onlyEqualOperator stringValue
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.Frame, value, offset }) %}
 
-flavorCondition -> ("flavor" | "ft") onlyEqualOperator stringValue
-    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.Flavor, value, offset }) %}
-
-flavorRegexCondition -> ("flavor" | "ft") onlyEqualOperator regexString
-    {% ([[{offset}], _, {value}]) => ({ filter: FilterType.FlavorRegex, value, offset }) %}
+flavorCondition -> flavorFilter onlyEqualOperator stringValue
+    {% ([{offset}, _, v], _1, reject) => {
+        const {value} = v;
+        if (v.type === "nqstring" && /^\d+$/.test(value.toString())) {
+            return reject
+        }
+        return { filter: FilterType.Flavor, value, offset }
+    } %}
+flavorRegexCondition -> flavorFilter onlyEqualOperator regexString
+    {% ([{offset}, _, {value}]) => ({ filter: FilterType.FlavorRegex, value, offset }) %}
+flavorCountCondition -> flavorFilter anyOperator %integer
+    {% ([{offset}, op, {value}]) => ({ filter: FilterType.FlavorCount, value, operator: op.value, offset }) %}
+flavorFilter -> ("flavor" | "ft") {% ([[token]]) => token %}
 
 gameCondition -> "game" onlyEqualOperator stringValue
     {% ([{offset}, _, {value}]) => ({ filter: FilterType.Game, value, offset }) %}
@@ -320,17 +331,12 @@ stringValue -> (noQuoteStringValue | %dqstring | %sqstring) {% ([[token]]) => {
     return { value: value.toLowerCase(), ...rest }
 }%}
 
-cubeValue -> (noQuoteStringValue | %dqstring | %sqstring) {% ([[value]]) => value %}
+cubeValue -> (noQuoteStringValue | %dqstring | %sqstring) {% ([[token]]) => token %}
 
 regexString -> %regex {% function([token]) {
     const { value, ...rest } = token
     return { value: value.toLowerCase(), ...rest }
 } %}
-
-integerValue -> [0-9]:+ {% ([digits]) => parseInt(digits.join(''), 10) %}
-
-numberValue -> [0-9]:* ("." [0-9]:+):?
-    {% ([preDec, dec]) => parseFloat(`${preDec.flat().join('')}${dec?.flat().join('')}`) %}
 
 anyOperator -> (":" | "=" | "!=" | "<>" | "<=" | "<" | ">=" | ">") {% ([[token]]) => token %}
 
@@ -379,7 +385,7 @@ isValue -> (
 
 # This somehow picks up restricted!=vintage
 noQuoteStringValue ->
-  ("a" | "an" | "o") {% ([[value]]) => value %}
+  ("a" | "an" | "o") {% ([[token]]) => token %}
   | ([^aAoO\- \t\n"'\\\/=<>:!\+@]
     | "a" [^nN \t\n"'\\=<>:]
     | "an" [^dD \t\n"'\\=<>:]
@@ -394,7 +400,8 @@ noQuoteStringValue ->
     if (allChars.find(it => rejectTypes.includes(it.type))) {
         return reject;
     }
-    return { value: allChars.join(''), offset: startChars[0]?.offset ?? -1 }
+    const value = allChars.map(it=>it.text).join("");
+    return { value, offset: startChars[0]?.offset ?? -1, type: "nqstring" }
 } %}
 
 # we never need offset from this
@@ -465,12 +472,11 @@ manaCostValue -> manaSymbol:+ {% ([symbols]) => ({
   } %}
 
 
-manaSymbol ->
-    "{" innerManaSymbol "}" {% ([brace, inner]) => ({ value: inner, offset: brace.offset }) %}
-  | purebredSymbol {% id %}
+manaSymbol -> "{" innerManaSymbol "}"
+    {% ([brace, inner]) => ({ value: inner, offset: brace.offset }) %}
 
 innerManaSymbol -> [0-9]:+ {% ([digits]) => digits.join('') %}
-  | purebredSymbol {% (symbol) => symbol.value %}
+  | purebredSymbol {% ([[symbol]]) => symbol.value %}
   | ( "2" "/" ("w" | "u" | "b" | "r" | "g") 
     | "p" "/" ("w" | "u" | "b" | "r" | "g") 
     | "w" "/" ("2" | "p" | "u" | "b" | "r" | "g") 
