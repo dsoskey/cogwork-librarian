@@ -1,7 +1,7 @@
 import moo from 'moo'
-import { keywords } from './types/filterKeyword'
-const bread = Object.values(keywords).sort((a, b) => b.length - a.length)
-// console.log(bread)
+import { FILTER_KEYWORDS } from './types/filterKeyword'
+
+const KEYWORDS_BY_LENGTH = Object.values(FILTER_KEYWORDS).sort((a, b) => b.length - a.length)
 
 const caseInsensitiveKeywords = map => {
   const transform = moo.keywords(map)
@@ -26,7 +26,7 @@ export const lexer = moo.states({
     sqstring: { match: /'(?:\\['\\]|[^\n'\\])*'/, value: s => s.slice(1, -1) },
     word: { match: /[a-zA-z\-]+/, type: caseInsensitiveKeywords({
         bool: ["and", "or"],
-        filter: bread
+        filter: KEYWORDS_BY_LENGTH
       }) },
   },
   manasymbol: {
@@ -41,7 +41,7 @@ export const states = moo.states({
   main: {
 
     bool: ["and", "or"],
-    filter: { match: bread, push:"maybefilter" },
+    filter: { match: KEYWORDS_BY_LENGTH, push:"maybefilter" },
   },
   maybefilter: {
     ws: { match: /[ \t]+/, pop: 1 },

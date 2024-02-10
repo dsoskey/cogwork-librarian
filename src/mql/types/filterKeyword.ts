@@ -1,6 +1,6 @@
-import { ObjectValues } from '../../../types'
+import { ObjectValues } from './common'
 
-export const keywords = {
+export const FILTER_KEYWORDS = {
   '!': '!',
   a: 'a', artist: 'artist',
   banned: 'banned',
@@ -60,15 +60,15 @@ export const keywords = {
   paperprints: 'paperprints',
 } as const
 
-export const keywordsToImplement = {
+export const KEYWORDS_TO_IMPLEMENT = {
   // these affect scryfall's UI behavior. are they needed here?
   // include: 'include', // maybe this one overrides a similar scryfall default?
   // display: 'display', is display needed?
 } as const
 
 const all = {
-  ...keywords,
-  ...keywordsToImplement,
+  ...FILTER_KEYWORDS,
+  ...KEYWORDS_TO_IMPLEMENT,
 } as const
 
 export type FilterKeyword = ObjectValues<typeof all>

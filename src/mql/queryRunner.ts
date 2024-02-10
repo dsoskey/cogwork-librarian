@@ -20,22 +20,6 @@ interface VennDiagram {
   rightIds: Set<string>
 }
 
-export const getOrder = (filtersUsed: string[], options: SearchOptions): SortOrder => {
-  const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
-  if (sortFilter !== undefined) {
-    return sortFilter.replace('order:', '') as SortOrder
-  }
-  return options.order
-}
-
-export const getDirection = (filtersUsed: string[], options: SearchOptions) => {
-  const dirFilter = filtersUsed.find(it => it.startsWith('direction:'))
-  if (dirFilter !== undefined) {
-    return dirFilter.replace("direction:", "")
-  }
-  return options.dir ?? 'auto'
-}
-
 type ParserProducer = () => Parser
 
 export interface QueryRunnerParams {
@@ -246,6 +230,20 @@ export class QueryRunner {
         return okAsync({ cards: sorted, leftIds, rightIds, bothIds })
       })
   }
+}
 
+function getOrder(filtersUsed: string[], options: SearchOptions): SortOrder {
+  const sortFilter = filtersUsed.find(it => it.startsWith('order:'))
+  if (sortFilter !== undefined) {
+    return sortFilter.replace('order:', '') as SortOrder
+  }
+  return options.order
+}
 
+function getDirection(filtersUsed: string[], options: SearchOptions) {
+  const dirFilter = filtersUsed.find(it => it.startsWith('direction:'))
+  if (dirFilter !== undefined) {
+    return dirFilter.replace("direction:", "")
+  }
+  return options.dir ?? 'auto'
 }

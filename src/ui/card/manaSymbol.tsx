@@ -1,4 +1,4 @@
-import { ManaSymbol } from '../../api/mql/types/card'
+import { ManaSymbol } from '../../mql'
 import React from 'react'
 
 const symbolToClassName: Record<ManaSymbol, string> = {

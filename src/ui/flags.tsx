@@ -1,40 +1,26 @@
 import React, { createContext, useState } from 'react'
-import { ObjectValues } from './types'
 import _cloneDeep from 'lodash/cloneDeep'
-import { ClientConfig, Stage } from '../config'
+export type { Flag } from '../../config'
+import { ClientConfig, Flag } from '../../config'
 
 // @ts-ignore
-import _config from 'configuration';
+import _config from 'configuration'
 console.log(_config);
-export const clientConfig = _config as ClientConfig;
-const IS_DEV = clientConfig.stage === Stage.Dev;
-export const FLAG_NAMES = {
-  adminMode: 'adminMode',
-  showDebugInfo: 'showDebugInfo',
-  displayTypes: 'displayTypes',
-  docsUpdate: 'docsUpdate',
-} as const
-export type Flag = ObjectValues<typeof FLAG_NAMES>
-
-export const INITIAL_FLAGS: Record<Flag, boolean> = {
-  showDebugInfo: IS_DEV,
-  adminMode: false,
-  displayTypes: false,
-  docsUpdate: IS_DEV
-}
+export const CLIENT_CONFIG = _config as ClientConfig;
 
 interface FlagManager {
   flags: Record<Flag, boolean>
   setFlag: (flag: Flag, value: boolean) => void
 }
+
 export const FlagContext = createContext<FlagManager>({
-  flags: INITIAL_FLAGS,
+  flags: CLIENT_CONFIG.flags,
   setFlag: () => console.error("FlagContext.setFlag called without a provider!"),
 })
 
 export const FlagContextProvider = ({ children }) => {
   const [flags, setFlags] = useState<Record<Flag, boolean>>(() => {
-    const result = _cloneDeep(INITIAL_FLAGS)
+    const result = _cloneDeep(CLIENT_CONFIG.flags)
     if (localStorage.getItem("admin.coglib.sosk.watch") === "~") {
       result.adminMode = true
     }

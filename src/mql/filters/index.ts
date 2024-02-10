@@ -43,8 +43,8 @@ import { errAsync, fromPromise, okAsync, ResultAsync } from 'neverthrow'
 import { FilterError } from '../types/error'
 import { DataProvider } from './dataProvider'
 import { newFilter } from './new'
-import { Block } from '../../local/db'
 import { noReminderText } from '../types/card'
+import { Block } from '../types/block'
 
 
 export interface FilterProvider {

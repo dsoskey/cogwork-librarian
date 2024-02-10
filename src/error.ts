@@ -1,5 +1,4 @@
-import { OPERATORS } from './api/mql/filters/base'
-import { SearchError } from './api/mql/types/error'
+import { SearchError, OPERATORS } from './mql'
 
 export interface CogError {
   // query that caused the error

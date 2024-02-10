@@ -1,5 +1,5 @@
 import { Card } from 'scryfall-sdk'
-import { ObjectValues } from '../../../types'
+import { ObjectValues } from './common'
 import { NormedCard, OracleKeys } from './normedCard'
 
 export const DOUBLE_FACED_LAYOUTS = [
@@ -22,7 +22,7 @@ export const BASIC_LAND_TYPES = [
 export const SHOCKLAND_REGEX =
   /As .* enters the battlefield, you may pay 2 life. If you don't, it enters the battlefield tapped\./
 
-export const isValues = {
+export const IS_VALUE_MAP = {
   gold: 'gold',
   hybrid: 'hybrid',
   phyrexian: 'phyrexian',
@@ -215,7 +215,7 @@ export const isValues = {
   prerelease: "prerelease",
   planeswalkerdeck: "planeswalkerdeck",
 } as const
-export type IsValue = ObjectValues<typeof isValues>
+export type IsValue = ObjectValues<typeof IS_VALUE_MAP>
 
 const MANA_SYMBOLS = {
   generic: 'generic',

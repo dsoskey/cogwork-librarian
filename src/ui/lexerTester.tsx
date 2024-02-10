@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
-import { lexer } from '../api/mql/lexer'
+import { MQL_LEXER } from '../mql'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 
 export const LexerTester = () => {
@@ -19,11 +19,11 @@ export const LexerTester = () => {
 
     const newTokens = []
     try {
-      lexer.reset(text)
-      let nextToken = lexer.next()
+      MQL_LEXER.reset(text)
+      let nextToken = MQL_LEXER.next()
       while (nextToken !== undefined) {
         newTokens.push(nextToken)
-        nextToken = lexer.next();
+        nextToken = MQL_LEXER.next();
       }
     } catch (e) {
       setError(e)

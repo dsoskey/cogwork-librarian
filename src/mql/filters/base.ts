@@ -1,4 +1,4 @@
-import { ObjectValues } from '../../../types'
+import { ObjectValues } from '../types/common'
 import { NormedCard, OracleKeys, PrintingFilterTuple } from '../types/normedCard'
 export const EQ_OPERATORS = {
   ':': ':',

@@ -396,7 +396,7 @@ noQuoteStringValue ->
     // hack: The lexer causes "or" to get picked up as a name search
     // todo: rework noQuoteString to play more nicely with lexer
     const allChars = startChars.concat(chars)
-    const rejectTypes = ["bool", "regex", "operator"]
+    const rejectTypes = ["bool", "regex", "operator", "dqstring"]
     if (allChars.find(it => rejectTypes.includes(it.type))) {
         return reject;
     }

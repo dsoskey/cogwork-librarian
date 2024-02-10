@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { ObjectValues, Setter, TaskStatus } from '../../types'
-import { CogDBContext } from '../../api/local/useCogDB'
+import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
 import { ScryfallImporter } from './scryfallImporter'
 import { CardFileImporter } from './cardFileImporter'
 import { CardListImporter } from './cardListImporter'
@@ -29,7 +29,6 @@ export const sourceToLabel: Record<ImportSource, string> = {
 const dateString = (date: Date) =>
   `${date.getFullYear()}.${date.getMonth().toString().padStart(2, "0")}.${date.getDay().toString().padStart(2, "0")}-${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`
 
-export type ImportTarget = "memory" | "db"
 interface TargetCheckboxProps {
   importTargets: ImportTarget[]
   setImportTargets: Setter<ImportTarget[]>

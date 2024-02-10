@@ -1,12 +1,11 @@
 import { Loader } from '../component/loader'
 import React, { useContext, useRef } from 'react'
-import { normCardList, NormedCard } from '../../api/mql/types/normedCard'
+import { normCardList, NormedCard } from '../../mql'
 import { Card } from 'scryfall-sdk'
 import { Setter, TaskStatus } from '../../types'
-import { CogDBContext } from '../../api/local/useCogDB'
+import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { Manifest, MANIFEST_ID } from '../../api/local/db'
-import { ImportTarget } from './cardDataView'
 
 const JSONMIME = "application/json"
 const TEXTMIME = "text/plain"

@@ -4,12 +4,13 @@
   "description": "web tool that aggregates scryfall searches",
   "main": "src/index.tsx",
   "scripts": {
-    "test": "npm run lint-ts && npm run lint-css && npm run test-ts",
+    "test": "npm run lint-deps && npm run lint-ts && npm run lint-css && npm run test-ts",
     "test-ts": "npx jest",
     "start-dev": "webpack-dev-server --config ./webpack.dev.js",
     "build-dev": "webpack --config ./webpack.dev.js",
     "build-prod": "webpack --config ./webpack.prod.js",
     "prettier": "npx prettier --write .",
+    "lint-deps": "npx dep-tree check",
     "lint-ts": "npx eslint src",
     "fix-lint-ts": "npm run lint-ts -- --fix",
     "lint-css": "npx stylelint '**/*.css'",
@@ -26,6 +27,7 @@
   },
   "homepage": "https://coglib.sosk.watch",
   "devDependencies": {
+    "@dep-tree/cli": "^0.19.6",
     "@leetcode/nearley-loader": "^2.1.0",
     "@swc/core": "^1.2.93",
     "@swc/jest": "^0.2.5",

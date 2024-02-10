@@ -1,6 +1,6 @@
 import { queryExamples } from '../../api/example'
 import React, { useContext } from 'react'
-import { FlagContext } from '../../flags'
+import { FlagContext } from '../flags'
 import { testQueries } from '../../api/queries'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { ExampleSection } from './exampleSection'

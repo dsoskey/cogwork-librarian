@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { DOUBLE_FACED_LAYOUTS } from '../../../api/mql/types/card'
+import { DOUBLE_FACED_LAYOUTS } from '../../../mql'
 import { Card, ImageUris } from 'scryfall-sdk'
 import "./cardImage.css"
 const getBackImageURI = (card: Card, version: keyof ImageUris) => {

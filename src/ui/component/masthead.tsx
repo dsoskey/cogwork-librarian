@@ -2,7 +2,7 @@ import { AdminPanel } from '../adminPanel'
 import { CoglibIcon } from './coglibIcon'
 import { Link } from 'react-router-dom'
 import React, { useContext } from 'react'
-import { FlagContext } from '../../flags'
+import { FlagContext } from '../flags'
 import { useLocation } from 'react-router'
 import { CogDBContext } from '../../api/local/useCogDB'
 

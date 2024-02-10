@@ -1,6 +1,6 @@
 import { CubeDefinition } from '../types/cube'
 import { IllustrationTag, OracleTag } from '../types/tag'
-import { Block } from '../../local/db'
+import { Block } from '../types/block'
 
 export interface DataProvider {
   getCube: (key: string) => Promise<CubeDefinition>

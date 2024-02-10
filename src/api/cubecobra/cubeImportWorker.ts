@@ -1,10 +1,10 @@
 import { importCubeCobra } from './cubeListImport'
-import { CubeDefinition, ExternalCubeSource } from '../mql/types/cube'
+import { CubeDefinition, ExternalCubeSource } from '../../mql/types/cube'
 import { cogDB } from '../local/db'
-import { isOracleVal } from '../mql/filters/is'
-import { not } from '../mql/filters/base'
+import { isOracleVal } from '../../mql/filters/is'
+import { not } from '../../mql/filters/base'
 import * as Scry from 'scryfall-sdk'
-import { normCardList, NormedCard } from '../mql/types/normedCard'
+import { normCardList, NormedCard } from '../../mql'
 import { importCubeArtisan } from '../cubeartisan/cubeListImport'
 
 

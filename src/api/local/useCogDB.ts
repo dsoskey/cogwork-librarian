@@ -2,11 +2,9 @@ import { createContext, SetStateAction, useEffect, useRef, useState } from 'reac
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, isScryfallManifest, Manifest } from './db'
 import { migrateCubes, putFile } from './populate'
-import { NormedCard } from '../mql/types/normedCard'
+import { NormedCard, isOracleVal } from '../../mql'
 import { QueryReport, useReporter } from '../useReporter'
-import { ImportTarget } from '../../ui/data/cardDataView'
 import { isFunction } from 'lodash'
-import { isOracleVal } from '../mql/filters/is'
 import { useLocalStorage } from './useLocalStorage'
 
 export const DB_LOAD_MESSAGES = [
@@ -29,6 +27,8 @@ export const DB_INIT_MESSAGES = [
   "loading cards to memory...",
   "persisting cards to database. search is ready, but don't leave the page or make data changes",
 ]
+
+export type ImportTarget = 'memory' | 'db'
 
 export interface CogDB {
   dbStatus: TaskStatus

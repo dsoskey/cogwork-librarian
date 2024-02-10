@@ -5,11 +5,11 @@ import { DataSource, Setter, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
-import { FlagContext } from '../../flags'
+import { FlagContext } from '../flags'
 import { ActiveCollection, activeCollections, DisplayType } from './types'
 import './topBar.css'
 import { SearchError } from '../component/searchError'
-import { useViewportListener } from '../../viewport'
+import { useViewportListener } from '../viewport'
 
 const collectionOptions: Record<ActiveCollection, string> = {
   search: 'results',

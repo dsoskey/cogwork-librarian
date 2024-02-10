@@ -1,11 +1,9 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import { NormedCard } from '../mql/types/normedCard'
-import { CubeDefinition } from '../mql/types/cube'
-import { IllustrationTag, OracleTag } from '../mql/types/tag'
+import { Block, IllustrationTag, OracleTag, NormedCard, CubeDefinition } from '../../mql'
 import { DataSource } from '../../types'
-import { RunStrategy } from '../scryfallExtendedParser'
 import { Project } from './types/project'
+import { RunStrategy } from '../queryRunnerCommon'
 
 export interface Collection {
   id: string
@@ -25,12 +23,6 @@ export interface QueryHistory {
   source: DataSource
   strategy?: RunStrategy
   executedAt: Date
-}
-
-export interface Block {
-  block_code: string
-  block: string
-  set_codes: string[]
 }
 
 export interface ProjectFolder {

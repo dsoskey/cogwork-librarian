@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { TaskStatus } from '../../types'
 import { QueryReport, useReporter } from '../useReporter'
-import { TagType } from '../mql/types/tag'
+import { TagType } from '../../mql'
 
 export interface OracleTagImporter {
   oracleTagReport: QueryReport

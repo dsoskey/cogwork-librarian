@@ -3,7 +3,6 @@ import { TaskStatus } from 'src/types'
 import { QueryReport } from 'src/api/useReporter'
 import { ResultAsync } from 'neverthrow'
 import { CogError } from '../error'
-import { RunStrategy } from './scryfallExtendedParser'
 
 export type QueryRunnerFunc = (
   query: string,
@@ -43,6 +42,8 @@ export interface QueryHandler {
   report: QueryReport
   errors: CogError[]
 }
+
+export enum RunStrategy { Search, Venn }
 
 export interface QueryRunner extends QueryHandler {
   run: (

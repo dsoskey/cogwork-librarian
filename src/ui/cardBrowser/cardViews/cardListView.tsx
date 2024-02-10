@@ -1,7 +1,7 @@
 import { EnrichedCard, SCORE_PRECISION } from '../../../api/queryRunnerCommon'
 import React, { useContext } from 'react'
 import './cardListView.css'
-import { FlagContext } from '../../../flags'
+import { FlagContext } from '../../flags'
 import { ManaCost } from '../../card/manaCost'
 
 

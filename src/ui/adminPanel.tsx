@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { Modal } from './component/modal'
-import { Flag, FLAG_NAMES, FlagContext } from '../flags'
+import { FlagContext, Flag } from './flags'
 import { LexerTester } from './lexerTester'
 
 export const AdminPanel = ({ children }) => {
@@ -16,7 +16,7 @@ export const AdminPanel = ({ children }) => {
       <h3>flag control</h3>
       <p className='alert'>disclamer: the feature flags on this page change the applications behavior. some of these features are unreleased, and using them could potentially break your application or database. use at your own risk!</p>
       <div className='column'>
-        {Object.keys(FLAG_NAMES).map((flag: Flag) => {
+        {Object.keys(flags).map((flag: Flag) => {
           if (flag === 'adminMode') {
             return null
           }

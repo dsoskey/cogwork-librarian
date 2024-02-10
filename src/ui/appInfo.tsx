@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { FlagContext } from '../flags'
+import { FlagContext } from './flags'
 import "./appInfo.css"
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
 

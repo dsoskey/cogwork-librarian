@@ -1,16 +1,15 @@
 import React from 'react'
 import Prism, { Environment, Grammar } from 'prismjs'
 import 'prismjs/components/prism-regex.js'
-import { keywords, keywordsToImplement } from '../mql/types/filterKeyword'
-import { OPERATORS } from '../mql/filters/base'
+import { FILTER_KEYWORDS, KEYWORDS_TO_IMPLEMENT, OPERATORS } from '../../mql'
 import { syntaxDocs } from './syntaxDocs'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended' | 'scryfall-extended-multi'
-const keywordRegex = Object.values(keywords).join('|')
+const keywordRegex = Object.values(FILTER_KEYWORDS).join('|')
 
-console.debug(`local supports ${Object.values(keywords).length} keywords`)
+console.debug(`local supports ${Object.values(FILTER_KEYWORDS).length} keywords`)
 console.debug(
-  `${Object.values(keywordsToImplement).length} keywords to add to local syntax`
+  `${Object.values(KEYWORDS_TO_IMPLEMENT).length} keywords to add to local syntax`
 )
 const operators = Object.values(OPERATORS).join('|')
 

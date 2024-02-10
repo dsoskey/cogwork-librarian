@@ -1,6 +1,7 @@
 build
 .idea/
 .tool-versions
+temp-res
 
 # Logs
 logs

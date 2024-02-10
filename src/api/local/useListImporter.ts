@@ -1,6 +1,6 @@
 import { QueryReport, useReporter } from '../useReporter'
 import { createContext, useState } from 'react'
-import { normCardList, NormedCard } from '../mql/types/normedCard'
+import { normCardList, NormedCard } from '../../mql'
 import { Setter, TaskStatus } from '../../types'
 import * as Scry from 'scryfall-sdk'
 import { CogDB } from './useCogDB'

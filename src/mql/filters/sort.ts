@@ -1,4 +1,4 @@
-import { ObjectValues } from '../../../types'
+import { ObjectValues } from '../types/common'
 import { Card, Rarity } from 'scryfall-sdk'
 import { parsePowTou } from '../types/card'
 

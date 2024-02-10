@@ -2,7 +2,7 @@ import React, { KeyboardEvent, useContext, useRef, useState } from 'react'
 import { EnrichedCard, SCORE_PRECISION } from '../../../api/queryRunnerCommon'
 import { WEIGHT, QUERIES } from '../constants'
 import { TaskStatus } from '../../../types'
-import { FlagContext } from '../../../flags'
+import { FlagContext } from '../../flags'
 import { ScryfallIcon } from '../../component/scryfallIcon'
 import "./cardImageView.css"
 import { CardImage } from './cardImage'

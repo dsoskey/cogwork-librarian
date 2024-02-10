@@ -11,10 +11,11 @@ import { CogDBContext } from '../api/local/useCogDB'
 import { SavedCardsEditor } from './savedCards'
 import { Masthead } from './component/masthead'
 import { Footer } from './footer'
-import { parseQuerySet, RunStrategy } from '../api/scryfallExtendedParser'
+import { parseQuerySet } from '../api/scryfallExtendedParser'
 import { CogError } from '../error'
-import { SearchOptions } from '../api/mql/types/searchOptions'
+import { SearchOptions } from '../mql'
 import { cogDB as cogDBClient } from '../api/local/db'
+import { RunStrategy } from '../api/queryRunnerCommon'
 
 const options: SearchOptions = {
   order: 'cmc',

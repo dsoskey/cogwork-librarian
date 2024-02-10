@@ -1,6 +1,6 @@
 import { ok, err, Result } from 'neverthrow'
 import { format } from 'date-fns'
-import { injectPrefix, weightAlgorithms } from './queryRunnerCommon'
+import { injectPrefix, RunStrategy, weightAlgorithms } from './queryRunnerCommon'
 import { CogError, columnShower } from '../error'
 
 type QueryMode = "allsub" | "basesub" | "venn"
@@ -164,7 +164,6 @@ export function parseEnv(lines: string[]): Result<QueryEnvironment, CogError> {
     defaultWeight: defaultWeight ?? DEFAULT_WEIGHT,
   })
 }
-export enum RunStrategy { Search, Venn }
 interface ParsedQuerySet {
   strategy: RunStrategy,
   queries: string[]

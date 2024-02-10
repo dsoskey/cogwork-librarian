@@ -13,7 +13,7 @@ import { Masthead } from './ui/component/masthead'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
 import { HistoryView } from './ui/historyView'
 import { DocsView } from './ui/docs/docsView'
-import { FlagContext } from './flags'
+import { FlagContext } from './ui/flags'
 import { ProjectContext, useProjectDao } from './api/local/useProjectDao'
 
 export const App = () => {

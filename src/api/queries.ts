@@ -1,4 +1,4 @@
-import { isValues } from './mql/types/card'
+import { IS_VALUE_MAP } from '../mql'
 
 export const displayQueries = [
   'o=/whenever ~ deals/',
@@ -29,7 +29,7 @@ export const displayQueries = [
 
 export const testQueries = [
   ...displayQueries,
-  ...Object.values(isValues).map((it) => `is:${it}`),
+  ...Object.values(IS_VALUE_MAP).map((it) => `is:${it}`),
   'layout:art_series',
   'o:/elf/ OR o:/goblin/',
   "o:'elf' oR o:'goblin'",
@@ -85,10 +85,6 @@ const unimplementedQueries = [
   'new:language',
   'name:/^A\\-/',
 ]
-
-const notGonnaImplementQueries = [
-  'art|atag|arttag'
-] // custom regex, display keywords
 
 const brokenQueries = [
   // Both of these aren't handling all of the card faces properly

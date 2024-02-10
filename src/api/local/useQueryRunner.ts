@@ -4,17 +4,15 @@ import {
   injectPrefix,
   QueryRunner as CoglibQueryRunner,
   QueryRunnerFunc,
-  QueryRunnerProps
+  QueryRunnerProps,
+  RunStrategy,
 } from '../queryRunnerCommon'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { NormedCard } from '../mql/types/normedCard'
 import { displayMessage } from '../../error'
-import { SearchOptions } from '../mql/types/searchOptions'
-import { QueryRunner } from '../mql/queryRunner'
+import { NormedCard, SearchOptions, QueryRunner } from '../../mql'
 import { useMemo, useState } from 'react'
-import { CachingFilterProvider } from '../mql/filters'
+import { CachingFilterProvider } from '../../mql'
 import { cogDB } from './db'
-import { RunStrategy } from '../scryfallExtendedParser'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]

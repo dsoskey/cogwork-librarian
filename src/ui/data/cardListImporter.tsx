@@ -1,11 +1,10 @@
 import React, { useContext, useRef, useState } from 'react'
 import { ListImporterContext } from '../../api/local/useListImporter'
-import { CogDBContext } from '../../api/local/useCogDB'
+import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
 import { Setter, TaskStatus } from '../../types'
 import { Manifest, MANIFEST_ID } from '../../api/local/db'
 import { Loader } from '../component/loader'
-import { NormedCard } from '../../api/mql/types/normedCard'
-import { ImportTarget } from './cardDataView'
+import { NormedCard } from '../../mql'
 import { ProjectContext } from '../../api/local/useProjectDao'
 
 export interface CardListImporterProps {

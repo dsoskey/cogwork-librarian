@@ -1,6 +1,4 @@
-import {
-  keywords,
-} from '../../api/mql/types/filterKeyword'
+import { FILTER_KEYWORDS } from '../../mql'
 import React from 'react'
 import { syntaxDocs } from '../../api/local/syntaxDocs'
 import { BasicSyntaxSection } from './basicSyntaxSection'
@@ -59,16 +57,16 @@ export const SyntaxDocs = () => {
     <BasicSyntaxSection textMd={typeText} exampleMd={typeExample} />
     <BasicSyntaxSection textMd={textBoxText} exampleMd={textBoxExample} />
     <BasicSyntaxSection textMd={combatBoxText} exampleMd={combatBoxExample} />
-    {/* Layout */}
+    {/* Layout  */}
     {/* Format */}
     {/* Artist */}
-    {/* Tags */}
+    {/* Tags oracle, art, cubes */}
     <BasicSyntaxSection textMd={andorText} exampleMd={andorExample} />
     <MDDoc className='single-section-docs'>{isText}</MDDoc>
 
     <h2 className='todo-supported-color'>supported keywords</h2>
     <ul>
-      {Object.keys(keywords).map((keyword) => (
+      {Object.keys(FILTER_KEYWORDS).map((keyword) => (
         <li key={keyword}>
           <a href={syntaxDocs[keyword]}>{keyword}</a>
         </li>

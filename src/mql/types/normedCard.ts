@@ -1,5 +1,5 @@
 import { Card } from 'scryfall-sdk'
-import { ObjectValues } from '../../../types'
+import { ObjectValues } from './common'
 import _groupBy from 'lodash/groupBy'
 import _pick from 'lodash/pick'
 import _omit from 'lodash/omit'

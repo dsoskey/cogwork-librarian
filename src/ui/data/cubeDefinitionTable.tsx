@@ -1,5 +1,5 @@
 import React, { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { CUBE_SOURCE_TO_LABEL, CubeDefinition, CubeSource } from '../../api/mql/types/cube'
+import { CubeDefinition, CubeSource } from '../../mql'
 import "./cubeDefinitionTable.css"
 import cubeartisanImage from "./cubeartisan-favicon.ico"
 import cubecobraImage from "./cubecobra-favicon.ico"
@@ -9,6 +9,7 @@ import { Modal } from '../component/modal'
 import { BulkImportMessage } from './bulkCubeSiteImporter'
 import { cogDB } from '../../api/local/db'
 import { groupBy } from 'lodash'
+import { CUBE_SOURCE_TO_LABEL } from './strings'
 
 interface CubeDefinitionRowProps {
   cube: CubeDefinition
