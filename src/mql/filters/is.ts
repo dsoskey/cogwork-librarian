@@ -582,6 +582,8 @@ export const isOracleVal = (value: IsValue) => (card: NormedCard): boolean => {
           card.oracle_text
         )
       )
+    case 'star':
+      return card.power?.includes("*") || card.toughness?.includes("*");
     case 'extra':
        /*
        these aren't accounted for

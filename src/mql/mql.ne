@@ -381,6 +381,8 @@ isValue -> (
   | "draculaseries" | "silverfoil" | "datestamped" | "league" | "doublerainbow" | "release" | "draftweekend" | "event" | "surgefoil"
   | "schinesealtart" | "playerrewards" | "storechampionship" | "giftbox" | "galaxyfoil" | "glossy" | "stepandcompleat" | "oilslick"
   | "tourney" | "premiereshop" | "judgegift" | "thick" | "jpwalker" | "prerelease" | "planeswalkerdeck"
+  # non-scryfall filters
+  | "star"
 ) {% ([[category]]) => category %}
 
 # This somehow picks up restricted!=vintage

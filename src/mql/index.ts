@@ -28,5 +28,6 @@ export type { IllustrationTag, OracleTag, TagType } from './types/tag';
 export { CachingFilterProvider } from './filters';
 export { OPERATORS } from './filters/base';
 export { isOracleVal } from './filters/is';
+export type { DataProvider } from './filters/dataProvider'
 
 export { lexer as MQL_LEXER } from './lexer'

@@ -1,6 +1,6 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import { Block, IllustrationTag, OracleTag, NormedCard, CubeDefinition } from '../../mql'
+import { Block, IllustrationTag, OracleTag, NormedCard, CubeDefinition, DataProvider } from '../../mql'
 import { DataSource } from '../../types'
 import { Project } from './types/project'
 import { RunStrategy } from '../queryRunnerCommon'
@@ -46,7 +46,7 @@ export const toManifest = (
   filter: filter.trim(),
 })
 
-export class TypedDexie extends Dexie {
+export class TypedDexie extends Dexie implements DataProvider {
   LAST_UPDATE = new Date('2023-11-20')
 
   collection!: Table<Collection>

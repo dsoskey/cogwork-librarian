@@ -214,6 +214,7 @@ export const IS_VALUE_MAP = {
   jpwalker: "jpwalker",
   prerelease: "prerelease",
   planeswalkerdeck: "planeswalkerdeck",
+  star: 'star',
 } as const
 export type IsValue = ObjectValues<typeof IS_VALUE_MAP>
 
