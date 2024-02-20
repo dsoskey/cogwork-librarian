@@ -1,6 +1,6 @@
 import { Loader } from '../component/loader'
 import React, { useContext, useRef } from 'react'
-import { normCardList, NormedCard } from '../../mql'
+import { normCardList, NormedCard } from 'mtgql'
 import { Card } from 'scryfall-sdk'
 import { Setter, TaskStatus } from '../../types'
 import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'

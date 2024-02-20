@@ -2,7 +2,7 @@ import { createContext, SetStateAction, useEffect, useRef, useState } from 'reac
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, isScryfallManifest, Manifest } from './db'
 import { migrateCubes, putFile } from './populate'
-import { NormedCard, isOracleVal } from '../../mql'
+import { NormedCard, isOracleVal } from 'mtgql'
 import { QueryReport, useReporter } from '../useReporter'
 import { isFunction } from 'lodash'
 import { useLocalStorage } from './useLocalStorage'

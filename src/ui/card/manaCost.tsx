@@ -1,4 +1,4 @@
-import { ManaSymbol, toSplitCost } from '../../mql'
+import { ManaSymbol, toSplitCost } from 'mtgql'
 import { ManaIcon } from './manaSymbol'
 import React from 'react'
 

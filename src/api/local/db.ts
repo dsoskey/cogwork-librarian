@@ -1,6 +1,6 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import { Block, IllustrationTag, OracleTag, NormedCard, CubeDefinition, DataProvider } from '../../mql'
+import { Block, IllustrationTag, OracleTag, NormedCard, CubeDefinition, DataProvider } from 'mtgql'
 import { DataSource } from '../../types'
 import { Project } from './types/project'
 import { RunStrategy } from '../queryRunnerCommon'

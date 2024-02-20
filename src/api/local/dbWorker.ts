@@ -2,13 +2,15 @@ import { cogDB, MANIFEST_ID, toManifest } from './db'
 import { downloadCards } from './populate'
 import * as Scry from 'scryfall-sdk'
 import { downloadIllustrationTags, downloadOracleTags } from '../scryfall/tagger'
-import { normCardList, NormedCard } from '../../mql'
+import { normCardList,
+  NormedCard,
+  QueryRunner,
+  MQLParser,
+  CachingFilterProvider,
+  FilterNode, identityNode,
+} from 'mtgql'
 import { BulkDataType } from 'scryfall-sdk/out/api/BulkData'
 import { downloadSets } from '../scryfall/set'
-import { QueryRunner } from '../../mql'
-import { MQLParser } from '../../mql/mql'
-import { CachingFilterProvider } from '../../mql/filters'
-import { FilterNode, identityNode } from '../../mql/filters/base'
 import { ImportTarget } from './useCogDB'
 
 self.onmessage = (_event) => {

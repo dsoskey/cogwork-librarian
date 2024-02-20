@@ -1,6 +1,6 @@
 import { createContext, useState } from 'react'
 import { Setter } from '../../types'
-import { CubeDefinition, ExternalCubeSource } from '../../mql'
+import { CubeDefinition, ExternalCubeSource } from 'mtgql'
 
 const RUNNING_STATES = [
   "querying-cubecobra",

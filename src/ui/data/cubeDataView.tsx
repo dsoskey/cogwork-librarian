@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { cogDB } from '../../api/local/db'
-import { NormedCard } from '../../mql'
+import { NormedCard, CubeSource, CUBE_SOURCE_OPTIONS } from 'mtgql'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BulkCubeSiteImporter } from './bulkCubeSiteImporter'
 import { isFunction } from 'lodash'
@@ -11,7 +11,6 @@ import { CubeListImporter } from './cubeListImporter'
 import { Setter } from '../../types'
 import { CubeDefinitionTable } from './cubeDefinitionTable'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
-import { CubeSource, CUBE_SOURCE_OPTIONS } from '../../mql'
 import { CUBE_SOURCE_TO_LABEL } from './strings'
 
 export const CubeDataView = () => {

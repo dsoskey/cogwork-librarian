@@ -1,4 +1,4 @@
-import { FILTER_KEYWORDS } from '../../mql'
+import { FILTER_KEYWORDS } from 'mtgql'
 import React from 'react'
 import { syntaxDocs } from '../../api/local/syntaxDocs'
 import { BasicSyntaxSection } from './basicSyntaxSection'

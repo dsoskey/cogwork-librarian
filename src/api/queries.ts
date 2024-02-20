@@ -1,4 +1,4 @@
-import { IS_VALUE_MAP } from '../mql'
+import { IS_VALUE_MAP } from 'mtgql'
 
 export const displayQueries = [
   'o=/whenever ~ deals/',

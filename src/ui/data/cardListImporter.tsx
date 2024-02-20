@@ -4,7 +4,7 @@ import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
 import { Setter, TaskStatus } from '../../types'
 import { Manifest, MANIFEST_ID } from '../../api/local/db'
 import { Loader } from '../component/loader'
-import { NormedCard } from '../../mql'
+import { NormedCard } from 'mtgql'
 import { ProjectContext } from '../../api/local/useProjectDao'
 
 export interface CardListImporterProps {

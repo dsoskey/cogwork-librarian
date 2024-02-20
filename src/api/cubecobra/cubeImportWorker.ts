@@ -1,10 +1,11 @@
 import { importCubeCobra } from './cubeListImport'
-import { CubeDefinition, ExternalCubeSource } from '../../mql/types/cube'
+import {
+  CubeDefinition, ExternalCubeSource,
+  isOracleVal, not,
+  normCardList, NormedCard,
+} from 'mtgql'
 import { cogDB } from '../local/db'
-import { isOracleVal } from '../../mql/filters/is'
-import { not } from '../../mql/filters/base'
 import * as Scry from 'scryfall-sdk'
-import { normCardList, NormedCard } from '../../mql'
 import { importCubeArtisan } from '../cubeartisan/cubeListImport'
 
 

@@ -1,5 +1,5 @@
 import React, { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { CubeDefinition, CubeSource } from '../../mql'
+import { CubeDefinition, CubeSource } from 'mtgql'
 import "./cubeDefinitionTable.css"
 import cubeartisanImage from "./cubeartisan-favicon.ico"
 import cubecobraImage from "./cubecobra-favicon.ico"

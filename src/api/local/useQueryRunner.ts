@@ -9,9 +9,8 @@ import {
 } from '../queryRunnerCommon'
 import { useQueryCoordinator } from '../useQueryCoordinator'
 import { displayMessage } from '../../error'
-import { NormedCard, SearchOptions, QueryRunner } from '../../mql'
+import { NormedCard, SearchOptions, QueryRunner, CachingFilterProvider } from 'mtgql'
 import { useMemo, useState } from 'react'
-import { CachingFilterProvider } from '../../mql'
 import { cogDB } from './db'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {

@@ -1,4 +1,4 @@
-import { SearchError, OPERATORS } from './mql'
+import { SearchError, OPERATORS } from 'mtgql'
 
 export interface CogError {
   // query that caused the error

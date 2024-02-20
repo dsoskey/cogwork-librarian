@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { Setter } from '../../types'
-import { NormedCard } from '../../mql'
+import { NormedCard } from 'mtgql'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { ProjectContext } from '../../api/local/useProjectDao'
 

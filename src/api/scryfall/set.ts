@@ -1,4 +1,4 @@
-import { Block } from '../../mql/types/block'
+import { Block } from 'mtgql'
 
 export async function downloadSets(): Promise<Block[]> {
   const response = await fetch("https://api.scryfall.com/sets")

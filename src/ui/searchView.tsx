@@ -13,7 +13,7 @@ import { Masthead } from './component/masthead'
 import { Footer } from './footer'
 import { parseQuerySet } from '../api/scryfallExtendedParser'
 import { CogError } from '../error'
-import { SearchOptions } from '../mql'
+import { SearchOptions } from 'mtgql'
 import { cogDB as cogDBClient } from '../api/local/db'
 import { RunStrategy } from '../api/queryRunnerCommon'
 
