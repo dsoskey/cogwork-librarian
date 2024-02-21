@@ -1,5 +1,74 @@
-import { parseQuerySet } from './scryfallExtendedParser'
-import { weightAlgorithms } from './queryRunnerCommon'
+import { alias, parseQuerySet, replaceUse, venn } from './parser'
+import { Alias } from './types'
+import { weightAlgorithms } from '../queryRunnerCommon'
+
+describe('alias', function() {
+  it('should parse an alias real proper', function() {
+    const result = alias("@a:u(t:creature)")._unsafeUnwrap();
+    const expected: Alias = { name: "u", query: "(t:creature)" };
+    expect(result).toEqual(expected)
+  })
+})
+
+describe('venn', function() {
+  function newVenn(left: string, right: string) {
+    return `@venn(${left})(${right})`
+  }
+  describe('happy cases', function() {
+    const testCases = [
+      ["simple, valid query", "t:creature", "name:bushwhack"],
+      ["simple, valid query", "@use:a", "name:bushwhack"],
+      ["queries with parentheses", "(t:creature or t:artifact) c:u", "r:u (name:bushwhack or t:frog)"],
+    ]
+    testCases.forEach(([msg, left, right]) => {
+      it(`should create a venn for ${msg}`, function() {
+        const result = venn(newVenn(left, right))._unsafeUnwrap();
+        expect(result).toEqual({ left, right })
+      })
+    })
+  })
+
+  describe('error cases', function() {
+    const testCases = [
+      ["missing left open parens", "@vennt:creature)(t:artifact)"],
+      ["missing left close parens", "@venn(t:creature(t:artifact)"],
+      ["missing right open parens", "@venn(t:creature)t:artifact)"],
+      ["missing right close parens", "@venn(t:creature)(t:artifact"],
+      ["stuff after right close parens", "@venn(t:creature)(t:artifact)extra"],
+    ]
+    testCases.forEach(([msg, input]) => {
+      it(`should throw an error for ${msg}`, function() {
+        const result = venn(input);
+        expect(result.isErr()).toEqual(true);
+      })
+    })
+  })
+})
+
+describe('replaceUse', function() {
+  it('should replace all aliases', function() {
+    const input = "@u:a or @u:b";
+    const aliases = {
+      a: { name: "a", query: "foo" },
+      b: { name: "b", query: "bingus" },
+    };
+    const result = replaceUse(aliases, input)._unsafeUnwrap();
+
+    expect(result).toEqual("foo or bingus");
+  })
+
+  it('should handle nested aliases', function() {
+    const input = "@u:a or @u:b";
+    const aliases = {
+      a: { name: "a", query: "foo" },
+      b: { name: "b", query: "@u:c or bingus" },
+      c: { name: "c", query: "blammo" },
+    };
+    const result = replaceUse(aliases, input)._unsafeUnwrap();
+
+    expect(result).toEqual("foo or blammo or bingus");
+  })
+})
 
 describe('parseQuerySet', function() {
   describe('alias/use', function() {

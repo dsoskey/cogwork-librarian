@@ -28,12 +28,12 @@ export const scryfall: Grammar = {
     alias: 'deleted',
     greedy: true,
   },
-  use: {
-    pattern: /(^|\s)@(use|u):\w+(?=( |\n|$))/,
-    alias: 'extension',
-  },
   keyword: {
     pattern: new RegExp(`(^|\\b)(${keywordRegex})(?=(${operators}))`, 'i'),
+  },
+  use: {
+    pattern: /(^|\s|)@(use|u):\w+(?=( |\)|\n|$))/,
+    alias: 'extension',
   },
   'unrecognized-keyword': {
     pattern: new RegExp(`(^|\\b)(\\w+)(?=(${operators}))`, 'i'),

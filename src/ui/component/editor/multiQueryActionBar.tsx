@@ -2,7 +2,7 @@ import React from 'react'
 import { rankInfo } from './infoLines'
 import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
 import { QuerySetButton } from '../querySetButton'
-import { VENN_REGEXP } from '../../../api/scryfallExtendedParser'
+import { VENN_REGEXP } from '../../../api/mtgql-ep/parser'
 
 export const multiQueryInfo = (renderSubquery: (count: number) => string) =>
   (queries: string[]): string[] => {
@@ -13,10 +13,10 @@ export const multiQueryInfo = (renderSubquery: (count: number) => string) =>
     let count = 0
     for (const line of queries) {
       if (line.trim().length === 0) {
-        result.push(' ')
+        result.push(` `)
         count = 0
       } else if (line.trimStart().startsWith('#')) {
-        result.push(' ')
+        result.push(` `)
       } else if (count === 0) {
         result.push(VENN_REGEXP.test(line.trim())? 'VENN' : 'BASE')
         count += 1
@@ -57,7 +57,7 @@ export const MultiQueryActionBar = ({
         const maxdex = mindex + query.length + 1
         copyText(mindex, maxdex)
     }}>
-      <code className={`multi-code ${line.toLowerCase()}`}>{line}</code>
+      <code className={`multi-code ${line.toLowerCase()}`}>{index+1} {line}</code>
       {(line === "BASE" || line === "VENN") && <button
         onClick={(event) => {
           event.stopPropagation()
