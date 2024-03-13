@@ -64,8 +64,8 @@
     flex-wrap: wrap;
     align-content: center;
     justify-content: center;
-    /*background-color: var(--blue-low-alpha);*/
-    /*border-color: var(--blue-mid-alpha);*/
+    /*background-color: var(--active-low-alpha);*/
+    /*border-color: var(--active-mid-alpha);*/
     padding: 0;
 }
 

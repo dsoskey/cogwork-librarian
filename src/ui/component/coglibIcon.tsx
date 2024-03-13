@@ -2,7 +2,7 @@ import React from 'react'
 import { SourceIconProps } from './scryfallIcon'
 
 export const CoglibIcon = ({ isActive, size }: SourceIconProps) => {
-  const highlightColor = isActive ? 'var(--blue)' : '#fff'
+  const highlightColor = isActive ? 'var(--active)' : '#fff'
   const strokeWidth = 20
   return (
     <svg

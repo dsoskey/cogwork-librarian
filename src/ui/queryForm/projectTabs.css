@@ -5,8 +5,8 @@
 
 .project-tab.active {
     color: var(--darker-color);
-    background-color: var(--blue);
-    border: var(--blue) inset 2px;
+    background-color: var(--active);
+    border: var(--active) inset 2px;
 }
 
 .project-tab .project-action {
@@ -27,7 +27,7 @@
 }
 
 .file-label:has(input[type=file]:focus-visible) {
-    outline: 2px inset var(--blue);
+    outline: 2px inset var(--active);
 }
 
 .file-label input[type=file] {

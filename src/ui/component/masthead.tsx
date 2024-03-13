@@ -32,6 +32,8 @@ export const Masthead = () => {
 
         <DatabaseLink active={topPath === 'data'} />
 
+        <Link to="/settings" className={topPath === "settings" ? "active-link" : ""}>settings</Link>
+
         <Link to='/about-me' className={topPath === "about-me" ? "active-link" : ""}>about me</Link>
 
         <Link to='/user-guide' className={topPath === "user-guide" ? "active-link" : ""}>user guide</Link>

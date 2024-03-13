@@ -14,6 +14,7 @@ import './styles.css'
 import 'mana-font/css/mana.min.css'
 import { FlagContextProvider } from './ui/flags'
 import { BrowserRouter } from 'react-router-dom'
+import { loadTheme } from './ui/component/theme'
 
 Prism.languages['scryfall'] = scryfall
 Prism.languages['scryfall-extended'] = scryfallExtended
@@ -22,6 +23,8 @@ Prism.languages['scryfall-extended-multi'] = scryfallExtendedMulti
 Prism.hooks.add('wrap', linkWrap)
 
 Scry.setTimeout(50)
+
+loadTheme();
 
 render(
   <FlagContextProvider>

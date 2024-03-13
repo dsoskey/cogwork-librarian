@@ -52,7 +52,7 @@
 }
 
 .docs-view code {
-    color: var(--blue-mid-alpha);
+    color: var(--active-mid-alpha);
     background-color: var(--darker-color);
     padding: var(--spacing-100);
     border-radius: var(--border-radius);
@@ -60,8 +60,8 @@
 
 .docs-sidenav :is(a.active, a:hover, a:focus-visible),
 .landing-card:hover, .landing-card:focus-visible {
-    border-color: var(--blue);
-    color: var(--blue);
+    border-color: var(--active);
+    color: var(--active);
 }
 
 .landing-card h4 {

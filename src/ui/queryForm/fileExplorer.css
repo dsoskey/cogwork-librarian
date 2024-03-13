@@ -27,7 +27,7 @@
 }
 
 .file-explorer .selectable:hover {
-    background-color: var(--blue-mid-alpha);
+    background-color: var(--active-mid-alpha);
     color: var(--darker-color);
 }
 

@@ -8,7 +8,7 @@ const widgetStyle = `
   --random-stroke:  var(--green);
   --tube-fill:  #970202;
   --chain-fill:  #dd8903;
-  --tube-stroke:  var(--blue);
+  --tube-stroke:  var(--active);
 }
 .iwroot {
   font-family: Helvetica, Arial, sans-serif;

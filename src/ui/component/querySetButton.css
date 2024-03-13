@@ -1,9 +1,9 @@
 .loading-button .background {
-    fill: var(--blue);
+    fill: var(--active);
 }
 
 .run-query-button:disabled .loading-button .background {
-    fill: var(--blue-mid-alpha);
+    fill: var(--active-mid-alpha);
 }
 
 .loading-button:disabled .play {

@@ -9,9 +9,9 @@
   --gray-68: hsl(0, 0%, 27%);
   --gray-68-shadow: hsla(0, 0%, 27%, 0.5);
   --gray-42: hsl(0, 0%, 50%);
-  --blue: hsl(312, 100%, 69%);
-  --blue-low-alpha: hsla(312, 100%, 69%, 50%);
-  --blue-mid-alpha: hsla(312, 100%, 69%, 75%);
+    --active: hsl(312, 100%, 69%);
+    --active-low-alpha: hsla(312, 100%, 69%, 50%);
+    --active-mid-alpha: hsla(312, 100%, 69%, 75%);
   --green: hsl(96, 100%, 69%);
   --light-red: hsl(339, 100%, 55%);
   --red: hsl(339, 100%, 37%);
@@ -26,26 +26,35 @@
   --gray-68: hsl(0, 0%, 27%);
   --gray-68-shadow: hsla(0, 0%, 27%, 0.5);
   --gray-42: hsl(0, 0%, 50%);
-  --blue: hsl(344, 100%, 69%);
-  --blue-low-alpha: hsla(344, 100%, 69%, 50%);
-  --blue-mid-alpha: hsla(344, 100%, 69%, 75%);
+  --active: hsl(344, 100%, 69%);
+  --active-low-alpha: hsla(344, 100%, 69%, 50%);
+  --active-mid-alpha: hsla(344, 100%, 69%, 75%);
   --green: hsl(96, 100%, 69%);
   --light-red: hsl(0, 100%, 55%);
   --red: hsl(0, 100%, 37%);
  */
 
 :root {
-  --dark-color: hsl(25, 32%, 27%);
-  --darker-color: hsl(25, 32%, 20%);
-  --darker-color-subdued: hsl(24, 20%, 20%);
-  --darkest-color: hsl(25, 31%, 12%);
-  --light-color: hsl(19, 41%, 88%);
+  --dark100:  hsl(25, 31%, 12%);
+  --dark150: hsl(24, 20%, 20%);
+  --dark200: hsl(25, 32%, 20%);
+  --dark300:  hsl(25, 32%, 27%);
+  --light600: hsl(228, 33%, 97%);
+  --active550: hsl(180, 100%, 69%, 50%);
+  --active575: hsl(180, 100%, 69%, 75%);
+  --active599: hsl(180, 100%, 69%);
+
+  --dark-color: var(--dark300);
+  --darker-color: var(--dark200);
+  --darker-color-subdued: var(--dark150);
+  --darkest-color: var(--dark100);
+  --light-color: var(--light600);
+  --active: var(--active599);
+  --active-mid-alpha: var(--active575);
+  --active-low-alpha: var(--active550);
   --gray-68: hsl(0, 0%, 27%);
   --gray-68-shadow: hsla(0, 0%, 27%, 0.5);
   --gray-42: hsl(0, 0%, 50%);
-  --blue: hsla(180, 100%, 69%, 100%);
-  --blue-low-alpha: hsla(180, 100%, 69%, 50%);
-  --blue-mid-alpha: hsla(180, 100%, 69%, 75%);
   --green: hsl(96, 100%, 69%);
   --light-red: hsl(0, 100%, 55%);
   --red: hsl(0, 100%, 37%);
@@ -75,7 +84,7 @@ body {
 }
 
 *:focus-visible {
-  outline: 2px inset var(--blue);
+  outline: 2px inset var(--active);
 }
 
 .button-like,
@@ -85,7 +94,7 @@ button {
   border-left-color: var(--gray-42);
   border-bottom-color: var(--darker-color);
   border-right-color: var(--darker-color);
-  color: var(--blue-mid-alpha);
+  color: var(--active-mid-alpha);
   cursor: pointer;
   border-width: 2px;
   border-style: solid;
@@ -110,21 +119,21 @@ button:disabled {
   background-color: var(--darker-color);
   border-bottom-color: var(--darkest-color);
   border-right-color: var(--darkest-color);
-  color: var(--blue-low-alpha);
+  color: var(--active-low-alpha);
 }
 
 input {
-  color: var(--blue);
+  color: var(--active);
   background: var(--darker-color);
   font-family: var(--monospace-family);
   border: none;
 }
 input:disabled {
   background-color: var(--darkest-color);
-  color: var(--blue-low-alpha);
+  color: var(--active-low-alpha);
 }
 input::placeholder {
-  color: var(--blue-mid-alpha);
+  color: var(--active-mid-alpha);
 }
 
 fieldset {
@@ -201,7 +210,7 @@ th, td {
 }
 
 .inverted {
-  background-color: var(--blue);
+  background-color: var(--active);
   color: var(--darker-color);
 }
 
@@ -273,7 +282,7 @@ th, td {
 
 .data-view-root .input-link,
 .masthead a {
-  color: var(--blue-mid-alpha);
+  color: var(--active-mid-alpha);
   text-decoration: none;
   padding: var(--spacing-100) var(--spacing-200);
   transition-property: color, background-color;
@@ -289,8 +298,8 @@ th, td {
 .masthead a:focus-visible,
 .masthead a:hover {
   color: var(--dark-color);
-  background-color: var(--blue);
-  border-color: var(--blue-mid-alpha) inset;
+  background-color: var(--active);
+  border-color: var(--active-mid-alpha) inset;
 }
 
 .cogwork-librarian.hide .masthead .toggle {
@@ -410,7 +419,7 @@ textarea.coglib-prism-theme {
   outline: none;
 }
 .query-editor:focus-within {
-  outline: 2px inset var(--blue);
+  outline: 2px inset var(--active);
 }
 
 .query-editor .links {
@@ -418,7 +427,7 @@ textarea.coglib-prism-theme {
   box-sizing: border-box;
   display: inline-block;
   background: transparent;
-  scrollbar-color: var(--blue-mid-alpha) var(--darker-color);
+  scrollbar-color: var(--active-mid-alpha) var(--darker-color);
 }
 .query-editor .links :not(a) {
   color: transparent;
@@ -432,7 +441,7 @@ textarea.coglib-prism-theme {
 }
 
 .query-editor .controller {
-  caret-color: var(--blue);
+  caret-color: var(--active);
   color: transparent;
   background-color: transparent;
   resize: none;
@@ -440,7 +449,7 @@ textarea.coglib-prism-theme {
   z-index: 3;
   box-sizing: border-box;
   overflow-x: auto;
-  scrollbar-color: var(--blue-mid-alpha) var(--darker-color);
+  scrollbar-color: var(--active-mid-alpha) var(--darker-color);
 }
 .query-editor input.controller {
   padding-right: 0;
@@ -448,11 +457,11 @@ textarea.coglib-prism-theme {
 }
 
 .query-editor .controller::selection {
-  background-color: var(--blue-low-alpha);
+  background-color: var(--active-low-alpha);
 }
 
 .query-editor .controller::placeholder {
-  color: var(--blue-mid-alpha);
+  color: var(--active-mid-alpha);
 }
 
 .query-editor .display {
@@ -503,8 +512,8 @@ textarea.coglib-prism-theme {
 }
 
 .source-option.selected {
-  border: var(--blue) inset 2px;
-  background-color: var(--blue);
+  border: var(--active) inset 2px;
+  background-color: var(--active);
   color: var(--dark-color);
 }
 .source-option .db-settings {
@@ -527,6 +536,7 @@ textarea.coglib-prism-theme {
 
 .alert {
   color: var(--light-red);
+  background-color: whitesmoke;
   font-weight: bold;
 }
 
@@ -571,7 +581,7 @@ textarea.coglib-prism-theme {
   border-radius: 100%;
 }
 .scryfall-input label.checked {
-  color: var(--blue);
+  color: var(--active);
 }
 .scryfall-input input[type=radio]::before {
   content: url("./ui/component/scryfallIcon.svg");
@@ -588,7 +598,7 @@ textarea.coglib-prism-theme {
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
   grid-template-areas: 'overlap';
-  border: var(--blue-mid-alpha) 2px inset;
+  border: var(--active-mid-alpha) 2px inset;
 }
 .db-import .file input {
   opacity: 0;
@@ -605,7 +615,7 @@ textarea.coglib-prism-theme {
   z-index: 1;
   display: inline-block;
   grid-area: overlap;
-  background: var(--blue);
+  background: var(--active);
   color: var(--dark-color);
   text-align: center;
   align-items: center;
@@ -624,7 +634,7 @@ textarea.coglib-prism-theme {
 }
 
 .cards-to-import::placeholder {
-  color: var(--blue-mid-alpha);
+  color: var(--active-mid-alpha);
 }
 
 .results {

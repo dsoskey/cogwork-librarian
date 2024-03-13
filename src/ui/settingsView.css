@@ -1,0 +1,31 @@
+.settings-view {
+    margin: var(--spacing-300);
+}
+
+.theme-picker {
+    display: flex;
+    flex-direction: column;
+}
+.picker-container {
+    margin-top: var(--spacing-300);
+}
+.theme-picker .picker {
+    width: 140px;
+    height: 140px;
+    margin: var(--spacing-200);
+}
+.theme-row-border {
+    max-width: 450px;
+}
+.theme-row-container {
+    justify-content: space-between;
+    cursor: pointer;
+}
+.theme-row {
+    display:flex;
+    flex-direction: row;
+}
+.theme-swatch {
+    width:40px;
+    height:40px;
+}

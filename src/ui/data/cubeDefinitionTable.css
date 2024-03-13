@@ -69,7 +69,7 @@
     /* Adjusts the position of the checkboxes on the text baseline */
     vertical-align: -2px;
     /* Set here so that Windows' High-Contrast Mode can override */
-    color: var(--blue);
+    color: var(--active);
 }
 .cube-definitions input[type="checkbox"]::before {
     content: "✔";

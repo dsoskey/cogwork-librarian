@@ -54,20 +54,20 @@ export const VennControl = ({ rightText, leftText, cards, activeSections, toggle
     </defs>
 
     <ellipse rx={`${r}%`} ry={`${r}%`} cx="65%" cy="50%" className="bordered"
-      fill={activeSections.includes("right") ? "var(--blue)":"var(--light-color)"}
+      fill={activeSections.includes("right") ? "var(--active)":"var(--light-color)"}
       onClick={toggleVennSection("right")}
     >
       <title>{rightText ?? "right count"} - {activeSections.includes("right")?"active":"inactive"}</title>
     </ellipse>
     <ellipse rx={`${r}%`} ry={`${r}%`} cx="35%" cy="50%" className="bordered"
-             fill={activeSections.includes("left") ? "var(--blue)":"var(--light-color)"}
+             fill={activeSections.includes("left") ? "var(--active)":"var(--light-color)"}
              onClick={toggleVennSection("left")}
     >
       <title>{leftText ?? "left count"} - {activeSections.includes("left")?"active":"inactive"}</title>
     </ellipse>
 
     <ellipse rx={`${r}%`} ry={`${r}%`} cx="65%" cy="50%" clipPath="url(#both-clip)" className="bordered"
-      fill={activeSections.includes("both") ? "var(--blue)":"var(--light-color)"}
+      fill={activeSections.includes("both") ? "var(--active)":"var(--light-color)"}
       onClick={toggleVennSection("both")}
     >
       <title>both count - {activeSections.includes("both")?"active":"inactive"}</title>

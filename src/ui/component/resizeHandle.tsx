@@ -8,7 +8,7 @@ const cheeseSS = (dragging: boolean): React.CSSProperties => ({
   left: 0,
   width: dragging ? 12 : 8,
   zIndex: 10,
-  background: dragging ? 'var(--blue)' : 'var(--blue-mid-alpha)',
+  background: dragging ? 'var(--active)' : 'var(--active-mid-alpha)',
   transition: 'width 100ms ease-out, background 100ms ease-out',
   cursor: 'col-resize',
   fontSize: 10,
