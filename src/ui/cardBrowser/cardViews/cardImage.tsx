@@ -1,12 +1,17 @@
 import React, { useState } from 'react'
-import { DOUBLE_FACED_LAYOUTS } from 'mtgql'
-import { Card, ImageUris } from 'scryfall-sdk'
+import { DOUBLE_FACED_LAYOUTS, Card, ImageUris } from 'mtgql'
 import "./cardImage.css"
 const getBackImageURI = (card: Card, version: keyof ImageUris) => {
   return card.card_faces.length === 1
     ? ''
     : card.card_faces[1].image_uris[version] ?? ''
 }
+
+function getFrontImageURI(card: Card, version: keyof ImageUris): string | undefined {
+  return card.card_faces[0].image_uris?.[version]
+    ?? card.image_uris?.[version];
+}
+
 interface CardImageProps {
   card: Card
 }
@@ -15,7 +20,7 @@ export const CardImage = ({ card }: CardImageProps) => {
   const version = 'normal'
   const imageSource = flipped
     ? getBackImageURI(card, version)
-    : card.image_uris?.normal ?? card.getFrontImageURI(version)
+    : card.image_uris?.normal ?? getFrontImageURI(card, version)
   return <div className='card-image'>
     <img
       width='100%'

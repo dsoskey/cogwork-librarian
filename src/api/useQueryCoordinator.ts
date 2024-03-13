@@ -4,7 +4,7 @@ import {
   QueryRunnerFunc,
   VennRunnerFunc
 } from './queryRunnerCommon'
-import { SearchOptions } from 'scryfall-sdk'
+import { SearchOptions } from 'mtgql'
 import { TaskStatus } from '../types'
 import { useReporter } from './useReporter'
 import { MutableRefObject, useRef, useState } from 'react'

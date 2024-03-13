@@ -16,7 +16,7 @@ import { CardJsonView } from './cardViews/cardJsonView'
 import { CardListView } from './cardViews/cardListView'
 import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { useVennControl, VennControl } from './vennControl'
-import { Card } from 'scryfall-sdk'
+import { Card } from 'mtgql'
 import { downloadText } from '../download'
 
 const handleDownload = (text: string, ext: string) => {

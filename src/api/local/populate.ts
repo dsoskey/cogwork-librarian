@@ -1,13 +1,12 @@
-import { Card } from 'scryfall-sdk'
 import { cogDB, Manifest, MANIFEST_ID } from './db'
-import { NormedCard, CubeDefinition } from 'mtgql'
+import { NormedCard, CubeDefinition, Card } from 'mtgql'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 
 export const downloadCards = async (manifest: BulkDataDefinition) => {
 
   const download = await fetch(manifest.download_uri, { method: 'GET' })
 
-  const results: Array<Card> = (await download.json()).map(Card.construct)
+  const results: Array<Card> = await download.json()
 
   return results
 }
@@ -32,7 +31,7 @@ export const putFile = async (manifest: Manifest, data: NormedCard[]) => {
       id: MANIFEST_ID,
       blob: new Blob([]),
     })
-    await cogDB.card.clear()
+    await cogDB.card.filter(it => it.collectionId === undefined).delete();
     await cogDB.card.bulkPut(toSave)
   })
 }

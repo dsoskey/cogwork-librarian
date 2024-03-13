@@ -1,5 +1,6 @@
 import * as Scry from 'scryfall-sdk'
-import { Card, SearchOptions } from 'scryfall-sdk'
+import { SearchOptions } from 'scryfall-sdk'
+import { Card } from "mtgql"
 import cloneDeep from 'lodash/cloneDeep'
 import MagicEmitter from 'scryfall-sdk/out/util/MagicEmitter'
 import MagicQuerier, {
@@ -59,7 +60,9 @@ export const useScryfallQueryRunner = ({
             report.setTotalCards((prev) => prev + data)
           })
           Scry.Cards.search(preparedQuery, options)
-            .on('data', (data) => {
+            .on('data', (_data) => {
+              // Hack: change types to bridge from scryfall-sdk.Card to mtgql.Card
+              const data = _data as Card;
               rawData.current[preparedQuery].push({
                 data,
                 weight,

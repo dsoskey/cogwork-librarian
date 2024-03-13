@@ -1,7 +1,7 @@
-import Scry, { SearchOptions } from 'scryfall-sdk'
 import { TaskStatus } from 'src/types'
 import { QueryReport } from 'src/api/useReporter'
 import { ResultAsync } from 'neverthrow'
+import { Card, SearchOptions } from 'mtgql'
 import { CogError } from '../error'
 
 export type QueryRunnerFunc = (
@@ -24,7 +24,7 @@ export type ErrorMap = { [key: string]: CogError }
 
 export interface EnrichedCard {
   weight: number
-  data: Scry.Card
+  data: Card
   matchedQueries: string[]
   left?: boolean
   right?: boolean

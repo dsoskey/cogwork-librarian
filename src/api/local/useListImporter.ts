@@ -1,6 +1,6 @@
 import { QueryReport, useReporter } from '../useReporter'
 import { createContext, useState } from 'react'
-import { normCardList, NormedCard } from 'mtgql'
+import { Card, normCardList, NormedCard } from 'mtgql'
 import { Setter, TaskStatus } from '../../types'
 import * as Scry from 'scryfall-sdk'
 import { CogDB } from './useCogDB'
@@ -73,7 +73,7 @@ export const useListImporter = (cogDb: CogDB): ListImporter => {
         console.debug("querying scryfall for missing cards")
         Scry.Cards.collection(...cardsToQueryAPI.map(name => ({name})))
           .on('data', data => {
-            foundCards.push(normCardList([data])[0])
+            foundCards.push(normCardList([data as Card])[0])
             report.addComplete()
           })
           .on("not_found", data => {

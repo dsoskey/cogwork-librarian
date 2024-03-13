@@ -2,12 +2,11 @@ import { importCubeCobra } from './cubeListImport'
 import {
   CubeDefinition, ExternalCubeSource,
   isOracleVal, not,
-  normCardList, NormedCard,
+  normCardList, NormedCard, Card,
 } from 'mtgql'
 import { cogDB } from '../local/db'
 import * as Scry from 'scryfall-sdk'
 import { importCubeArtisan } from '../cubeartisan/cubeListImport'
-
 
 self.onmessage = (_event) => {
   const event = _event.data
@@ -101,7 +100,7 @@ async function lookupCards(
   await cogDB.card.each(addToFoundCards)
 
   const missingCards = Array.from(foundNames).filter(it => !foundCards.has(it))
-
+Scry.Card
   if (missingCards.length) {
     postMessage({ type: "scryfall-lookup", data: `missing ${missingCards.length} cards` })
     const cards = await Scry.Cards.collection(...missingCards.map(name => ({name}))).waitForAll()
@@ -122,7 +121,7 @@ async function lookupCards(
         }})
     } else {
       for (const card of cards) {
-        const normed = normCardList([card])[0]
+        const normed = normCardList([card as Card])[0]
         addToFoundCards(normed)
       }
     }

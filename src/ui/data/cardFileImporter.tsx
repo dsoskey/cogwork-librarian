@@ -1,7 +1,6 @@
 import { Loader } from '../component/loader'
 import React, { useContext, useRef } from 'react'
 import { normCardList, NormedCard } from 'mtgql'
-import { Card } from 'scryfall-sdk'
 import { Setter, TaskStatus } from '../../types'
 import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
 import { ListImporterContext } from '../../api/local/useListImporter'
@@ -52,7 +51,7 @@ export const CardFileImporter = ({
     let cards: NormedCard[]
     switch (file.type) {
       case JSONMIME:
-        cards = normCardList(JSON.parse(content).map(Card.construct))
+        cards = normCardList(JSON.parse(content))
         break
       case TEXTMIME:
         cards = await listImporter.attemptImport(content.split(/[\r\n]+/), true)

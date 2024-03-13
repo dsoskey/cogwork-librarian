@@ -1,4 +1,3 @@
-import { Card } from 'scryfall-sdk'
 import {
   EnrichedCard,
   injectPrefix,
@@ -9,7 +8,7 @@ import {
 } from '../queryRunnerCommon'
 import { useQueryCoordinator } from '../useQueryCoordinator'
 import { displayMessage } from '../../error'
-import { NormedCard, SearchOptions, QueryRunner, CachingFilterProvider } from 'mtgql'
+import { Card, NormedCard, SearchOptions, QueryRunner, CachingFilterProvider } from 'mtgql'
 import { useMemo, useState } from 'react'
 import { cogDB } from './db'
 
