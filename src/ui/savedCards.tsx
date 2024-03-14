@@ -12,9 +12,9 @@ export type SavedCardsEditorProps = Pick<ProjectDao, PropsKeys>
 
 interface CardEntryEditorProps extends Pick<ProjectDao, "currentLine" | "setCurrentLine">{
   card: CardEntry
-  index: number
   editing: boolean
-  syncLine: (card: CardEntry, index: number) => void;
+  onBlur: () => void;
+  onFocus: () => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
 }
 
@@ -30,16 +30,14 @@ function focusEntry(index: number, backwards?: boolean, selection?: number) {
 }
 
 function CardEntryEditor(props: CardEntryEditorProps) {
-  const { card, index, editing, currentLine, setCurrentLine, onKeyDown, syncLine } = props;
-  const onFocus = () => {
-    syncLine(card, index);
-  }
+  const { card, editing, currentLine, setCurrentLine, onFocus, onBlur, onKeyDown } = props;
   if (editing) {
     return <input
       className='card-entry-editor'
       value={currentLine}
       onKeyDown={onKeyDown}
       onFocus={onFocus}
+      onBlur={onBlur}
       onChange={e => setCurrentLine(e.target.value)}
     />
   }
@@ -48,6 +46,7 @@ function CardEntryEditor(props: CardEntryEditorProps) {
     readOnly
     value={serializeEntry(card)}
     onFocus={onFocus}
+    onBlur={onBlur}
   />
 }
 
@@ -71,7 +70,7 @@ export function SavedCardsEditor(props: SavedCardsEditorProps) {
     localStorage.removeItem("saved-cards.coglib.sosk.watch")
     setMigrateOpen(false)
   }
-  const syncLine = (card: CardEntry, index: number) => {
+  const syncLine = () => {
     const newEntry = parseEntry(currentLine);
     if (savedCards[currentIndex] !== undefined && !isEqual(newEntry, savedCards[currentIndex])) {
       setSavedCards(prev => {
@@ -80,8 +79,6 @@ export function SavedCardsEditor(props: SavedCardsEditorProps) {
         return next
       })
     }
-    setCurrentIndex(index)
-    setCurrentLine(serializeEntry(card))
   }
 
   const onKeyDown = (index: number) => (event: KeyboardEvent<HTMLInputElement>) => {
@@ -193,11 +190,15 @@ export function SavedCardsEditor(props: SavedCardsEditorProps) {
     {savedCards.map((card, index) =>
       <CardEntryEditor
         key={path + index}
+        currentLine={currentLine} setCurrentLine={setCurrentLine}
         editing={index === currentIndex}
         card={card}
         onKeyDown={onKeyDown(index)}
-        index={index} syncLine={syncLine}
-        currentLine={currentLine} setCurrentLine={setCurrentLine}
+        onFocus={() => {
+          setCurrentLine(serializeEntry(card))
+          setCurrentIndex(index)
+        }}
+        onBlur={syncLine}
       />)}
   </div>
 }
