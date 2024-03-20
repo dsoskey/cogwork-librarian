@@ -1,0 +1,68 @@
+
+.theme-controls {
+    display: flex;
+    flex-direction: row;
+    gap: var(--spacing-400);
+}
+
+.theme-picker {
+    display: flex;
+    flex-direction: column;
+}
+
+.color-space,
+.picker-container {
+    margin-top: var(--spacing-300);
+}
+
+.picker-container .picker {
+    width: 140px;
+    height: 140px;
+    margin: var(--spacing-200);
+}
+.theme-row-border {
+    max-width: 450px;
+}
+.theme-row-container {
+    justify-content: space-between;
+    cursor: pointer;
+}
+.theme-row {
+    display:flex;
+    flex-direction: row;
+}
+.theme-swatch {
+    width:40px;
+    height:40px;
+}
+
+.theme-sample {
+    padding-top: var(--spacing-400);
+    padding-bottom: var(--spacing-400);
+    padding-left: var(--spacing-400);
+    border: 2px solid var(--light-color);
+    overflow-x: clip;
+}
+
+.theme-sample * {
+    overflow-x: clip;
+}
+
+.color-blend {
+    background-color: var(--dark-color);
+}
+.color-blend::-moz-range-track {
+    background-color: var(--light-color);
+}
+.color-blend::-moz-range-thumb {
+    background-color: var(--active);
+}
+.color-blend::-moz-range-progress {
+    background-color: var(--active);
+}
+
+.custom-theme-name {
+    margin-bottom: .5em;
+    font-weight: 700;
+    font-size: 1.17em;
+}

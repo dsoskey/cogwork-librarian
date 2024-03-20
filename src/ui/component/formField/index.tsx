@@ -1,2 +1,1 @@
-import { FormField as _FormField } from './formField';
-export const FormField = _FormField;
+export { FormField, RangeField } from "./formField"

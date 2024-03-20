@@ -1,14 +1,16 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import { Block, IllustrationTag, OracleTag, NormedCard, CubeDefinition, DataProvider } from 'mtgql'
+import { Block, CubeDefinition, DataProvider, IllustrationTag, NormedCard, OracleTag } from 'mtgql'
 import { DataSource } from '../../types'
 import { Project } from './types/project'
 import { RunStrategy } from '../queryRunnerCommon'
+import { ThemeDefinition } from './types/theme'
 
 export interface Collection {
-  id: string
+  id: string // used for NormedCard.collectionId
   name: string
   type: string
+  bulkUrl?: string
   blob: Blob
   lastUpdated: Date
   filter: string
@@ -44,6 +46,7 @@ export const toManifest = (
   name: bulkDataDefinition.uri,
   lastUpdated: new Date(),
   filter: filter.trim(),
+  bulkUrl: bulkDataDefinition.download_uri,
 })
 
 export class TypedDexie extends Dexie implements DataProvider {
@@ -61,6 +64,7 @@ export class TypedDexie extends Dexie implements DataProvider {
   history!: Table<QueryHistory>
   project!: Table<Project>
   projectFolder!: Table<ProjectFolder>
+  theme: Table<ThemeDefinition>
 
   getCube = (key: String) => this.cube.get(key)
   getOtag = (key: String) => this.oracleTag.get({ label: key })
@@ -170,6 +174,15 @@ export class TypedDexie extends Dexie implements DataProvider {
           }
         })
     })
+
+    this.version(12).stores({
+      card: 'oracle_id, name, collectionId',
+    })
+
+    this.version(13).stores({
+      theme: 'name, createdAt, updatedAt'
+    })
   }
 }
 export const cogDB = new TypedDexie()
+

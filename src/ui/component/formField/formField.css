@@ -9,3 +9,14 @@ label.form-field .description {
     font-size: .9em;
 }
 
+label.form-field.range .title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+label.form-field.range .title > span {
+    width: 150px;
+}
+
