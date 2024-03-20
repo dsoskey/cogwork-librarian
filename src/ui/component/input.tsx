@@ -1,17 +1,17 @@
-import React, { ChangeEventHandler, useEffect, useRef, useState } from 'react'
+import React, { ChangeEventHandler, HTMLAttributes, useEffect, useRef, useState } from 'react'
 import {
   Language,
   useHighlightPrism,
 } from '../../api/local/syntaxHighlighting'
 
-export interface InputProps {
+export interface InputProps extends HTMLAttributes<HTMLInputElement> {
   value: string
   onChange: ChangeEventHandler<HTMLInputElement>
   language?: Language
 }
 
 const linkKeys = ['Meta', 'Control']
-export const Input = ({ value, onChange, language }: InputProps) => {
+export const Input = ({ value, onChange, language, ...rest }: InputProps) => {
   const controller = useRef<HTMLInputElement>()
   const faker = useRef<HTMLPreElement>()
   const linker = useRef<HTMLPreElement>()
@@ -47,6 +47,7 @@ export const Input = ({ value, onChange, language }: InputProps) => {
           revealLinks ? 'show' : 'hide'
         }`}>{value}</code>
       <input
+        {...rest}
         ref={controller}
         className='controller coglib-prism-theme'
         value={value}

@@ -119,7 +119,7 @@ export const CardDataView = () => {
       <FormField
         title="in-memory filter"
         description="load cards that match this query into memory on page load">
-        <Input onChange={e => setLoadFilter(e.target.value)} value={loadFilter} language="scryfall"/>
+        <Input onChange={e => setLoadFilter(e.target.value)} value={loadFilter} language="scryfall" placeholder="No filter will be applied"/>
       </FormField>
       <button onClick={() => window.location.reload()}>reload page</button>
       <button

@@ -9,6 +9,7 @@
 .footer .links {
     display: flex;
     flex-direction: row;
+    gap: var(--spacing-400);
 }
 .footer a,
 .footer a:visited {

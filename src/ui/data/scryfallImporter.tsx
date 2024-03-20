@@ -66,7 +66,7 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
       title="import filter"
       description="cards that match this filter will be loaded into the database during importing"
     >
-      <Input onChange={e => setFilter(e.target.value)} value={filter} language="scryfall" />
+      <Input onChange={e => setFilter(e.target.value)} value={filter} language="scryfall" placeholder="No filter will be applied" />
     </FormField>
     <button
       disabled={dbStatus === 'loading' || memStatus === 'loading' || targetDefinition === undefined}

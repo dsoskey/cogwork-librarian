@@ -36,11 +36,20 @@ export const Footer = () => {
           </a>{' '}
           💡
         </div>
+        <div>
+          <a
+            href="https://ko-fi.com/cogworklibrarian"
+            rel="noreferrer"
+            target="_blank"
+          >
+            donate
+          </a>{" "}☕️
+        </div>
       </div>
       <InnertubeWidget />
       <div className='legalese'>
         <p>
-          portions of cogwork librarian are unofficial Fan Content permitted
+          Portions of cogwork librarian are unofficial Fan Content permitted
           under the Wizards of the Coast Fan Content Policy. The literal and
           graphical information presented on this site about Magic: The
           Gathering, including card images, mana symbols, and Oracle text, is
