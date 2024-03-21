@@ -4,7 +4,7 @@ import "./cardImage.css"
 const getBackImageURI = (card: Card, version: keyof ImageUris) => {
   return card.card_faces.length === 1
     ? ''
-    : card.card_faces[1].image_uris[version] ?? ''
+    : card.card_faces[1]?.image_uris[version] ?? ''
 }
 
 function getFrontImageURI(card: Card, version: keyof ImageUris): string | undefined {
