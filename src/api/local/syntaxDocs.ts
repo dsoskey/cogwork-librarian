@@ -37,7 +37,7 @@ export const syntaxDocs: Record<FilterKeyword, string> = {
   identity: 'https://scryfall.com/docs/syntax#colors',
   in: 'https://scryfall.com/docs/syntax#sets',
   include: 'https://scryfall.com/docs/syntax#extras',
-  is: 'https://scryfall.com/docs/syntax#shortcuts',
+  is: '/user-guide/query-syntax#is',
   keyword: 'https://scryfall.com/docs/syntax#oracle',
   lang: 'https://scryfall.com/docs/syntax#languages',
   language: 'https://scryfall.com/docs/syntax#languages',
