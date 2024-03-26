@@ -46,9 +46,9 @@ async function searchCubes({ cubeIds, source }: SearchInput) {
     return
   }
 
-  console.time("generate nameToOracleId")
-  const nameToOracleId = await lookupCards(foundCubes, foundNames)
-  console.timeEnd("generate nameToOracleId")
+  console.time("generate nameToIds")
+  const nameToIds = await lookupCards(foundCubes, foundNames)
+  console.timeEnd("generate nameToIds")
 
   postMessage({ type: "generate-cube-definitions" })
 
@@ -56,7 +56,8 @@ async function searchCubes({ cubeIds, source }: SearchInput) {
   const cubeDefinitions: CubeDefinition[] = Object.entries(foundCubes)
     .map(([key, names]) => ({
       key,
-      oracle_ids: names.map(it => nameToOracleId[it]).filter(it => it !== undefined),
+      oracle_ids: names.map(it => nameToIds[it].oracle_id).filter(it => it !== undefined),
+      print_ids: names.map(it => nameToIds[it].print_id).filter(it => it !== undefined),
       source,
       last_updated,
     }))
@@ -68,29 +69,42 @@ async function searchCubes({ cubeIds, source }: SearchInput) {
   postMessage({ type: "end" })
 }
 
+interface CardIds {
+  oracle_id: string
+  print_id: string
+}
 async function lookupCards(
   foundCubes: { [cubeId: string]: string[] },
   foundNames: Set<string>,
-): Promise<{ [name: string]: string}> {
+): Promise<{ [name: string]: CardIds}> {
   postMessage({ type: "card-lookup" })
 
-  const nameToOracleId: { [name: string]: string } = {}
+  const nameToOracleId: { [name: string]: CardIds } = {}
   const foundCards: Set<string> = new Set()
 
   const filter = not(isOracleVal("extra"))
   const addToFoundCards = (card: NormedCard) => {
     if (filter(card)) {
       if (foundNames.has(card.name)) {
-        nameToOracleId[card.name] = card.oracle_id
+        nameToOracleId[card.name] = {
+          oracle_id: card.oracle_id,
+          print_id: card.printings[0].id
+        }
         foundCards.add(card.name)
       } else {
         const split = card.name.split(" // ")
         if (foundNames.has(split[0])) {
-          nameToOracleId[split[0]] = card.oracle_id
+          nameToOracleId[split[0]] = {
+            oracle_id: card.oracle_id,
+            print_id: card.printings[0].id
+          }
           foundCards.add(split[0])
         }
         if (foundNames.has(split[1])) {
-          nameToOracleId[split[1]] = card.oracle_id
+          nameToOracleId[split[1]] = {
+            oracle_id: card.oracle_id,
+            print_id: card.printings[0].id
+          }
           foundCards.add(split[1])
         }
       }
@@ -100,7 +114,7 @@ async function lookupCards(
   await cogDB.card.each(addToFoundCards)
 
   const missingCards = Array.from(foundNames).filter(it => !foundCards.has(it))
-Scry.Card
+
   if (missingCards.length) {
     postMessage({ type: "scryfall-lookup", data: `missing ${missingCards.length} cards` })
     const cards = await Scry.Cards.collection(...missingCards.map(name => ({name}))).waitForAll()

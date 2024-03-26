@@ -68,6 +68,7 @@
   --spacing-200: 4px;
   --spacing-300: 8px;
   --spacing-400: 16px;
+  --spacing-500: 32px;
 
   background-color: var(--dark-color);
   color: var(--light-color);

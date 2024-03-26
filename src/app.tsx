@@ -16,6 +16,7 @@ import { DocsView } from './ui/docs/docsView'
 import { FlagContext } from './ui/flags'
 import { ProjectContext, useProjectDao } from './api/local/useProjectDao'
 import { SettingsView } from './ui/settingsView'
+import { CubeView } from './ui/cubeView'
 
 export const App = () => {
   const { pathname } = useLocation()
@@ -57,6 +58,7 @@ export const App = () => {
                       <Route path='/user-guide/*' element={<DocsView />} />
                       <Route path='/history' element={<HistoryView />} />
                       <Route path="/settings" element={<SettingsView />} />
+                      <Route path="/cube/:key" element={<CubeView />} />
                       <Route element={<div>404'ed!</div>} />
                     </Routes>
                     <Footer />

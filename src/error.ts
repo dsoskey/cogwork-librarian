@@ -1,10 +1,11 @@
 import { SearchError, OPERATORS } from 'mtgql'
+import React from 'react'
 
 export interface CogError {
   // query that caused the error
   query: string
   // error message meant to be displayed in the UI
-  displayMessage: string
+  displayMessage: React.ReactNode
   // more detailed version that's used for populating bug reports
   debugMessage?: string
 }

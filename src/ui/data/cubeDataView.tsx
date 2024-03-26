@@ -9,9 +9,9 @@ import { ListImporterContext } from '../../api/local/useListImporter'
 import { Loader } from '../component/loader'
 import { CubeListImporter } from './cubeListImporter'
 import { Setter } from '../../types'
-import { CubeDefinitionTable } from './cubeDefinitionTable'
+import { CubeDefinitionTable } from '../component/cube/cubeDefinitionTable'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
-import { CUBE_SOURCE_TO_LABEL } from './strings'
+import { CUBE_SOURCE_TO_LABEL } from '../component/cube/sourceIcon'
 
 export const CubeDataView = () => {
   const { addMessage, dismissMessage } = useContext(ToasterContext)
@@ -42,7 +42,8 @@ export const CubeDataView = () => {
       setShowConfirmation(true)
     } else {
       const oracle_ids = cards.map(it => it.oracle_id)
-      await cogDB.cube.put({ key, oracle_ids, source: "list", last_updated: new Date() })
+      const print_ids = cards.map(it => it.printings[0].id)
+      await cogDB.cube.put({ key, oracle_ids, print_ids, source: "list", last_updated: new Date() })
       setCubeId("")
       setCardsToImport([])
       setError("")
