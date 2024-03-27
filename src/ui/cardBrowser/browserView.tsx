@@ -18,6 +18,7 @@ import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { useVennControl, VennControl } from './vennControl'
 import { Card } from 'mtgql'
 import { downloadText } from '../download'
+import { SearchHoverActions } from './cardViews/searchHoverActions'
 
 const handleDownload = (text: string, ext: string) => {
   const now = new Date()
@@ -160,30 +161,34 @@ export const BrowserView = React.memo(({
 
         {showCards && <>
           <div className='result-container'>
-            {(displayType === 'cards' || displayType === 'render') && currentPage.map((card, index) => (
-              <CardImageView
-                className={`_${cardsPerRow}`}
-                onAdd={() => {
-                  addCard(card.data)
-                  const id = addMessage(`Added ${card.data.name} to saved cards`, false)
-                  setTimeout(() => {
-                    dismissMessage(id)
-                  }, DISMISS_TIMEOUT_MS)
-                }}
-                onIgnore={() => {
-                  addIgnoredId(card.data.oracle_id)
-                  const id = addMessage(`Ignored ${card.data.name} from future searches`, false)
-                  setTimeout(() => {
-                    dismissMessage(id)
-                  }, DISMISS_TIMEOUT_MS)
-                }}
-                key={index}
-                card={card}
-                showRender={displayType === "render"}
-                revealDetails={revealDetails}
-                visibleDetails={visibleDetails}
-              />
-            ))}
+            {(displayType === 'cards' || displayType === 'render') && currentPage.map((card, index) => {
+              const onAdd = () => {
+                addCard(card.data)
+                const id = addMessage(`Added ${card.data.name} to saved cards`, false)
+                setTimeout(() => {
+                  dismissMessage(id)
+                }, DISMISS_TIMEOUT_MS)
+              }
+              const onIgnore = () => {
+                addIgnoredId(card.data.oracle_id)
+                const id = addMessage(`Ignored ${card.data.name} from future searches`, false)
+                setTimeout(() => {
+                  dismissMessage(id)
+                }, DISMISS_TIMEOUT_MS)
+              }
+              return (
+                <CardImageView
+                  className={`_${cardsPerRow}`}
+                  onAdd={onAdd}
+                  hoverContent={<SearchHoverActions card={card} onAdd={onAdd} onIgnore={onIgnore} />}
+                  key={index}
+                  card={card}
+                  showRender={displayType === "render"}
+                  revealDetails={revealDetails}
+                  visibleDetails={visibleDetails}
+                />
+              )
+            })}
             {displayType === 'json' && <CardJsonView result={currentPage} />}
             {displayType === 'list' && <CardListView result={currentPage} />}
           </div>

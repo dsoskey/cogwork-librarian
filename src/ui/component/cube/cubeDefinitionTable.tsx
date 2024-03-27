@@ -1,5 +1,5 @@
 import React, { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { CubeDefinition } from '../mtgql-js/src'
+import { CubeDefinition } from 'mtgql'
 import './cubeDefinitionTable.css'
 import { PageControl } from '../../cardBrowser/pageControl'
 import { BulkCubeImporterContext } from '../../../api/cubecobra/useBulkCubeImporter'
@@ -28,7 +28,7 @@ const CubeDefinitionRow = ({ cube, checked, onChecked }: CubeDefinitionRowProps)
       />
     </td>
     <td>
-      <Link to={`/cube/${key}`}>{key}</Link>
+      <Link to={`/data/cube/${key}`}>{key}</Link>
     </td>
     <td>
       {source !== "list" &&

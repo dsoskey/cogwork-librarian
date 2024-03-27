@@ -49,6 +49,7 @@ export const App = () => {
                   {pathname !== "/" && <>
                     <Masthead/>
                     <Routes>
+                      <Route path="/data/cube/:key" element={<CubeView />} />
                       <Route path='/data/*' element={<DataView />}/>
                       <Route
                         path='/saved'
@@ -58,7 +59,6 @@ export const App = () => {
                       <Route path='/user-guide/*' element={<DocsView />} />
                       <Route path='/history' element={<HistoryView />} />
                       <Route path="/settings" element={<SettingsView />} />
-                      <Route path="/cube/:key" element={<CubeView />} />
                       <Route element={<div>404'ed!</div>} />
                     </Routes>
                     <Footer />

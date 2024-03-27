@@ -43,7 +43,13 @@ export const CubeDataView = () => {
     } else {
       const oracle_ids = cards.map(it => it.oracle_id)
       const print_ids = cards.map(it => it.printings[0].id)
-      await cogDB.cube.put({ key, oracle_ids, print_ids, source: "list", last_updated: new Date() })
+      await cogDB.cube.put({ key,
+        cards: cards.map(it => ({ print_id: it.printings[0].id, oracle_id: it.oracle_id })),
+        oracle_ids,
+        print_ids,
+        source: "list",
+        last_updated: new Date()
+      })
       setCubeId("")
       setCardsToImport([])
       setError("")

@@ -7,6 +7,9 @@
   max-height: 80%;
   overflow-y: scroll;
 }
+.modal a {
+  color: var(--dark-color);
+}
 
 .modal section:not(:first-of-type) {
   margin-top: 2em;

@@ -1,9 +1,13 @@
 
+export interface CubeArtisanCardIds {
+  oracleIds: string[]
+  printIds: string[]
+}
+export async function importCubeArtisan(cubeId: string): Promise<CubeArtisanCardIds> {
 
-
-export async function importCubeArtisan(cubeId: string): Promise<string[]> {
-  // const response = await fetch(`https://cubeartisan.net/cube/${cubeId}/cards/names`)
-  const response = await fetch(`https://cubeartisan.net/cube/${cubeId}/export/plaintext`)
-  const tree = await response.text()
-  return tree.split("\n").filter(it => it.length)
+  const response = await fetch(`https://cubeartisan.net/cube/${cubeId}/export/json`)
+  const cube = await response.json();
+  console.log(cube)
+  const printIds = cube.cards.map(it => it.cardID)
+  return { printIds, oracleIds: cube.cardOracles }
 }

@@ -17,6 +17,10 @@ interface CardImageProps {
 }
 export const CardImage = ({ card }: CardImageProps) => {
   const [flipped, setFlipped] = useState(false)
+  const onFlipCLick = e => {
+    e.stopPropagation()
+    setFlipped((prev) => !prev)
+  }
   const version = 'normal'
   const imageSource = flipped
     ? getBackImageURI(card, version)
@@ -34,7 +38,7 @@ export const CardImage = ({ card }: CardImageProps) => {
     {DOUBLE_FACED_LAYOUTS.includes(card.layout) && (
       <button
         className='flip-button'
-        onClick={() => setFlipped((prev) => !prev)}
+        onClick={onFlipCLick}
         title='flip'
       >🔄</button>
     )}

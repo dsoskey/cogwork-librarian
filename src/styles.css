@@ -653,6 +653,11 @@ textarea.coglib-prism-theme {
   flex-direction: row;
 }
 
+.results .card-view {
+  margin-left: 0.75%;
+  margin-bottom: var(--spacing-200);
+}
+
 .query-panel {
   flex:1;
   height: 100vh;

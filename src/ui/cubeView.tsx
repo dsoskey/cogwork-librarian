@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Card, NormedCard, QueryRunner, SearchError, sortFunc } from 'mtgql'
+import { Card, NormedCard, QueryRunner, SearchError, SortFunctions } from 'mtgql'
 import { cogDB as cogDBClient } from '../api/local/db'
 import { CardImageView } from './cardBrowser/cardViews/cardImageView'
 import { groupBy, sortBy } from 'lodash'
@@ -10,22 +10,33 @@ import { Input } from './component/input'
 import { CUBE_SOURCE_TO_LABEL, cubeLink } from './component/cube/sourceIcon'
 import { Modal } from './component/modal'
 import { RefreshButton } from './component/cube/refreshButton'
+import { ScryfallIcon } from './component/scryfallIcon'
 
 
 interface OrderedCard extends Card {
   index: number
 }
+
+function isCreature(card: OrderedCard): number {
+  if (card.type_line.includes("Creature")) return 0
+  return 1
+}
+
 export function CubeView() {
   const { key } = useParams();
   const cube = useLiveQuery(() => cogDBClient.getCube(key), [key]);
-  const needsMigration = cube && cube.print_ids === undefined;
+  const needsMigration = cube && cube.cards === undefined;
   const [oracles, setOracles] = useState<{ [key: string]: NormedCard[] }>({})
   const [cards, setCards] = useState<OrderedCard[]>([])
   const [error, setError] = useState<SearchError | undefined>()
   const [filterQuery, setFilterQuery] = useState<string>("")
   const [filteredCards, setFilteredCards] = useState<OrderedCard[] | undefined>();
-  const cardsToDisplay = filteredCards ?? cards;
-  const sorted: OrderedCard[] = sortBy(cardsToDisplay, sortFunc("cube")) as OrderedCard[]
+  const sorted: OrderedCard[] = useMemo(() => {
+    return sortBy(
+      filteredCards ?? cards,
+      [SortFunctions.byColorId, 'cmc', isCreature, 'type_line', 'name'],
+    ) as OrderedCard[]
+  }, [filteredCards, cards])
   const [activeCard, setActiveCard] = useState<OrderedCard | undefined>();
   const applyFilter = () => {
     const qr = new QueryRunner({ corpus: cards, dataProvider: cogDBClient })
@@ -42,13 +53,14 @@ export function CubeView() {
     const funk = async() => {
       try {
         const next: OrderedCard[] = [];
-        const newOracles = (await cogDBClient.card.bulkGet(cube.oracle_ids)) ?? [];
-        setOracles(groupBy(newOracles, "oracle_id"));
+        const newOracles = (await cogDBClient.card.bulkGet(cube.cards.map(it=>it.oracle_id))) ?? [];
+        const oracleIdToNormed = groupBy(newOracles, "oracle_id")
+        setOracles(oracleIdToNormed);
         if (needsMigration) {
-          const print_ids = newOracles.map(it => it.printings[0].id);
+          const cards = newOracles.map(it => ({ oracle_id: it.oracle_id, print_id: it.printings[0].id }));
           await cogDBClient.cube.put({
             ...cube,
-            print_ids,
+            cards
           });
         } else {
           const printToCard: { [key: string]: Card } = {};
@@ -58,8 +70,8 @@ export function CubeView() {
             }
           }
 
-          for (let i = 0; i < cube.print_ids.length; i++){
-            const printId = cube.print_ids[i]
+          for (let i = 0; i < cube.cards.length; i++) {
+            const printId = cube.cards[i].print_id
             if (printId in printToCard) {
               next.push({ ...printToCard[printId], index: i });
             }
@@ -83,15 +95,15 @@ export function CubeView() {
   }
 
   const saveActiveCard = () => {
-    if (activeCard && cube.print_ids[activeCard.index] !== activeCard.id) {
-      const print_ids = [
-        ...cube.print_ids.slice(0, activeCard.index),
-        activeCard.id,
-        ...cube.print_ids.slice(activeCard.index + 1)
+    if (activeCard && cube.cards[activeCard.index].print_id !== activeCard.id) {
+      const cards = [
+        ...cube.cards.slice(0, activeCard.index),
+        { oracle_id: activeCard.oracle_id, print_id: activeCard.id },
+        ...cube.cards.slice(activeCard.index + 1)
       ];
       const newCube = {
         ...cube,
-        print_ids,
+        cards,
       }
       cogDBClient.cube.put(newCube)
         .then(() => setActiveCard(undefined))
@@ -107,7 +119,7 @@ export function CubeView() {
         <h2>{cube?.key ?? "loading..."}</h2>
         {error && <div className="alert">{error.message}</div>}
         {cube && <>
-          {<div>a {cube.print_ids?.length ?? cube.oracle_ids.length} card cube</div>}
+          {<div>a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube</div>}
           <div className='baseline row'><strong>source:</strong>
             {cube.source !== "list" && <>
               <a href={cubeLink(cube)}
@@ -128,44 +140,42 @@ export function CubeView() {
         </div>
         {cube && filteredCards && <div>filter matched {filteredCards.length} of {cube.print_ids.length}</div>}
       </div>
+      {cards.length === 0 && error === undefined && <div>loading cards...</div>}
       {sorted.length > 0 && error === undefined && <div className='result-container'>
         <div className="card-image-container">
           {sorted.map((card, index) =>
             <CardImageView
               key={card.id + index.toString()}
               className={"_8"}
-              card={{ data: card, matchedQueries: [`newcube:${key}`], weight: 1 }}
+              card={{ data: card, matchedQueries: [`cube:${key}`], weight: 1 }}
               onClick={() => setActiveCard(card)}
-              onAdd={() => {}}
-              onIgnore={() => {}}
-              showRender={false}
-              revealDetails={false}
-              visibleDetails={[]}
             />)}
         </div>
       </div>}
     </div>
     <Modal
       open={activeCard !== undefined}
-      title={<h2>{activeCard?.name}</h2>}
+      title={<div className="row center">
+        <h2>{activeCard?.name} –</h2>
+        <a href={activeCard?.scryfall_uri.replace(/\?.+$/, "")}
+           rel='noreferrer'
+           target='_blank'
+           title="view on scryfall "
+        ><ScryfallIcon size="1.5em" /></a>
+      </div>}
       onClose={() => setActiveCard(undefined)}>
       {activeCard && <>
-        <CardImageView
-          onAdd={() => {}}
-          onIgnore={() => {}}
-          card={{ data: activeCard, matchedQueries: [`newcube:${key}`], weight: 1 }}
-          showRender={false}
-          revealDetails={false}
-          visibleDetails={[]}
-        />
-        <select value={activeCard.id} onChange={onPrintSelect}>
-          {oracles[activeCard.oracle_id][0]
-            .printings.map(printing =>
-              <option value={printing.id}>
-                {printing.set} {printing.collector_number}
-              </option>)}
-        </select>
-        <button onClick={saveActiveCard}>save</button>
+          <CardImageView card={{ data: activeCard, matchedQueries: [`cube:${key}`], weight: 1 }} />
+          <div>
+            <select value={activeCard.id} onChange={onPrintSelect}>
+              {oracles[activeCard.oracle_id][0]
+                .printings.map(printing =>
+                  <option key={printing.id} value={printing.id}>
+                    {printing.set_name} – ({printing.set} {printing.collector_number})
+                  </option>)}
+            </select>
+            <button onClick={saveActiveCard}>save</button>
+        </div>
       </>}
     </Modal>
   </>

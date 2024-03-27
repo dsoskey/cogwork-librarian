@@ -1,7 +1,5 @@
 .card-view {
     position: relative;
-    margin-left: 0.75%;
-    margin-bottom: var(--spacing-200);
     aspect-ratio: var(--card-apect-ratio);
     border-radius: var(--card-border-radius);
 }
