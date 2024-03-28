@@ -53,7 +53,7 @@ export function CubeView() {
     const funk = async() => {
       try {
         const next: OrderedCard[] = [];
-        const newOracles = (await cogDBClient.card.bulkGet(cube.cards.map(it=>it.oracle_id))) ?? [];
+        const newOracles = (await cogDBClient.card.bulkGet(cube.cards?.map(it=>it.oracle_id) ?? cube.oracle_ids)) ?? [];
         const oracleIdToNormed = groupBy(newOracles, "oracle_id")
         setOracles(oracleIdToNormed);
         if (needsMigration) {
