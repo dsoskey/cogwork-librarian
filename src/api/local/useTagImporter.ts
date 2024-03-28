@@ -10,8 +10,8 @@ export interface OracleTagImporter {
 }
 
 export const LOADING_MESSAGES = [
-  "downloading tags...",
-  "saving tags to db...",
+  "downloading tags",
+  "saving tags to db",
 ]
 export const useTagImporter = (): OracleTagImporter => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>('unstarted')

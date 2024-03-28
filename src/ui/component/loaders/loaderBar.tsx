@@ -8,7 +8,7 @@ export interface LoaderProps {
 }
 
 // should this be a <progress> instead of an svg?
-export const Loader = ({ width, count, total, label }: LoaderProps) => {
+export const LoaderBar = ({ width, count, total, label }: LoaderProps) => {
   const viewHeight = 20
   const viewWidth = 400
   const rx = 4

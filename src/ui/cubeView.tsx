@@ -11,6 +11,8 @@ import { CUBE_SOURCE_TO_LABEL, cubeLink } from './component/cube/sourceIcon'
 import { Modal } from './component/modal'
 import { RefreshButton } from './component/cube/refreshButton'
 import { ScryfallIcon } from './component/scryfallIcon'
+import { LoaderText } from './component/loaders'
+import { useBulkCubeImporter } from '../api/cubecobra/useBulkCubeImporter'
 
 
 interface OrderedCard extends Card {
@@ -24,11 +26,11 @@ function isCreature(card: OrderedCard): number {
 
 export function CubeView() {
   const { key } = useParams();
-  const cube = useLiveQuery(() => cogDBClient.getCube(key), [key]);
+  const [error, setError] = useState<SearchError | undefined>()
+  const cube = useLiveQuery(() => cogDBClient.getCube(key), [key], null);
   const needsMigration = cube && cube.cards === undefined;
   const [oracles, setOracles] = useState<{ [key: string]: NormedCard[] }>({})
   const [cards, setCards] = useState<OrderedCard[]>([])
-  const [error, setError] = useState<SearchError | undefined>()
   const [filterQuery, setFilterQuery] = useState<string>("")
   const [filteredCards, setFilteredCards] = useState<OrderedCard[] | undefined>();
   const sorted: OrderedCard[] = useMemo(() => {
@@ -84,8 +86,7 @@ export function CubeView() {
         console.error(e)
       }
     };
-    if (cube !== undefined)
-      funk().catch(console.error);
+    if (cube) funk().catch(console.error);
   }, [cube])
 
   const onPrintSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -113,12 +114,15 @@ export function CubeView() {
     }
   }
 
+  // highly cursed, don't do this lol
   return <>
     <div className='cube-view-root'>
-      <div className='header'>
-        <h2>{cube?.key ?? "loading..."}</h2>
-        {error && <div className="alert">{error.message}</div>}
-        {cube && <>
+      {cube === null && <div className='header'><h2><LoaderText /></h2></div>}
+      {cube === undefined && <NotFound cubekey={key} error={error} />}
+      {cube && <>
+        <div className='header'>
+          <h2>{cube.key}</h2>
+          {error && <div className="alert">{error.message}</div>}
           {<div>a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube</div>}
           <div className='baseline row'><strong>source:</strong>
             {cube.source !== "list" && <>
@@ -132,26 +136,25 @@ export function CubeView() {
             {cube.source === "list" && "a text list"}
           </div>
           <div><strong>last updated:</strong> {cube.last_updated.toLocaleString() ?? "~"}</div>
-        </>}
-        <div className="row center">
-          <Input language="scryfall" value={filterQuery} onChange={e => setFilterQuery(e.target.value)} />
-          <button onClick={applyFilter} disabled={filterQuery.length === 0}>Apply filter</button>
-          <button onClick={clearFilter} disabled={filteredCards === undefined}>Clear filter</button>
+          <div className="row center">
+            <Input language="scryfall" value={filterQuery} onChange={e => setFilterQuery(e.target.value)} />
+            <button onClick={applyFilter} disabled={filterQuery.length === 0}>Apply filter</button>
+            <button onClick={clearFilter} disabled={filteredCards === undefined}>Clear filter</button>
+          </div>
+          {filteredCards && <div>filter matched {filteredCards.length} of {cube.print_ids.length}</div>}
         </div>
-        {cube && filteredCards && <div>filter matched {filteredCards.length} of {cube.print_ids.length}</div>}
-      </div>
-      {cards.length === 0 && error === undefined && <div>loading cards...</div>}
-      {sorted.length > 0 && error === undefined && <div className='result-container'>
-        <div className="card-image-container">
-          {sorted.map((card, index) =>
-            <CardImageView
-              key={card.id + index.toString()}
-              className={"_8"}
-              card={{ data: card, matchedQueries: [`cube:${key}`], weight: 1 }}
-              onClick={() => setActiveCard(card)}
-            />)}
-        </div>
-      </div>}
+        {sorted.length > 0 && error === undefined && <div className='result-container'>
+          <div className="card-image-container">
+            {sorted.map((card, index) =>
+              <CardImageView
+                key={card.id + index.toString()}
+                className={"_8"}
+                card={{ data: card, matchedQueries: [`cube:${key}`], weight: 1 }}
+                onClick={() => setActiveCard(card)}
+              />)}
+          </div>
+        </div>}
+      </>}
     </div>
     <Modal
       open={activeCard !== undefined}
@@ -179,4 +182,28 @@ export function CubeView() {
       </>}
     </Modal>
   </>
+}
+
+interface NotFoundProps {
+  cubekey: string;
+  error?: SearchError
+}
+function NotFound({cubekey}: NotFoundProps) {
+  const { attemptImport, isRunning, missingCubes, source, setSource } = useBulkCubeImporter()
+  const notFound = useMemo(() => missingCubes.includes(cubekey), [missingCubes, cubekey, source])
+
+  return <div className="header row baseline">
+    <h2>{cubekey} not found</h2>
+    <div>
+      <button disabled={isRunning} onClick={() => {
+        setSource("cubeartisan")
+        attemptImport([cubekey], "cubeartisan")
+      }}>import from cubeartisan</button>
+      <button disabled={isRunning} onClick={() => {
+        setSource("cubecobra")
+        attemptImport([cubekey], "cubecobra")
+      }}>import from cubecobra</button>
+    </div>
+    {notFound && <div className="alert">{cubekey} not found in {source}</div>}
+  </div>
 }

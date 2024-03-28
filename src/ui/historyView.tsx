@@ -5,6 +5,7 @@ import { useHighlightPrism } from '../api/local/syntaxHighlighting'
 import "./historyView.css"
 import { CopyToClipboardButton } from './component/copyToClipboardButton'
 import { PageControl } from './cardBrowser/pageControl'
+import { LoaderText } from './component/loaders'
 
 const displayQuery = (history: QueryHistory) => {
   const result = history.baseIndex > 0 ? [`# ${history.baseIndex} prev lines...`] : [];
@@ -61,7 +62,7 @@ export const HistoryView = () => {
   const count = useLiveQuery(() => cogDB.history.count())
 
   return <div className='history-view'>
-    {history === undefined && "loading history..."}
+    {history === undefined && <LoaderText text="loading history" />}
     {history !== undefined && <>
       <div className='row baseline route-header'>
         <h2>query history</h2>

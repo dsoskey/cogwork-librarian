@@ -1,4 +1,4 @@
-import { Loader } from '../component/loader'
+import { LoaderBar } from '../component/loaders'
 import { QUERIES, WEIGHT } from './constants'
 import React, { useCallback, useContext, useMemo } from 'react'
 import { DataSource, Setter, TaskStatus } from '../../types'
@@ -92,7 +92,7 @@ export const TopBar = ({
             {report.start &&
               `Time elapsed: ${(Date.now() - report.start) / 1000}s`}
             {report.totalQueries > 0 && (
-              <Loader
+              <LoaderBar
                 label='queries curated'
                 width={500}
                 count={report.complete}
@@ -100,7 +100,7 @@ export const TopBar = ({
               />
             )}
             {report.totalCards > 0 && (
-              <Loader
+              <LoaderBar
                 label='ledgers shredded'
                 width={500}
                 count={report.cardCount}

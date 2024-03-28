@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
+import { LoaderText } from '../component/loaders'
 
 const REPORT_URL_BASE = "https://github.com/dsoskey/cogwork-librarian/issues/new?assignees=&labels=bug&projects=&title=failed+cubecobra+import&body=during+bulk+import+these+cards+were+not+found%0A```%0A"
 
@@ -12,18 +13,18 @@ const encodeObject = (obj: {[u:string]:string[]}) => Object.entries(obj)
     return`${cubeId}${NL}${cards}`
   }).join(NL)
 export const CUBE_IMPORT_MESSAGES = {
-  "querying-cubesite": "downloading cube lists...",
-  "finding-oracle-ids": "finding associated cards...",
-  "scryfall-lookup": "querying scryfall for cards not in the database...",
-  "generating-cube-definitions": "generating cube definitions...",
-  "saving-to-db": "propagating cube definitions to the database...",
-  "refresh-memory": "reloading memory...",
+  "querying-cubesite": "downloading cube lists",
+  "finding-oracle-ids": "finding associated cards",
+  "scryfall-lookup": "querying scryfall for cards not in the database",
+  "generating-cube-definitions": "generating cube definitions",
+  "saving-to-db": "propagating cube definitions to the database",
+  "refresh-memory": "reloading memory",
 }
 
 export const BulkImportMessage = () => {
   const { missingCards, missingCubes, status } = useContext(BulkCubeImporterContext)
   return <div className='row'>
-    {CUBE_IMPORT_MESSAGES[status]?.length > 0 && <div>{CUBE_IMPORT_MESSAGES[status]}</div>}
+    {CUBE_IMPORT_MESSAGES[status]?.length > 0 && <div><LoaderText text={CUBE_IMPORT_MESSAGES[status]} /></div>}
     {missingCubes.length > 0 && <span className='alert'>
         couldn't find cubes: {missingCubes.join(", ")}
       </span>}

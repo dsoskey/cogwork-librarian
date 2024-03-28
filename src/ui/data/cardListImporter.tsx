@@ -3,7 +3,7 @@ import { ListImporterContext } from '../../api/local/useListImporter'
 import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
 import { Setter, TaskStatus } from '../../types'
 import { Manifest, MANIFEST_ID } from '../../api/local/db'
-import { Loader } from '../component/loader'
+import { LoaderBar } from '../component/loaders'
 import { NormedCard } from 'mtgql'
 import { ProjectContext } from '../../api/local/useProjectDao'
 
@@ -58,6 +58,7 @@ export const CardListImporter = ({
       name: listTitle.length > 0 ? listTitle : "text import",
       type: 'text',
       lastUpdated,
+      filter: "",
     }
     doTry(cardsToImport, true)
   }
@@ -68,7 +69,7 @@ export const CardListImporter = ({
 
   return <div className="list-import">
     {listImporter.status === "loading" && (
-      <Loader
+      <LoaderBar
         label="cards found"
         width={400}
         count={listImporter.report.complete}

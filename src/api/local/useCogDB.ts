@@ -8,23 +8,23 @@ import { isFunction } from 'lodash'
 import { useLocalStorage } from './useLocalStorage'
 
 export const DB_LOAD_MESSAGES = [
-  "loading cubes...",
-  "loading oracle tags...",
-  "loading illustration tags...",
-  "preparing the library...",
+  "loading cubes",
+  "loading oracle tags",
+  "loading illustration tags",
+  "preparing the library",
 ]
 
 export const DB_INIT_MESSAGES = [
-  "loading card manifest...",
-  "downloading card data...",
-  "downloading oracle tags...",
-  "preparing oracle tags...",
-  "downloading illustration tags...",
-  "preparing illustration tags...",
-  "downloading set data...",
-  "preparing set data...",
-  "preparing card entries...",
-  "loading cards to memory...",
+  "loading card manifest",
+  "downloading card data",
+  "downloading oracle tags",
+  "preparing oracle tags",
+  "downloading illustration tags",
+  "preparing illustration tags",
+  "downloading set data",
+  "preparing set data",
+  "preparing card entries",
+  "loading cards to memory",
   "persisting cards to database. search is ready, but don't leave the page or make data changes",
 ]
 

@@ -6,7 +6,7 @@ import { BulkCubeSiteImporter } from './bulkCubeSiteImporter'
 import { isFunction } from 'lodash'
 import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { ListImporterContext } from '../../api/local/useListImporter'
-import { Loader } from '../component/loader'
+import { LoaderBar } from '../component/loaders'
 import { CubeListImporter } from './cubeListImporter'
 import { Setter } from '../../types'
 import { CubeDefinitionTable } from '../component/cube/cubeDefinitionTable'
@@ -97,7 +97,7 @@ export const CubeDataView = () => {
   </label>
 
   const loader = listImporter.status === "loading" ? (
-      <Loader
+      <LoaderBar
         label="cards found"
         width={400}
         count={listImporter.report.complete}

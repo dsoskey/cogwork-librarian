@@ -10,7 +10,7 @@ export function RefreshButton({ toSubmit }: RefreshButtonProps) {
   const { isRunning, attemptRefresh } = useContext(BulkCubeImporterContext);
   const importCheckedCubeIds = () => {
     if (toSubmit.length === 0) {
-      console.warn("no selected cubes are from refreshable sources. ignoring...");
+      console.warn("no selected cubes are from refreshable sources. ignoring");
       return;
     }
 

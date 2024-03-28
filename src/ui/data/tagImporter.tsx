@@ -1,6 +1,6 @@
 import React from 'react'
 import { LOADING_MESSAGES, useTagImporter } from '../../api/local/useTagImporter'
-import { Loader } from '../component/loader'
+import { LoaderBar, LoaderText } from '../component/loaders'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB } from '../../api/local/db'
 
@@ -33,8 +33,8 @@ export const TagImporter = () => {
       </button>
     </span>
     {oracleTagImporter.taskStatus === 'loading' && <>
-      <div>{LOADING_MESSAGES[oracleTagImporter.oracleTagReport.complete]}</div>
-      <Loader width={500} count={oracleTagImporter.oracleTagReport.complete} total={oracleTagImporter.oracleTagReport.totalQueries} />
+      <div><LoaderText text={LOADING_MESSAGES[oracleTagImporter.oracleTagReport.complete]} /></div>
+      <LoaderBar width={500} count={oracleTagImporter.oracleTagReport.complete} total={oracleTagImporter.oracleTagReport.totalQueries} />
     </>}
   </section>
 }

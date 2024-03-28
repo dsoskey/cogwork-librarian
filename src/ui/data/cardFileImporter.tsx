@@ -1,4 +1,4 @@
-import { Loader } from '../component/loader'
+import { LoaderBar } from '../component/loaders'
 import React, { useContext, useRef } from 'react'
 import { normCardList, NormedCard } from 'mtgql'
 import { Setter, TaskStatus } from '../../types'
@@ -91,7 +91,7 @@ export const CardFileImporter = ({
 
   return <div className='file-import'>
     {listImporter.status === "loading" && (
-      <Loader
+      <LoaderBar
         label="cards found"
         width={400}
         count={listImporter.report.complete}

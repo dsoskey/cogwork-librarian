@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 import * as Scry from 'scryfall-sdk'
 import { CogDBContext, DB_INIT_MESSAGES, ImportTarget } from '../../api/local/useCogDB'
-import { Loader } from '../component/loader'
+import { LoaderBar } from '../component/loaders'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { Input } from '../component/input'
 import { FormField } from '../component/formField'
@@ -55,8 +55,8 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
     {dbStatus === 'loading' && <>
       <span>{DB_INIT_MESSAGES[dbReport.complete]}</span>
       <div className='column'>
-        <Loader width={500} count={dbReport.complete} total={dbReport.totalQueries} />
-        {memStatus === "loading" && dbReport.totalCards > 0 && <Loader
+        <LoaderBar width={500} count={dbReport.complete} total={dbReport.totalQueries} />
+        {memStatus === "loading" && dbReport.totalCards > 0 && <LoaderBar
           width={500} label='cards loaded'
           count={dbReport.cardCount} total={dbReport.totalCards}
         />}
