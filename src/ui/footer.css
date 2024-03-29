@@ -11,8 +11,7 @@
     flex-direction: row;
     gap: var(--spacing-400);
 }
-.footer a,
-.footer a:visited {
+.footer a {
     color: var(--light-color);
 }
 

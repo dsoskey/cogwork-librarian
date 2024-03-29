@@ -1,11 +1,18 @@
 .project-tab {
     padding: var(--spacing-100);
     border: var(--dark-color) inset 2px;
+    cursor: pointer;
 }
 
 .project-tab.active {
     color: var(--darker-color);
     background-color: var(--active);
+    border: var(--active) inset 2px;
+}
+
+.project-tab:hover:not(:disabled) {
+    color: var(--darker-color);
+    background-color: var(--active-mid-alpha);
     border: var(--active) inset 2px;
 }
 

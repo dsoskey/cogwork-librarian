@@ -71,6 +71,9 @@
     /* Set here so that Windows' High-Contrast Mode can override */
     color: var(--active);
 }
+.cube-definitions input[type="checkbox"]:hover:not(:disabled) {
+    border: 1px solid var(--active);
+}
 .cube-definitions input[type="checkbox"]::before {
     content: "✔";
     position: absolute;

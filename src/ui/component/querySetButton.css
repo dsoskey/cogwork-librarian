@@ -2,8 +2,16 @@
     fill: var(--active);
 }
 
+.run-query-button:hover:not(:disabled) {
+    background-color: transparent;
+}
+
+.run-query-button:hover:not(:disabled) .background {
+    fill: var(--active-mid-alpha)
+}
+
 .run-query-button:disabled .loading-button .background {
-    fill: var(--active-mid-alpha);
+    fill: var(--active-low-alpha);
 }
 
 .loading-button:disabled .play {

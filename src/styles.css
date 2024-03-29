@@ -81,6 +81,9 @@
 a {
   color: var(--light-color);
 }
+a:hover {
+  color: var(--active);
+}
 
 body {
   margin: 0;
@@ -119,10 +122,18 @@ button:disabled {
 .button-like.disabled,
 .button-like:disabled,
 button:disabled {
-  background-color: var(--darker-color);
+  background-color: var(--darker-color-subdued);
   border-bottom-color: var(--darkest-color);
   border-right-color: var(--darkest-color);
   color: var(--active-low-alpha);
+}
+
+button:hover:not(:disabled),
+.button-like:hover:not(:disabled) {
+  color: var(--dark-color);
+  background-color: var(--active-mid-alpha);
+  border-bottom-color: var(--active);
+  border-right-color: var(--active);
 }
 
 input {
@@ -297,15 +308,20 @@ th, td {
 }
 
 
+.settings-view-root .input-link:hover,
+.data-view-root .input-link:hover,
+.masthead a:hover {
+  color: var(--dark-color);
+  background-color: var(--active-mid-alpha);
+  border-color: var(--active-low-alpha) inset;
+}
+
 .settings-view-root .input-link.active-link,
 .settings-view-root .input-link:focus-visible,
-.settings-view-root .input-link:hover,
 .data-view-root .input-link.active-link,
 .data-view-root .input-link:focus-visible,
-.data-view-root .input-link:hover,
 .masthead a.active-link,
-.masthead a:focus-visible,
-.masthead a:hover {
+.masthead a:focus-visible {
   color: var(--dark-color);
   background-color: var(--active);
   border-color: var(--active-mid-alpha) inset;
@@ -525,6 +541,12 @@ textarea.coglib-prism-theme {
   background-color: var(--active);
   color: var(--dark-color);
 }
+.source-option:hover {
+  background-color: var(--active-mid-alpha);
+  border: var(--active) inset 2px;
+  color: var(--dark-color);
+}
+
 .source-option .db-settings {
   margin-left: var(--spacing-200);
 }
