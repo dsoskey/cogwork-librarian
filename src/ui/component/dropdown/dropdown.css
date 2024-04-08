@@ -1,0 +1,45 @@
+.dropdown {
+    position: relative;
+    border-radius: var(--border-radius);
+    color: var(--active-mid-alpha)
+}
+
+.dropdown:hover {
+    background-color: var(--active-mid-alpha);
+    color: var(--dark-color);
+}
+
+.dropdown:hover .dropdown-controls * {
+    color: var(--dark-color);
+}
+
+.dropdown .dropdown-controls * {
+    color: inherit;
+}
+
+.dropdown .dropdown-controls {
+    display: flex;
+    flex-direction: row;
+    border-radius: var(--border-radius);
+}
+
+.dropdown button.expander-button {
+    border: none;
+    border-radius: var(--border-radius);
+    background: transparent;
+}
+
+.dropdown .dropdown-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-100);
+    top: 1.5em;
+    z-index: 4;
+    background-color: var(--dark-color);
+    color: var(--active);
+    min-width: 100px;
+    white-space: nowrap;
+    border-radius: var(--border-radius);
+    box-shadow: 1px 1px 2px 1px var(--darker-color);
+}

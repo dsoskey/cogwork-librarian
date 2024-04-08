@@ -18,7 +18,7 @@ export function RefreshButton({ toSubmit }: RefreshButtonProps) {
     attemptRefresh(bySource);
   }
 
-  return <button onClick={importCheckedCubeIds} disabled={isRunning}>
-    refresh from source
+  return <button onClick={importCheckedCubeIds} disabled={isRunning} title="refresh from source">
+    {"🔄"}
   </button>
 }

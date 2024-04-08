@@ -11,6 +11,7 @@ import {
 } from './api/local/syntaxHighlighting'
 import './prism-cogwork.css'
 import './styles.css'
+import "./ui/data/dataView.css"
 import 'mana-font/css/mana.min.css'
 import { FlagContextProvider } from './ui/flags'
 import { BrowserRouter } from 'react-router-dom'

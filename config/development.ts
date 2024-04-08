@@ -7,6 +7,7 @@ const config: ClientConfig = {
     adminMode: true,
     displayTypes: false,
     docsUpdate: true,
+    edhrecOverlay: false,
   }
 }
 

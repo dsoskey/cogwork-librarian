@@ -20,6 +20,15 @@
     cursor: pointer;
 }
 
+.edhrec-lol {
+    position: absolute;
+    z-index: 2;
+    bottom: 2%;
+    right: 2%;
+    background-color: var(--dark-color);
+    color: var(--light-color);
+}
+
 .flip-button:hover {
     color: whitesmoke;
 }

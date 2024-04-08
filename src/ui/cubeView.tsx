@@ -13,6 +13,8 @@ import { RefreshButton } from './component/cube/refreshButton'
 import { ScryfallIcon } from './component/scryfallIcon'
 import { LoaderText } from './component/loaders'
 import { useBulkCubeImporter } from '../api/cubecobra/useBulkCubeImporter'
+import { Multiselect } from './component/multiselect'
+import { useLocalStorage } from '../api/local/useLocalStorage'
 
 
 interface OrderedCard extends Card {
@@ -23,6 +25,29 @@ function isCreature(card: OrderedCard): number {
   if (card.type_line.includes("Creature")) return 0
   return 1
 }
+function byEdhrecRank(card: Card) {
+  return card.edhrec_rank ?? Number.MAX_VALUE
+}
+
+const orderValToKey = {
+  color_id: SortFunctions.byColorId,
+  usd: SortFunctions.byUsd,
+  color: SortFunctions.byColor,
+  released: SortFunctions.byReleased,
+  rarity: SortFunctions.byRarity,
+  edhrec: byEdhrecRank,
+  creatures_first: isCreature,
+}
+
+const SORT_OPTIONS = [
+  // Defaults
+  "color_id", 'cmc', "creatures_first", 'type_line', 'name',
+  "usd", "eur", "tix",
+  "color",
+  "released",
+  "rarity",
+  "edhrec",
+]
 
 export function CubeView() {
   const { key } = useParams();
@@ -33,12 +58,16 @@ export function CubeView() {
   const [cards, setCards] = useState<OrderedCard[]>([])
   const [filterQuery, setFilterQuery] = useState<string>("")
   const [filteredCards, setFilteredCards] = useState<OrderedCard[] | undefined>();
+  const [ordering, setOrdering] = useLocalStorage<any[]>(
+    "cube-sort.coglib.sosk.watch",
+    ["color_id", 'cmc', "creatures_first", 'type_line', 'name']
+  )
   const sorted: OrderedCard[] = useMemo(() => {
     return sortBy(
       filteredCards ?? cards,
-      [SortFunctions.byColorId, 'cmc', isCreature, 'type_line', 'name'],
+      ordering.map(it => orderValToKey[it]??it),
     ) as OrderedCard[]
-  }, [filteredCards, cards])
+  }, [filteredCards, cards, ordering])
   const [activeCard, setActiveCard] = useState<OrderedCard | undefined>();
   const applyFilter = () => {
     const qr = new QueryRunner({ corpus: cards, dataProvider: cogDBClient })
@@ -123,26 +152,43 @@ export function CubeView() {
         <div className='header'>
           <h2>{cube.key}</h2>
           {error && <div className="alert">{error.message}</div>}
-          {<div>a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube</div>}
-          <div className='baseline row'><strong>source:</strong>
+          {<div>
+            a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube
+            from{" "}
             {cube.source !== "list" && <>
               <a href={cubeLink(cube)}
                  rel='noreferrer'
                  target='_blank'>
                 {CUBE_SOURCE_TO_LABEL[cube.source]}
               </a>
+              {" "}
               <RefreshButton toSubmit={[cube]} />
             </>}
             {cube.source === "list" && "a text list"}
-          </div>
-          <div><strong>last updated:</strong> {cube.last_updated.toLocaleString() ?? "~"}</div>
-          <div className="row center">
-            <Input language="scryfall" value={filterQuery} onChange={e => setFilterQuery(e.target.value)} />
+            {" "}
+            <strong>last updated:</strong> {cube.last_updated.toLocaleString() ?? "~"}
+          </div>}
+          <div className="cube-filter row center">
+            <label className='row center'>
+              <strong>filter: </strong>
+              <Input language="scryfall" value={filterQuery} onChange={e => setFilterQuery(e.target.value)} />
+            </label>
             <button onClick={applyFilter} disabled={filterQuery.length === 0}>Apply filter</button>
             <button onClick={clearFilter} disabled={filteredCards === undefined}>Clear filter</button>
           </div>
+          <Multiselect
+            optionTransform={it => it.replace(/_/g, " ")}
+            labelComponent={<strong>sort: </strong>} value={ordering} setValue={setOrdering}>
+            {SORT_OPTIONS.map(value => {
+              return <option key={value} value={value}>
+                {value.replace(/_/g, " ")}
+                {ordering.find(it => it === value) && " \u2714"}
+              </option>
+            })}
+          </Multiselect>
           {filteredCards && <div>filter matched {filteredCards.length} of {cube.print_ids.length}</div>}
         </div>
+        {cards.length === 0 && error === undefined && <LoaderText text="Loading cards"/>}
         {sorted.length > 0 && error === undefined && <div className='result-container'>
           <div className="card-image-container">
             {sorted.map((card, index) =>

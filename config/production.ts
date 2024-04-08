@@ -6,7 +6,8 @@ const config: ClientConfig = {
     showDebugInfo: false,
     adminMode: false,
     displayTypes: false,
-    docsUpdate: false
+    docsUpdate: false,
+    edhrecOverlay: false
   }
 }
 

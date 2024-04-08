@@ -8,10 +8,13 @@ import { LoaderBar } from '../component/loaders'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { Input } from '../component/input'
 import { FormField } from '../component/formField'
+import { parseISO } from 'date-fns'
 
 export interface ScryfallImporterProps {
   importTargets: ImportTarget[]
 }
+
+const OUTPUT_FORMAT = "YYYY-MM-dd HH:mm"
 export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
   const { memStatus, dbStatus, dbReport, loadManifest } = useContext(CogDBContext)
 
@@ -46,6 +49,7 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
           <label className={it.type === targetDefinition?.type ? "checked" : ""} htmlFor={`source-${it.type}`}>
             {it.name}
             <code className='size'>{humanFileSize(it.size)}</code>
+            {" "}{parseISO(it.updated_at).toLocaleString()}
           </label>
         </div>
 

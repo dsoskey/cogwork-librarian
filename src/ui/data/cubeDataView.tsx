@@ -105,13 +105,14 @@ export const CubeDataView = () => {
       />
     ) : undefined
 
-  return <section className='cube-import'>
-    <h3>manage cube lists</h3>
+  return <div className='data-view-root'>
+    <h2>cubes</h2>
     <p>local <code className='language-scryfall-extended'>cube:</code> queries match against these cube ids</p>
 
     <CubeDefinitionTable cubes={existingCubes} />
 
-    <h4 className='row baseline'>
+    <section className='cube-import'>
+    <h3 className='row baseline'>
       <span>import from</span>
       {CUBE_SOURCE_OPTIONS.map(sourceOption => (<label key={sourceOption}
         className={`input-link ${sourceOption === importType ? "active-link" : ""}`}
@@ -128,7 +129,7 @@ export const CubeDataView = () => {
         />
         {CUBE_SOURCE_TO_LABEL[sourceOption]}
       </label>))}
-    </h4>
+    </h3>
     {importType !== "list" && <BulkCubeSiteImporter />}
     {importType === "list" && <CubeListImporter
       cardsToImport={cardsToImport}
@@ -164,4 +165,5 @@ export const CubeDataView = () => {
       <button onClick={handleOverwrite}>overwrite cube</button>
     </div>}
   </section>
+  </div>
 }

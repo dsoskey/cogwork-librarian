@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { DOUBLE_FACED_LAYOUTS, Card, ImageUris } from 'mtgql'
 import "./cardImage.css"
+import { FlagContext } from '../../flags'
 const getBackImageURI = (card: Card, version: keyof ImageUris) => {
   return card.card_faces.length === 1
     ? ''
@@ -16,6 +17,7 @@ interface CardImageProps {
   card: Card
 }
 export const CardImage = ({ card }: CardImageProps) => {
+  const { edhrecOverlay } = useContext(FlagContext).flags
   const [flipped, setFlipped] = useState(false)
   const onFlipCLick = e => {
     e.stopPropagation()
@@ -42,5 +44,6 @@ export const CardImage = ({ card }: CardImageProps) => {
         title='flip'
       >🔄</button>
     )}
+    {edhrecOverlay&&<div className='edhrec-lol'>{card.edhrec_rank}</div>}
   </div>
 }

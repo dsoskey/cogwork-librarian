@@ -1,0 +1,14 @@
+
+.drag-handle:hover {
+    color: var(--dark-color);
+    background-color: var(--active-mid-alpha);
+}
+
+.multiselect .multiselect-droppable {
+    flex-wrap: wrap;
+}
+
+.slug {
+    padding: var(--spacing-100);
+    border: var(--light-color) inset 2px;
+}

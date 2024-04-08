@@ -320,7 +320,7 @@ th, td {
 .settings-view-root .input-link:focus-visible,
 .data-view-root .input-link.active-link,
 .data-view-root .input-link:focus-visible,
-.masthead a.active-link,
+.masthead .active-link,
 .masthead a:focus-visible {
   color: var(--dark-color);
   background-color: var(--active);

@@ -89,15 +89,16 @@ export const CardDataView = () => {
   } else if (dbDirty) {
     saveText = 'save to database'
   }
-  return <>
+  return <div className='data-view-root'>
+    <h2>card data</h2>
     <section className='card-import'>
       <div className='row'>
         <div>
-          <h4>in memory {dbImportStatus === 'loading' && '(importing...)'}</h4>
+          <h3>in memory {dbImportStatus === 'loading' && '(importing...)'}</h3>
           <ManifestView manifest={manifest} />
         </div>
         {dbDirty && dbManifest && <div>
-          <h4>in database</h4>
+          <h3>in database</h3>
           <ManifestView manifest={dbManifest} />
         </div>}
       </div>
@@ -169,5 +170,5 @@ export const CardDataView = () => {
         setDbImportStatus={setDbImportStatus}
       />}
     </section>
-  </>
+  </div>
 }

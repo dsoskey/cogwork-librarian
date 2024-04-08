@@ -45,7 +45,7 @@ export const BulkCubeSiteImporter = () => {
       className='cards-to-import coglib-prism-theme'
       placeholder='enter one cube id per line'
       value={cubeIds.join("\n")}
-      rows={9}
+      rows={cubeIds.length > 0 ? cubeIds.length : 1}
       onChange={(event) => setCubeIds(event.target.value.split("\n"))}
     />
     <div className='row'>
