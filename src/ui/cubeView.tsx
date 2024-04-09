@@ -15,8 +15,14 @@ import { LoaderText } from './component/loaders'
 import { useBulkCubeImporter } from '../api/cubecobra/useBulkCubeImporter'
 import { Multiselect } from './component/multiselect'
 import { useLocalStorage } from '../api/local/useLocalStorage'
+import { useSearchParams } from 'react-router-dom'
+import { CopyToClipboardButton } from './component/copyToClipboardButton'
 
-
+const shareButtonText = {
+  unstarted: '🔗',
+  success: '✅',
+  error: '🚫',
+}
 interface OrderedCard extends Card {
   index: number
 }
@@ -163,6 +169,11 @@ export function CubeView() {
               </a>
               {" "}
               <RefreshButton toSubmit={[cube]} />
+              <CopyToClipboardButton
+                copyText={`${window.location.protocol}//${window.location.host}/data/cube/${cube.key}?source=${cube.source}`}
+                title={`copy share link to keyboard`}
+                buttonText={shareButtonText}
+              />
             </>}
             {cube.source === "list" && "a text list"}
             {" "}
@@ -237,9 +248,17 @@ interface NotFoundProps {
 function NotFound({cubekey}: NotFoundProps) {
   const { attemptImport, isRunning, missingCubes, source, setSource } = useBulkCubeImporter()
   const notFound = useMemo(() => missingCubes.includes(cubekey), [missingCubes, cubekey, source])
+  let [searchParams] = useSearchParams();
+  useEffect(() => {
+    const source = searchParams.get("source")
+    if (source === "cubecobra" || source === "cubeartisan") {
+      setSource(source);
+      attemptImport([cubekey], source)
+    }
+  }, [searchParams])
 
   return <div className="header row baseline">
-    <h2>{cubekey} not found</h2>
+    <h2>{cubekey} not found in local database</h2>
     <div>
       <button disabled={isRunning} onClick={() => {
         setSource("cubeartisan")
@@ -251,5 +270,6 @@ function NotFound({cubekey}: NotFoundProps) {
       }}>import from cubecobra</button>
     </div>
     {notFound && <div className="alert">{cubekey} not found in {source}</div>}
+    {isRunning && <LoaderText text={`Fetching ${cubekey} from ${source}`} />}
   </div>
 }

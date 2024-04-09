@@ -3,7 +3,7 @@ import { cogDB } from '../../api/local/db'
 import { NormedCard, CubeSource, CUBE_SOURCE_OPTIONS } from 'mtgql'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BulkCubeSiteImporter } from './bulkCubeSiteImporter'
-import { isFunction } from 'lodash'
+import { isFunction, sortBy } from 'lodash'
 import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { LoaderBar } from '../component/loaders'
@@ -27,7 +27,7 @@ export const CubeDataView = () => {
 
   const listImporter = useContext(ListImporterContext)
 
-  const existingCubes = useLiveQuery(() => cogDB.cube.toArray())
+  const existingCubes = useLiveQuery(async () => sortBy(await cogDB.cube.toArray(), [(it) => it.key.toLowerCase()]))
 
   const [showConfirmation, setShowConfirmation] = useState(false)
 

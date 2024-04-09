@@ -1,22 +1,24 @@
-import React, { useState } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import { TaskStatus } from '../../types'
 
-const buttonText = {
+const DEFAULT_BUTTON_TEXT = {
   unstarted: 'copy to clipboard',
   success: 'copied successfully!',
   error: 'there was an error copying',
 }
 
-interface CopyToClipboardButtonProps {
+interface CopyToClipboardButtonProps extends HTMLAttributes<HTMLButtonElement> {
   copyText: string
   children?: React.ReactNode
+  buttonText?: Partial<Record<TaskStatus, React.ReactNode>>
   className?: string
 }
-export const CopyToClipboardButton = ({ copyText, className, children }: CopyToClipboardButtonProps) => {
+export const CopyToClipboardButton = ({ buttonText, copyText, className, children, ...rest }: CopyToClipboardButtonProps) => {
   const [clipboardStatus, setClipboardStatus] =
     useState<TaskStatus>('unstarted')
 
   return <button
+    {...rest}
     className={className}
     disabled={clipboardStatus !== 'unstarted'}
     onClick={() => {
@@ -33,6 +35,6 @@ export const CopyToClipboardButton = ({ copyText, className, children }: CopyToC
         })
     }}
   >
-    {children ?? buttonText[clipboardStatus]}
+    {children ?? buttonText[clipboardStatus] ?? DEFAULT_BUTTON_TEXT[clipboardStatus]}
   </button>
 }
