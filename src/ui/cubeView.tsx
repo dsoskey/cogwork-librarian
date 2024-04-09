@@ -177,7 +177,7 @@ export function CubeView() {
             </>}
             {cube.source === "list" && "a text list"}
             {" "}
-            <strong>last updated:</strong> {cube.last_updated.toLocaleString() ?? "~"}
+            <strong>last updated:</strong> {cube.last_updated?.toLocaleString() ?? "~"}
           </div>}
           <div className="cube-filter row center">
             <label className='row center'>
