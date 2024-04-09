@@ -17,6 +17,13 @@ export const CopyToClipboardButton = ({ buttonText, copyText, className, childre
   const [clipboardStatus, setClipboardStatus] =
     useState<TaskStatus>('unstarted')
 
+  let content =  DEFAULT_BUTTON_TEXT[clipboardStatus];
+  if (children) {
+    content = children
+  } else if (buttonText) {
+    content = buttonText[clipboardStatus]
+  }
+
   return <button
     {...rest}
     className={className}
@@ -35,6 +42,6 @@ export const CopyToClipboardButton = ({ buttonText, copyText, className, childre
         })
     }}
   >
-    {children ?? buttonText[clipboardStatus] ?? DEFAULT_BUTTON_TEXT[clipboardStatus]}
+    {content}
   </button>
 }
