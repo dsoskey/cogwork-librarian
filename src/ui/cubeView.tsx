@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Card, NormedCard, QueryRunner, SearchError, SortFunctions } from 'mtgql'
@@ -17,6 +17,8 @@ import { Multiselect } from './component/multiselect'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 import { useSearchParams } from 'react-router-dom'
 import { CopyToClipboardButton } from './component/copyToClipboardButton'
+import { DBStatusLoader } from './component/dbStatusLoader'
+import { CogDBContext } from '../api/local/useCogDB'
 
 const shareButtonText = {
   unstarted: '🔗',
@@ -57,8 +59,9 @@ const SORT_OPTIONS = [
 
 export function CubeView() {
   const { key } = useParams();
+  const { dbStatus } = useContext(CogDBContext);
   const [error, setError] = useState<SearchError | undefined>()
-  const cube = useLiveQuery(() => cogDBClient.getCube(key), [key], null);
+  const cube = useLiveQuery(() => cogDBClient.getCube(key), [key, dbStatus], null);
   const needsMigration = cube && cube.cards === undefined;
   const [oracles, setOracles] = useState<{ [key: string]: NormedCard[] }>({})
   const [cards, setCards] = useState<OrderedCard[]>([])
@@ -198,8 +201,9 @@ export function CubeView() {
             })}
           </Multiselect>
           {filteredCards && <div>filter matched {filteredCards.length} of {cube.print_ids.length}</div>}
+          {cards.length === 0 && error === undefined && dbStatus !== "loading" && <LoaderText text="Loading cards"/>}
+          {dbStatus === "loading" && <div className="cube-db-status"><DBStatusLoader /></div>}
         </div>
-        {cards.length === 0 && error === undefined && <LoaderText text="Loading cards"/>}
         {sorted.length > 0 && error === undefined && <div className='result-container'>
           <div className="card-image-container">
             {sorted.map((card, index) =>
