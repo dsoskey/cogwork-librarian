@@ -586,10 +586,34 @@ textarea.coglib-prism-theme {
   margin: var(--spacing-200);
 }
 
+.alert::before {
+  content: "⚠ ";
+}
 .alert {
-  color: var(--light-red);
-  background-color: whitesmoke;
+  --alert-foreground: var(--light-red);
+  --alert-background: whitesmoke;
+  color: var(--alert-foreground);
+  background-color: var(--alert-background);
+  padding: var(--spacing-200) var(--spacing-300);
   font-weight: bold;
+  width: fit-content;
+}
+
+.alert * {
+  color: inherit;
+  background-color: inherit;
+}
+
+.alert button:hover:not(:disabled) {
+  color: var(--alert-background);
+  background-color: var(--alert-foreground);
+  border-bottom-color: var(--alert-background);
+  border-right-color: var(--alert-background);
+}
+
+.alert *:disabled {
+  color: color-mix(in srgb, var(--alert-foreground), black 20%);
+  background-color: color-mix(in srgb, var(--alert-background), black 20%);
 }
 
 .cube-import ul {

@@ -10,7 +10,7 @@
 git clone git+https://github.com/dsoskey/cogwork-librarian.git
 cd cogwork-librarian
 npm install
-npm run dev-server
+npm run start-dev
 ```
 
 ## tests to run

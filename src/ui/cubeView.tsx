@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Card, NormedCard, QueryRunner, SearchError, SortFunctions } from 'mtgql'
-import { cogDB as cogDBClient } from '../api/local/db'
+import { cogDB as cogDBClient, Manifest, toManifest } from '../api/local/db'
 import { CardImageView } from './cardBrowser/cardViews/cardImageView'
 import { groupBy, sortBy } from 'lodash'
 import './cubeView.css'
@@ -15,7 +15,7 @@ import { LoaderText } from './component/loaders'
 import { useBulkCubeImporter } from '../api/cubecobra/useBulkCubeImporter'
 import { Multiselect } from './component/multiselect'
 import { useLocalStorage } from '../api/local/useLocalStorage'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { CopyToClipboardButton } from './component/copyToClipboardButton'
 import { DBStatusLoader } from './component/dbStatusLoader'
 import { CogDBContext } from '../api/local/useCogDB'
@@ -57,10 +57,25 @@ const SORT_OPTIONS = [
   "edhrec",
 ]
 
+function LoadingError({ cardCount, refreshCubeCards }) {
+  const { loadManifest, memStatus, dbStatus } = useContext(CogDBContext)
+
+  const onClick = async () => {
+    await loadManifest({ type: "default_cards" } as Manifest, ["db", "memory"], "")
+    await refreshCubeCards()
+  }
+  
+  return <div className="alert">
+    Your local database is missing {cardCount} cards.{" "}
+    <Link to="/data/card">Go to data</Link> to refresh your database then load this page again or
+    {" "}<button disabled={memStatus === "loading" || dbStatus === 'loading'} onClick={onClick}>load default database</button>
+  </div>
+}
 export function CubeView() {
   const { key } = useParams();
   const { dbStatus } = useContext(CogDBContext);
-  const [error, setError] = useState<SearchError | undefined>()
+  const [searchError, setSearchError] = useState<SearchError | undefined>()
+  const [loadingError, setLoadingError] = useState<React.ReactNode>(undefined);
   const cube = useLiveQuery(() => cogDBClient.getCube(key), [key, dbStatus], null);
   const needsMigration = cube && cube.cards === undefined;
   const [oracles, setOracles] = useState<{ [key: string]: NormedCard[] }>({})
@@ -84,48 +99,73 @@ export function CubeView() {
       // This technically works with OrderedCard because the query runner spreads its props.
       // @ts-ignore
       .map(setFilteredCards)
-      .mapErr(setError)
+      .mapErr(setSearchError)
     return [];
   };
   const clearFilter = () => setFilteredCards(undefined);
 
-  useEffect(() => {
-    const funk = async() => {
-      try {
-        const next: OrderedCard[] = [];
-        const newOracles = (await cogDBClient.card.bulkGet(cube.cards?.map(it=>it.oracle_id) ?? cube.oracle_ids)) ?? [];
-        const oracleIdToNormed = groupBy(newOracles, "oracle_id")
-        setOracles(oracleIdToNormed);
-        if (needsMigration) {
-          const cards = newOracles.map(it => ({ oracle_id: it.oracle_id, print_id: it.printings[0].id }));
-          await cogDBClient.cube.put({
-            ...cube,
-            cards
-          });
-        } else {
-          const printToCard: { [key: string]: Card } = {};
-          for (const normCard of newOracles) {
-            for (const print of normCard.printings) {
-              printToCard[print.id] = {...normCard, ...print};
-            }
+  const refreshCubeCards = async() => {
+    try {
+      const next: OrderedCard[] = [];
+      const newOracles = (await cogDBClient.card.bulkGet(cube.cards?.map(it=>it.oracle_id) ?? cube.oracle_ids)) ?? [];
+      const missingIndexes = newOracles
+        .map((card, index) => card === undefined ? index : -1)
+        .filter(index => index !== -1)
+      if (missingIndexes.length) {
+        setLoadingError(<LoadingError
+          cardCount={missingIndexes.length}
+          refreshCubeCards={refreshCubeCards}
+        />)
+        return;
+      }
+      const oracleIdToNormed = groupBy(newOracles, "oracle_id")
+      setOracles(oracleIdToNormed);
+      if (needsMigration) {
+        const cards = newOracles.map(it => ({ oracle_id: it.oracle_id, print_id: it.printings[0].id }));
+        await cogDBClient.cube.put({
+          ...cube,
+          cards
+        });
+      } else {
+        const printToCard: { [key: string]: Card } = {};
+        for (const normCard of newOracles) {
+          for (const print of normCard.printings) {
+            printToCard[print.id] = {...normCard, ...print};
           }
-
-          for (let i = 0; i < cube.cards.length; i++) {
-            const printId = cube.cards[i].print_id
-            if (printId in printToCard) {
-              next.push({ ...printToCard[printId], index: i });
-            }
-          }
-
-          setCards(next);
         }
 
-        } catch (e) {
-        console.error(e)
+        const missingPrints = []
+        for (let i = 0; i < cube.cards.length; i++) {
+          const printId = cube.cards[i].print_id
+          if (printId in printToCard) {
+            next.push({ ...printToCard[printId], index: i });
+          } else {
+            missingPrints.push(printId);
+          }
+        }
+
+        if (missingPrints.length) {
+          setLoadingError(<LoadingError
+            cardCount={missingPrints.length}
+            refreshCubeCards={refreshCubeCards}
+          />)
+
+        } else {
+          setCards(next);
+        }
       }
-    };
-    if (cube) funk().catch(console.error);
-  }, [cube])
+      setLoadingError(undefined)
+    } catch (e) {
+      console.error(e)
+      setLoadingError(<div className="alert">
+        {e.message}
+      </div>)
+    }
+  };
+
+  useEffect(() => {
+    if (cube && dbStatus === "success") refreshCubeCards().catch(console.error);
+  }, [cube, dbStatus])
 
   const onPrintSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const normedCard = oracles[activeCard.oracle_id][0]
@@ -156,11 +196,11 @@ export function CubeView() {
   return <>
     <div className='cube-view-root'>
       {cube === null && <div className='header'><h2><LoaderText /></h2></div>}
-      {cube === undefined && <NotFound cubekey={key} error={error} />}
+      {cube === undefined && <NotFound cubekey={key} error={searchError} />}
       {cube && <>
         <div className='header'>
           <h2>{cube.key}</h2>
-          {error && <div className="alert">{error.message}</div>}
+          {searchError && <div className="alert">{searchError.message}</div>}
           {<div>
             a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube
             from{" "}
@@ -201,10 +241,15 @@ export function CubeView() {
             })}
           </Multiselect>
           {filteredCards && <div>filter matched {filteredCards.length} of {cube.print_ids.length}</div>}
-          {cards.length === 0 && error === undefined && dbStatus !== "loading" && <LoaderText text="Loading cards"/>}
+          {cards.length === 0
+            && searchError === undefined
+            && loadingError === undefined
+            && dbStatus !== "loading" &&
+            <LoaderText text="Loading cards"/>}
+          {loadingError}
           {dbStatus === "loading" && <div className="cube-db-status"><DBStatusLoader /></div>}
         </div>
-        {sorted.length > 0 && error === undefined && <div className='result-container'>
+        {sorted.length > 0 && searchError === undefined && <div className='result-container'>
           <div className="card-image-container">
             {sorted.map((card, index) =>
               <CardImageView

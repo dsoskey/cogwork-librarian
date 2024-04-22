@@ -122,7 +122,9 @@ export const CardDataView = () => {
         description="load cards that match this query into memory on page load">
         <Input onChange={e => setLoadFilter(e.target.value)} value={loadFilter} language="scryfall" placeholder="No filter will be applied"/>
       </FormField>
-      <button onClick={() => window.location.reload()}>reload page</button>
+      <button
+        disabled={dbStatus === 'loading' || memStatus === 'loading'}
+        onClick={() => window.location.reload()}>reload page</button>
       <button
         disabled={dbStatus === 'loading' || memStatus === 'loading' || !dbDirty}
         onClick={() => saveToDB()}
