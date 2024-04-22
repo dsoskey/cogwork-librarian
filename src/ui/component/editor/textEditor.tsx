@@ -4,7 +4,6 @@ import { MultiQueryActionBar } from './multiQueryActionBar'
 import { ok, Result } from 'neverthrow'
 
 const MIN_TEXTAREA_HEIGHT = 32
-const LINK_KEYS = ['Meta', 'Control']
 
 export const findQueryIndex = (value: string, cursorIndex: number): Result<number, Error> => {
   let result = 0
@@ -88,12 +87,8 @@ export const TextEditor = ({
       }
     }
 
-    if (LINK_KEYS.includes(event.key)) {
-      setRevealLinks(true)
-    }
-
     if (event.metaKey || event.ctrlKey) {
-      if (event.key == "Enter") {
+      if (event.key === "Enter") {
         let baseIndex = 0
         const cursorIndex = controller.current.selectionStart ?? 0
         const queryIndex = findQueryIndex(value, cursorIndex)
@@ -106,12 +101,13 @@ export const TextEditor = ({
           onSubmit?.(baseIndex)
         }
       }
-    }
-  }
-  const hideLinks = (event) => {
-    if (LINK_KEYS.includes(event.key)) {
-      setRevealLinks(false)
-      controller.current.focus()
+
+      if (event.key === "\\") {
+        setRevealLinks(prev => !prev)
+        if (revealLinks) {
+          controller.current.focus()
+        }
+      }
     }
   }
 
@@ -148,16 +144,27 @@ export const TextEditor = ({
 
   useEffect(() => {
     controller.current.addEventListener('scroll', onScroll)
-    return () => controller.current?.removeEventListener('scroll', onScroll)
+    linker.current.addEventListener('scroll', onScroll)
+    return () => {
+      controller.current?.removeEventListener('scroll', onScroll)
+      linker.current?.removeEventListener('scroll', onScroll)
+    }
   }, [])
   return (
-    <div className='query-editor' onKeyDown={handleDown} onKeyUp={hideLinks}>
+    <div className='query-editor' onKeyDown={handleDown}>
       <MultiQueryActionBar
         queries={queries}
         copyText={copyText}
         onSubmit={onSubmit}
         canSubmit={canSubmit}
       />
+      <button
+        className="overlay-toggle"
+        title={revealLinks ? "close overlay (ctrl/cmd + \\)": "open overlay (ctrl/cmd + \\)"}
+        onClick={() => setRevealLinks(prev => !prev)}
+      >
+        {revealLinks ? "⊠" : "⧈"}️
+      </button>
       <pre
         ref={linker}
         tabIndex={-1}

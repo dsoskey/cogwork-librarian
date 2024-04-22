@@ -31,7 +31,10 @@ textarea[class*='language-'] {
 /* Code blocks */
 pre[class*='language-'],
 textarea[class*='language-'] {
-  padding: 1em;
+  padding-top: var(--toolbar-height, 1em);
+  padding-right: 1em;
+  padding-left: 1em;
+  padding-bottom: 1em;
   margin: 0.5em 0;
   overflow: auto;
 }
@@ -153,8 +156,7 @@ textarea[class*='language-'] {
 }
 
 .token.operator,
-.token.entity,
-.token.url {
+.token.entity {
   color: #67cdcc;
 }
 

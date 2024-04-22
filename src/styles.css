@@ -192,7 +192,7 @@ th, td {
 /* classnames */
 
 .root {
-  height: 100vh;
+  min-height: 100vh;
 }
 
 @media (min-width: 769px) {
@@ -288,6 +288,10 @@ th, td {
   margin-bottom: 0;
 }
 
+.masthead .masthead-links {
+  flex-wrap: wrap;
+}
+
 .settings-view-root .input-link input ,
 .data-view-root .input-link input {
  appearance: none;
@@ -354,7 +358,10 @@ th, td {
   border: none;
 }
 textarea.coglib-prism-theme {
-  padding: 1em;
+  padding-top: var(--toolbar-height, 1em);
+  padding-right: 1em;
+  padding-left: 1em;
+  padding-bottom: 1em;
   margin: 0.5em 0;
 }
 
@@ -387,10 +394,12 @@ textarea.coglib-prism-theme {
 }
 
 .query-editor {
+  --toolbar-height: 24px;
   margin-top: var(--spacing-200);
   margin-bottom: var(--spacing-200);
   height: max-content;
   display: grid;
+  position: relative;
   grid-template-columns: auto auto 1fr;
   grid-template-rows: 1fr;
   grid-template-areas: 'labels brown overlap';
@@ -447,11 +456,23 @@ textarea.coglib-prism-theme {
   outline: 2px inset var(--active);
 }
 
+.query-editor .overlay-toggle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  padding: 0;
+  border: unset;
+  font-weight: bold;
+  width: var(--toolbar-height, 20px);
+  height: var(--toolbar-height, 20px);
+}
+
 .query-editor .links {
   grid-area: overlap;
   box-sizing: border-box;
   display: inline-block;
-  background: transparent;
+  background-color: color-mix(in srgb, var(--active), transparent 80%);
   scrollbar-color: var(--active-mid-alpha) var(--darker-color);
 }
 .query-editor .links :not(a) {
@@ -579,10 +600,6 @@ textarea.coglib-prism-theme {
   margin-top: var(--spacing-200);
 }
 
-.db-import {
-  height: 350px;
-  align-items: flex-start;
-}
 .db-import > * {
   flex: 1;
 }

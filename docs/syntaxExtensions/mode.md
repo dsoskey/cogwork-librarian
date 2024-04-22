@@ -1,6 +1,6 @@
 ### @defaultMode
 
-`@defaultMode` changes how the parser interprets a query-set.
+`@defaultMode` changes how the parser interprets a query set.
 this directive should be placed in its own paragraph.
 
 possible values:

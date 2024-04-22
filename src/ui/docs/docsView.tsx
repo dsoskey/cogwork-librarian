@@ -51,13 +51,9 @@ const LandingPage = () => {
 }
 export const DocsView = () => {
   const { pathname, hash } = useLocation()
-  const shouldScroll = useRef(false);
   useEffect(() => {
-    if (shouldScroll.current) {
-      const element = document.getElementById(hash ? hash.slice(1) : "page-title");
-      element?.scrollIntoView({ behavior: 'smooth' });
-    }
-    shouldScroll.current = true
+    const element = document.getElementById(hash ? hash.slice(1) : "page-title");
+    element?.scrollIntoView({ behavior: 'smooth' });
   }, [hash]);
 
   useHighlightPrism([pathname])

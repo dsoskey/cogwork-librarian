@@ -2,6 +2,10 @@ import { FilterKeyword } from 'mtgql'
 
 export const syntaxDocs: Record<FilterKeyword, string> = {
   '!': 'https://scryfall.com/docs/syntax#exact',
+  "++": "https://scryfall.com/docs/syntax#display",
+  "@@": "https://scryfall.com/docs/syntax#display",
+  and: "/user-guide/query-syntax#and-and-or-operators",
+  or: "/user-guide/query-syntax#and-and-or-operators",
   a: 'https://scryfall.com/docs/syntax#flavor',
   art: 'https://scryfall.com/docs/syntax#tagger',
   artist: 'https://scryfall.com/docs/syntax#flavor',
@@ -18,6 +22,7 @@ export const syntaxDocs: Record<FilterKeyword, string> = {
   color: 'https://scryfall.com/docs/syntax#colors',
   commander: 'https://scryfall.com/docs/syntax#colors',
   cube: 'https://scryfall.com/docs/syntax#cubes',
+  cubeo: 'https://scryfall.com/docs/syntax#cubes',
   date: 'https://scryfall.com/docs/syntax#year',
   devotion: 'https://scryfall.com/docs/syntax#mana',
   direction: 'https://scryfall.com/docs/syntax#display',
@@ -32,12 +37,13 @@ export const syntaxDocs: Record<FilterKeyword, string> = {
   ft: 'https://scryfall.com/docs/syntax#flavor',
   function: 'https://scryfall.com/docs/syntax#tagger',
   game: 'https://scryfall.com/docs/syntax#promos',
-  has: 'https://scryfall.com/docs/syntax#',
+  has: '/user-guide/query-syntax#is',
   id: 'https://scryfall.com/docs/syntax#colors',
   identity: 'https://scryfall.com/docs/syntax#colors',
   in: 'https://scryfall.com/docs/syntax#sets',
   include: 'https://scryfall.com/docs/syntax#extras',
   is: '/user-guide/query-syntax#is',
+  kw: 'https://scryfall.com/docs/syntax#oracle',
   keyword: 'https://scryfall.com/docs/syntax#oracle',
   lang: 'https://scryfall.com/docs/syntax#languages',
   language: 'https://scryfall.com/docs/syntax#languages',
@@ -50,7 +56,7 @@ export const syntaxDocs: Record<FilterKeyword, string> = {
   mv: 'https://scryfall.com/docs/syntax#mana',
   name: 'https://scryfall.com/docs/syntax#regex',
   new: 'https://scryfall.com/docs/syntax#rarity',
-  not: 'https://scryfall.com/docs/syntax#negating',
+  not: '/user-guide/query-syntax#is',
   number: 'https://scryfall.com/docs/syntax#sets',
   o: 'https://scryfall.com/docs/syntax#oracle',
   oracle: 'https://scryfall.com/docs/syntax#oracle',
@@ -81,4 +87,17 @@ export const syntaxDocs: Record<FilterKeyword, string> = {
   watermark: 'https://scryfall.com/docs/syntax#flavor',
   wm: 'https://scryfall.com/docs/syntax#flavor',
   year: 'https://scryfall.com/docs/syntax#year',
+}
+
+export const extensionDocs = {
+  alias: "/user-guide/syntax-extension#@alias-&-@use",
+  a: "/user-guide/syntax-extension#@alias-&-@use",
+  defaultMode: "/user-guide/syntax-extension#@defaultmode",
+  dm: "/user-guide/syntax-extension#@defaultmode",
+  defaultWeight: "/user-guide/syntax-extension#@defaultweight",
+  dw: "/user-guide/syntax-extension#@defaultweight",
+  include: "/user-guide/syntax-extension#@include",
+  i: "/user-guide/syntax-extension#@include",
+  use: "/user-guide/syntax-extension#@alias-&-@use",
+  venn: "/user-guide/syntax-extension#@venn-diagram-search"
 }
