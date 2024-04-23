@@ -173,21 +173,25 @@ export const linkWrap = (env: Environment) => {
     case "venn": {
       const filter = env.content.match(/^@(\w+):?.*$/)[1];
       const href = extensionDocs[filter];
-      env.tag = 'a';
-      env.attributes.href = href;
-      if (!href.startsWith("/")) {
-        env.attributes.target = '_blank'
-        env.attributes.rel = 'noreferrer noopener'
+      if (href) {
+        env.tag = 'a';
+        env.attributes.href = href;
+        if (!href.startsWith("/")) {
+          env.attributes.target = '_blank'
+          env.attributes.rel = 'noreferrer noopener'
+        }
       }
       break;
     }
     case "keyword": {
-      const href = syntaxDocs[env.content] ?? ""
-      env.tag = 'a'
-      env.attributes.href = href
-      if (!href.startsWith("/")) {
-        env.attributes.target = '_blank'
-        env.attributes.rel = 'noreferrer noopener'
+      const href = syntaxDocs[env.content]
+      if (href) {
+        env.tag = 'a';
+        env.attributes.href = href;
+        if (!href.startsWith("/")) {
+          env.attributes.target = '_blank'
+          env.attributes.rel = 'noreferrer noopener'
+        }
       }
       break;
     }
