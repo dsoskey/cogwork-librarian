@@ -182,7 +182,7 @@ export const linkWrap = (env: Environment) => {
       break;
     }
     case "keyword": {
-      const href = syntaxDocs[env.content]
+      const href = syntaxDocs[env.content] ?? ""
       env.tag = 'a'
       env.attributes.href = href
       if (!href.startsWith("/")) {
