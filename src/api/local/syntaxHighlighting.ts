@@ -171,7 +171,7 @@ export const linkWrap = (env: Environment) => {
     case "extension":
     case "use":
     case "venn": {
-      const filter = env.content.match(/^@(\w+):?.*$/)[1];
+      const filter = env.content.match(/^\s*@(\w+):?.*$/)[1];
       const href = extensionDocs[filter];
       if (href) {
         env.tag = 'a';
