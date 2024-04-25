@@ -28,6 +28,7 @@ interface TopBarProps {
   pageControl: React.ReactNode
   downloadButton: React.ReactNode
   vennControl: React.ReactNode
+  cardsPerRowControl: React.ReactNode
   visibleDetails: string[]
   setVisibleDetails: Setter<string[]>
   revealDetails: boolean
@@ -45,6 +46,7 @@ export const TopBar = ({
   pageControl,
   downloadButton,
   vennControl,
+  cardsPerRowControl,
   status,
   report,
   searchCount,
@@ -173,6 +175,7 @@ export const TopBar = ({
           </select>
         </label>}
         {downloadButton}
+        {cardsPerRowControl}
       </div>
     </div>
   )

@@ -19,6 +19,8 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { CopyToClipboardButton } from './component/copyToClipboardButton'
 import { DBStatusLoader } from './component/dbStatusLoader'
 import { CogDBContext } from '../api/local/useCogDB'
+import { CardsPerRowControl } from './component/cardsPerRowControl'
+import { useViewportListener } from './viewport'
 
 const shareButtonText = {
   unstarted: '🔗',
@@ -74,6 +76,7 @@ function LoadingError({ cardCount, refreshCubeCards }) {
 export function CubeView() {
   const { key } = useParams();
   const { dbStatus } = useContext(CogDBContext);
+  const viewport = useViewportListener();
   const [searchError, setSearchError] = useState<SearchError | undefined>()
   const [loadingError, setLoadingError] = useState<React.ReactNode>(undefined);
   const cube = useLiveQuery(() => cogDBClient.getCube(key), [key, dbStatus], null);
@@ -86,6 +89,8 @@ export function CubeView() {
     "cube-sort.coglib.sosk.watch",
     ["color_id", 'cmc', "creatures_first", 'type_line', 'name']
   )
+  const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
+
   const sorted: OrderedCard[] = useMemo(() => {
     return sortBy(
       filteredCards ?? cards,
@@ -240,6 +245,7 @@ export function CubeView() {
               </option>
             })}
           </Multiselect>
+          {viewport.width > 1024 && <CardsPerRowControl setCardsPerRow={setCardsPerRow} cardsPerRow={cardsPerRow} />}
           {filteredCards && <div>filter matched {filteredCards.length} of {cube.print_ids.length}</div>}
           {cards.length === 0
             && searchError === undefined
@@ -254,7 +260,7 @@ export function CubeView() {
             {sorted.map((card, index) =>
               <CardImageView
                 key={card.id + index.toString()}
-                className={"_8"}
+                className={`_${cardsPerRow}`}
                 card={{ data: card, matchedQueries: [`cube:${key}`], weight: 1 }}
                 onClick={() => setActiveCard(card)}
               />)}

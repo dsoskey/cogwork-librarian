@@ -168,6 +168,12 @@ export const scryfallExtendedMulti: Grammar = {
 
 export const linkWrap = (env: Environment) => {
   switch (env.type) {
+    case "negation":
+      env.tag = "a"
+      env.attributes.href = "https://scryfall.com/docs/syntax#negating";
+      env.attributes.target = '_blank'
+      env.attributes.rel = 'noreferrer noopener'
+      break;
     case "extension":
     case "use":
     case "venn": {

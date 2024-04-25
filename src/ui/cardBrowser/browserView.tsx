@@ -19,6 +19,7 @@ import { useVennControl, VennControl } from './vennControl'
 import { Card } from 'mtgql'
 import { downloadText } from '../download'
 import { SearchHoverActions } from './cardViews/searchHoverActions'
+import { CardsPerRowControl } from '../component/cardsPerRowControl'
 
 const handleDownload = (text: string, ext: string) => {
   const now = new Date()
@@ -85,7 +86,7 @@ export const BrowserView = React.memo(({
   } = useDebugDetails()
 
   const [pageSize] = useLocalStorage('page-size', PAGE_SIZE)
-  const [cardsPerRow] = useLocalStorage('cards-per-row', 4)
+  const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
   const [page, _setPage] = useState(0)
   const setPage = (n: number) => {
     _setPage(n)
@@ -135,12 +136,19 @@ export const BrowserView = React.memo(({
     </button>
   </div>
 
+  const isCardDisplay = (displayType === 'cards' || displayType === 'render')
+
+  const cardsPerRowControl = isCardDisplay && viewport.width > 1024
+    ? <CardsPerRowControl cardsPerRow={cardsPerRow} setCardsPerRow={setCardsPerRow} />
+    : undefined;
+
   return <div className='results' ref={topOfResults}>
       <div className='content'>
         <TopBar
           pageControl={pageControl}
           downloadButton={downloadButton}
           vennControl={vennControl}
+          cardsPerRowControl={cardsPerRowControl}
           errors={errors}
           source={source}
           status={status}
@@ -161,7 +169,7 @@ export const BrowserView = React.memo(({
 
         {showCards && <>
           <div className='result-container'>
-            {(displayType === 'cards' || displayType === 'render') && currentPage.map((card, index) => {
+            {isCardDisplay && currentPage.map((card, index) => {
               const onAdd = () => {
                 addCard(card.data)
                 const id = addMessage(`Added ${card.data.name} to saved cards`, false)

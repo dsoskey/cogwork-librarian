@@ -87,6 +87,8 @@ export const syntaxDocs: Record<FilterKeyword, string> = {
   watermark: 'https://scryfall.com/docs/syntax#flavor',
   wm: 'https://scryfall.com/docs/syntax#flavor',
   year: 'https://scryfall.com/docs/syntax#year',
+  scryfallid: "/user-guide/query-syntax#ids",
+  oracleid: "/user-guide/query-syntax#ids"
 }
 
 export const extensionDocs = {

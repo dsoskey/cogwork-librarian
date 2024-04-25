@@ -716,11 +716,6 @@ textarea.coglib-prism-theme {
   flex-direction: row;
 }
 
-.results .card-view {
-  margin-left: 0.75%;
-  margin-bottom: var(--spacing-200);
-}
-
 .query-panel {
   flex:1;
   height: 100vh;
@@ -734,13 +729,12 @@ textarea.coglib-prism-theme {
 }
 
 .result-container {
-  padding-top: var(--spacing-300);
+  padding: var(--spacing-300) var(--spacing-500) 0;
   background-color: var(--darker-color);
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  justify-content: start;
-  align-content: flex-start;
+  justify-content: center;
 }
 
 .bottom-page-control {

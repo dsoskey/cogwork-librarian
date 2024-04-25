@@ -2,9 +2,13 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    justify-content: start;
-    align-content: flex-start;
-    max-width: 1296px;
+    justify-content: center;
+}
+
+@media (min-width: 769px) {
+    .card-image-container {
+        margin: 0 var(--spacing-500);
+    }
 }
 
 .cube-view-root .header {
