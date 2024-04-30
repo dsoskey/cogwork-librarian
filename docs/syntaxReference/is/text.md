@@ -144,4 +144,4 @@ See the tables below for the full list of supported and documented `is` filters.
 | variation        |                               |          |
 | watermark        |                               |          |
 
-* For the ultimate source of truth on Cogwork Libarian's support, see [this file]().
+* For the ultimate source of truth on Cogwork Libarian's support, see [this file](https://github.com/dsoskey/mtgql-js/blob/028b8f70ea8261c9b0cf002242e99ed62e266e14/src/types/card.ts#L25).
