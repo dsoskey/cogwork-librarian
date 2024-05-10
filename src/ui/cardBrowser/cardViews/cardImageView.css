@@ -2,12 +2,55 @@
     position: relative;
     aspect-ratio: var(--card-apect-ratio);
     border-radius: var(--card-border-radius);
-}
-.card-view.lea img {
-    clip-path: inset(0 0 0 0 round 7% / 5.5%);
-}
-.card-view:focus-visible {
-    outline: unset;
+
+    :focus-visible {
+        outline: unset;
+    }
+
+    .lea img {
+        clip-path: inset(0 0 0 0 round 7% / 5.5%);
+    }
+
+    .detail {
+        margin-top: var(--spacing-200);
+    }
+
+    .card-weight {
+        position: absolute;
+        z-index: 2;
+        bottom: 0;
+        right: 0;
+        background-color: var(--dark-color);
+        color: var(--light-color);
+    }
+
+    .hover-actions {
+        position: absolute;
+        z-index: 2;
+        bottom: 5%;
+        left: 4%;
+        display: flex;
+        flex-direction: row;
+        /*background-color: transparent;*/
+    }
+
+    .hover-actions button {
+        height: 1.75em;
+        width: 1.75em;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: center;
+        justify-content: center;
+        /*background-color: var(--active-low-alpha);*/
+        /*border-color: var(--active-mid-alpha);*/
+        padding: 0;
+    }
+
+    .add-icon {
+        font-weight: bold;
+        font-size: 1.5em;
+        background-color: transparent;
+    }
 }
 
 @media (min-width: 1024px) {
@@ -36,45 +79,4 @@
     .card-view {
         width: 49%;
     }
-}
-
-.card-view .detail {
-    margin-top: var(--spacing-200);
-}
-
-.card-view .card-weight {
-    position: absolute;
-    z-index: 2;
-    bottom: 0;
-    right: 0;
-    background-color: var(--dark-color);
-    color: var(--light-color);
-}
-
-.card-view .hover-actions {
-    position: absolute;
-    z-index: 2;
-    bottom: 5%;
-    left: 4%;
-    display: flex;
-    flex-direction: row;
-    /*background-color: transparent;*/
-}
-
-.card-view .hover-actions button {
-    height: 1.75em;
-    width: 1.75em;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: center;
-    justify-content: center;
-    /*background-color: var(--active-low-alpha);*/
-    /*border-color: var(--active-mid-alpha);*/
-    padding: 0;
-}
-
-.card-view .add-icon {
-    font-weight: bold;
-    font-size: 1.5em;
-    background-color: transparent;
 }

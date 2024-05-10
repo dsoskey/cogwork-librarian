@@ -219,6 +219,7 @@ export const linkWrap = (env: Environment) => {
       break;
     case "operator":
       if (Object.keys(OPERATORS).includes(env.content)) return;
+      if (env.content.includes("&lt;")) return;
       if (env.content.includes(")")) return;
       if (env.content.includes("(")) return;
       env.tag = 'a'

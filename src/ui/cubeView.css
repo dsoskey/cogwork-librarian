@@ -11,38 +11,40 @@
     }
 }
 
-.cube-view-root .header {
-    margin: 0 var(--spacing-300) var(--spacing-300);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-200);
-}
-
-.cube-view-root .result-container {
-    justify-content: center;
-}
-
-.cube-view-root .card-view {
-    margin: unset;
-}
-
-.cube-view-root h2 {
-    margin-bottom: 0;
-}
-
-.cube-view-root .cube-filter {
-    flex-wrap: wrap;
-}
-
-@media (min-width: 769px) {
-    .cube-view-root .cube-filter input {
-        width: 30rem;
+.cube-view-root {
+    .header {
+        margin: 0 var(--spacing-300) var(--spacing-300);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-200);
     }
-}
 
-@media (max-width: 768px) {
-    .cube-view-root .cube-filter input {
-        width: 17rem;
+    .result-container {
+        justify-content: center;
+    }
+
+    .card-view {
+        margin: unset;
+    }
+
+    h2 {
+        margin-bottom: 0;
+    }
+
+    .cube-filter {
+        flex-wrap: wrap;
+    }
+
+    @media (min-width: 769px) {
+        .cube-filter input {
+            width: 30rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .cube-filter input {
+            width: 17rem;
+        }
     }
 }
 

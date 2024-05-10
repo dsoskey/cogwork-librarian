@@ -212,48 +212,9 @@ th, td {
   }
 }
 
-.cogwork-librarian {
-  position: relative;
-  top: 0;
-  z-index: 5;
-  width: var(--coglib-width);
-  transition-property: left, background-color;
-  transition-delay: 25ms;
-  transition-duration: 200ms;
-  transition-timing-function: ease-in-out;
-}
-
 .inverted {
   background-color: var(--active);
   color: var(--darker-color);
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-  .cogwork-librarian.show {
-    width: 66%;
-  }
-}
-
-@media (max-width: 768px) {
-  .cogwork-librarian {
-    position: static;
-    width: 100%;
-  }
-  .cogwork-librarian.hide {
-    left: 0;
-  }
-}
-
-.cogwork-librarian.show {
-  left: 0;
-  background-color: var(--dark-color);
-  box-shadow: 2px 2px 4px 0 var(--gray-68-shadow);
-}
-
-.cogwork-librarian.hide {
-  left: calc(0px - var(--coglib-width));
-  background-color: transparent;
-  /*width: var(--coglib-width);*/
 }
 
 .column {
@@ -331,9 +292,6 @@ th, td {
   border-color: var(--active-mid-alpha) inset;
 }
 
-.cogwork-librarian.hide .masthead .toggle {
-  margin-right: 0;
-}
 .masthead .toggle {
   position: absolute;
   top: var(--spacing-200);
@@ -749,12 +707,13 @@ textarea.coglib-prism-theme {
   width: 500px;
 }
 
-.loader .background {
-  fill: var(--light-color);
-}
-
-.loader .foreground {
-  fill: var(--green);
+.loader {
+  .background {
+    fill: var(--light-color);
+  }
+  .foreground {
+    fill: var(--green);
+  }
 }
 
 .saved-cards-toggle {
@@ -762,6 +721,7 @@ textarea.coglib-prism-theme {
 }
 
 .saved-cards-floater {
+  --show-width: 25%;
   height: 100vh;
   overflow-y: scroll;
   border-left: var(--gray-68) 2px solid;
@@ -774,7 +734,7 @@ textarea.coglib-prism-theme {
 }
 
 .saved-cards-floater.show {
-  width: 25%;
+  width: var(--show-width);
 }
 
 .saved-cards-floater.hide {

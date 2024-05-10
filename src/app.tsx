@@ -18,6 +18,7 @@ import { SettingsView } from './ui/settingsView'
 import { CubeView } from './ui/cubeView'
 import { CardDataView } from './ui/data/cardDataView'
 import { CubeDataView } from './ui/data/cubeDataView'
+import { NotFoundView } from './ui/notFoundView'
 
 export const App = () => {
   const { pathname } = useLocation()
@@ -61,7 +62,7 @@ export const App = () => {
                       <Route path='/user-guide/*' element={<DocsView />} />
                       <Route path='/history' element={<HistoryView />} />
                       <Route path="/settings" element={<SettingsView />} />
-                      <Route element={<div>404'ed!</div>} />
+                      <Route path="*" element={<NotFoundView />} />
                     </Routes>
                     <Footer />
                   </>}
