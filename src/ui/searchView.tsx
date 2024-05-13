@@ -83,13 +83,11 @@ export const SearchView = () => {
 
   return<div className='search-view-root'>
     <div className='query-panel'>
-      <div className='row'>
+      <div className='row top'>
         <Masthead />
-        <div className='saved-cards-toggle'>
-          <button onClick={() => setShowSavedCards(prev => !prev)}>
+          <button className='saved-cards-toggle' onClick={() => setShowSavedCards(prev => !prev)}>
             {showSavedCards ? "hide": "show"} saved cards
           </button>
-        </div>
       </div>
       <QueryForm
         status={queryRunner.status}

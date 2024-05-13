@@ -234,6 +234,14 @@ th, td {
   align-items: center;
 }
 
+.row.wrap {
+  flex-wrap: wrap;
+}
+
+.row.top {
+  align-items: start;
+}
+
 .row.baseline {
   align-items: baseline;
 }

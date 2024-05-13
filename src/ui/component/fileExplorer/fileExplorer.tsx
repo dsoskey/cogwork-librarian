@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState } from 'react'
 import "./fileExplorer.css"
-import { Setter } from '../../types'
-import { defaultFunction } from '../../api/context'
+import { Setter } from '../../../types'
+import { defaultFunction } from '../../../api/context'
+import { useEditablePath } from './editablePath'
 
 export const RESERVED_PATH = ".path"
 export enum PathType { File, Dir }
@@ -50,6 +51,8 @@ export interface ExplorerCtx {
   selectable: Set<PathType>
   canCreateDir?: boolean
   createNewDir: () => void
+  moveProject: (oldPath: string, newName: string) => void
+  moveFolder: (oldPath: string, newName: string) => void
   createDirParent: string | undefined
   setCreateDirParent: Setter<string | undefined>
   newDir: string
@@ -57,7 +60,9 @@ export interface ExplorerCtx {
 }
 const ExplorerContext = createContext<ExplorerCtx>({
   canCreateDir: false,
-  createNewDir:defaultFunction("ExplorerContext.createNewDir"),
+  createNewDir: defaultFunction("ExplorerContext.createNewDir"),
+  moveProject: defaultFunction("ExplorerContext.moveProject"),
+  moveFolder: defaultFunction("ExplorerContext.moveFolder"),
   createDirParent: '',
   newDir: '',
   onPathSelected: defaultFunction("ExplorerContext.onPathSelected"),
@@ -72,14 +77,24 @@ interface ExplorerLeafProps {
   text: string
 }
 const ExplorerLeaf = ({ path, text }: ExplorerLeafProps) => {
-  const { onPathSelected, selectedPath, selectable } = useContext(ExplorerContext)
+  const { onPathSelected, selectedPath, selectable, moveProject } = useContext(ExplorerContext)
   const canSelect = selectable.has(PathType.File);
+  const isSelected = selectedPath?.path === path;
+  const { pathEditor, editing, editButton } = useEditablePath({ path, text, isSelected, updatePath: moveProject });
   const onClick = () => {
-    if (canSelect) {
-      onPathSelected({ path, type: PathType.File })
+    if (canSelect && !isSelected) {
+      onPathSelected({ path, type: PathType.File });
     }
   }
-  return <li onClick={onClick} className={`project ${canSelect ? "selectable": "" } ${selectedPath?.path === path ? "inverted" : ""}`}>{text}</li>
+
+  return <li className={`project ${editing ? "editing" : ""} ${canSelect ? "selectable": "" } ${isSelected ? "inverted" : ""}`}
+    title="click to select"
+    onClick={onClick}
+  >
+    {(!editing || !isSelected) && text}
+    {isSelected && !editing && editButton}
+    {isSelected && editing && pathEditor}
+  </li>
 }
 
 interface ExplorerBranchProps {
@@ -89,20 +104,28 @@ interface ExplorerBranchProps {
 const ExplorerBranch = ({ tree, text }: ExplorerBranchProps) => {
   const { onPathSelected, selectedPath, selectable, canCreateDir,
     createDirParent, setCreateDirParent, newDir, setNewDir, createNewDir,
+    moveFolder,
   } = useContext(ExplorerContext)
   const { [RESERVED_PATH]: path, ...rest } = tree;
   const keys = Object.keys(rest);
   const [open, setOpen] = useState<boolean>(text === "")
+
   const canSelect = selectable.has(PathType.Dir)
   const isCreateDirParent = path === createDirParent;
+  const isSelected = selectedPath?.path === path;
+  const { pathEditor, editing, editButton } = useEditablePath({ path, text, isSelected, updatePath: moveFolder });
+
   const onClick = () => {
-    if (canSelect) {
+    if (canSelect && !isSelected) {
       onPathSelected({ path, type: PathType.Dir })
     }
   }
+
   return <li>
-    <span onClick={onClick} className={`folder ${canSelect ? "selectable": "" } ${selectedPath?.path === path ? "inverted" : ""}`}>
-      {text}/&nbsp;
+    <span onClick={onClick} className={`folder ${editing ? "editing" : ""} ${canSelect ? "selectable": "" } ${isSelected ? "inverted" : ""}`}>
+      {(!editing || !isSelected) && `${text}/ `}
+      {isSelected && !editing && editButton}
+      {isSelected && editing && pathEditor}
       {keys.length > 0 && <button
         title={open ? `collapse ${path}` : `expand ${path}`}
         onClick={e => {

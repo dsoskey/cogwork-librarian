@@ -1,5 +1,5 @@
 import { Setter } from '../../types'
-import { ExplorerCtx, FileExplorer, Path, PATH_TYPE_STRINGS, PathType, RESERVED_PATH, SELECT_ALL } from './fileExplorer'
+import { ExplorerCtx, FileExplorer, Path, PATH_TYPE_STRINGS, PathType, RESERVED_PATH, SELECT_ALL } from '../component/fileExplorer'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB } from '../../api/local/db'
 import React, { useContext, useState } from 'react'
@@ -164,6 +164,26 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
     }
   }
 
+  const onMoveProject = async (oldPath: string, newPath: string) => {
+    try {
+      await project.moveProject(oldPath, newPath);
+      dispatchTabState({ type: 'rename', paths: [{oldPath, newPath}] })
+    } catch (e) {
+      console.error(e);
+      setError(e.message);
+    }
+  }
+
+  const onMoveFolder = async (oldPath: string, newPath: string) => {
+    try {
+      const paths = await project.moveFolder(oldPath, newPath);
+      dispatchTabState({ type: 'rename', paths })
+    } catch (e) {
+      console.error(e);
+      setError(e.message);
+    }
+  }
+
   return <Modal
     open={modalState !== ModalState.Closed}
     title={<h2>Manage projects</h2>}
@@ -179,6 +199,7 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
       createNewDir={onCreateFolderClick}
       selectedPath={selectedPath} onPathSelected={setSelectedPath}
       createDirParent={createDirParent} setCreateDirParent={setCreateDirParent}
+      moveProject={onMoveProject} moveFolder={onMoveFolder}
       newDir={newDir} setNewDir={setNewDir} />
 
     <FormField

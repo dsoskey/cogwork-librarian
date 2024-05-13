@@ -17,6 +17,8 @@ export interface ProjectDao {
   newProject: (path: string) => Promise<Project>
   importProject: (project: Project) => Promise<Project>
   openProject: (path: string) => Promise<Project>
+  moveProject: (oldPath: string, newPath: string) => Promise<void>,
+  moveFolder: (oldPath: string, newPath: string) => Promise<string[]>
   // returns paths that were deleted.
   deleteProject: (path: string) => Promise<Set<string>>
   queries: string[]
@@ -42,6 +44,8 @@ const defaultDao: ProjectDao = {
   importProject: defaultPromise("ProjectDao.importProject"),
   openProject: defaultPromise("ProjectDao.openProject"),
   deleteProject: defaultPromise("ProjectDao.deleteProject"),
+  moveProject: defaultPromise("ProjectDao.moveProject"),
+  moveFolder: defaultPromise("ProjectDao.moveFolder"),
   queries: [],
   setQueries: defaultFunction("ProjectDao.setQueries"),
   savedCards: [],
@@ -219,6 +223,53 @@ export function useProjectDao(): ProjectDao {
     return toOpen;
   }
 
+  const moveProject = async (oldPath: string, newPath: string) => {
+    if (oldPath === initialPath) {
+      await saveMemory();
+    }
+
+    try {
+      const result = await cogDB.project.update(oldPath, { path: newPath });
+      if (result === 0) console.warn(`${oldPath} not found`);
+    } catch (e) {
+      throw Error(`There already is a project at ${newPath}`)
+    }
+
+    if (oldPath === initialPath) {
+      setInitialPath(newPath);
+      _setCurrentPath(newPath);
+    }
+  }
+
+  const moveFolder = async (oldPath: string, newPath: string) => {
+    if (initialPath.startsWith(oldPath)) {
+      await saveMemory();
+    }
+
+    let changed = []
+
+    await cogDB.transaction("rw", cogDB.project, cogDB.projectFolder, async() => {
+      try {
+        await cogDB.projectFolder.update(oldPath, { path: newPath });
+      } catch (e) {
+        throw Error(`There already is a folder at ${newPath}`)
+      }
+      cogDB.project.where("path").startsWith(oldPath).modify(prev => {
+        //replaced string starts with /
+        const newProjectPath = `${newPath}${prev.path.replace(oldPath, "")}`
+        changed.push({ oldPath: prev.path, newPath: newProjectPath })
+        prev.path = newProjectPath
+      })
+    })
+
+    if (initialPath.startsWith(oldPath)) {
+      setInitialPath(prev => `${newPath}${prev.replace(oldPath, '')}`);
+      _setCurrentPath(prev => `${newPath}${prev.replace(oldPath, '')}`);
+    }
+
+    return changed
+  }
+
   // todo: handle the current project being deleted.
   const deleteProject = async (path: string) => {
     if (path === initialPath) {
@@ -263,6 +314,8 @@ export function useProjectDao(): ProjectDao {
     importProject,
     openProject,
     deleteProject,
+    moveProject,
+    moveFolder,
     queries, setQueries: keepUpdated(_setQueries, _setUpdatedAt),
     savedCards, setSavedCards, addCard,
     path: currentPath,

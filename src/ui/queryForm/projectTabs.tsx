@@ -4,6 +4,7 @@ import './projectTabs.css'
 import { downloadText } from '../download'
 import { serializeProject } from '../../api/local/types/project'
 import { ModalState, ProjectModal } from './projectModal'
+import cloneDeep from 'lodash/cloneDeep'
 
 interface ProjectTabProps {
   canClose: boolean
@@ -87,6 +88,17 @@ function reducer(state: { active: string[], selectedIndex: number }, action) {
       }
       break;
     }
+    case "rename": {
+      for (const change of action.paths) {
+        const { oldPath, newPath } = change;
+        const selectedIndex = state.active.findIndex(it => it === oldPath);
+        if (selectedIndex > -1) {
+          state.active[selectedIndex] = newPath;
+        }
+      }
+      result = cloneDeep(state)
+      break;
+    }
     default:
       throw Error(`Unknown action ${action.type}`)
   }
@@ -117,7 +129,7 @@ export const ProjectTabs = () => {
   });
 
   return <>
-    <div className="row center">
+    <div className="row center wrap">
       <strong>projects: </strong>
       {tabState.active.map((it, i) =>
         <ProjectTab
@@ -137,14 +149,16 @@ export const ProjectTabs = () => {
               .catch(console.error)
           }}
       />)}
-      <button onClick={() => setModalState(ModalState.Open)} title='manage projects'>
-        manage projects
-      </button>
-      <button onClick={() => {
-        const now = new Date();
-        const text = serializeProject({ createdAt: now, updatedAt: now, ...project, ignoredCards: [] });
-        downloadText(text, title, "md")
-      }}>export {title}</button>
+      <div>
+        <button onClick={() => setModalState(ModalState.Open)} title='manage projects'>
+          manage projects
+        </button>
+        <button onClick={() => {
+          const now = new Date();
+          const text = serializeProject({ createdAt: now, updatedAt: now, ...project, ignoredCards: [] });
+          downloadText(text, title, "md")
+        }}>export {title}</button>
+      </div>
     </div>
     <ProjectModal
       modalState={modalState}

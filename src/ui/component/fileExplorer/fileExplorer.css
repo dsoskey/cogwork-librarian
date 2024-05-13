@@ -1,0 +1,56 @@
+.file-explorer {
+    --path-height: 22px;
+    list-style: none;
+    padding: var(--spacing-300);
+    margin-top: 0;
+    background-color: var(--darker-color);
+    color: var(--light-color);
+    border: var(--darker-color) inset 2px;
+
+    .folder, .project {
+        display: flex;
+        flex-direction: row;
+        align-items: baseline;
+    }
+
+    :is(ul, li) {
+        list-style: inherit;
+        margin: var(--spacing-100)
+    }
+
+    ul {
+        padding-left: var(--spacing-300);
+    }
+
+    .selectable {
+        cursor: pointer;
+        height: var(--path-height);
+    }
+
+    .selectable:not(.inverted) {
+        line-height: 24px;
+    }
+
+    .selectable:not(.editing) {
+        padding-left: var(--spacing-200);
+    }
+
+    .selectable:hover {
+        background-color: var(--active-mid-alpha);
+        color: var(--darker-color);
+    }
+
+    .none {
+        display: none;
+    }
+
+    button.edit {
+        margin-left: var(--spacing-200);
+    }
+
+    input.edit {
+        margin-right: 2px;
+        height: var(--path-height);
+        align-self: center;
+    }
+}
