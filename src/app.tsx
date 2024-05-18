@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { Footer } from './ui/footer'
 import { AppInfo } from './ui/appInfo'
