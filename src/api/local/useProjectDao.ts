@@ -224,6 +224,7 @@ export function useProjectDao(): ProjectDao {
   }
 
   const moveProject = async (oldPath: string, newPath: string) => {
+    if (oldPath === newPath) throw Error("can't move path to itself")
     if (oldPath === initialPath) {
       await saveMemory();
     }
@@ -242,6 +243,7 @@ export function useProjectDao(): ProjectDao {
   }
 
   const moveFolder = async (oldPath: string, newPath: string) => {
+    if (oldPath === newPath) throw Error("can't move path to itself")
     if (initialPath.startsWith(oldPath)) {
       await saveMemory();
     }

@@ -2,11 +2,13 @@ import { createContext, SetStateAction, useRef, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, isScryfallManifest, Manifest } from './db'
 import { migrateCubes, putFile } from './populate'
-import { NormedCard, isOracleVal } from 'mtgql'
+import { NormedCard, isOracleVal, normCardList } from 'mtgql'
 import { QueryReport, useReporter } from '../useReporter'
 import _isFunction  from 'lodash/isFunction'
 import { useLocalStorage } from './useLocalStorage'
 import { defaultPromise } from '../context'
+import { CubeCard } from 'mtgql/build/types/cube'
+import * as Scryfall from 'scryfall-sdk'
 
 export const DB_LOAD_MESSAGES = [
   "loading cubes",
@@ -38,6 +40,7 @@ export interface CogDB {
   memory: NormedCard[]
   cardByOracle: (id: string) => NormedCard | undefined
   bulkCardByOracle: (oracleIds: string[]) => Promise<NormedCard[]>
+  bulkCardByCubeList: (cards: CubeCard[]) => Promise<NormedCard[]>
   setMemory: Setter<NormedCard[]>
   loadFilter: string
   setLoadFilter: Setter<string>
@@ -59,6 +62,7 @@ const defaultDB: CogDB = {
     return undefined
   },
   bulkCardByOracle: defaultPromise("CogDB.bulkCardByOracle"),
+  bulkCardByCubeList: defaultPromise("CogDB.bulkCardByCubeList"),
   dbReport: null,
   setMemory: () => console.error("CogDB.setMemory called without a provider!"),
   cardByName: () => {
@@ -307,21 +311,53 @@ export const useCogDB = (): CogDB => {
     const missingMemoryIndices = memOracles
       .map((card, index) => card === undefined ? index : -1)
       .filter(index => index !== -1)
+    if (missingMemoryIndices.length === 0) return memOracles;
 
-    if (missingMemoryIndices.length) {
-      const oraclesToCheckDB = missingMemoryIndices.map(index => oracleIds[index]);
-      const newOracles = (await cogDB.card.bulkGet(oraclesToCheckDB)) ?? [];
-      const missingIndexes = newOracles
-        .map((card, index) => card === undefined ? index : -1)
-        .filter(index => index !== -1)
-      if (missingIndexes.length) return Promise.reject(missingIndexes);
+    const oraclesToCheckDB = missingMemoryIndices.map(index => oracleIds[index]);
+    const newOracles = (await cogDB.card.bulkGet(oraclesToCheckDB)) ?? [];
+    const missingIndexes = newOracles
+      .map((card, index) => card === undefined ? index : -1)
+      .filter(index => index !== -1)
 
+    if (missingIndexes.length) return Promise.reject(missingIndexes);
+
+    for (let i = 0; i < missingMemoryIndices.length; i++){
+      const index = missingMemoryIndices[i]
+      memOracles[index] = newOracles[i]
+    }
+    return memOracles
+  }
+
+  const bulkCardByCubeList = async (cubeList: CubeCard[]) => {
+    const memOracles = cubeList.map(it => cardByOracle(it.oracle_id))
+    const missingMemoryIndices = memOracles
+      .map((card, index) => card === undefined ? index : -1)
+      .filter(index => index !== -1)
+    if (missingMemoryIndices.length === 0) return memOracles;
+
+    const oraclesToCheckDB = missingMemoryIndices.map(index => cubeList[index].oracle_id);
+    const newOracles = (await cogDB.card.bulkGet(oraclesToCheckDB)) ?? [];
+    const missingDBIndexes = newOracles
+      .map((card, index) => card === undefined ? index : -1)
+      .filter(index => index !== -1)
+
+    if (missingDBIndexes.length === 0) {
       for (let i = 0; i < missingMemoryIndices.length; i++){
         const index = missingMemoryIndices[i]
         memOracles[index] = newOracles[i]
       }
+      return memOracles
     }
 
+    const toCheckScryfall = missingDBIndexes
+      .map(index => Scryfall.CardIdentifier.byId(cubeList[index].print_id));
+    const scryfallCards = await Scryfall.Cards.collection(...toCheckScryfall).waitForAll();
+    if (scryfallCards.not_found.length) return Promise.reject(scryfallCards.not_found);
+
+    for (let i = 0; i < missingDBIndexes.length; i++){
+      const index = missingDBIndexes[i]
+      memOracles[index] = normCardList([scryfallCards[i]])[0];
+    }
     return memOracles
   }
 
@@ -334,6 +370,7 @@ export const useCogDB = (): CogDB => {
     memory,
     cardByOracle,
     bulkCardByOracle,
+    bulkCardByCubeList,
     setMemory,
     resetDB,
     loadManifest,
