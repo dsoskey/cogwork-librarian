@@ -3,7 +3,7 @@ import { CoglibIcon } from './coglibIcon'
 import { Link } from 'react-router-dom'
 import React, { useContext, useEffect } from 'react'
 import { FlagContext } from '../flags'
-import { useLocation, useParams } from 'react-router'
+import { useLocation } from 'react-router'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { Dropdown } from './dropdown'
 import _cloneDeep from 'lodash/cloneDeep'
@@ -22,13 +22,10 @@ export const Masthead = () => {
   const { adminMode } = useContext(FlagContext).flags
   const { pathname } = useLocation()
   const topPath = pathname.replace("/","").split("/")[0]
-  const params = useParams()
   const [lastVistedCubes, setLastVisitedCubes] = useLocalStorage<string[]>("recent-cubes.coglib.sosk.watch",[]);
   useEffect(() => {
     if (pathname.startsWith("/data/cube/")) {
       const cubeId = pathname.split("/").pop();
-      console.log(pathname)
-      console.log(params);
       setLastVisitedCubes(prev=> {
         const next = _cloneDeep(prev);
         const prevIndex = next.findIndex(it => it === cubeId);

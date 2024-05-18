@@ -1,17 +1,13 @@
 import React from 'react'
 import Prism, { Environment, Grammar } from 'prismjs'
 import 'prismjs/components/prism-regex.js'
-import { FILTER_KEYWORDS, KEYWORDS_TO_IMPLEMENT, OPERATORS } from 'mtgql'
+import { FILTER_KEYWORDS, OPERATORS } from 'mtgql'
 import { extensionDocs, syntaxDocs } from './syntaxDocs'
 import { Router as RemixRouter } from '@remix-run/router'
 
 export type Language = 'regex' | 'scryfall' | 'scryfall-extended' | 'scryfall-extended-multi'
 const keywordRegex = Object.values(FILTER_KEYWORDS).join('|')
 
-console.debug(`local supports ${Object.values(FILTER_KEYWORDS).length} keywords`)
-console.debug(
-  `${Object.values(KEYWORDS_TO_IMPLEMENT).length} keywords to add to local syntax`
-)
 const operators = Object.values(OPERATORS).join('|')
 
 const scryfallRegex = {

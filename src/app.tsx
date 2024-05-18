@@ -39,6 +39,9 @@ export const App = () => {
   const dismissMessage = (messageId: string) => {
     setMessages(prev => prev.filter(it => it.id !== messageId))
   }
+  useEffect(() => {
+    cogDB.resetDB()
+  }, [])
 
   return (
     <CogDBContext.Provider value={cogDB}>

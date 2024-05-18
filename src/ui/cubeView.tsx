@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
+import _sortBy from 'lodash/sortBy'
+import _groupBy from 'lodash/groupBy'
 import { Card, NormedCard, QueryRunner, SearchError, SortFunctions } from 'mtgql'
-import { cogDB as cogDBClient, Manifest, toManifest } from '../api/local/db'
+import { cogDB as cogDBClient, Manifest } from '../api/local/db'
 import { CardImageView } from './cardBrowser/cardViews/cardImageView'
-import { groupBy, sortBy } from 'lodash'
 import './cubeView.css'
 import { Input } from './component/input'
 import { CUBE_SOURCE_TO_LABEL, cubeLink } from './component/cube/sourceIcon'
@@ -75,7 +76,7 @@ function LoadingError({ cardCount, refreshCubeCards }) {
 }
 export function CubeView() {
   const { key } = useParams();
-  const { dbStatus } = useContext(CogDBContext);
+  const { dbStatus, bulkCardByOracle } = useContext(CogDBContext);
   const viewport = useViewportListener();
   const [searchError, setSearchError] = useState<SearchError | undefined>()
   const [loadingError, setLoadingError] = useState<React.ReactNode>(undefined);
@@ -92,7 +93,7 @@ export function CubeView() {
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
 
   const sorted: OrderedCard[] = useMemo(() => {
-    return sortBy(
+    return _sortBy(
       filteredCards ?? cards,
       ordering.map(it => orderValToKey[it]??it),
     ) as OrderedCard[]
@@ -109,22 +110,13 @@ export function CubeView() {
   };
   const clearFilter = () => setFilteredCards(undefined);
 
-  const refreshCubeCards = async() => {
+  const refreshCubeCards = async () => {
     try {
       const next: OrderedCard[] = [];
-      const newOracles = (await cogDBClient.card.bulkGet(cube.cards?.map(it=>it.oracle_id) ?? cube.oracle_ids)) ?? [];
-      const missingIndexes = newOracles
-        .map((card, index) => card === undefined ? index : -1)
-        .filter(index => index !== -1)
-      if (missingIndexes.length) {
-        setLoadingError(<LoadingError
-          cardCount={missingIndexes.length}
-          refreshCubeCards={refreshCubeCards}
-        />)
-        return;
-      }
-      const oracleIdToNormed = groupBy(newOracles, "oracle_id")
-      setOracles(oracleIdToNormed);
+      const oracleIds =  cube.cards?.map(it=>it.oracle_id) ?? cube.oracle_ids;
+      const newOracles = await bulkCardByOracle(oracleIds);
+      const byOracle = _groupBy(newOracles, "oracle_id");
+      setOracles(byOracle);
       if (needsMigration) {
         const cards = newOracles.map(it => ({ oracle_id: it.oracle_id, print_id: it.printings[0].id }));
         await cogDBClient.cube.put({
@@ -161,10 +153,16 @@ export function CubeView() {
       }
       setLoadingError(undefined)
     } catch (e) {
-      console.error(e)
-      setLoadingError(<div className="alert">
-        {e.message}
-      </div>)
+      if (Array.isArray(e)) {
+        setLoadingError(<LoadingError
+          cardCount={e.length}
+          refreshCubeCards={refreshCubeCards}
+        />)
+      } else {
+        setLoadingError(<div className="alert">
+          {e.message}
+        </div>)
+      }
     }
   };
 

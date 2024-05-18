@@ -1,11 +1,12 @@
-import { createContext, SetStateAction, useEffect, useRef, useState } from 'react'
+import { createContext, SetStateAction, useRef, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, isScryfallManifest, Manifest } from './db'
 import { migrateCubes, putFile } from './populate'
 import { NormedCard, isOracleVal } from 'mtgql'
 import { QueryReport, useReporter } from '../useReporter'
-import { isFunction } from 'lodash'
+import _isFunction  from 'lodash/isFunction'
 import { useLocalStorage } from './useLocalStorage'
+import { defaultPromise } from '../context'
 
 export const DB_LOAD_MESSAGES = [
   "loading cubes",
@@ -35,6 +36,8 @@ export interface CogDB {
   memStatus: TaskStatus
   dbReport: QueryReport
   memory: NormedCard[]
+  cardByOracle: (id: string) => NormedCard | undefined
+  bulkCardByOracle: (oracleIds: string[]) => Promise<NormedCard[]>
   setMemory: Setter<NormedCard[]>
   loadFilter: string
   setLoadFilter: Setter<string>
@@ -51,6 +54,11 @@ const defaultDB: CogDB = {
   dbStatus: 'unstarted',
   memStatus: 'unstarted',
   memory: [],
+  cardByOracle: () => {
+    console.error("CogDB.cardByOracle called without a provider!")
+    return undefined
+  },
+  bulkCardByOracle: defaultPromise("CogDB.bulkCardByOracle"),
   dbReport: null,
   setMemory: () => console.error("CogDB.setMemory called without a provider!"),
   cardByName: () => {
@@ -104,7 +112,7 @@ export const useCogDB = (): CogDB => {
     }
   }
   const setMemory = (setto: SetStateAction<NormedCard[]>) => {
-    const res = isFunction(setto) ? setto(memory) : setto
+    const res = _isFunction(setto) ? setto(memory) : setto
     rawSetMemory(res)
     resetIndex()
     res.forEach(addCardToIndex)
@@ -243,6 +251,7 @@ export const useCogDB = (): CogDB => {
         }
       })
     } else {
+      setDbStatus("success")
       console.debug("posting start message to worker")
       worker.onmessage = handleLoadDB
       worker.postMessage({ type: 'load', data: { filter: loadFilter } })
@@ -282,12 +291,38 @@ export const useCogDB = (): CogDB => {
     worker.postMessage({ type: 'init', data: { bulkType: manifest.type, targets, filter } })
   }
 
-  useEffect(() => { resetDB() }, [])
-
   const cardByName = (name: string, fuzzy: boolean = false): NormedCard | undefined => {
     // todo: add fuzzing
     const fuzzed = fuzzy ? name : name
     return oracleToCard.current[nameToOracle.current[fuzzed]]
+  }
+
+  const cardByOracle = (oracleId: string): NormedCard | undefined => {
+    return oracleToCard.current[oracleId];
+  }
+
+  // this looks pretty generalizable ngl
+  const bulkCardByOracle = async (oracleIds: string[]) => {
+    const memOracles = oracleIds.map(cardByOracle)
+    const missingMemoryIndices = memOracles
+      .map((card, index) => card === undefined ? index : -1)
+      .filter(index => index !== -1)
+
+    if (missingMemoryIndices.length) {
+      const oraclesToCheckDB = missingMemoryIndices.map(index => oracleIds[index]);
+      const newOracles = (await cogDB.card.bulkGet(oraclesToCheckDB)) ?? [];
+      const missingIndexes = newOracles
+        .map((card, index) => card === undefined ? index : -1)
+        .filter(index => index !== -1)
+      if (missingIndexes.length) return Promise.reject(missingIndexes);
+
+      for (let i = 0; i < missingMemoryIndices.length; i++){
+        const index = missingMemoryIndices[i]
+        memOracles[index] = newOracles[i]
+      }
+    }
+
+    return memOracles
   }
 
   return {
@@ -297,6 +332,8 @@ export const useCogDB = (): CogDB => {
     manifest,
     setManifest,
     memory,
+    cardByOracle,
+    bulkCardByOracle,
     setMemory,
     resetDB,
     loadManifest,
