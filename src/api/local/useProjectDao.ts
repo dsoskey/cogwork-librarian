@@ -256,7 +256,7 @@ export function useProjectDao(): ProjectDao {
       } catch (e) {
         throw Error(`There already is a folder at ${newPath}`)
       }
-      cogDB.project.where("path").startsWith(oldPath).modify(prev => {
+      cogDB.project.where("path").startsWith(`${oldPath}/`).modify(prev => {
         //replaced string starts with /
         const newProjectPath = `${newPath}${prev.path.replace(oldPath, "")}`
         changed.push({ oldPath: prev.path, newPath: newProjectPath })

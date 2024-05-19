@@ -180,7 +180,7 @@ const ExplorerBranch = ({ tree, text }: ExplorerBranchProps) => {
         {open ? "V" : ">" }
       </button>}
       {canCreateDir && <button
-        title={isCreateDirParent ? "stop creating folder": `create folder${path.length ? ` in ${path}` : ""}`}
+        title={isCreateDirParent ? "stop creating folder": `create folder${(path?.length ?? 0) ? ` in ${path}` : ""}`}
         onClick={() => {
           setCreateDirParent(isCreateDirParent ? undefined : path)
           setOpen(true)
