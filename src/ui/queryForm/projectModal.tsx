@@ -35,7 +35,7 @@ interface ProjectModalProps {
 export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: ProjectModalProps) => {
   const project = useContext(ProjectContext)
 
-  const [error, setError] = useState<string>('')
+  const [error, setError] = useState<string>("")
   const [projectToSubmit, setProjectToSubmit] = useState<string>('my-project')
   const [selectedPath, setSelectedPath] = useState<Path>({ path: '', type: PathType.Dir })
   const [createDirParent, setCreateDirParent] = useState<string | undefined>(undefined)
@@ -58,7 +58,6 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
     }
     func(selectedPath.path)
       .then(paths => {
-        console.log(paths, 'have been deleted. you should do something about it')
         dispatchTabState({ type: 'delete', paths })
         confirmer.hide()
       })
@@ -166,6 +165,7 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
 
   const onMoveProject = async (oldPath: string, newPath: string) => {
     try {
+      setError("")
       await project.moveProject(oldPath, newPath);
       dispatchTabState({ type: 'rename', paths: [{oldPath, newPath}] })
     } catch (e) {
@@ -176,6 +176,7 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
 
   const onMoveFolder = async (oldPath: string, newPath: string) => {
     try {
+      setError("")
       const paths = await project.moveFolder(oldPath, newPath);
       dispatchTabState({ type: 'rename', paths })
     } catch (e) {
@@ -185,8 +186,12 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
   }
 
   return <Modal
+    className="project-modal"
     open={modalState !== ModalState.Closed}
-    title={<h2>Manage projects</h2>}
+    title={<div className="row center">
+      <h2>Manage projects</h2>
+      {error && <div className='alert'>{error}</div>}
+    </div>}
     onClose={() => {
       confirmer.hide()
       setModalState(ModalState.Closed)
@@ -214,7 +219,6 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
         onChange={e => setProjectToSubmit(e.target.value)}
       />}
     </FormField>
-    {error && <div className='alert'>{error}</div>}
     <button onClick={onCreateProjectClick} disabled={!canCreateProject}>Create project</button>
     <label className={`file-label button-like ${canCreateProject ? "" : "disabled"}`}>
       <span>Import project</span>

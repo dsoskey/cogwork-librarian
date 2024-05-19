@@ -3,6 +3,7 @@ import "./fileExplorer.css"
 import { Setter } from '../../../types'
 import { defaultFunction } from '../../../api/context'
 import { useEditablePath } from './editablePath'
+import { useDrag, useDrop } from 'react-dnd'
 
 export const RESERVED_PATH = ".path"
 export enum PathType { File, Dir }
@@ -86,12 +87,17 @@ const ExplorerLeaf = ({ path, text }: ExplorerLeafProps) => {
       onPathSelected({ path, type: PathType.File });
     }
   }
+  const [{}, drag, dragPreview] = useDrag(() => ({
+    type: "PROJECT",
+    item: { path, type: PathType.File },
+  }))
 
-  return <li className={`project ${editing ? "editing" : ""} ${canSelect ? "selectable": "" } ${isSelected ? "inverted" : ""}`}
+  return <li ref={dragPreview} className={`project ${editing ? "editing" : ""} ${canSelect ? "selectable": "" } ${isSelected ? "inverted" : ""}`}
     title="click to select"
     onClick={onClick}
   >
     {(!editing || !isSelected) && text}
+    {isSelected && !editing && <button className="drag" ref={drag} title={`drag to move ${path}`}>⬍</button>}
     {isSelected && !editing && editButton}
     {isSelected && editing && pathEditor}
   </li>
@@ -104,7 +110,7 @@ interface ExplorerBranchProps {
 const ExplorerBranch = ({ tree, text }: ExplorerBranchProps) => {
   const { onPathSelected, selectedPath, selectable, canCreateDir,
     createDirParent, setCreateDirParent, newDir, setNewDir, createNewDir,
-    moveFolder,
+    moveFolder, moveProject,
   } = useContext(ExplorerContext)
   const { [RESERVED_PATH]: path, ...rest } = tree;
   const keys = Object.keys(rest);
@@ -121,10 +127,49 @@ const ExplorerBranch = ({ tree, text }: ExplorerBranchProps) => {
     }
   }
 
-  return <li>
-    <span onClick={onClick} className={`folder ${editing ? "editing" : ""} ${canSelect ? "selectable": "" } ${isSelected ? "inverted" : ""}`}>
-      {(!editing || !isSelected) && `${text}/ `}
-      {isSelected && !editing && editButton}
+  const [{}, drag, dragPreview] = useDrag(() => ({
+    type: "FOLDER",
+    item: { path, type: PathType.Dir },
+  }))
+
+  const [{ canDrop, isOver }, drop] = useDrop(() => ({
+    accept: ["PROJECT", "FOLDER"],
+    drop: (item: Path, monitor) => {
+      if (item.path === path) {
+        console.log("can't drop on self")
+        return;
+      }
+      if (!monitor.isOver({ shallow: true })) return;
+      switch (item.type) {
+        case PathType.File: {
+          const projectName = item.path.split("/").pop()
+          const newPath = `${path}/${projectName}`
+          if (item.path === newPath) return;
+          moveProject(item.path, newPath);
+          break;
+        }
+        case PathType.Dir:
+          const folderName = item.path.split("/").pop()
+          const newPath = `${path}/${folderName}`
+          if (item.path === newPath) return;
+          moveFolder(item.path, newPath);
+          break;
+      }
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver({ shallow: true }),
+      canDrop: monitor.canDrop() && monitor.getItem().path !== path
+    })
+  }), [path])
+
+
+  return <li role="folder" ref={drop} className={`${isOver && canDrop ? "is-over" : "" }`}>
+    <span ref={dragPreview} onClick={onClick} className={`folder ${editing ? "editing" : ""} ${canSelect ? "selectable": "" } ${isSelected ? "inverted" : ""}`}>
+      {(!editing || !isSelected) && `${text}/`}
+      {isSelected && !editing && text.length > 0 && <>
+        <button className="drag" ref={drag} title={`drag to move ${path}`}>⬍</button>
+        {editButton}
+      </>}
       {isSelected && editing && pathEditor}
       {keys.length > 0 && <button
         title={open ? `collapse ${path}` : `expand ${path}`}

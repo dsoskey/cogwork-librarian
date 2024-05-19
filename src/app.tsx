@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import { DndProvider } from 'react-dnd'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { Footer } from './ui/footer'
 import { AppInfo } from './ui/appInfo'
@@ -47,8 +49,9 @@ export const App = () => {
     <CogDBContext.Provider value={cogDB}>
       <ListImporterContext.Provider value={listImporter}>
         <BulkCubeImporterContext.Provider value={bulkCubeImporter}>
-            <ProjectContext.Provider value={project}>
-              <ToasterContext.Provider value={{ messages, addMessage, dismissMessage }}>
+          <ProjectContext.Provider value={project}>
+            <ToasterContext.Provider value={{ messages, addMessage, dismissMessage }}>
+              <DndProvider backend={HTML5Backend}>
                 <div className='root'>
                   {pathname === "/" && <SearchView />}
                   {pathname !== "/" && <>
@@ -71,8 +74,9 @@ export const App = () => {
                   </>}
                   <Toaster />
                 </div>
-              </ToasterContext.Provider>
-            </ProjectContext.Provider>
+              </DndProvider>
+            </ToasterContext.Provider>
+          </ProjectContext.Provider>
         </BulkCubeImporterContext.Provider>
       </ListImporterContext.Provider>
     </CogDBContext.Provider>

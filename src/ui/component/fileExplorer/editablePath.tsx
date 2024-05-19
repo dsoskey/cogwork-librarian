@@ -25,6 +25,7 @@ export function useEditablePath({ path, text, isSelected, updatePath }: Editable
     }, [isSelected])
 
     const onRename = event => {
+        if (updatedName === '') return;
         event.stopPropagation();
         const pathParts = path.split("/")
         pathParts[pathParts.length-1] = updatedName;
@@ -52,7 +53,7 @@ export function useEditablePath({ path, text, isSelected, updatePath }: Editable
             setEditing(false)
             setUpdatedName(text)
         }}>cancel</button>
-        <button onClick={onRename} disabled={updatedName === text}>
+        <button onClick={onRename} disabled={updatedName === text || updatedName === ""}>
             rename
         </button>
     </>

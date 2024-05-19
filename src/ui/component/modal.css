@@ -3,31 +3,32 @@
   background: var(--light-color);
   border-color: var(--darker-color);
   color: var(--dark-color);
-  width: 80%;
-  max-height: 80%;
+  width: 80vw;
+  max-height: 80svh;
   overflow-y: scroll;
-}
-.modal a {
-  color: var(--dark-color);
-}
 
-.modal section:not(:first-of-type) {
-  margin-top: 2em;
+  a {
+    color: var(--dark-color);
+  }
+
+  section:not(:first-of-type) {
+    margin-top: 2em;
+  }
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+  }
+
+  .modal-title {
+    flex: 1;
+  }
+
+  .modal-close {
+    height: 2rem;
+    width: 2rem;
+  }
 }
 
 .info-modal .modal {
   width: 40%;
-}
-
-.modal::backdrop {
-  background: rgba(0, 0, 0, 0.75);
-}
-
-.modal-title {
-  flex: 1;
-}
-
-.modal-close {
-  height: 2rem;
-  width: 2rem;
 }

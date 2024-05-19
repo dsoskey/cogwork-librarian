@@ -27,6 +27,10 @@
         height: var(--path-height);
     }
 
+    .is-over {
+        background-color: var(--active-mid-alpha);
+    }
+
     .selectable:not(.inverted) {
         line-height: 24px;
     }
@@ -44,8 +48,16 @@
         display: none;
     }
 
-    button.edit {
+    button:first-child {
         margin-left: var(--spacing-200);
+    }
+
+    .drag {
+        line-height: .82em;
+        align-self: center;
+        /*padding: 0 4px;*/
+        font-size: 1.2em;
+        /*font-weight: bolder;*/
     }
 
     input.edit {

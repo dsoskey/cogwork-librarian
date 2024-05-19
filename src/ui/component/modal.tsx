@@ -1,12 +1,13 @@
-import React, { useEffect, useRef } from 'react'
+import React, { HTMLAttributes, useEffect, useRef } from 'react'
 import './modal.css'
-export interface ModalProps {
+
+export interface ModalProps extends Omit<HTMLAttributes<HTMLDialogElement>, "title"> {
   open: boolean
   title: React.ReactNode
   children: React.ReactNode
   onClose: () => void
 }
-export const Modal = ({ onClose, title, open, children }: ModalProps) => {
+export const Modal = ({ onClose, title, open, children, className, ...dialogProps }: ModalProps) => {
   const modal = useRef<HTMLDialogElement>()
   const onEsc = (event) => {
     if (event.key === 'Escape') {
@@ -27,7 +28,7 @@ export const Modal = ({ onClose, title, open, children }: ModalProps) => {
   }, [open])
 
   return (
-    <dialog className='modal' ref={modal}>
+    <dialog className={`modal ${className ?? ""}`} ref={modal} {...dialogProps}>
       <div className='row'>
         <div className='modal-title'>{title}</div>
         <button
