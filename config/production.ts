@@ -7,7 +7,8 @@ const config: ClientConfig = {
     adminMode: false,
     displayTypes: false,
     docsUpdate: false,
-    edhrecOverlay: false
+    edhrecOverlay: false,
+    proxyTest: false,
   }
 }
 

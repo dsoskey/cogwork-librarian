@@ -8,6 +8,7 @@ const config: ClientConfig = {
     displayTypes: false,
     docsUpdate: true,
     edhrecOverlay: false,
+    proxyTest: true,
   }
 }
 
