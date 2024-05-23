@@ -329,11 +329,11 @@ export const useCogDB = (): CogDB => {
   }
 
   const bulkCardByCubeList = async (cubeList: CubeCard[]) => {
-    const memOracles = cubeList.map(it => cardByOracle(it.oracle_id))
-    const missingMemoryIndices = memOracles
+    const result = cubeList.map(it => cardByOracle(it.oracle_id))
+    const missingMemoryIndices = result
       .map((card, index) => card === undefined ? index : -1)
       .filter(index => index !== -1)
-    if (missingMemoryIndices.length === 0) return memOracles;
+    if (missingMemoryIndices.length === 0) return result;
 
     const oraclesToCheckDB = missingMemoryIndices.map(index => cubeList[index].oracle_id);
     const newOracles = (await cogDB.card.bulkGet(oraclesToCheckDB)) ?? [];
@@ -341,13 +341,11 @@ export const useCogDB = (): CogDB => {
       .map((card, index) => card === undefined ? index : -1)
       .filter(index => index !== -1)
 
-    if (missingDBIndexes.length === 0) {
-      for (let i = 0; i < missingMemoryIndices.length; i++){
-        const index = missingMemoryIndices[i]
-        memOracles[index] = newOracles[i]
-      }
-      return memOracles
+    for (let i = 0; i < missingMemoryIndices.length; i++){
+      const index = missingMemoryIndices[i]
+      result[index] = newOracles[i]
     }
+    if (missingDBIndexes.length === 0) return result
 
     const toCheckScryfall = missingDBIndexes
       .map(index => Scryfall.CardIdentifier.byId(cubeList[index].print_id));
@@ -356,9 +354,9 @@ export const useCogDB = (): CogDB => {
 
     for (let i = 0; i < missingDBIndexes.length; i++){
       const index = missingDBIndexes[i]
-      memOracles[index] = normCardList([scryfallCards[i]])[0];
+      result[index] = normCardList([scryfallCards[i]])[0];
     }
-    return memOracles
+    return result
   }
 
   return {

@@ -156,6 +156,7 @@ export function CubeView() {
       }
       setLoadingError(undefined)
     } catch (e) {
+      console.error(e)
       if (Array.isArray(e)) {
         setLoadingError(<LoadingError
           cardCount={e.length}
@@ -255,7 +256,6 @@ export function CubeView() {
           {loadingError}
         </div>
         {sorted.length > 0 && searchError === undefined && <div className='result-container'>
-          <div className="card-image-container">
             {sorted.map((card, index) =>
               <CardImageView
                 key={card.id + index.toString()}
@@ -263,7 +263,6 @@ export function CubeView() {
                 card={{ data: card, matchedQueries: [`cube:${key}`], weight: 1 }}
                 onClick={() => setActiveCard(card)}
               />)}
-          </div>
         </div>}
       </>}
     </div>

@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import { FlagContext } from './flags'
-import "./appInfo.css"
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
 
 export const AppInfo = () => {
@@ -30,7 +29,7 @@ export const AppInfo = () => {
   }
 
   return (
-    <div className='app-info-root'>
+    <>
       <h2>what is cogwork librarian?</h2>
       <p>
         <span onClick={tryLock}>cogwork librarian</span> wants to help you brainstorm and build cubes, battle
@@ -109,6 +108,6 @@ export const AppInfo = () => {
         </a>{' '}
         are encouraged!
       </p>
-    </div>
+    </>
   )
 }

@@ -1,14 +1,5 @@
-.card-image-container {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
-}
-
-@media (min-width: 769px) {
-    .card-image-container {
-        margin: 0 var(--spacing-500);
-    }
+.default-layout:has(.cube-view-root) {
+    margin: unset;
 }
 
 .cube-view-root {
@@ -17,10 +8,6 @@
         display: flex;
         flex-direction: column;
         gap: var(--spacing-200);
-    }
-
-    .result-container {
-        justify-content: center;
     }
 
     .card-view {

@@ -89,7 +89,7 @@ export const CardDataView = () => {
   } else if (dbDirty) {
     saveText = 'save to database'
   }
-  return <div className='data-view-root'>
+  return <>
     <h2>card data</h2>
     <section className='card-import'>
       <div className='row'>
@@ -172,5 +172,5 @@ export const CardDataView = () => {
         setDbImportStatus={setDbImportStatus}
       />}
     </section>
-  </div>
+  </>
 }

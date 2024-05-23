@@ -1,7 +1,3 @@
-.data-view-root {
-    margin: var(--spacing-300);
-}
-
 .cubesite-import {
     display: flex;
     flex-direction: column;

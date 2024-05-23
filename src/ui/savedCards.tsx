@@ -158,7 +158,7 @@ export function SavedCardsEditor(props: SavedCardsEditorProps) {
   }
 
 
-  return <div className='saved-cards-root'>
+  return <div className='saved-cards-editor'>
     <div className='row center'>
       <h2>saved cards</h2>
       <CopyToClipboardButton

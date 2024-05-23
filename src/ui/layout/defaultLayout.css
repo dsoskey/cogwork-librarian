@@ -1,0 +1,7 @@
+.default-layout {
+    margin: var(--spacing-300);
+
+    h2 {
+        margin-top: 0;
+    }
+}

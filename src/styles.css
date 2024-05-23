@@ -192,7 +192,7 @@ th, td {
 /* classnames */
 
 .root {
-  min-height: 100vh;
+  min-height: 100svh;
 }
 
 @media (min-width: 769px) {
@@ -684,7 +684,7 @@ textarea.coglib-prism-theme {
 
 .query-panel {
   flex:1;
-  height: 100vh;
+  height: 100svh;
   overflow-y: auto;
 }
 
@@ -694,8 +694,14 @@ textarea.coglib-prism-theme {
   flex: 1;
 }
 
+@media (min-width: 769px) {
+  .result-container {
+    padding: var(--spacing-300) var(--spacing-500) 0;
+  }
+}
+
 .result-container {
-  padding: var(--spacing-300) var(--spacing-500) 0;
+  padding-top: var(--spacing-300) ;
   background-color: var(--darker-color);
   display: flex;
   flex-wrap: wrap;
@@ -730,7 +736,7 @@ textarea.coglib-prism-theme {
 
 .saved-cards-floater {
   --show-width: 25%;
-  height: 100vh;
+  height: 100svh;
   overflow-y: scroll;
   border-left: var(--gray-68) 2px solid;
   box-shadow: -2px 0 2px 0 var(--gray-68-shadow);
