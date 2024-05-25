@@ -4,7 +4,7 @@ import React from 'react'
 import { CubeDefinition, CubeSource } from 'mtgql'
 
 export const CUBE_SOURCE_TO_LABEL: Record<CubeSource, string> = {
-  cubeartisan: 'CubeArtisan', cubecobra: 'CubeCobra', list: 'a text list'
+  cubeartisan: 'CubeArtisan', cubecobra: 'Cube Cobra', list: 'a text list'
 }
 
 export const SourceIcon = ({ source }: { source: CubeSource }) => {

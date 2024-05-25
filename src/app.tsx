@@ -4,7 +4,7 @@ import { DndProvider } from 'react-dnd'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { AppInfo } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
-import { Route, Routes, useLocation } from 'react-router'
+import { Navigate, Route, Routes, useLocation } from 'react-router'
 import { SavedCardsEditor } from './ui/savedCards'
 import { ToasterMessage, Toaster, ToasterContext } from './ui/component/toaster'
 import { v4 as uuidv4 } from 'uuid';
@@ -58,9 +58,10 @@ export const App = () => {
                     {pathname === "/" && <SearchView />}
                     {pathname !== "/" && <DefaultLayout>
                       <Routes>
-                        <Route path="/data/cube/:key" element={<CubeView />} />
+                        <Route path="/data/cube/*" element={<CubeRedirect />} />
+                        <Route path="/cube/:key" element={<CubeView />} />
                         <Route path='/data/card' element={<CardDataView />}/>
-                        <Route path='/data/cube' element={<CubeDataView />}/>
+                        <Route path='/cube' element={<CubeDataView />}/>
                         <Route
                           path='/saved'
                           element={<SavedCardsEditor {...project} />}
@@ -82,4 +83,9 @@ export const App = () => {
       </ListImporterContext.Provider>
     </CogDBContext.Provider>
   )
+}
+
+function CubeRedirect() {
+  const { pathname } = useLocation();
+  return <Navigate to={pathname.replace("/data","")} replace />
 }

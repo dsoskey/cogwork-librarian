@@ -22,7 +22,7 @@ export interface QueryExecutor extends QueryHandler {
     injectPrefixx: (query: string) => string,
     getWeight: (index: number) => number,
   ) => Promise<void>
-
+  reset: () => void
   aggregateVenn: (funk: VennRunnerFunc) => (
     left: string,
     right: string,
@@ -37,6 +37,10 @@ export const useQueryCoordinator = (): QueryExecutor => {
   const [status, setStatus] = useState<TaskStatus>('unstarted')
   const [errors, setErrors] = useState<CogError[]>([])
   const [result, setResult] = useState<Array<EnrichedCard>>([])
+  const reset = () => {
+    setStatus("unstarted")
+    setResult([]);
+  }
   const report = useReporter()
 
   // Should this be an implementation detail of query runners?
@@ -153,6 +157,7 @@ export const useQueryCoordinator = (): QueryExecutor => {
     status,
     report,
     result,
+    reset,
     execute,
     aggregateVenn,
     rawData,

@@ -261,15 +261,13 @@ th, td {
   flex-wrap: wrap;
 }
 
-.settings-view-root .input-link input ,
-.data-view-root .input-link input {
+.input-link input {
  appearance: none;
   outline: none;
   margin: 0;
 }
 
-.settings-view-root .input-link,
-.data-view-root .input-link,
+.input-link,
 .masthead a {
   color: var(--active-mid-alpha);
   text-decoration: none;
@@ -281,20 +279,15 @@ th, td {
 }
 
 
-.settings-view-root .input-link:hover,
-.data-view-root .input-link:hover,
+.input-link:hover,
 .masthead a:hover {
   color: var(--dark-color);
   background-color: var(--active-mid-alpha);
   border-color: var(--active-low-alpha) inset;
 }
 
-.settings-view-root .input-link.active-link,
-.settings-view-root .input-link:focus-visible,
-.data-view-root .input-link.active-link,
-.data-view-root .input-link:focus-visible,
-.masthead .active-link,
-.masthead a:focus-visible {
+.input-link.active-link, .input-link:focus-visible,
+.masthead .active-link, .masthead a:focus-visible {
   color: var(--dark-color);
   background-color: var(--active);
   border-color: var(--active-mid-alpha) inset;
@@ -304,10 +297,6 @@ th, td {
   position: absolute;
   top: var(--spacing-200);
   right: var(--spacing-200);
-}
-
-.search-view-root .masthead {
-  flex: 1;
 }
 
 .coglib-prism-theme {
@@ -324,16 +313,17 @@ th, td {
   border: none;
 }
 textarea.coglib-prism-theme {
-  padding-top: var(--toolbar-height, 1em);
-  padding-right: 1em;
-  padding-left: 1em;
-  padding-bottom: 1em;
+  padding: var(--toolbar-height, 1em) 1em 1em;
   margin: 0.5em 0;
 }
 
 .search-view-root {
   display: flex;
   flex-direction: row;
+
+  .masthead {
+    flex: 1;
+  }
 }
 
 .example-query {

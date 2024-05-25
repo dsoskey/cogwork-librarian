@@ -348,12 +348,12 @@ export const useCogDB = (): CogDB => {
     if (missingDBIndexes.length === 0) return result
 
     const toCheckScryfall = missingDBIndexes
-      .map(index => Scryfall.CardIdentifier.byId(cubeList[index].print_id));
+      .map(index => Scryfall.CardIdentifier.byId(cubeList[missingMemoryIndices[index]].print_id));
     const scryfallCards = await Scryfall.Cards.collection(...toCheckScryfall).waitForAll();
     if (scryfallCards.not_found.length) return Promise.reject(scryfallCards.not_found);
 
     for (let i = 0; i < missingDBIndexes.length; i++){
-      const index = missingDBIndexes[i]
+      const index = missingMemoryIndices[missingDBIndexes[i]]
       result[index] = normCardList([scryfallCards[i]])[0];
     }
     return result

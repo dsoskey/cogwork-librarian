@@ -16,7 +16,7 @@ interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]
 }
 export const useMemoryQueryRunner = ({ corpus }: MemoryQueryRunnerProps): CoglibQueryRunner => {
-  const { status, report, result, rawData, execute, aggregateVenn, errors } =
+  const { status, report, result, reset, rawData, execute, aggregateVenn, errors } =
     useQueryCoordinator()
   const [runStrategy, setRunStrategy] = useState<RunStrategy>(RunStrategy.Search)
   const searchCards = useMemo(() => {
@@ -111,6 +111,7 @@ export const useMemoryQueryRunner = ({ corpus }: MemoryQueryRunnerProps): Coglib
     generateVenn: aggregateVenn(runVennQuery),
     runStrategy,
     result,
+    reset,
     status,
     report,
     errors,

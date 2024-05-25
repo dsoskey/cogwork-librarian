@@ -10,23 +10,11 @@ export interface InputProps extends HTMLAttributes<HTMLInputElement> {
   language?: Language
 }
 
-const linkKeys = ['Meta', 'Control']
 export const Input = ({ value, onChange, language, ...rest }: InputProps) => {
   const controller = useRef<HTMLInputElement>()
   const faker = useRef<HTMLPreElement>()
   const linker = useRef<HTMLPreElement>()
   const [revealLinks, setRevealLinks] = useState<boolean>(false)
-  const showLinks = (event) => {
-    if (linkKeys.includes(event.key)) {
-      setRevealLinks(true)
-    }
-  }
-  const hideLinks = (event) => {
-    if (linkKeys.includes(event.key)) {
-      setRevealLinks(false)
-      controller.current.focus()
-    }
-  }
   const onScroll = (event) => {
     faker.current.scrollLeft = event.target.scrollLeft
     linker.current.scrollLeft = event.target.scrollLeft
@@ -38,8 +26,17 @@ export const Input = ({ value, onChange, language, ...rest }: InputProps) => {
     return () => controller.current?.removeEventListener('scroll', onScroll)
   }, [])
 
+  const handleDown = (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === '\\') {
+      setRevealLinks(prev => !prev)
+      if (revealLinks) {
+        controller.current.focus()
+      }
+    }
+  }
+
   return (
-    <div className='query-editor query-input' onKeyDown={showLinks} onKeyUp={hideLinks}>
+    <div className='query-editor query-input' onKeyDown={handleDown}>
       <code ref={linker}
         tabIndex={-1}
         aria-hidden

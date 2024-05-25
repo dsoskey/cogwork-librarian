@@ -5,6 +5,7 @@ import {
 } from 'mtgql'
 import { cogDB as cogDBClient, cogDB } from '../local/db'
 import { importCubeArtisan } from '../cubeartisan/cubeListImport'
+import * as Scryfall from 'scryfall-sdk'
 
 self.onmessage = (_event) => {
   const event = _event.data
@@ -93,13 +94,7 @@ async function searchCubeArtisan(cubeIds: string[]) {
     return
   }
 
-  const newOracles = (await cogDBClient.card.bulkGet(Array.from(foundOracleIds))) ?? [];
-  const printToOracleId: { [key: string]: string } = {}
-  for (const oracle of newOracles) {
-    for (const print of oracle.printings) {
-      printToOracleId[print.id] = oracle.oracle_id
-    }
-  }
+  const printToOracleId = await generatePrintToOracleId(foundCubes, foundOracleIds)
 
   const last_updated = new Date()
   const cubeDefinitions: CubeDefinition[] = Object.entries(foundCubes)
@@ -122,4 +117,40 @@ async function searchCubeArtisan(cubeIds: string[]) {
   await cogDB.cube.bulkPut(cubeDefinitions)
 
   postMessage({ type: "end" })
+}
+
+async function generatePrintToOracleId(
+  foundCubes: { [cubeId: string]: string[] },
+  foundOracleIds: Set<string>
+): Promise<{ [key: string]: string }> {
+  const result: { [key: string]: string } = {}
+  const oracleIdsToSearch = Array.from(foundOracleIds)
+  const newOracles = (await cogDBClient.card.bulkGet(oracleIdsToSearch)) ?? [];
+  const missingDBIndexes = newOracles
+    .map((card, index) => card === undefined ? index : -1)
+    .filter(index => index !== -1)
+
+  if (missingDBIndexes.length === 0) {
+    for (const oracle of newOracles) {
+      for (const print of oracle?.printings) {
+        result[print.id] = oracle.oracle_id
+      }
+    }
+    return result
+  }
+
+  const toCheckScryfall = Array.from(
+    new Set(Object.values(foundCubes).flat())
+  ).map((id => Scryfall.CardIdentifier.byId(id)));
+  const scryfallCards = await Scryfall.Cards.collection(...toCheckScryfall).waitForAll();
+
+  // todo: test
+  if (scryfallCards.not_found.length) {
+    throw Error(`Scryfall DB Missing ${scryfallCards.not_found.length} cards`)
+  }
+
+  for (const card of scryfallCards) {
+    result[card.id] = card.oracle_id
+  }
+  return result;
 }

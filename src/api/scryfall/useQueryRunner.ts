@@ -39,7 +39,7 @@ export const useScryfallQueryRunner = ({
   getWeight = weightAlgorithms.uniform,
   injectPrefix,
 }: QueryRunnerProps): QueryRunner => {
-  const { status, result, report, cache, rawData, execute, errors } =
+  const { status, result, reset, report, cache, rawData, execute, errors } =
     useQueryCoordinator()
 
   const runQuery: QueryRunnerFunc = (
@@ -100,6 +100,7 @@ export const useScryfallQueryRunner = ({
   return {
     run: execute(runQuery),
     result,
+    reset,
     status,
     report,
     errors,

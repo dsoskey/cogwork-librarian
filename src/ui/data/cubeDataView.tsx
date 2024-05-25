@@ -105,7 +105,7 @@ export const CubeDataView = () => {
       />
     ) : undefined
 
-  return <div className='data-view-root'>
+  return <>
     <h2>cubes</h2>
     <p>local <code className='language-scryfall-extended'>cube:</code> queries match against these cube ids</p>
 
@@ -165,5 +165,5 @@ export const CubeDataView = () => {
       <button onClick={handleOverwrite}>overwrite cube</button>
     </div>}
   </section>
-  </div>
+  </>
 }

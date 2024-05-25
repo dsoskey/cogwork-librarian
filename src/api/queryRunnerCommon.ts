@@ -52,6 +52,7 @@ export interface QueryRunner extends QueryHandler {
     injectPrefix: (query:string) => string,
     getWeight: (index:number) => number,
   ) => Promise<void>
+  reset: () => void
   generateVenn?: (
     left: string, right: string, subs: string[],
     options: SearchOptions,
