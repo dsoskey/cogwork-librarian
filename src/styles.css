@@ -62,7 +62,7 @@
   --red: hsl(0, 100%, 37%);
   --border-radius: 2px;
   --card-border-radius: 4.75% / 3.5%;
-  --card-apect-ratio: 2.5/3.5;
+  --card-aspect-ratio: 2.5/3.5;
 
   --spacing-100: 2px;
   --spacing-200: 4px;
@@ -83,6 +83,10 @@ a {
 }
 a:hover {
   color: var(--active);
+}
+
+.margin-200 {
+  margin: var(--spacing-300);
 }
 
 body {
@@ -238,6 +242,10 @@ th, td {
   flex-wrap: wrap;
 }
 
+.row.wrap-reverse {
+  flex-wrap: wrap-reverse;
+}
+
 .row.top {
   align-items: start;
 }
@@ -268,6 +276,7 @@ th, td {
 }
 
 .input-link,
+.cube-subroutes a,
 .masthead a {
   color: var(--active-mid-alpha);
   text-decoration: none;
@@ -280,6 +289,7 @@ th, td {
 
 
 .input-link:hover,
+.cube-subroutes a:hover,
 .masthead a:hover {
   color: var(--dark-color);
   background-color: var(--active-mid-alpha);
@@ -287,6 +297,7 @@ th, td {
 }
 
 .input-link.active-link, .input-link:focus-visible,
+.cube-subroutes .active-link, .cube-subroutes a:focus-visible,
 .masthead .active-link, .masthead a:focus-visible {
   color: var(--dark-color);
   background-color: var(--active);

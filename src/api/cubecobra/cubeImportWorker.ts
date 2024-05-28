@@ -1,10 +1,10 @@
 import { importCubeCobra } from './cubeListImport'
 import {
-  CubeDefinition, ExternalCubeSource,
+  ExternalCubeSource,
   CubeCard
 } from 'mtgql'
-import { cogDB as cogDBClient, cogDB } from '../local/db'
-import { importCubeArtisan } from '../cubeartisan/cubeListImport'
+import { CogCubeDefinition, cogDB as cogDBClient, cogDB } from '../local/db'
+import { CubeArtisanImportData, importCubeArtisan } from '../cubeartisan/cubeListImport'
 import * as Scryfall from 'scryfall-sdk'
 
 self.onmessage = (_event) => {
@@ -33,7 +33,7 @@ async function searchCubes({ cubeIds, source }: SearchInput) {
 async function searchCubeCobra(cubeIds: string[]) {
   const last_updated = new Date()
   const missingCubes: string[] = []
-  const cubeDefinitions: CubeDefinition[] = [];
+  const cubeDefinitions: CogCubeDefinition[] = [];
   const results = await Promise.allSettled(cubeIds.map(importCubeCobra))
 
   for (let i = 0; i < results.length; i++) {
@@ -41,14 +41,17 @@ async function searchCubeCobra(cubeIds: string[]) {
     const result = results[i]
 
     if (result.status === "fulfilled") {
-      const cards = result.value;
+      const { cards, name, description, last_source_update, cover_image, created_by } = result.value;
       cubeDefinitions.push({
         key: cubeId,
-        cards,
+        cards, created_by,
+        name, description,
+        cover_image,
         oracle_ids: cards.map(it => it.oracle_id),
         print_ids: cards.map(it => it.print_id),
         source: "cubecobra",
         last_updated,
+        last_source_update,
       })
     } else {
       missingCubes.push(cubeId)
@@ -70,7 +73,7 @@ async function searchCubeCobra(cubeIds: string[]) {
 }
 
 async function searchCubeArtisan(cubeIds: string[]) {
-  const foundCubes: { [cubeId: string]: string[] } = {}
+  const foundCubes: { [cubeId: string]: CubeArtisanImportData } = {}
   const foundOracleIds = new Set<string>()
   const results = await Promise.allSettled(cubeIds.map(importCubeArtisan))
   const missingCubes: string[] = []
@@ -80,7 +83,7 @@ async function searchCubeArtisan(cubeIds: string[]) {
     const result = results[i]
 
     if (result.status === "fulfilled") {
-      foundCubes[cubeId] = result.value.printIds
+      foundCubes[cubeId] = result.value
       for (const line of result.value.oracleIds) {
         foundOracleIds.add(line)
       }
@@ -97,14 +100,15 @@ async function searchCubeArtisan(cubeIds: string[]) {
   const printToOracleId = await generatePrintToOracleId(foundCubes, foundOracleIds)
 
   const last_updated = new Date()
-  const cubeDefinitions: CubeDefinition[] = Object.entries(foundCubes)
-    .map(([key, printIds]) => {
-      const cards: CubeCard[] = printIds.map(it => ({ oracle_id: printToOracleId[it], print_id: it }))
+  const cubeDefinitions: CogCubeDefinition[] = Object.entries(foundCubes)
+    .map(([key, cubeInfo]) => {
+      const cards: CubeCard[] = cubeInfo.printIds.map(it => ({ oracle_id: printToOracleId[it], print_id: it }))
       return {
         key,
+        ...cubeInfo,
         cards,
         oracle_ids: cards.map(it => it.oracle_id),
-        print_ids: printIds,
+        print_ids: cubeInfo.printIds,
         source: "cubeartisan",
         last_updated,
       }
@@ -120,7 +124,7 @@ async function searchCubeArtisan(cubeIds: string[]) {
 }
 
 async function generatePrintToOracleId(
-  foundCubes: { [cubeId: string]: string[] },
+  foundCubes: { [cubeId: string]: CubeArtisanImportData },
   foundOracleIds: Set<string>
 ): Promise<{ [key: string]: string }> {
   const result: { [key: string]: string } = {}
@@ -140,7 +144,7 @@ async function generatePrintToOracleId(
   }
 
   const toCheckScryfall = Array.from(
-    new Set(Object.values(foundCubes).flat())
+    new Set(Object.values(foundCubes).flatMap(it => it.printIds))
   ).map((id => Scryfall.CardIdentifier.byId(id)));
   const scryfallCards = await Scryfall.Cards.collection(...toCheckScryfall).waitForAll();
 

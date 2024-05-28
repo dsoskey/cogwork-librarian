@@ -59,7 +59,7 @@ export const App = () => {
                     {pathname !== "/" && <DefaultLayout>
                       <Routes>
                         <Route path="/data/cube/*" element={<CubeRedirect />} />
-                        <Route path="/cube/:key" element={<CubeView />} />
+                        <Route path="/cube/:key/*" element={<CubeView />} />
                         <Route path='/data/card' element={<CardDataView />}/>
                         <Route path='/cube' element={<CubeDataView />}/>
                         <Route

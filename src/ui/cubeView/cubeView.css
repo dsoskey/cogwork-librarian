@@ -4,7 +4,7 @@
 
 .cube-view-root {
     .header {
-        margin: 0 var(--spacing-300) var(--spacing-300);
+        margin: 0 var(--spacing-300);
         display: flex;
         flex-direction: column;
         gap: var(--spacing-200);
@@ -33,8 +33,50 @@
             width: 17rem;
         }
     }
+
+    .description-not-found {
+        margin: var(--spacing-300);
+    }
 }
 
 .cube-db-status {
     width: 500px;
+}
+
+.cube-overview {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    gap: var(--spacing-200);
+
+    .cube-description {
+        margin: 0;
+        padding: var(--spacing-300);
+        background-color: var(--darker-color);
+    }
+
+    img.cover-image {
+        max-width: 33vw;
+        border: var(--darker-color) inset 2px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cube-overview {
+        flex-wrap: wrap;
+
+        img.cover-image {
+            max-width: 95vw;
+        }
+    }
+}
+
+.card-row > * {
+    width: 33%;
+    aspect-ratio: var(--card-aspect-ratio);
+}
+
+
+.card-image-container span {
+    font-size: 5em;
 }

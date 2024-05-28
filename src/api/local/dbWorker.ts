@@ -20,12 +20,12 @@ self.onmessage = (_event) => {
   switch (event.type) {
     case 'load': {
       const { filter } = event.data;
-      loadDb(filter).catch(e => postMessage({ type: 'error', data: e.toString() }))
+      sendCardDBToMemory(filter).catch(e => postMessage({ type: 'error', data: e.toString() }))
       break;
     }
     case 'init': { // idea: this event data has manifest OR type name to fetch
       const { bulkType, targets, filter } = event.data
-      initDb(bulkType ?? 'default_cards', targets, filter)
+      initOfficialDB(bulkType ?? 'default_cards', targets, filter)
         .catch(e => postMessage({ type: 'error', data: e.toString() }))
       break;
     }
@@ -41,23 +41,21 @@ self.onmessage = (_event) => {
   }
 }
 
-async function loadDb(filter?: string) {
+async function sendCardDBToMemory(filter?: string) {
   let index = 0
   let found = 0;
   console.debug("pulling collection")
   const manifest  = await cogDB.collection.get("the_one")
   postMessage({ type: 'manifest', data: manifest })
 
-  const count = await cogDB.card.count()
+  const count = (await cogDB.card.count()) + (await cogDB.customCard.count())
   postMessage({ type: 'count', data: count })
   const node: FilterNode = filter ?
     await QueryRunner.parseFilterNode(MQLParser, new CachingFilterProvider(cogDB), filter)
       .unwrapOr(identityNode()) :
     identityNode();
 
-  console.log(node)
-
-  await cogDB.card.each(card => {
+  const processCard = (card: NormedCard) =>  {
     index++
     if (node.filterFunc(card)) {
       const printings = [];
@@ -71,12 +69,15 @@ async function loadDb(filter?: string) {
         postMessage({ type: 'card', data: { card: {...card, printings}, index } })
       }
     }
-  })
+  }
+  await cogDB.card.each(processCard)
+  await cogDB.customCard.each(processCard)
+
   postMessage({ type: 'count', data: found })
   postMessage({ type: 'end' })
 }
 
-async function initDb(type: BulkDataType, targets: ImportTarget[], filter?: string) {
+async function initOfficialDB(type: BulkDataType, targets: ImportTarget[], filter?: string) {
   if (targets.length === 0) {
     throw Error("No targets specified!")
   }
@@ -171,5 +172,4 @@ async function loadBlocks() {
   postMessage({ type: "blocks-downloaded", data: sets.length })
   await cogDB.block.bulkPut(sets)
   postMessage({ type: "blocks-end" })
-
 }

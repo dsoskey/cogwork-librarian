@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import { DOUBLE_FACED_LAYOUTS, Card, ImageUris } from 'mtgql'
 import "./cardImage.css"
 import { FlagContext } from '../../flags'
+
 const getBackImageURI = (card: Card, version: keyof ImageUris) => {
   return card.card_faces.length === 1
     ? ''
@@ -9,13 +10,15 @@ const getBackImageURI = (card: Card, version: keyof ImageUris) => {
 }
 
 function getFrontImageURI(card: Card, version: keyof ImageUris): string | undefined {
-  return card.card_faces[0].image_uris?.[version]
+  if (!card.card_faces) return undefined;
+  return card.card_faces[0]?.image_uris?.[version]
     ?? card.image_uris?.[version];
 }
 
 interface CardImageProps {
   card: Card
 }
+
 export const CardImage = ({ card }: CardImageProps) => {
   const { edhrecOverlay } = useContext(FlagContext).flags
   const [flipped, setFlipped] = useState(false)
@@ -27,7 +30,7 @@ export const CardImage = ({ card }: CardImageProps) => {
   const imageSource = flipped
     ? getBackImageURI(card, version)
     : card.image_uris?.normal ?? getFrontImageURI(card, version)
-  return <div className='card-image'>
+  return <div className={`card-image ${card.set}`}>
     <img
       width='100%'
       src={imageSource}

@@ -1,6 +1,6 @@
 .custom-card-render {
     position:relative;
-    aspect-ratio: var(--card-apect-ratio);
+    aspect-ratio: var(--card-aspect-ratio);
     border-radius: var(--card-border-radius);
     --w: peachpuff;
     --w-text: #222;

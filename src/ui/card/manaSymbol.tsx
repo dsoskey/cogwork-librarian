@@ -67,5 +67,5 @@ interface ManaIconProps {
   symbol: ManaSymbol
 }
 export const ManaIcon = ({ symbol }: ManaIconProps) => {
-  return <i className={`ms ms-${symbolToClassName[symbol] ?? symbol} ms-cost ms-shadow`}/>
+  return <i className={`ms ms-${symbolToClassName[symbol.toLowerCase()] ?? symbol.toLowerCase()} ms-cost ms-shadow`}/>
 }

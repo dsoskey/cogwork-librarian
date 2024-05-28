@@ -1,8 +1,8 @@
-import { CubeCard } from 'mtgql'
+import { CogCubeDefinition } from '../local/db'
 
 
 const URL_BASE = "https://cubecobra.com/cube/api/cubeJSON/"
-export async function importCubeCobra(cubeId: string): Promise<CubeCard[]> {
+export async function importCubeCobra(cubeId: string): Promise<Partial<CogCubeDefinition>> {
   const response = await fetch(`${URL_BASE}${cubeId}`)
 
   const json = await response.json();
@@ -12,5 +12,15 @@ export async function importCubeCobra(cubeId: string): Promise<CubeCard[]> {
 
   }))
   console.debug(json);
-  return cards;
+  return {
+    name: json.name,
+    cover_image: {
+      uri: json.image.uri,
+      artist: json.image.artist,
+    },
+    created_by: json.owner.username,
+    last_source_update: new Date(json.date),
+    description: json.description,
+    cards,
+  };
 }

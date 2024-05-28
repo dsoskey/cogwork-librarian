@@ -56,7 +56,7 @@ export const Masthead = () => {
         <DatabaseLink active={pathname === '/data/card'} />
 
         <Dropdown
-          className={pathname.startsWith("/data/cube") ? "active-link" : ""}
+          className={pathname.startsWith("/cube") ? "active-link" : ""}
           options={(close) =>
             lastVistedCubes.length > 0
               ? lastVistedCubes.map(it => <Link key={it} to={`/data/cube/${it}`} onClick={close}>{it}</Link>)

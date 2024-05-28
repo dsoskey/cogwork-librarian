@@ -6,6 +6,18 @@ import { Project } from './types/project'
 import { RunStrategy } from '../queryRunnerCommon'
 import { ThemeDefinition } from './types/theme'
 
+export interface CoverImage {
+  uri: string
+  artist: string
+}
+export interface CogCubeDefinition extends CubeDefinition {
+  name: string
+  created_by: string
+  description: string
+  cover_image?: CoverImage
+  last_source_update: Date
+}
+
 export interface Collection {
   id: string // used for NormedCard.collectionId
   name: string
@@ -55,9 +67,8 @@ export class TypedDexie extends Dexie implements DataProvider {
   collection!: Table<Collection>
 
   card!: Table<NormedCard>
-
-  cube!: Table<CubeDefinition>
-
+  customCard!: Table<NormedCard>
+  cube!: Table<CogCubeDefinition>
   oracleTag!: Table<OracleTag>
   illustrationTag!: Table<IllustrationTag>
   block!: Table<Block>
@@ -77,6 +88,23 @@ export class TypedDexie extends Dexie implements DataProvider {
       }
       return it
     })
+
+  getCardByNameId = async (name: string, id: string) => {
+    let res = await cogDB.card.where("name").equals(name).toArray();
+    if (res.length === 0)
+      res = await cogDB.card.where("name").startsWith(`${name} /`).toArray();
+    if (res.length === 0)
+      res = await cogDB.card.where("name").equalsIgnoreCase(name).toArray();
+    if (res.length === 0)
+      res = await cogDB.card.where("name").startsWithIgnoreCase(`${name} /`).toArray();
+    if (res.length === 0) return undefined;
+    const card = res.length > 1
+      ? res.find(card => card.printings.find(it => it.id === id)) ?? res[0]
+      : res[0];
+
+    const printing = card.printings.find(it => it.id === id) ?? card.printings[0]
+    return { ...card, ...printing }
+  }
 
   constructor() {
     super('cogwork-librarian')
@@ -181,6 +209,27 @@ export class TypedDexie extends Dexie implements DataProvider {
 
     this.version(13).stores({
       theme: 'name, createdAt, updatedAt'
+    })
+
+    this.version(14).stores({
+      customCard: 'oracle_id, name, collectionId',
+    })
+
+    this.version(15).stores({
+      cube: 'key, name',
+    }).upgrade(trans => {
+      return trans.table("cube").toCollection()
+        .modify(c => {
+          if (c.name === undefined) {
+            c.name = c.key
+          }
+          if (c.description === undefined) {
+            c.description = ""
+          }
+          if (c.created_by === undefined) {
+            c.created_by = ""
+          }
+        })
     })
   }
 }

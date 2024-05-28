@@ -1,0 +1,15 @@
+.card-link {
+    text-decoration: underline;
+    cursor: pointer;
+}
+.card-link.active,
+.card-link:hover {
+    color: var(--active);
+}
+
+.popup-container {
+    z-index: 20;
+}
+.popup-container * {
+    max-height: 45svh;
+}

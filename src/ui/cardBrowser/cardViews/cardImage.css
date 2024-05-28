@@ -1,3 +1,7 @@
+.card-image {
+    position: relative;
+}
+
 .card-image img {
     clip-path: inset(0 0 0 0 round var(--card-border-radius));
     box-shadow: var(--spacing-200) var(--gray-68);
@@ -7,6 +11,10 @@
     bottom: 0;
     right: 0;
     left: 0;
+}
+
+.card-image.lea img {
+    clip-path: inset(0 0 0 0 round 7% / 5.5%);
 }
 
 .flip-button {

@@ -1,12 +1,13 @@
-import { Card, CubeDefinition, NormedCard } from 'mtgql'
+import { Card, NormedCard } from 'mtgql'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { CogDBContext } from '../../api/local/useCogDB'
-import { cogDB as cogDBClient, Manifest } from '../../api/local/db'
+import { CogCubeDefinition, cogDB as cogDBClient, Manifest } from '../../api/local/db'
 import { Link } from 'react-router-dom'
 import { useParams } from 'react-router'
 import { useKeyValList } from '../hooks/useKeyValList'
 import _groupBy from 'lodash/groupBy'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Setter } from '../../types'
 
 export interface OrderedCard extends Card {
   index: number
@@ -30,11 +31,13 @@ function LoadingError({ cardCount, refreshCubeCards }) {
 }
 
 export interface CubeViewModel {
-  cube: CubeDefinition | undefined | null
+  cube: CogCubeDefinition | undefined | null
   cards: OrderedCard[]
   loadingError: React.ReactNode,
   oracleList: NormedCard[]
   oracleMap: { [k: string]: NormedCard[] }
+  activeCard: OrderedCard | undefined
+  setActiveCard: Setter<OrderedCard | undefined>
 }
 
 export function useCubeViewModel(): CubeViewModel {
@@ -43,6 +46,7 @@ export function useCubeViewModel(): CubeViewModel {
   const [loadingError, setLoadingError] = useState<React.ReactNode>(undefined)
   const [cards, setCards] = useState<OrderedCard[]>([])
   const [oracleList, oracleMap, setOracles] = useKeyValList<NormedCard>(list => _groupBy(list, 'oracle_id'))
+  const [activeCard, setActiveCard] = useState<OrderedCard | undefined>();
 
   // highly cursed, don't do this lol
   const cube = useLiveQuery(() => cogDBClient.getCube(key), [key, dbStatus], null)
@@ -112,7 +116,8 @@ export function useCubeViewModel(): CubeViewModel {
 
   return {
     cards, cube, loadingError,
-    oracleList, oracleMap
+    oracleList, oracleMap,
+    activeCard, setActiveCard,
   }
 }
 

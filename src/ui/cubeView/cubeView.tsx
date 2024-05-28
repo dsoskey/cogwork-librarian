@@ -1,30 +1,22 @@
-import React, { KeyboardEvent, useContext, useMemo, useState } from 'react'
-import _sortBy from 'lodash/sortBy'
-import { Card, SearchOptions, SortFunctions } from 'mtgql'
+import React, { useContext } from 'react'
 import { cogDB as cogDBClient } from '../../api/local/db'
 import { CardImageView } from '../cardBrowser/cardViews/cardImageView'
 import './cubeView.css'
-import { Input } from '../component/input'
 import { CUBE_SOURCE_TO_LABEL, cubeLink } from '../component/cube/sourceIcon'
 import { Modal } from '../component/modal'
 import { RefreshButton } from '../component/cube/refreshButton'
 import { ScryfallIcon } from '../component/scryfallIcon'
 import { LoaderText } from '../component/loaders'
-import { Multiselect } from '../component/multiselect'
-import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { CopyToClipboardButton } from '../component/copyToClipboardButton'
-import { CardsPerRowControl } from '../component/cardsPerRowControl'
-import { useViewportListener } from '../viewport'
-import { useMemoryQueryRunner } from '../../api/local/useQueryRunner'
-import { parseQuerySet } from '../../api/mtgql-ep/parser'
-import { RunStrategy } from '../../api/queryRunnerCommon'
-import { Setter } from '../../types'
 import { CubeNotFoundView } from './notFoundView'
 import {
   CubeViewModelContext,
-  OrderedCard,
   useCubeViewModel
 } from './useCubeViewModel'
+import { Route, Routes, useLocation } from 'react-router'
+import { CubeOverview } from './cubeOverview'
+import { CubeList } from './cubeList'
+import { Link } from 'react-router-dom'
 
 const shareButtonText = {
   unstarted: '🔗',
@@ -32,38 +24,9 @@ const shareButtonText = {
   error: '🚫',
 }
 
-function isCreature(card: OrderedCard): number {
-  if (card.type_line.includes("Creature")) return 0
-  return 1
-}
-function byEdhrecRank(card: Card) {
-  return card.edhrec_rank ?? Number.MAX_VALUE
-}
-
-const orderValToKey = {
-  color_id: SortFunctions.byColorId,
-  usd: SortFunctions.byUsd,
-  color: SortFunctions.byColor,
-  released: SortFunctions.byReleased,
-  rarity: SortFunctions.byRarity,
-  edhrec: byEdhrecRank,
-  creatures_first: isCreature,
-}
-
-const SORT_OPTIONS = [
-  // Defaults
-  "color_id", 'cmc', "creatures_first", 'type_line', 'name',
-  "usd", "eur", "tix",
-  "color",
-  "released",
-  "rarity",
-  "edhrec",
-]
-
 export function CubeView() {
   const cubeViewModel = useCubeViewModel();
-  const { cube, oracleMap } = cubeViewModel;
-  const [activeCard, setActiveCard] = useState<OrderedCard | undefined>();
+  const { cube, oracleMap, activeCard, setActiveCard } = cubeViewModel;
 
   const onPrintSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const normedCard = oracleMap[activeCard.oracle_id][0]
@@ -94,7 +57,7 @@ export function CubeView() {
     <div className='cube-view-root'>
       {cube === null && <div className='header'><h2><LoaderText /></h2></div>}
       {cube === undefined && <CubeNotFoundView />}
-      {cube && <CubeModelView setActiveCard={setActiveCard} />}
+      {cube && <CubeModelView />}
     </div>
     <Modal
       open={activeCard !== undefined}
@@ -124,156 +87,45 @@ export function CubeView() {
   </CubeViewModelContext.Provider>
 }
 
-
-const options: SearchOptions = {
-  order: 'cmc',
-  dir: 'auto',
-}
-
-interface CubeModelViewProps {
-  setActiveCard: Setter<OrderedCard | undefined>
-}
-function CubeModelView({ setActiveCard }: CubeModelViewProps) {
-  const viewport = useViewportListener();
-  const { cube, cards, oracleList, loadingError } = useContext(CubeViewModelContext);
-  const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
-  const queryRunner = useMemoryQueryRunner({ corpus: oracleList });
-
-  const execute = (queries: string[], baseIndex: number) => {
-    parseQuerySet(queries, baseIndex)
-      .map(({ strategy, queries, getWeight, injectPrefix }) => {
-        const executedAt = new Date();
-        let promise
-        if (strategy === RunStrategy.Venn && queryRunner.generateVenn !== undefined) {
-          const [left, right, ...rest] = queries
-          promise = queryRunner.generateVenn(left, right, rest, options, getWeight)
-        } else {
-          promise = queryRunner.run(queries, options, injectPrefix, getWeight)
-        }
-        promise.then(() =>
-          cogDBClient.history.put({
-            rawQueries: queries,
-            baseIndex,
-            source: 'local',
-            strategy,
-            executedAt,
-            projectPath: `/.coglib/cube/${cube.key}`,
-          })
-        ).catch(error => {
-          console.error(error)
-          cogDBClient.history.put({
-            rawQueries: queries,
-            baseIndex,
-            source: 'local',
-            strategy,
-            errorText: error.toString(),
-            executedAt,
-            projectPath: `/.coglib/cube/${cube.key}`,
-          })
-        })
-      })
-  }
-  const applySimpleFilter = (query: string) => {
-    execute([query], 0);
-  }
-
-  const [ordering, setOrdering] = useLocalStorage<any[]>(
-    "cube-sort.coglib.sosk.watch",
-    ["color_id", 'cmc', "creatures_first", 'type_line', 'name']
-  )
-  const sorted: OrderedCard[] = useMemo(() => {
-    const _cards = queryRunner.status === "success"
-      // grossly inefficient
-      ? queryRunner.result.map(it => it.data)
-      : cards;
-    return _sortBy(_cards, ordering.map(it => orderValToKey[it] ?? it),
-    ) as OrderedCard[]
-  }, [queryRunner.result, cards, ordering])
+function CubeModelView() {
+  const { cube } = useContext(CubeViewModelContext);
+  const { pathname } = useLocation()
 
   return <>
     <div className='header'>
-      <h2>{cube.key}</h2>
-      {/*{runner.status === "error" && <div className="alert">{searchError.message}</div>}*/}
-      {<div>
-        a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube
-        from{" "}
-        {cube.source !== "list" && <>
-          <a href={cubeLink(cube)}
+      <div className="row baseline wrap">
+        <h2>{cube.name}</h2>
+        <em>
+          — a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube
+          from{" "}
+          {cube.source !== "list" && <a href={cubeLink(cube)}
              rel='noreferrer'
              target='_blank'>
             {CUBE_SOURCE_TO_LABEL[cube.source]}
-          </a>
+          </a>}
+          {cube.source === "list" && "a text list"}
+        </em>
+      </div>
+      <div className="cube-subroutes row">
+        <Link to={`/cube/${cube.key}`} className={pathname === `/cube/${cube.key}` ? "active-link" : ""}>overview</Link>
+        <Link to={`/cube/${cube.key}/list`} className={pathname === `/cube/${cube.key}/list` ? "active-link" : ""}>list</Link>
+        <div>
+          {cube.source !== "list" && <>
+            <CopyToClipboardButton
+              copyText={`${window.location.protocol}//${window.location.host}/data/cube/${cube.key}?source=${cube.source}`}
+              title={`copy share link to keyboard`}
+              buttonText={shareButtonText}
+            />
+            <RefreshButton toSubmit={[cube]} />
+          </>}
           {" "}
-          <RefreshButton toSubmit={[cube]} />
-          <CopyToClipboardButton
-            copyText={`${window.location.protocol}//${window.location.host}/data/cube/${cube.key}?source=${cube.source}`}
-            title={`copy share link to keyboard`}
-            buttonText={shareButtonText}
-          />
-        </>}
-        {cube.source === "list" && "a text list"}
-        {" "}
-        <strong>last updated:</strong> {cube.last_updated?.toLocaleString() ?? "~"}
-      </div>}
-      <SimpleFilterAndSort
-        ordering={ordering} setOrdering={setOrdering}
-        applyFilter={applySimpleFilter}
-        clearFilter={queryRunner.reset}
-        canClear={queryRunner.status !== "unstarted"}
-      />
-      {viewport.width > 1024 && <CardsPerRowControl setCardsPerRow={setCardsPerRow} cardsPerRow={cardsPerRow} />}
-      {queryRunner.status === "success" && <div>filter matched {queryRunner.result.length} of {cube.print_ids.length}</div>}
-      {cards.length === 0
-        && queryRunner.status !== "error"
-        && loadingError === undefined
-        && <LoaderText text="Loading cards"/>}
-      {loadingError}
+          <strong>last updated:</strong> {cube.last_updated?.toLocaleString() ?? "~"}
+        </div>
+      </div>
     </div>
-    {sorted.length > 0 && queryRunner.status !== 'error' && <div className='result-container'>
-      {sorted.map((card, index) =>
-        <CardImageView
-          key={card.id + index.toString()}
-          className={`_${cardsPerRow}`}
-          card={{ data: card, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
-          onClick={() => setActiveCard(card)}
-        />)}
-    </div>}
-  </>
-}
-
-interface SimpleFilterAndSortProps {
-  ordering: any[]
-  setOrdering: Setter<any[]>
-  applyFilter: (query: string) => void;
-  clearFilter: () => void;
-  canClear: boolean
-}
-function SimpleFilterAndSort({ ordering, setOrdering, applyFilter, clearFilter, canClear }: SimpleFilterAndSortProps) {
-  const [filterQuery, setFilterQuery] = useState<string>("")
-
-  const apply = () => applyFilter(filterQuery)
-
-  const handleEnter = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") apply();
-  }
-  return <>
-    <div className="cube-filter row center">
-      <label className='row center'>
-        <strong>filter: </strong>
-        <Input language="scryfall" value={filterQuery} onChange={e => setFilterQuery(e.target.value)} onKeyDown={handleEnter} />
-      </label>
-      <button onClick={apply} disabled={filterQuery.length === 0}>Apply filter</button>
-      <button onClick={clearFilter} disabled={!canClear}>Clear filter</button>
-    </div>
-    <Multiselect
-      optionTransform={it => it.replace(/_/g, " ")}
-      labelComponent={<strong>sort: </strong>} value={ordering} setValue={setOrdering}>
-      {SORT_OPTIONS.map(value => {
-        return <option key={value} value={value}>
-          {value.replace(/_/g, " ")}
-          {ordering.find(it => it === value) && " \u2714"}
-        </option>
-      })}
-    </Multiselect>
+    <Routes>
+      <Route path="/list" element={<CubeList />}/>
+      <Route path="" element={<CubeOverview />}/>
+    </Routes>
   </>
 }

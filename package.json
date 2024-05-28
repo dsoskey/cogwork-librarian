@@ -66,12 +66,17 @@
     "webpack-dev-server": "^4.3.1"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.26.16",
     "axios": "^1.6.0",
     "date-fns": "^2.30.0",
     "dexie": "^3.2.2",
     "dexie-react-hooks": "^1.1.6",
     "lodash": "^4.17.21",
     "mana-font": "^1.15.4",
+    "micromark-factory-space": "^2.0.0",
+    "micromark-util-character": "^2.1.0",
+    "micromark-util-chunked": "^2.0.0",
+    "micromark-util-symbol": "^2.0.0",
     "moo": "^0.5.2",
     "mtgql": "^1.3.4",
     "nearley": "^2.20.1",
@@ -87,8 +92,10 @@
     "react-markdown": "^8.0.7",
     "react-router-dom": "^6.16.0",
     "remark": "^15.0.1",
+    "remark-breaks": "^4.0.0",
     "remark-gfm": "^3.0.1",
     "scryfall-sdk": "^4.2.0",
+    "unist-util-visit": "^5.0.0",
     "uuid": "^9.0.0"
   }
 }

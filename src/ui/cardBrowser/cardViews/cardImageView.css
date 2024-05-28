@@ -1,14 +1,10 @@
 .card-view {
     position: relative;
-    aspect-ratio: var(--card-apect-ratio);
+    aspect-ratio: var(--card-aspect-ratio);
     border-radius: var(--card-border-radius);
 
     :focus-visible {
         outline: unset;
-    }
-
-    .lea img {
-        clip-path: inset(0 0 0 0 round 7% / 5.5%);
     }
 
     .detail {
