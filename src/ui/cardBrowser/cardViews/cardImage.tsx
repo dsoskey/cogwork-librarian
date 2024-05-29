@@ -20,31 +20,54 @@ interface CardImageProps {
 }
 
 export const CardImage = ({ card }: CardImageProps) => {
-  const { edhrecOverlay } = useContext(FlagContext).flags
-  const [flipped, setFlipped] = useState(false)
-  const onFlipCLick = e => {
+  const { edhrecOverlay } = useContext(FlagContext).flags;
+  const [transformed, setTransformed] = useState(false);
+  const [flipped, setFlipped] = useState(false);
+  const canTransform = DOUBLE_FACED_LAYOUTS.includes(card.layout)
+  const onTransformCLick = e => {
     e.stopPropagation()
-    setFlipped((prev) => !prev)
+    setTransformed((prev) => !prev)
+  }
+  const onFlipClick = e => {
+    e.stopPropagation();
+    setFlipped(prev => !prev)
   }
   const version = 'normal'
-  const imageSource = flipped
-    ? getBackImageURI(card, version)
-    : card.image_uris?.normal ?? getFrontImageURI(card, version)
   return <div className={`card-image ${card.set}`}>
     <img
+      className={`front ${flipped ? "flipped" : ""} ${canTransform && transformed ? "transformed" : ""}`}
       width='100%'
-      src={imageSource}
+      src={card.image_uris?.normal ?? getFrontImageURI(card, version)}
       alt={card.name}
       title={card.name}
       onError={() => {
         // load local backup
       }}
     />
-    {DOUBLE_FACED_LAYOUTS.includes(card.layout) && (
+    {canTransform &&
+      <img
+        className={`back ${canTransform && transformed ? "transformed" : ""}`}
+        width='100%'
+        src={getBackImageURI(card, version)}
+        alt={card.name}
+        title={card.name}
+        onError={() => {
+          // load local backup
+        }}
+      />
+    }
+    {canTransform && (
       <button
-        className='flip-button'
-        onClick={onFlipCLick}
-        title='flip'
+        className='transform-button'
+        onClick={onTransformCLick}
+        title='transform'
+      >🔄</button>
+    )}
+    {card.layout === "flip" && (
+      <button
+        className="flip-button"
+        onClick={onFlipClick}
+        title="flip"
       >🔄</button>
     )}
     {edhrecOverlay&&<div className='edhrec-lol'>{card.edhrec_rank}</div>}

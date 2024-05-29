@@ -189,7 +189,7 @@ export const BrowserView = React.memo(({
                   className={`_${cardsPerRow}`}
                   onAdd={onAdd}
                   hoverContent={<SearchHoverActions card={card} onAdd={onAdd} onIgnore={onIgnore} />}
-                  key={index}
+                  key={card.data.id + index}
                   card={card}
                   showRender={displayType === "render"}
                   revealDetails={revealDetails}

@@ -214,7 +214,7 @@ export const CardCustomRender = ({ card }: CardCustomRenderProps) => {
     {framedComponent}
     {DOUBLE_FACED_LAYOUTS.includes(card.layout) && (
       <button
-        className='flip-button'
+        className='transform-button'
         onClick={() => setFlipped((prev) => !prev)}
         title='flip'
       >🔄</button>

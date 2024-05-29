@@ -1,31 +1,69 @@
 .card-image {
     position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: 'overlap';
 }
 
 .card-image img {
     clip-path: inset(0 0 0 0 round var(--card-border-radius));
     box-shadow: var(--spacing-200) var(--gray-68);
     position: relative;
-    z-index: 1;
+    grid-area: overlap;
     top: 0;
     bottom: 0;
     right: 0;
     left: 0;
+    backface-visibility: hidden;
+    transition: rotate 400ms ease, transform 400ms ease-in-out;
 }
 
 .card-image.lea img {
     clip-path: inset(0 0 0 0 round 7% / 5.5%);
 }
 
-.flip-button {
+.card-image img.flipped {
+    rotate: 180deg;
+    rotation-point: center;
+}
+
+.card-image img.front {
+    transform: rotateY(0deg);
+    z-index: 2;
+}
+.card-image img.front.transformed {
+    transform: rotateY(180deg);
+}
+
+.card-image img.back {
+    z-index: 1;
+    transform: rotateY(-180deg);
+}
+.card-image img.back.transformed {
+    transform: rotateY(0deg);
+}
+
+.flip-button,
+.transform-button {
     position: absolute;
     z-index: 2;
-    top: 11%;
     right: 8%;
     background-color: transparent;
     border-color: transparent;
     font-size: 1.75em;
     cursor: pointer;
+}
+.flip-button {
+    top: 30%;
+}
+.transform-button {
+    top: 11%;
+
+}
+.flip-button:hover,
+.transform-button:hover {
+    color: whitesmoke;
 }
 
 .edhrec-lol {
@@ -37,6 +75,3 @@
     color: var(--light-color);
 }
 
-.flip-button:hover {
-    color: whitesmoke;
-}
