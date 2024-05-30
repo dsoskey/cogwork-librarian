@@ -137,7 +137,7 @@ const FlipCardRender = ({ card }: CardCustomRenderProps) => {
 
 const NormalCardRender = ({ card, flipped }: CardCustomRenderProps) => {
   const flipDex = flipped ? 1 : 0;
-  const canFlip = DOUBLE_FACED_LAYOUTS.includes(card.layout)
+  const canFlip = card.card_faces?.length > 0
   const activeFace = canFlip ? card.card_faces[flipDex] : card;
   const { name, mana_cost,
     type_line,
