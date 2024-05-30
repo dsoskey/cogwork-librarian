@@ -56,6 +56,7 @@ export function CardLink({ name, id }: CardLinkProps) {
           ref={refs.setFloating}
           style={floatingStyles}
           {...getFloatingProps()}
+          onClick={() => setIsLockedOpen(false)}
         >
           <_CardImage name={name} card={card} />
         </div>

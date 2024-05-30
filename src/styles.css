@@ -1,39 +1,4 @@
 /* global */
-
-/*
-  --dark-color: hsl(207, 87%, 30%);
-  --darker-color: hsl(207, 87%, 20%);
-  --darker-color-subdued: hsl(206, 87%, 20%);
-  --darkest-color: hsl(207, 86%, 12%);
-  --light-color: hsl(19, 100%, 76%);
-  --gray-68: hsl(0, 0%, 27%);
-  --gray-68-shadow: hsla(0, 0%, 27%, 0.5);
-  --gray-42: hsl(0, 0%, 50%);
-    --active: hsl(312, 100%, 69%);
-    --active-low-alpha: hsla(312, 100%, 69%, 50%);
-    --active-mid-alpha: hsla(312, 100%, 69%, 75%);
-  --green: hsl(96, 100%, 69%);
-  --light-red: hsl(339, 100%, 55%);
-  --red: hsl(339, 100%, 37%);
-*/
-
-/*
-  --dark-color: hsl(132, 32%, 27%);
-  --darker-color: hsl(132, 32%, 20%);
-  --darker-color-subdued: hsl(131, 20%, 20%);
-  --darkest-color: hsl(132, 31%, 12%);
-  --light-color: hsl(341, 41%, 88%);
-  --gray-68: hsl(0, 0%, 27%);
-  --gray-68-shadow: hsla(0, 0%, 27%, 0.5);
-  --gray-42: hsl(0, 0%, 50%);
-  --active: hsl(344, 100%, 69%);
-  --active-low-alpha: hsla(344, 100%, 69%, 50%);
-  --active-mid-alpha: hsla(344, 100%, 69%, 75%);
-  --green: hsl(96, 100%, 69%);
-  --light-red: hsl(0, 100%, 55%);
-  --red: hsl(0, 100%, 37%);
- */
-
 :root {
   --color-interpolation: in oklch;
   --dark300:  hsl(25, 32%, 27%);
@@ -74,8 +39,6 @@
   color: var(--light-color);
 
   --monospace-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  --coglib-width: 50%;
-  --coglib-closed-width: 2.5%;
 }
 
 a {
