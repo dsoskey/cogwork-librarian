@@ -87,7 +87,7 @@ function ThemeSample({ theme }: ThemeSampleProps) {
   }, [ref.current, theme])
   return <div className='theme-sample' ref={ref}>
     <div className="row center">
-      <strong>projects: </strong>
+      <span className="bold">projects: </span>
       <div className="project-tab row center active">
         <button>X</button>
         <div>morphin-around</div>

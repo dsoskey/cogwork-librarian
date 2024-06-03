@@ -1,22 +1,10 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import { Block, CubeDefinition, DataProvider, IllustrationTag, NormedCard, OracleTag } from 'mtgql'
+import { Block, Cube, DataProvider, IllustrationTag, NormedCard, OracleTag } from 'mtgql'
 import { DataSource } from '../../types'
 import { Project } from './types/project'
 import { RunStrategy } from '../queryRunnerCommon'
 import { ThemeDefinition } from './types/theme'
-
-export interface CoverImage {
-  uri: string
-  artist: string
-}
-export interface CogCubeDefinition extends CubeDefinition {
-  name: string
-  created_by: string
-  description: string
-  cover_image?: CoverImage
-  last_source_update: Date
-}
 
 export interface Collection {
   id: string // used for NormedCard.collectionId
@@ -68,7 +56,7 @@ export class TypedDexie extends Dexie implements DataProvider {
 
   card!: Table<NormedCard>
   customCard!: Table<NormedCard>
-  cube!: Table<CogCubeDefinition>
+  cube!: Table<Cube>
   oracleTag!: Table<OracleTag>
   illustrationTag!: Table<IllustrationTag>
   block!: Table<Block>

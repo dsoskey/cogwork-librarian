@@ -95,7 +95,7 @@ export const CardListImporter = ({
     </>)}
     {dbImportStatus !== "loading" && dbImportStatus !== "error" && <>
       <label className='row'>
-        <strong>data set name:</strong>
+        <span className="bold">data set name:</span>
         <input value={listTitle} onChange={event => setListTitle(event.target.value)} />
       </label>
       <textarea

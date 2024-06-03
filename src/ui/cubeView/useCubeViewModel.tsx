@@ -1,7 +1,7 @@
-import { Card, NormedCard } from 'mtgql'
+import { Card, CubeCard, Cube, NormedCard } from 'mtgql'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { CogDBContext } from '../../api/local/useCogDB'
-import { CogCubeDefinition, cogDB as cogDBClient, Manifest } from '../../api/local/db'
+import { cogDB as cogDBClient, Manifest } from '../../api/local/db'
 import { Link } from 'react-router-dom'
 import { useParams } from 'react-router'
 import { useKeyValList } from '../hooks/useKeyValList'
@@ -9,7 +9,7 @@ import _groupBy from 'lodash/groupBy'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Setter } from '../../types'
 
-export interface OrderedCard extends Card {
+export interface OrderedCard extends Card, Omit<CubeCard, "name"|"cmc"|"colors"|"rarity"> {
   index: number
 }
 
@@ -31,7 +31,7 @@ function LoadingError({ cardCount, refreshCubeCards }) {
 }
 
 export interface CubeViewModel {
-  cube: CogCubeDefinition | undefined | null
+  cube: Cube | undefined | null
   cards: OrderedCard[]
   loadingError: React.ReactNode,
   oracleList: NormedCard[]
@@ -75,26 +75,30 @@ export function useCubeViewModel(): CubeViewModel {
 
         const missingPrints = []
         const next: OrderedCard[] = []
+        let byOracle;
         for (let i = 0; i < cube.cards.length; i++) {
+          const card = cube.cards[i];
           const printId = cube.cards[i].print_id
           if (printId in printToCard) {
-            next.push({ ...printToCard[printId], index: i })
+            next.push({
+              ...printToCard[printId],
+              ...card,
+              index: i })
           } else {
+            if (byOracle === undefined) {
+              byOracle = _groupBy(newOracles, "oracle_id");
+            }
             missingPrints.push(printId)
+            const defaultOracleCard = byOracle[card.oracle_id][0]
+            next.push({
+              ...defaultOracleCard,
+              ...defaultOracleCard.printings[0],
+              index: i,
+            })
           }
         }
-
-        if (missingPrints.length) {
-          setLoadingError(<LoadingError
-            cardCount={missingPrints.length}
-            refreshCubeCards={refreshCubeCards}
-          />)
-
-        } else {
-          setCards(next)
-        }
+        setCards(next)
       }
-      setLoadingError(undefined)
     } catch (e) {
       console.error(e)
       if (Array.isArray(e)) {

@@ -15,6 +15,8 @@ export interface CardImageViewProps {
   visibleDetails?: string[]
   onAdd?: () => void
   hoverContent?: React.ReactNode
+  altImageUri?: string
+  altImageBackUri?: string
 }
 
 export const CardImageView = ({
@@ -26,6 +28,7 @@ export const CardImageView = ({
   className,
   onClick,
   hoverContent,
+  altImageBackUri, altImageUri,
 }: CardImageViewProps) => {
   const { showDebugInfo } = useContext(FlagContext).flags
   const [hovered, setHovered] = useState(false)
@@ -69,7 +72,11 @@ export const CardImageView = ({
       }}
     >
       {showRender && <CardCustomRender card={card.data} />}
-      {!showRender && <CardImage card={card.data} />}
+      {!showRender && <CardImage
+        card={card.data}
+        altImageBackUri={altImageBackUri}
+        altImageUri={altImageUri}
+      />}
       {showDebugInfo && revealDetails && visibleDetails?.includes(WEIGHT) &&
         <code className='card-weight'>{card.weight.toFixed(SCORE_PRECISION)}</code>}
       {hovered && hoverContent}

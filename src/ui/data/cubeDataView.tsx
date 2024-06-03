@@ -9,7 +9,7 @@ import { ListImporterContext } from '../../api/local/useListImporter'
 import { LoaderBar } from '../component/loaders'
 import { CubeListImporter } from './cubeListImporter'
 import { Setter } from '../../types'
-import { CubeDefinitionTable } from '../component/cube/cubeDefinitionTable'
+import { CubeTable } from '../component/cube/cubeDefinitionTable'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
 import { CUBE_SOURCE_TO_LABEL } from '../component/cube/sourceIcon'
 
@@ -43,12 +43,18 @@ export const CubeDataView = () => {
     } else {
       const oracle_ids = cards.map(it => it.oracle_id)
       const print_ids = cards.map(it => it.printings[0].id)
+      const now = new Date();
       await cogDB.cube.put({ key,
         cards: cards.map(it => ({ print_id: it.printings[0].id, oracle_id: it.oracle_id })),
         oracle_ids,
         print_ids,
+        name: key,
+        description: "",
+        canonical_id: key,
         source: "list",
-        last_updated: new Date()
+        last_updated: now,
+        last_source_update: now,
+        created_by: "",
       })
       setCubeId("")
       setCardsToImport([])
@@ -91,7 +97,7 @@ export const CubeDataView = () => {
   }
 
   const CubeIdInput = <label>
-    <strong>new cube id:{" "}</strong>
+    <span className="bold">new cube id:{" "}</span>
     <input placeholder='soskgy' value={cubeId} onChange={onCubeIdChange}/>
     {error && <div className='alert'>{error}</div>}
   </label>
@@ -109,7 +115,7 @@ export const CubeDataView = () => {
     <h2>cubes</h2>
     <p>local <code className='language-scryfall-extended'>cube:</code> queries match against these cube ids</p>
 
-    <CubeDefinitionTable cubes={existingCubes} />
+    <CubeTable cubes={existingCubes} />
 
     <section className='cube-import'>
     <h3 className='row baseline'>

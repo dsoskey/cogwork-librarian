@@ -10,7 +10,7 @@ export interface CubeOverviewProps {
 
 export function CubeOverview({}: CubeOverviewProps) {
     const { cube } = useContext(CubeViewModelContext);
-    const hasDescription = cube.description.length > 0;
+    const hasDescription = cube.description !== undefined;
 
     return hasDescription
       ? <div className="cube-overview">
@@ -19,6 +19,7 @@ export function CubeOverview({}: CubeOverviewProps) {
               <img
                 className="cover-image"
                 src={cube.cover_image.uri}
+                title={cube.cover_image.card_name?.replace(/ \[.*$/, "") ?? undefined}
                 alt={`${cube.name}'s cover image`}
               />
               <em>Illus. {cube.cover_image.artist}</em>

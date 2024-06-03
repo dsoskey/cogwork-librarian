@@ -130,7 +130,7 @@ export const ProjectTabs = () => {
 
   return <>
     <div className="row center wrap">
-      <strong>projects: </strong>
+      <span className="bold">projects: </span>
       {tabState.active.map((it, i) =>
         <ProjectTab
           key={i}

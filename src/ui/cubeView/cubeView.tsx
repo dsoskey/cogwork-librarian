@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import { Link } from 'react-router-dom'
 import { cogDB as cogDBClient } from '../../api/local/db'
 import { CardImageView } from '../cardBrowser/cardViews/cardImageView'
 import './cubeView.css'
@@ -16,7 +17,8 @@ import {
 import { Route, Routes, useLocation } from 'react-router'
 import { CubeOverview } from './cubeOverview'
 import { CubeList } from './cubeList'
-import { Link } from 'react-router-dom'
+import { FlagContext } from '../flags'
+import { ManaCost } from '../card/manaCost'
 
 const shareButtonText = {
   unstarted: '🔗',
@@ -25,6 +27,7 @@ const shareButtonText = {
 }
 
 export function CubeView() {
+  const showDebugInfo = useContext(FlagContext).flags.showDebugInfo;
   const cubeViewModel = useCubeViewModel();
   const { cube, oracleMap, activeCard, setActiveCard } = cubeViewModel;
 
@@ -70,19 +73,59 @@ export function CubeView() {
         ><ScryfallIcon size="1.5em" /></a>
       </div>}
       onClose={() => setActiveCard(undefined)}>
-      {activeCard && <>
-          <CardImageView card={{ data: activeCard, matchedQueries: [`cube:${cube.key}`], weight: 1 }} />
+      {activeCard && <div className="row active-card-root">
           <div>
-            <select value={activeCard.id} onChange={onPrintSelect}>
-              {oracleMap[activeCard.oracle_id][0]
-                .printings.map(printing =>
-                  <option key={printing.id} value={printing.id}>
-                    {printing.set_name} – ({printing.set} {printing.collector_number})
-                  </option>)}
-            </select>
-            <button onClick={saveActiveCard}>save</button>
-        </div>
-      </>}
+            <CardImageView
+              card={{ data: activeCard, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
+              altImageUri={activeCard.alt_image_uri}
+              altImageBackUri={activeCard.alt_image_back_uri}
+            />
+            <div>
+              <select value={activeCard.id} onChange={onPrintSelect}>
+                {oracleMap[activeCard.oracle_id][0]
+                  .printings.map(printing =>
+                    <option key={printing.id} value={printing.id}>
+                      {printing.set_name} – ({printing.set} {printing.collector_number})
+                    </option>)}
+              </select>
+              <button onClick={saveActiveCard}>save</button>
+            </div>
+          </div>
+          <div>
+            <div className="row baseline">
+              <h3>mana cost</h3>
+              {activeCard.mana_cost && <ManaCost manaCost={activeCard.mana_cost} />}
+
+              <h3>mana value</h3>
+              <div>{activeCard.cmc?.toString()}</div>
+            </div>
+
+            <h3>colors</h3>
+            <div className="row">{activeCard.colors
+              ?.map(it => <span key={it}>{it}</span>)}</div>
+
+            {activeCard.color_category && <><h3>color category</h3>
+            <div>{activeCard.color_category}</div></>}
+
+            <h3>type line</h3>
+            <div>{activeCard.type_line}</div>
+
+            <h3>rarity</h3>
+            <div>{activeCard.rarity}</div>
+
+            <h3>tags</h3>
+            <div className='row'>{activeCard.tags
+              ?.map(it => <span key={it}>{it}</span>)}</div>
+
+            <h3>notes</h3>
+            <div>{activeCard.notes ?? "~"}</div>
+
+            <h3>status</h3>
+            <div>{activeCard.status}</div>
+
+            {showDebugInfo && <pre><code>{JSON.stringify(activeCard, undefined, 2)}</code></pre>}
+          </div>
+      </div>}
     </Modal>
   </CubeViewModelContext.Provider>
 }
@@ -97,6 +140,7 @@ function CubeModelView() {
         <h2>{cube.name}</h2>
         <em>
           — a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube
+          {cube.created_by && ` created by ${cube.created_by} `}
           from{" "}
           {cube.source !== "list" && <a href={cubeLink(cube)}
              rel='noreferrer'
@@ -112,14 +156,14 @@ function CubeModelView() {
         <div>
           {cube.source !== "list" && <>
             <CopyToClipboardButton
-              copyText={`${window.location.protocol}//${window.location.host}/data/cube/${cube.key}?source=${cube.source}`}
+              copyText={`${window.location.protocol}//${window.location.host}/cube/${cube.key}?source=${cube.source}`}
               title={`copy share link to keyboard`}
               buttonText={shareButtonText}
             />
             <RefreshButton toSubmit={[cube]} />
           </>}
           {" "}
-          <strong>last updated:</strong> {cube.last_updated?.toLocaleString() ?? "~"}
+          <span className="bold">last updated:</span> {cube.last_updated?.toLocaleString() ?? "~"}
         </div>
       </div>
     </div>

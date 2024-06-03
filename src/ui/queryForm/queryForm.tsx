@@ -65,7 +65,7 @@ export const QueryForm = ({
       </div>
 
       <div className='row center execute-controls'>
-        <label><strong>data source:</strong></label>
+        <label><span className="bold">data source:</span></label>
         <div className={`source-option row center ${source === 'local' ? 'selected' : ''}`}>
           <div className='radio-button-holder'>
             <CoglibIcon

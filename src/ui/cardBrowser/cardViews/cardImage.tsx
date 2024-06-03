@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { Card, ImageUris } from 'mtgql'
+import { Card, DOUBLE_FACED_LAYOUTS, ImageUris } from 'mtgql'
 import { FlagContext } from '../../flags'
 import "./cardImage.css"
 
@@ -17,13 +17,16 @@ function getFrontImageURI(card: Card, version: keyof ImageUris): string | undefi
 
 interface CardImageProps {
   card: Card
+  altImageUri?: string
+  altImageBackUri?: string
 }
 
-export const CardImage = ({ card }: CardImageProps) => {
+export const CardImage = ({ card, altImageUri, altImageBackUri }: CardImageProps) => {
   const { edhrecOverlay } = useContext(FlagContext).flags;
   const [transformed, setTransformed] = useState(false);
   const [flipped, setFlipped] = useState(false);
-  const canTransform = card.card_faces.length > 0
+  const canTransform = DOUBLE_FACED_LAYOUTS.includes(card.layout)
+
   const onTransformCLick = e => {
     e.stopPropagation()
     setTransformed((prev) => !prev)
@@ -37,9 +40,10 @@ export const CardImage = ({ card }: CardImageProps) => {
     <img
       className={`front ${flipped ? "flipped" : ""} ${canTransform && transformed ? "transformed" : ""}`}
       width='100%'
-      src={card.image_uris?.normal ?? getFrontImageURI(card, version)}
+      src={altImageUri ?? card.image_uris?.normal ?? getFrontImageURI(card, version)}
       alt={card.name}
       title={card.name}
+      loading={"lazy"}
       onError={() => {
         // load local backup
       }}
@@ -48,9 +52,10 @@ export const CardImage = ({ card }: CardImageProps) => {
       <img
         className={`back ${canTransform && transformed ? "transformed" : ""}`}
         width='100%'
-        src={getBackImageURI(card, version)}
+        src={altImageBackUri ?? getBackImageURI(card, version)}
         alt={card.name}
         title={card.name}
+        loading={"lazy"}
         onError={() => {
           // load local backup
         }}

@@ -16,7 +16,7 @@ import _sortBy from 'lodash/sortBy'
 import { Card, SearchOptions, SortFunctions } from 'mtgql'
 
 function isCreature(card: OrderedCard): number {
-    if (card.type_line.includes("Creature")) return 0
+    if (card.type_line?.includes("Creature")) return 0
     return 1
 }
 function byEdhrecRank(card: Card) {
@@ -55,6 +55,7 @@ export function CubeList({}: CubeListProps) {
     const viewport = useViewportListener();
     const { cube, cards, oracleList, loadingError, setActiveCard } = useContext(CubeViewModelContext);
     const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
+    const [showCustomImage, setShowCustomImage] = useLocalStorage('cards-custom-image', true)
     const queryRunner = useMemoryQueryRunner({ corpus: oracleList });
 
     const execute = (queries: string[], baseIndex: number) => {
@@ -111,15 +112,25 @@ export function CubeList({}: CubeListProps) {
     }, [queryRunner.result, cards, ordering])
 
     return <>
-        <div className="header">
+        <div className="list-control">
             <SimpleFilterAndSort
               ordering={ordering} setOrdering={setOrdering}
               applyFilter={applySimpleFilter}
               clearFilter={queryRunner.reset}
               canClear={queryRunner.status !== "unstarted"}
             />
-            {viewport.width > 1024 && <CardsPerRowControl setCardsPerRow={setCardsPerRow} cardsPerRow={cardsPerRow} />}
-            {queryRunner.status === "success" && <div>filter matched {queryRunner.result.length} of {cube.print_ids.length}</div>}
+            <div className="row">
+                <label className="row center">
+                    <span className="bold">show custom images:</span>
+                    <input
+                      className="custom"
+                      type="checkbox"
+                      checked={showCustomImage}
+                      onChange={e => setShowCustomImage(e.target.checked)} />
+                </label>
+                {viewport.width > 1024 && <CardsPerRowControl setCardsPerRow={setCardsPerRow} cardsPerRow={cardsPerRow} />}
+            </div>
+            {queryRunner.status === "success" && <div>filter matched {queryRunner.result.length} of {cube.cards.length}</div>}
             {cards.length === 0
               && queryRunner.status !== "error"
               && loadingError === undefined
@@ -133,6 +144,8 @@ export function CubeList({}: CubeListProps) {
                 className={`_${cardsPerRow}`}
                 card={{ data: card, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
                 onClick={() => setActiveCard(card)}
+                altImageUri={showCustomImage ? card.alt_image_uri : undefined}
+                altImageBackUri={showCustomImage ? card.alt_image_back_uri : undefined}
               />)}
         </div>}
     </>;
@@ -158,7 +171,7 @@ function SimpleFilterAndSort({ ordering, setOrdering, applyFilter, clearFilter, 
     return <>
         <div className="cube-filter row center">
             <label className='row center'>
-                <strong>filter: </strong>
+                <span className="bold">filter: </span>
                 <Input language="scryfall" value={filterQuery} onChange={e => setFilterQuery(e.target.value)} onKeyDown={handleEnter} />
             </label>
             <button onClick={apply} disabled={filterQuery.length === 0}>Apply filter</button>
@@ -166,7 +179,7 @@ function SimpleFilterAndSort({ ordering, setOrdering, applyFilter, clearFilter, 
         </div>
         <Multiselect
           optionTransform={it => it.replace(/_/g, " ")}
-          labelComponent={<strong>sort: </strong>} value={ordering} setValue={setOrdering}>
+          labelComponent={<span className="bold">sort: </span>} value={ordering} setValue={setOrdering}>
             {SORT_OPTIONS.map(value => {
                 return <option key={value} value={value}>
                     {value.replace(/_/g, " ")}

@@ -1,5 +1,5 @@
 import { cogDB, Manifest, MANIFEST_ID } from './db'
-import { NormedCard, CubeDefinition, Card } from 'mtgql'
+import { NormedCard, Cube, Card } from 'mtgql'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
 
 export const downloadCards = async (manifest: BulkDataDefinition) => {
@@ -38,13 +38,21 @@ export const putFile = async (manifest: Manifest, data: NormedCard[]) => {
 
 const cubeNamespace = ".cube.coglib.sosk.watch"
 export const migrateCubes = async () => {
-  const existingCubes: CubeDefinition[] = Object.keys(localStorage)
+  const now = new Date();
+  const existingCubes: Cube[] = Object.keys(localStorage)
     .filter(it => it.endsWith(cubeNamespace))
     .map(it => ({
       key: it.slice(0, it.indexOf(".")),
+      name: it.slice(0, it.indexOf(".")),
+      canonical_id: it.slice(0, it.indexOf(".")),
+      created_by: "",
+      description: "",
       oracle_ids: JSON.parse(localStorage.getItem(it) ?? "[]"),
+      print_ids: [],
+      cards: [],
       source: "list",
-      last_updated: new Date(),
+      last_updated: now,
+      last_source_update: now,
     }))
 
 

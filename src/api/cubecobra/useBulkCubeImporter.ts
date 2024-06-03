@@ -1,6 +1,6 @@
 import { createContext, useState } from 'react'
 import { Setter } from '../../types'
-import { CubeDefinition, CubeSource, ExternalCubeSource } from 'mtgql'
+import { Cube, CubeSource, ExternalCubeSource } from 'mtgql'
 
 const RUNNING_STATES = [
   "querying-cubecobra",
@@ -17,7 +17,7 @@ export interface MissingCards {
 
 interface BulkCubeImporter {
   attemptImport: (cubeIds: string[], source?: CubeSource) => void
-  attemptRefresh: (cubeIds: { [key: string]: CubeDefinition[] }) => void
+  attemptRefresh: (cubeIds: { [key: string]: Cube[] }) => void
   status: string
   isRunning: boolean
   missingCubes: string[]
@@ -104,7 +104,7 @@ export const useBulkCubeImporter = (): BulkCubeImporter => {
     worker.postMessage({ type: "import", data: { cubeIds: submittableCubeIds, source: sourceOverride ?? source } })
   }
 
-  const attemptRefresh = (cubesBySource: { [key: string]: CubeDefinition[] }) => {
+  const attemptRefresh = (cubesBySource: { [key: string]: Cube[] }) => {
     if (Object.keys(cubesBySource).length === 0) return;
 
     console.debug("starting cube import worker")

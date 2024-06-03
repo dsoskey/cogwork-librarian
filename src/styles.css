@@ -117,6 +117,41 @@ input::placeholder {
   color: var(--active-mid-alpha);
 }
 
+.bold {
+  font-weight: bold;
+}
+
+input[type="checkbox"].custom {
+  appearance: none;
+  position: relative;
+  width: 1.2em;
+  height: 1.2em;
+  border: 1px solid var(--light-color);
+  /* Adjusts the position of the checkboxes on the text baseline */
+  vertical-align: -2px;
+  /* Set here so that Windows' High-Contrast Mode can override */
+  color: var(--active);
+}
+input[type="checkbox"].custom:hover:not(:disabled) {
+  border: 1px solid var(--active);
+}
+input[type="checkbox"].custom::before {
+  content: "✔";
+  position: absolute;
+  font-size: 1.6em;
+  top: -0.45em;
+  visibility: hidden;
+}
+input[type="checkbox"].custom:checked::before {
+  /* Use `visibility` instead of `display` to avoid recalculating layout */
+  visibility: visible;
+}
+input[type="checkbox"].custom:indeterminate::before {
+  content: "-";
+  font-weight: bold;
+  visibility: visible;
+}
+
 fieldset {
   margin-left: 0;
   padding-left: unset;

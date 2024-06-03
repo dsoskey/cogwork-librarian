@@ -10,7 +10,7 @@ export function CardsPerRowControl({cardsPerRow, setCardsPerRow}: CardsPerRowCon
 
     return <div>
         <label>
-            <strong>cards per row: </strong>
+            <span className="bold">cards per row: </span>
             <select value={cardsPerRow} onChange={e => setCardsPerRow(parseInt(e.target.value))}>
                 <option value={4}>4</option>
                 <option value={6}>6</option>

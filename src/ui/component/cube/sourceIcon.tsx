@@ -1,7 +1,7 @@
 import cubecobraImage from './cubecobra-favicon.ico'
 import cubeartisanImage from './cubeartisan-favicon.ico'
 import React from 'react'
-import { CubeDefinition, CubeSource } from 'mtgql'
+import { Cube, CubeSource } from 'mtgql'
 
 export const CUBE_SOURCE_TO_LABEL: Record<CubeSource, string> = {
   cubeartisan: 'CubeArtisan', cubecobra: 'Cube Cobra', list: 'a text list'
@@ -19,7 +19,7 @@ export const SourceIcon = ({ source }: { source: CubeSource }) => {
   }
 }
 
-export function cubeLink(cube: CubeDefinition): string {
+export function cubeLink(cube: Cube): string {
   switch (cube.source) {
     case 'cubeartisan':
       return `https://cubeartisan.net/cube/${cube.key}/overview`
@@ -30,7 +30,7 @@ export function cubeLink(cube: CubeDefinition): string {
   }
 }
 
-export function SourceLink({ cube }: { cube: CubeDefinition }) {
+export function SourceLink({ cube }: { cube: Cube }) {
   return <a href={cubeLink(cube)}
      rel='noreferrer'
      target='_blank'>

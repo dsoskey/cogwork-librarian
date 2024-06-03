@@ -55,17 +55,17 @@ const ManifestView = ({ manifest }) => {
   useHighlightPrism([manifest.filter]);
   return <>
     <div>
-      <strong>source:</strong> <code>{manifest.name}</code>
+      <span className="bold">source:</span> <code>{manifest.name}</code>
     </div>
     <div>
-      <strong>type:</strong> <code>{manifest.type}</code>
+      <span className="bold">type:</span> <code>{manifest.type}</code>
     </div>
     <div>
-      <strong>last updated:</strong>{' '}
+      <span className="bold">last updated:</span>{' '}
       <code>{dateString(manifest.lastUpdated)}</code>
     </div>
     <div>
-      <strong>import filter:</strong>{' '}
+      <span className="bold">import filter:</span>{' '}
       {manifest.filter
         ? <code className="language-scryfall">{manifest.filter}</code>
         : <code>No filter</code>}

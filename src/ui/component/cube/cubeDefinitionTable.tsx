@@ -1,5 +1,5 @@
 import React, { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { CubeDefinition } from 'mtgql'
+import { Cube } from 'mtgql'
 import './cubeDefinitionTable.css'
 import { PageControl } from '../../cardBrowser/pageControl'
 import { BulkCubeImporterContext } from '../../../api/cubecobra/useBulkCubeImporter'
@@ -10,18 +10,24 @@ import { Link } from 'react-router-dom'
 import { SourceIcon } from './sourceIcon'
 import { RefreshButton } from './refreshButton'
 
-interface CubeDefinitionRowProps {
-  cube: CubeDefinition
+interface CubeRowProps {
+  cube: Cube
   checked: boolean
   onChecked: (checked: boolean) => void
 }
 
-const CubeDefinitionRow = ({ cube, checked, onChecked }: CubeDefinitionRowProps) => {
-  const { key, source, last_updated } = cube
+const userUrlPrefix = {
+  cubecobra: "https://cubecobra.com/user/view/",
+  cubeartisan: "https://cubeartisan.net/user/",
+}
+
+const CubeRow = ({ cube, checked, onChecked }: CubeRowProps) => {
+  const { key, created_by, source, last_updated } = cube
   return <tr>
     <td>
       {/* what's the accessibility story here? */}
       <input
+        className="custom"
         type="checkbox"
         checked={checked}
         onChange={() => onChecked(!checked)}
@@ -29,6 +35,15 @@ const CubeDefinitionRow = ({ cube, checked, onChecked }: CubeDefinitionRowProps)
     </td>
     <td>
       <Link to={`/data/cube/${key}`}>{key}</Link>
+    </td>
+    <td>
+      {created_by?.length > 0 && cube.source !== "list" && <a
+        href={`${userUrlPrefix[cube.source]}${cube.created_by}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >{created_by}</a>}
+      {created_by?.length > 0 && cube.source === "list" && created_by}
+      {(created_by === undefined || created_by?.length === 0) && "~"}
     </td>
     <td>
       {source !== "list" &&
@@ -44,10 +59,10 @@ const CubeDefinitionRow = ({ cube, checked, onChecked }: CubeDefinitionRowProps)
   </tr>
 }
 
-interface CubeDefinitionTableProps {
-  cubes?: CubeDefinition[]
+interface CubeTableProps {
+  cubes?: Cube[]
 }
-export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
+export const CubeTable = ({ cubes }: CubeTableProps) => {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set())
   const checkRef = useRef<HTMLInputElement>()
   const { isRunning } = useContext(BulkCubeImporterContext);
@@ -88,7 +103,7 @@ export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
   const pageSize = 20
   const [page, setPage] = useState<number>(0)
   const [filterString, _setFilterString] = useState<string>("")
-  const [filteredCubes, setFilteredCubes] = useState<CubeDefinition[] | undefined>(undefined)
+  const [filteredCubes, setFilteredCubes] = useState<Cube[] | undefined>(undefined)
 
   const timeout = useRef<number>()
   const setFilterString = (value: string) => {
@@ -147,6 +162,7 @@ export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
           <tr>
             <th>
               <input
+                className="custom"
                 ref={checkRef}
                 type="checkbox"
                 checked={checkedIds.size === cubes?.length}
@@ -160,6 +176,7 @@ export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
               />
             </th>
             <th>cube id</th>
+            <th>curator</th>
             <th>source</th>
             <th>last updated</th>
           </tr>
@@ -170,7 +187,7 @@ export const CubeDefinitionTable = ({ cubes }: CubeDefinitionTableProps) => {
             {filteredCubes !== undefined && filterString.length > 0 && `no cubes found for filter "${filterString}"`}
             {filteredCubes === undefined && "no cubes found in database. import some below!"}
           </td></tr>}
-          {cubes !== undefined && currentCubes.map(cube => <CubeDefinitionRow
+          {cubes !== undefined && currentCubes.map(cube => <CubeRow
             key={cube.key}
             cube={cube}
             checked={checkedIds.has(cube.key)}

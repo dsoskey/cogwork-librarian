@@ -12,92 +12,63 @@
     }
 }
 
-.cube-definitions .table-controls {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: var(--spacing-200);
-}
+.cube-definitions {
+    .table-controls {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: var(--spacing-200);
+    }
 
-.cube-definitions .table-controls .filter {
-    display: flex;
-    flex-direction: row;
-}
+    .table-controls .filter {
+        display: flex;
+        flex-direction: row;
+    }
 
-.cube-definitions thead {
-    background-color: var(--darkest-color);
-}
+    thead {
+        background-color: var(--darkest-color);
+    }
 
-.cube-definitions tbody {
-    background-color: var(--dark-color);
-}
+    tbody {
+        background-color: var(--dark-color);
+    }
 
-.cube-definitions tbody tr:nth-child(even) {
-    background-color: var(--darker-color);
-}
+    tbody tr:nth-child(even) {
+        background-color: var(--darker-color);
+    }
 
-.cube-definitions th,
-.cube-definitions td {
-    width: 33%;
-    height: 20px;
-}
+    th,
+    td {
+        width: 25%;
+        height: 20px;
+    }
 
-.cube-definitions th:nth-child(1),
-.cube-definitions td:nth-child(1) {
-    width: max-content;
-    padding: var(--spacing-100);
-}
+    th:nth-child(1),
+    td:nth-child(1) {
+        width: max-content;
+        padding: var(--spacing-100);
+    }
 
-.cube-definitions td.notfound {
-    width: unset;
-    text-align: center;
-}
+    td.notfound {
+        width: unset;
+        text-align: center;
+    }
 
-.cube-definitions td img {
-    align-self: center;
-}
+    td img {
+        align-self: center;
+    }
 
-.cube-definitions .page-numbers {
-    margin-left: var(--spacing-200);
-}
+    .page-numbers {
+        margin-left: var(--spacing-200);
+    }
 
-.cube-definitions input[type="checkbox"] {
-    appearance: none;
-    position: relative;
-    width: 1.2em;
-    height: 1.2em;
-    border: 1px solid var(--light-color);
-    /* Adjusts the position of the checkboxes on the text baseline */
-    vertical-align: -2px;
-    /* Set here so that Windows' High-Contrast Mode can override */
-    color: var(--active);
-}
-.cube-definitions input[type="checkbox"]:hover:not(:disabled) {
-    border: 1px solid var(--active);
-}
-.cube-definitions input[type="checkbox"]::before {
-    content: "✔";
-    position: absolute;
-    font-size: 1.6em;
-    top: -0.45em;
-    visibility: hidden;
-}
-.cube-definitions input[type="checkbox"]:checked::before {
-    /* Use `visibility` instead of `display` to avoid recalculating layout */
-    visibility: visible;
-}
-.cube-definitions input[type="checkbox"]:indeterminate::before {
-    content: "-";
-    font-weight: bold;
-    visibility: visible;
-}
+    .select-actions {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: baseline;
+        flex: 1;
+    }
 
-.cube-definitions .select-actions {
-    display: flex;
-    flex-direction: row-reverse;
-    align-items: baseline;
-    flex: 1;
-}
-
-.cube-definitions .select-actions .message {
-    margin-right: var(--spacing-200);
+    .select-actions .message {
+        margin-right: var(--spacing-200);
+    }
 }

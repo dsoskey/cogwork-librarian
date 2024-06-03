@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
 import { BulkCubeImporterContext } from '../../../api/cubecobra/useBulkCubeImporter'
 import { groupBy } from 'lodash'
-import { CubeDefinition } from 'mtgql'
+import { Cube } from 'mtgql'
 
 export interface RefreshButtonProps {
-  toSubmit: CubeDefinition[]
+  toSubmit: Cube[]
 }
 export function RefreshButton({ toSubmit }: RefreshButtonProps) {
   const { isRunning, attemptRefresh } = useContext(BulkCubeImporterContext);

@@ -10,6 +10,13 @@
         gap: var(--spacing-200);
     }
 
+    .list-control {
+        margin: 0 var(--spacing-300) var(--spacing-300);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-200);
+    }
+
     .card-view {
         margin: unset;
     }
@@ -53,6 +60,7 @@
         margin: 0;
         padding: var(--spacing-300);
         background-color: var(--darker-color);
+        min-width: 63vw;
     }
 
     img.cover-image {
@@ -69,6 +77,9 @@
             max-width: 95vw;
         }
     }
+    .cube-description {
+        width: 100%;
+    }
 }
 
 .card-row > * {
@@ -79,4 +90,9 @@
 
 .card-image-container span {
     font-size: 5em;
+}
+
+.active-card-root img {
+    width: 300px;
+    aspect-ratio: var(--card-aspect-ratio);
 }

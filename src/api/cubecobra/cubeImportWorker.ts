@@ -1,9 +1,10 @@
 import { importCubeCobra } from './cubeListImport'
 import {
   ExternalCubeSource,
-  CubeCard
+  CubeCard,
+  Cube,
 } from 'mtgql'
-import { CogCubeDefinition, cogDB as cogDBClient, cogDB } from '../local/db'
+import { cogDB as cogDBClient, cogDB } from '../local/db'
 import { CubeArtisanImportData, importCubeArtisan } from '../cubeartisan/cubeListImport'
 import * as Scryfall from 'scryfall-sdk'
 
@@ -33,27 +34,13 @@ async function searchCubes({ cubeIds, source }: SearchInput) {
 async function searchCubeCobra(cubeIds: string[]) {
   const last_updated = new Date()
   const missingCubes: string[] = []
-  const cubeDefinitions: CogCubeDefinition[] = [];
-  const results = await Promise.allSettled(cubeIds.map(importCubeCobra))
+  const results = await Promise
+    .allSettled(cubeIds.map(it => importCubeCobra(it, last_updated)))
 
   for (let i = 0; i < results.length; i++) {
     const cubeId = cubeIds[i]
     const result = results[i]
-
-    if (result.status === "fulfilled") {
-      const { cards, name, description, last_source_update, cover_image, created_by } = result.value;
-      cubeDefinitions.push({
-        key: cubeId,
-        cards, created_by,
-        name, description,
-        cover_image,
-        oracle_ids: cards.map(it => it.oracle_id),
-        print_ids: cards.map(it => it.print_id),
-        source: "cubecobra",
-        last_updated,
-        last_source_update,
-      })
-    } else {
+    if (result.status === "rejected") {
       missingCubes.push(cubeId)
     }
   }
@@ -67,7 +54,7 @@ async function searchCubeCobra(cubeIds: string[]) {
 
   postMessage({ type: "save-to-db" })
 
-  await cogDB.cube.bulkPut(cubeDefinitions)
+  await cogDB.cube.bulkPut(results.filter(it => it.status === "fulfilled").map(it => it.value))
 
   postMessage({ type: "end" })
 }
@@ -100,15 +87,15 @@ async function searchCubeArtisan(cubeIds: string[]) {
   const printToOracleId = await generatePrintToOracleId(foundCubes, foundOracleIds)
 
   const last_updated = new Date()
-  const cubeDefinitions: CogCubeDefinition[] = Object.entries(foundCubes)
+  const cubeDefinitions: Cube[] = Object.entries(foundCubes)
     .map(([key, cubeInfo]) => {
-      const cards: CubeCard[] = cubeInfo.printIds.map(it => ({ oracle_id: printToOracleId[it], print_id: it }))
+      const cards: CubeCard[] = cubeInfo.artisanCards.map(it => ({ oracle_id: printToOracleId[it.print_id], ...it }))
       return {
         key,
         ...cubeInfo,
         cards,
         oracle_ids: cards.map(it => it.oracle_id),
-        print_ids: cubeInfo.printIds,
+        print_ids: cards.map(it => it.print_id),
         source: "cubeartisan",
         last_updated,
       }
@@ -144,7 +131,7 @@ async function generatePrintToOracleId(
   }
 
   const toCheckScryfall = Array.from(
-    new Set(Object.values(foundCubes).flatMap(it => it.printIds))
+    new Set(Object.values(foundCubes).flatMap(it => it.artisanCards.map(jt => jt.print_id)))
   ).map((id => Scryfall.CardIdentifier.byId(id)));
   const scryfallCards = await Scryfall.Cards.collection(...toCheckScryfall).waitForAll();
 
