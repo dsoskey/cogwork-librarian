@@ -8,7 +8,7 @@ import { Modal } from '../component/modal'
 import { RefreshButton } from '../component/cube/refreshButton'
 import { ScryfallIcon } from '../component/scryfallIcon'
 import { LoaderText } from '../component/loaders'
-import { CopyToClipboardButton } from '../component/copyToClipboardButton'
+import { CopyToClipboardButton, useCopyToClipboard } from '../component/copyToClipboardButton'
 import { CubeNotFoundView } from './notFoundView'
 import {
   CubeViewModelContext,
@@ -30,6 +30,7 @@ export function CubeView() {
   const showDebugInfo = useContext(FlagContext).flags.showDebugInfo;
   const cubeViewModel = useCubeViewModel();
   const { cube, oracleMap, activeCard, setActiveCard } = cubeViewModel;
+  const clipboardHandler = useCopyToClipboard(() => JSON.stringify(activeCard, undefined, 2))
 
   const onPrintSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const normedCard = oracleMap[activeCard.oracle_id][0]
@@ -123,7 +124,9 @@ export function CubeView() {
             <h3>status</h3>
             <div>{activeCard.status}</div>
 
-            {showDebugInfo && <pre><code>{JSON.stringify(activeCard, undefined, 2)}</code></pre>}
+            {showDebugInfo && <pre onClick={clipboardHandler.onClick}>
+              <code>{JSON.stringify(activeCard, undefined, 2)}</code>
+            </pre>}
           </div>
       </div>}
     </Modal>

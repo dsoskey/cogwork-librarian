@@ -31,6 +31,8 @@ const orderValToKey = {
     rarity: SortFunctions.byRarity,
     edhrec: byEdhrecRank,
     creatures_first: isCreature,
+    word_count: SortFunctions.byWordCount,
+    full_word_count: SortFunctions.byFullWordCount,
 }
 
 const SORT_OPTIONS = [
@@ -41,6 +43,8 @@ const SORT_OPTIONS = [
     "released",
     "rarity",
     "edhrec",
+    "word_count",
+    "full_word_count"
 ]
 
 const options: SearchOptions = {

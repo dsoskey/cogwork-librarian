@@ -194,8 +194,8 @@ export const useCogDB = (): CogDB => {
       case "oracle-tag-end":
       case "illustration-tag-downloaded":
       case "illustration-tag-end":
-      case "blocks-downloaded":
-      case "blocks-end":
+      case "sets-downloaded":
+      case "sets-end":
         dbReport.addComplete()
         break
       case "normed-cards":

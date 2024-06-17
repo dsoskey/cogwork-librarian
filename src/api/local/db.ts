@@ -1,6 +1,6 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import { Block, Cube, DataProvider, IllustrationTag, NormedCard, OracleTag } from 'mtgql'
+import { Block, CardSet, Cube, DataProvider, IllustrationTag, NormedCard, OracleTag } from 'mtgql'
 import { DataSource } from '../../types'
 import { Project } from './types/project'
 import { RunStrategy } from '../queryRunnerCommon'
@@ -60,6 +60,7 @@ export class TypedDexie extends Dexie implements DataProvider {
   oracleTag!: Table<OracleTag>
   illustrationTag!: Table<IllustrationTag>
   block!: Table<Block>
+  set!: Table<CardSet>
   history!: Table<QueryHistory>
   project!: Table<Project>
   projectFolder!: Table<ProjectFolder>
@@ -76,6 +77,8 @@ export class TypedDexie extends Dexie implements DataProvider {
       }
       return it
     })
+
+  getSet = (key: string) => this.set.get({ code: key })
 
   getCardByNameId = async (name: string, id: string) => {
     let res = await cogDB.card.where("name").equals(name).toArray();
@@ -218,6 +221,10 @@ export class TypedDexie extends Dexie implements DataProvider {
             c.created_by = ""
           }
         })
+    })
+
+    this.version(16).stores({
+      set: 'id, code, name'
     })
   }
 }

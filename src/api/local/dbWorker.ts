@@ -90,7 +90,7 @@ async function initOfficialDB(type: BulkDataType, targets: ImportTarget[], filte
 
   await loadOracleTags();
   await loadIllustrationTags();
-  await loadBlocks();
+  await loadSetsAndBlocks();
 
   let res;
   if (manifest.filter) {
@@ -167,9 +167,10 @@ async function loadIllustrationTags() {
   postMessage({ type: 'illustration-tag-end' })
 }
 
-async function loadBlocks() {
-  const sets = await downloadSets()
-  postMessage({ type: "blocks-downloaded", data: sets.length })
-  await cogDB.block.bulkPut(sets)
-  postMessage({ type: "blocks-end" })
+async function loadSetsAndBlocks() {
+  const { blocks, sets } = await downloadSets()
+  postMessage({ type: "sets-downloaded", data: sets.length })
+  await cogDB.block.bulkPut(blocks)
+  await cogDB.set.bulkPut(sets)
+  postMessage({ type: "sets-end" })
 }

@@ -1,11 +1,15 @@
-import { Block } from 'mtgql'
+import { Block, CardSet } from 'mtgql'
 
-export async function downloadSets(): Promise<Block[]> {
+export interface BulkSetInfo {
+  sets: CardSet[]
+  blocks: Block[]
+}
+export async function downloadSets(): Promise<BulkSetInfo> {
   const response = await fetch("https://api.scryfall.com/sets")
   const text = await response.text()
-  const jsoned = JSON.parse(text).data as any[];
+  const cardSets = JSON.parse(text).data as CardSet[];
   const blocks: { [key: string]: Block } = {};
-  for (const c of jsoned) {
+  for (const c of cardSets) {
     if (c.block_code !== undefined) {
       if (blocks[c.block_code] === undefined) {
         blocks[c.block_code] = {
@@ -18,5 +22,8 @@ export async function downloadSets(): Promise<Block[]> {
       }
     }
   }
-  return Object.values(blocks)
+  return {
+    sets: cardSets,
+    blocks: Object.values(blocks),
+  }
 }

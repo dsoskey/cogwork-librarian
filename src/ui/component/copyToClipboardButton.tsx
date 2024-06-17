@@ -1,5 +1,28 @@
 import React, { HTMLAttributes, useState } from 'react'
 import { TaskStatus } from '../../types'
+import _isFunction from 'lodash/isFunction'
+
+export function useCopyToClipboard(copyText: (() => string) | string) {
+  const [status, setStatus] =
+    useState<TaskStatus>('unstarted')
+
+  const onClick = () => {
+    const text = _isFunction(copyText) ? copyText() : copyText;
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setStatus('success')
+        setTimeout(() => {
+          setStatus('unstarted')
+        }, 3000)
+      })
+      .catch(() => {
+        setStatus('error')
+      })
+  }
+
+  return { onClick, status }
+}
 
 const DEFAULT_BUTTON_TEXT = {
   unstarted: 'copy to clipboard',
@@ -14,33 +37,19 @@ interface CopyToClipboardButtonProps extends HTMLAttributes<HTMLButtonElement> {
   className?: string
 }
 export const CopyToClipboardButton = ({ buttonText, copyText, className, children, ...rest }: CopyToClipboardButtonProps) => {
-  const [clipboardStatus, setClipboardStatus] =
-    useState<TaskStatus>('unstarted')
-
-  let content =  DEFAULT_BUTTON_TEXT[clipboardStatus];
+  const { status, onClick } = useCopyToClipboard(copyText);
+  let content =  DEFAULT_BUTTON_TEXT[status];
   if (children) {
     content = children
   } else if (buttonText) {
-    content = buttonText[clipboardStatus]
+    content = buttonText[status]
   }
 
   return <button
     {...rest}
     className={className}
-    disabled={clipboardStatus !== 'unstarted'}
-    onClick={() => {
-      navigator.clipboard
-        .writeText(copyText)
-        .then(() => {
-          setClipboardStatus('success')
-          setTimeout(() => {
-            setClipboardStatus('unstarted')
-          }, 3000)
-        })
-        .catch(() => {
-          setClipboardStatus('error')
-        })
-    }}
+    disabled={status !== 'unstarted'}
+    onClick={onClick}
   >
     {content}
   </button>
