@@ -214,6 +214,10 @@ th, td {
   }
 }
 
+.prose {
+  max-width: 769px;
+}
+
 .inverted {
   background-color: var(--active);
   color: var(--darker-color);

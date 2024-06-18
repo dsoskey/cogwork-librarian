@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DndProvider } from 'react-dnd'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
-import { AppInfo } from './ui/appInfo'
+import { AppInfo, WhatsNext } from './ui/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
 import { Navigate, Route, Routes, useLocation } from 'react-router'
 import { SavedCardsEditor } from './ui/savedCards'
@@ -67,6 +67,7 @@ export const App = () => {
                           element={<SavedCardsEditor {...project} />}
                         />
                         <Route path='/about-me' element={<AppInfo />} />
+                        <Route path='/whats-next/*' element={<WhatsNext />} />
                         <Route path='/user-guide/*' element={<DocsView />} />
                         <Route path='/history' element={<HistoryView />} />
                         <Route path="/settings" element={<SettingsView />} />

@@ -1,6 +1,10 @@
 import React, { useContext, useState } from 'react'
 import { FlagContext } from './flags'
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
+import { Link } from 'react-router-dom'
+import gitcube from "../../docs/design/gitcube.md";
+import { Route, Routes } from 'react-router'
+import { MDDoc } from './docs/renderer'
 
 export const AppInfo = () => {
   const { setFlag } = useContext(FlagContext)
@@ -80,11 +84,10 @@ export const AppInfo = () => {
       <ul>
         <li>locally-sourced syntax documentation</li>
         <li>query history</li>
-        <li>
-          full scryfall syntax support for in-memory filtering, potentially as
-          a standalone code library
-        </li>
         <li>shareable search links</li>
+        <li>
+          <Link to="/whats-next/git-cube">a more portable cube data format</Link>
+        </li>
       </ul>
 
       <h2>this looks cool<span onClick={clickPin2}>!</span> how can i contribute?</h2>
@@ -110,4 +113,14 @@ export const AppInfo = () => {
       </p>
     </>
   )
+}
+
+export function WhatsNext() {
+  useHighlightPrism([]);
+
+  return <div className="prose">
+    <Routes>
+      <Route path="/git-cube" element={<MDDoc>{gitcube}</MDDoc>}/>
+    </Routes>
+  </div>
 }
