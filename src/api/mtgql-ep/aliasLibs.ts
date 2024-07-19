@@ -12,6 +12,10 @@ export const stdlib = (now: Date) => ({
     name: "pauper-commander",
     query: '(is:commander or t:creature) r:u'
   },
+  traditional: {
+    name: "default-skin",
+    hovertext: 'Attempts to filter out digital cards, joke cards, and unreadable showcase printings.',
+    query: 'in:paper -is:silly -is:showcase -frame:showcase -border:silver -border:gold -border:borderless -is:full -l:phyrexian',
   htr: {
     name: "htr",
     query: 'set:PH22 or set:ph21 or set:ph20 or set:ph19 or set:ph18 or set:ph17 or set:phtr'
