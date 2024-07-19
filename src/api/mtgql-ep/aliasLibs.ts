@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 export const stdlib = (now: Date) => ({
   released: { name: "released", query: `date<=${format(now, "yyyy-MM-dd")}` },
   newest: { name: "newest", query: `order:released direction:desc` },
+  oldest: { name: "oldest", query: `order:released direction:desc` },
   bar: {
     name: "bar",
     query: `-fo:token (-fo:/\\bcounters?\\b/ or fo:/counter (it|up to|target|that|all)/) game:paper -has:back -is:dfc -is:extra -fo:/\\bnote\\b/`,
