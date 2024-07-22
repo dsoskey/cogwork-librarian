@@ -6,6 +6,7 @@ export const displayTypes = {
   render: 'render',
   list: 'list',
   json: 'json',
+  viz: 'viz'
 } as const
 export type DisplayType = ObjectValues<typeof displayTypes>
 

@@ -3,6 +3,7 @@ import React, { useContext } from 'react'
 import './cardListView.css'
 import { FlagContext } from '../../flags'
 import { ManaCost } from '../../card/manaCost'
+import { CardLink } from '../../card/CardLink'
 
 
 interface CardListRowProps {
@@ -10,14 +11,12 @@ interface CardListRowProps {
 }
 
 
-export const CardListRow = ({ card }: CardListRowProps) => {
+export function CardListRow({ card }: CardListRowProps) {
   const { showDebugInfo } = useContext(FlagContext).flags
 
   return <tr>
     <td>
-      <a href={card.data.scryfall_uri} target='_blank' rel='noreferrer noopener'>
-        {card.data.name}
-      </a>
+      <CardLink name={card.data.name} id={card.data.id} />
     </td>
     <td className='mana-cost'>
       {card.data.mana_cost ? <ManaCost manaCost={card.data.mana_cost} /> : '~'}
@@ -31,16 +30,17 @@ interface CardListViewProps {
   result: EnrichedCard[]
 }
 
-export const CardListView = ({ result }: CardListViewProps) => {
+// NEXT: column config to combine with data viz functions
+export function CardListView({ result }: CardListViewProps) {
   const { showDebugInfo } = useContext(FlagContext).flags
   return <table className='list-view'>
     <thead>
-      <tr>
-        <th>name</th>
-        <th>mana cost</th>
-        <th>type</th>
-        {showDebugInfo && <th>weight</th>}
-      </tr>
+    <tr>
+      <th>name</th>
+      <th>mana cost</th>
+      <th>type</th>
+      {showDebugInfo && <th>weight</th>}
+    </tr>
     </thead>
     <tbody>
     {result.map(it => <CardListRow key={it.data.id} card={it} />)}

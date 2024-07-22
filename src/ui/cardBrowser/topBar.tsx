@@ -6,15 +6,10 @@ import { QueryReport } from '../../api/useReporter'
 import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { FlagContext } from '../flags'
-import { ActiveCollection, activeCollections, DisplayType } from './types'
+import { ActiveCollection, DisplayType } from './types'
 import './topBar.css'
 import { SearchError } from '../component/searchError'
 import { useViewportListener } from '../viewport'
-
-const collectionOptions: Record<ActiveCollection, string> = {
-  search: 'results',
-  ignore: 'ignored'
-}
 
 interface TopBarProps {
   // report metadata
@@ -61,8 +56,6 @@ export const TopBar = ({
   errors,
   displayType,
   setDisplayType,
-  activeCollection,
-  setActiveCollection,
 }: TopBarProps) => {
   const { showDebugInfo, displayTypes } = useContext(FlagContext).flags
   const { mobile } = useViewportListener()
@@ -160,21 +153,16 @@ export const TopBar = ({
         </>)}
       </div>
       {status === 'success' && !mobile && vennControl}
-      <div className='result-controls column'>
+      <div className='result-controls'>
         {pageControl}
+        {downloadButton}
         {displayTypes && <label className='display-type'>
-          <span>show{" "}</span>
-          <select value={activeCollection} onChange={event => setActiveCollection(event.target.value as ActiveCollection)}>
-            {Object.values(activeCollections).map(it => <option key={it} value={it}>{collectionOptions[it]}</option>)}
-          </select>
-          <span>{" "}as:{" "}</span>
+          <span className="bold">show cards as:{" "}</span>
           <select value={displayType} onChange={event => setDisplayType(event.target.value as DisplayType)}>
-            <option>cards</option>
-            <option>render</option>
-            <option>list</option>
+            <option value="cards">images</option>
+            <option value="viz">data viz (alpha)</option>
           </select>
         </label>}
-        {downloadButton}
         {cardsPerRowControl}
       </div>
     </div>

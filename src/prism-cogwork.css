@@ -112,6 +112,11 @@ textarea[class*='language-'] {
   color: #f8c555;
 }
 
+.token.identity {
+  color: #d4f854;
+  font-weight: bold;
+}
+
 .token.scryfallCharSet {
   font-style: italic;
 }

@@ -20,6 +20,7 @@ import { Card } from 'mtgql'
 import { downloadText } from '../download'
 import { SearchHoverActions } from './cardViews/searchHoverActions'
 import { CardsPerRowControl } from '../component/cardsPerRowControl'
+import { CardVizView } from './cardViews/cardVizView'
 
 const handleDownload = (text: string, ext: string) => {
   const now = new Date()
@@ -127,7 +128,7 @@ export const BrowserView = React.memo(({
   /> : null
 
   const downloadButton = <div>
-    <span>download:&nbsp;</span>
+    <span className="bold">download:&nbsp;</span>
     <button onClick={() => handleDownload(result.map(it => it.data.name).join("\n"), 'txt')}>
       card names
     </button>
@@ -197,6 +198,10 @@ export const BrowserView = React.memo(({
                 />
               )
             })}
+            {displayType === "viz" && <div className="viz-container">
+              <CardVizView cards={result} />
+              <CardListView result={currentPage} />
+            </div>}
             {displayType === 'json' && <CardJsonView result={currentPage} />}
             {displayType === 'list' && <CardListView result={currentPage} />}
           </div>

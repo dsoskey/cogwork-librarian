@@ -9,7 +9,7 @@ const getBackImageURI = (card: Card, version: keyof ImageUris) => {
     : card.card_faces[1]?.image_uris?.[version] ?? ''
 }
 
-function getFrontImageURI(card: Card, version: keyof ImageUris): string | undefined {
+export function getFrontImageURI(card: Card, version: keyof ImageUris): string | undefined {
   if (!card.card_faces) return undefined;
   return card.card_faces[0]?.image_uris?.[version]
     ?? card.image_uris?.[version];

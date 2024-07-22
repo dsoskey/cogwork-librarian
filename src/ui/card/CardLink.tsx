@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { flip, offset, useFloating, useHover, useInteractions } from '@floating-ui/react'
+import { autoPlacement, Placement, offset, useFloating, useHover, useInteractions } from '@floating-ui/react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB } from '../../api/local/db'
 import { Card } from 'mtgql'
@@ -28,17 +28,21 @@ export function MDCardImage ({ name, id }) {
 interface CardLinkProps {
   name: string
   id: string
+  allowedPlacements?: Placement[]
 }
-export function CardLink({ name, id }: CardLinkProps) {
+export function CardLink({ name, id, allowedPlacements }: CardLinkProps) {
   const card: Card = useCardLoader(name, id);
   const [isLockedOpen, setIsLockedOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const _allowedPlacements = allowedPlacements ?? ["top", "bottom"];
 
   const {refs, floatingStyles, context} = useFloating({
     open: isOpen,
-    placement: "bottom",
     onOpenChange: setIsOpen,
-    middleware: [offset({ mainAxis: 4 }), flip()],
+    middleware: [
+      autoPlacement({ allowedPlacements: _allowedPlacements }),
+      offset({ mainAxis: 4 }),
+    ],
   });
 
   const hover = useHover(context);
@@ -47,7 +51,10 @@ export function CardLink({ name, id }: CardLinkProps) {
 
   return (
     <>
-      <span className={`card-link ${isLockedOpen ? "active" : ''}`} ref={refs.setReference} {...getReferenceProps()} onClick={() => setIsLockedOpen(p=>!p)}>
+      <span
+        className={`card-link ${isLockedOpen ? "active" : ''}`}
+        title={isLockedOpen ? "" : "click hovered text to keep image open"}
+        ref={refs.setReference} {...getReferenceProps()} onClick={() => setIsLockedOpen(p=>!p)}>
         {name}
       </span>
       {(isLockedOpen || isOpen) && (

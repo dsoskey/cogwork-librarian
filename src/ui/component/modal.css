@@ -5,7 +5,9 @@
   color: var(--dark-color);
   width: 80vw;
   max-height: 80svh;
-  overflow-y: scroll;
+  overflow-y: auto;
+  scrollbar-color: var(--light-color) var(--dark-color);
+
 
   a {
     color: var(--dark-color);

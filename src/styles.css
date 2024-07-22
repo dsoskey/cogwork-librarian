@@ -37,6 +37,7 @@
 
   background-color: var(--dark-color);
   color: var(--light-color);
+  scrollbar-color: var(--light-color) var(--dark-color);
 
   --monospace-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
@@ -115,6 +116,11 @@ input:disabled {
 }
 input::placeholder {
   color: var(--active-mid-alpha);
+}
+
+select {
+  background-color: var(--darker-color);
+  color: var(--light-color);
 }
 
 .bold {
@@ -685,6 +691,11 @@ textarea.coglib-prism-theme {
   flex-direction: row;
 }
 
+
+body:has(.query-panel) {
+  /* prevents CardLink from adding site-wide scroll on first render */
+  overflow-y: hidden;
+}
 .query-panel {
   flex:1;
   height: 100svh;

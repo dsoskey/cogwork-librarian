@@ -7,5 +7,6 @@ export const FLAG_NAMES = {
   docsUpdate: 'docsUpdate',
   edhrecOverlay: 'edhrecOverlay',
   proxyTest: 'proxyTest',
+  searchSource: "searchSource"
 } as const
 export type Flag = ObjectValues<typeof FLAG_NAMES>

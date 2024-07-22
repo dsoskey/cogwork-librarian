@@ -5,10 +5,11 @@ const config: ClientConfig = {
   flags: {
     showDebugInfo: true,
     adminMode: true,
-    displayTypes: false,
+    displayTypes: true,
     docsUpdate: true,
     edhrecOverlay: false,
     proxyTest: true,
+    searchSource: false,
   }
 }
 

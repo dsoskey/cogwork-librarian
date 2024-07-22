@@ -35,15 +35,6 @@
     align-items: end;
 }
 
-.topbar .display-type {
-    margin-top: var(--spacing-100);
-}
-
-.topbar select {
-    background-color: var(--darker-color);
-    color: var(--light-color);
-}
-
 .topbar .open-cogwork {
     position: absolute;
     top: 0;
