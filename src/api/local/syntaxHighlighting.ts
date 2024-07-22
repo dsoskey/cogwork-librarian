@@ -47,6 +47,10 @@ export const scryfall: Grammar = {
     lookbehind: true,
     alias: "string",
   },
+  identity: {
+    pattern: /(\s|^)\*(?=(\s|$))/,
+    lookbehind: true,
+  },
   keyword: {
     pattern: new RegExp(`(^|\\b)(${keywordRegex})(?=(${operators}))`, 'i'),
   },
