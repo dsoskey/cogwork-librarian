@@ -147,6 +147,10 @@ export const scryfallExtendedMulti: Grammar = {
     // pattern: /(\n|^)\s*#.*(?=\n|$)/,
     pattern: /@(include|i|defaultMode|dm|defaultWeight|dw|alias|a):\w+/,
   },
+  dd: {
+    pattern: /@(defaultDomain|dd)/,
+    alias: "extension",
+  },
   venn: {
     pattern: /@(venn|v)/,
     alias: ["extension"]

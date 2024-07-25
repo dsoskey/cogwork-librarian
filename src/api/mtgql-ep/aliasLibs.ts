@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
+import { Alias } from './types'
 
-export const stdlib = (now: Date) => ({
+export const stdlib = (now: Date): { [key: string]: Alias } => ({
   released: { name: "released", query: `date<=${format(now, "yyyy-MM-dd")}` },
   newest: { name: "newest", query: `order:released direction:desc` },
   bar: {

@@ -14,6 +14,7 @@ export interface Venn {
 }
 
 export interface QueryEnvironment {
+  defaultDomain?: string
   aliases: { [name: string]: Alias }
   defaultMode: QueryMode
   defaultWeight: QueryWeight

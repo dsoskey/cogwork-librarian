@@ -68,6 +68,19 @@ describe('replaceUse', function() {
 
     expect(result).toEqual("foo or blammo or bingus");
   })
+
+  it('should handle a nested alias cycle', function() {
+    const input = "@u:a or @u:b";
+    const aliases = {
+      a: { name: "a", query: "foo" },
+      b: { name: "b", query: "@u:c or bingus" },
+      c: { name: "c", query: "@u:d" },
+      d: { name: "d", query: "@u:b" }
+    };
+
+    const result = replaceUse(aliases, input);
+    expect(result.isErr()).toEqual(true);
+  })
 })
 
 describe('parseQuerySet', function() {

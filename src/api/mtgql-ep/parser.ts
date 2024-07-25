@@ -41,7 +41,7 @@ function resolveAliases(aliases: { [name: string]: Alias }): Result<{ [name: str
 
   for (const key in copy) {
     const value = aliases[key];
-    const res = replaceUse(aliases, value.query, [value.name]);
+    const res = replaceUse(aliases, value.query);
     if (res.isErr()) return err(res._unsafeUnwrapErr());
 
     copy[key] = { name: key, query: res._unsafeUnwrap() }
@@ -123,23 +123,26 @@ export function venn(_line: string): Result<Venn, ParserError> {
 }
 
 
-export function replaceUse(aliases: { [key: string]: Alias }, _line: string, cycle: string[] = []): Result<string, ParserError> {
+export function replaceUse(aliases: { [key: string]: Alias }, _line: string): Result<string, ParserError> {
   let result = _line.trim();
-  let jawn = new Set(cycle);
+  const usedAliasSet = new Set<string>();
 
   while (/(@u(?:se)?):([a-zA-Z0-9_-]+)/.test(result)) {
     const searchFor = /(@u(?:se)?):([a-zA-Z0-9_-]+)/g;
     const matches = Array.from(result.matchAll(searchFor));
+    const namesUsedThisStep = new Set<string>();
     for (let i = matches.length - 1; i >= 0; i--) {
       const match = matches[i];
       const name = match[2];
-      if (jawn.has(name)) return err({ offset: searchFor.lastIndex - name.length, message: `Alias ${name} is part of a cycle.`})
+      if (usedAliasSet.has(name)) return err({ offset: searchFor.lastIndex - name.length, message: `Alias ${name} is part of a cycle.`})
       if (!aliases[name]) return err({ offset: searchFor.lastIndex - name.length, message: `unknown alias ${name}` });
 
+      namesUsedThisStep.add(name);
       result = result.slice(0, match.index)
         + aliases[name].query
         + result.slice(match.index + match[0].length)
     }
+    namesUsedThisStep.forEach(it => usedAliasSet.add(it));
   }
 
   return ok(result);
@@ -153,6 +156,7 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
   const aliases: { [name: string]: Alias } = {}
   let defaultMode: QueryMode | undefined = undefined
   let defaultWeight: QueryWeight | undefined = undefined
+  let defaultDomain: string | undefined = undefined;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
@@ -227,7 +231,16 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
         default:
           break;
       }
+    } else if (/^@(dd|defaultDomain)\((.+)\)$/.test(trimmed)) {
+      const matches = trimmed.match(/^@(dd|defaultDomain)\((.+)\)$/);
+      defaultDomain = matches[matches.length - 1];
     }
+  }
+
+  if (defaultDomain !== undefined) {
+    const replaceResult = replaceUse(aliases, defaultDomain);
+    if (replaceResult.isErr()) return err({ query: "", displayMessage: replaceResult._unsafeUnwrapErr().message });
+    defaultDomain = replaceResult._unsafeUnwrap();
   }
 
   return resolveAliases(aliases)
@@ -235,6 +248,7 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
       aliases: resolvedAliases,
       defaultMode: defaultMode ?? DEFAULT_MODE,
       defaultWeight: defaultWeight ?? DEFAULT_WEIGHT,
+      defaultDomain,
     }))
     .mapErr(e => ({ query: "", displayMessage: e.message }))
 }
@@ -300,10 +314,18 @@ export function parseQuerySet(
         sub = selectedQueries
       }
 
+      let prefixFunc = injectPrefix(base)
+      if (queryEnv.defaultDomain !== undefined) {
+        // assign old prefix func to new variable to prevent recursion
+        const inner = prefixFunc;
+        prefixFunc = (query) =>
+          `${queryEnv.defaultDomain} (${inner(query)})`
+      }
+
       return ok({
         strategy: RunStrategy.Search,
         queries: sub,
-        injectPrefix: injectPrefix(base),
+        injectPrefix: prefixFunc,
         getWeight: weightAlgorithms[queryEnv.defaultWeight],
       })
     })
