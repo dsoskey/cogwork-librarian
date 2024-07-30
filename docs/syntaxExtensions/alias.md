@@ -1,13 +1,10 @@
 ### @alias & @use
 
-similar to defining a function in programming languages, 
-`@alias` defines a single query that you can reuse with the `@use` directive.
-aliases are defined in their own paragraph and cannot use other aliases.
+Aliases let you define a query once and use it in other query sets
+Define aliases in their own paragraph in the format `@alias:NAME(QUERY)`
+Press ▶️ next to the alias definition to run it as its own query
 
 ```scryfall-extended-multi
-# Aliases let you define a query once and use it in other query sets
-# Define aliases in their own paragraph in the format `@alias:NAME(QUERY)`
-# Press ▶️ next to the alias definition to run it as its own query
 @alias:innistrad(s:vow or s:mid or s:ema or s:soi or s:avr or s:dka or s:isd unique:cards)
 
 @alias:importantTypes(t:zombie or t:spirit or t:human or t:vampire or t:werewolf)
@@ -24,4 +21,15 @@ o:create
 @use:innistrad t:land
 
 @use:importantTypes o:/other .* you control/
+```
+
+Aliases can use other aliases as long as those aliases don't form a cycle.
+```scryfall-extended-multi
+# Example of a cycle
+@alias:a(@use:b)
+
+@alias:b(@use:c)
+
+# cogwork librarian identifies cycle here
+@alias:c(@use:a)
 ```

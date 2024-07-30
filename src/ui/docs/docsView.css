@@ -7,6 +7,10 @@
 .docs-view .docs-content {
     margin: 0 var(--spacing-300);
     flex: 5;
+
+    & > * {
+      max-width: 60rem;
+    }
 }
 
 .docs-content h3 {
