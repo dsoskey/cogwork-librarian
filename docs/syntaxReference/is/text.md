@@ -10,13 +10,13 @@ See the tables below for the full list of supported and documented `is` filters.
 | adventure        | cards that go on an adventure                                                                                        | ⚙️       |
 | arenaid          | cards with an arena_id                                                                                               | ⚙️       |
 | artist           | cards with at least one artist                                                                                       | ⚙️       |
-| artistmisprint   | not implemented                                                                                                      | 👁       |
+| artistmisprint   | not implemented                                                                                                      | 👁️      |
 | artseries        | card is an art series card                                                                                           | ⚙️       |
 | augmentation     | cards with augment or host                                                                                           | ⚙️       |
 | back             | cards with non-default back                                                                                          | ⚙️       |
 | battleland       | bfz typed dual lands. see `tangoland`                                                                                | ⚙️       |
 | bear             | cards that are 2 mana 2/2s                                                                                           | ⚙️       |
-| belzenlok        | not implemented                                                                                                      | 👁       |
+| belzenlok        | not implemented                                                                                                      | 👁️      |
 | bicycleland      | akh cycling dual lands. see `bikeland`                                                                               | ⚙️       |
 | bikeland         | akh cycling dual lands. see `cycleland`                                                                              | ⚙️       |
 | bondland         | multiplayer untapped dual lands from battlebond                                                                      | ⚙️       |
