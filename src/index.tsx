@@ -5,9 +5,9 @@ import Prism from 'prismjs'
 import {
   hookReactDOM,
   linkWrap,
-  scryfall,
-  scryfallExtended,
-  scryfallExtendedMulti
+  mtgql,
+  mtgqlExtended,
+  mtgqlExtendedMulti
 } from './api/local/syntaxHighlighting'
 import './prism-cogwork.css'
 import './styles.css'
@@ -22,9 +22,9 @@ const router = createBrowserRouter([
   { path: "*", Component: App }
 ])
 
-Prism.languages['scryfall'] = scryfall
-Prism.languages['scryfall-extended'] = scryfallExtended
-Prism.languages['scryfall-extended-multi'] = scryfallExtendedMulti
+Prism.languages['scryfall'] = mtgql
+Prism.languages['scryfall-extended'] = mtgqlExtended
+Prism.languages['scryfall-extended-multi'] = mtgqlExtendedMulti
 
 Prism.hooks.add('wrap', linkWrap)
 Prism.hooks.add('complete', hookReactDOM(router))

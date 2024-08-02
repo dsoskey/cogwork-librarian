@@ -144,4 +144,4 @@ See the tables below for the full list of supported and documented `is` filters.
 | variation        | cards with print variations, for example 2/3 Corpse Knight                                                           | ⚙️       |
 | watermark        | cards with a watermark                                                                                               | ⚙️       |
 
-* For the ultimate source of truth on Cogwork Libarian's support, see [this file](https://github.com/dsoskey/mtgql-js/blob/028b8f70ea8261c9b0cf002242e99ed62e266e14/src/types/card.ts#L25).
+* For the ultimate source of truth on Cogwork Libarian's `is` support, see [this file](https://github.com/dsoskey/mtgql-js/blob/028b8f70ea8261c9b0cf002242e99ed62e266e14/src/types/card.ts#L25).

@@ -1,19 +1,28 @@
 .loading-button .background {
-    fill: var(--active);
+  fill: var(--active);
 }
 
 .run-query-button:hover:not(:disabled) {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 .run-query-button:hover:not(:disabled) .background {
-    fill: var(--active-mid-alpha)
+  fill: var(--active-mid-alpha);
 }
 
 .run-query-button:disabled .loading-button .background {
+  fill: var(--active-low-alpha);
+}
+
+.run-query-button:focus {
+  .background {
     fill: var(--active-low-alpha);
+  }
+  .play {
+    fill: var(--active);
+  }
 }
 
 .loading-button:disabled .play {
-    fill: var(--dark-color);
+  fill: var(--dark-color);
 }

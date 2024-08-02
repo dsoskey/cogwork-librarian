@@ -1,41 +1,45 @@
-import React from 'react'
-import Prism, { Environment, Grammar } from 'prismjs'
-import 'prismjs/components/prism-regex.js'
-import { FILTER_KEYWORDS, OPERATORS } from 'mtgql'
-import { extensionDocs, syntaxDocs } from './syntaxDocs'
+import React from "react";
+import Prism, { Environment, Grammar } from "prismjs";
+import "prismjs/components/prism-regex.js";
+import { FILTER_KEYWORDS, OPERATORS } from "mtgql";
+import { extensionDocs, syntaxDocs } from "./syntaxDocs";
 import { Router as RemixRouter } from '@remix-run/router'
 
-export type Language = 'regex' | 'scryfall' | 'scryfall-extended' | 'scryfall-extended-multi'
-const keywordRegex = Object.values(FILTER_KEYWORDS).join('|')
+export type Language =
+  | "regex"
+  | "mtgql"
+  | "mtgql-extended"
+  | "mtgql-extended-multi";
+const keywordRegex = Object.values(FILTER_KEYWORDS).join("|");
 
-const operators = Object.values(OPERATORS).join('|')
+const operators = Object.values(OPERATORS).join("|");
 
-const scryfallRegex = {
-  scryfallCharSet: {
+const mtgqlRegex = {
+  mtgqlCharSet: {
     pattern: /\\(spt|spp|smh|smp|smm|smr|sm|sc|ss)/,
-    alias: 'class-name',
+    alias: "class-name",
   },
   ...Prism.languages.regex,
-}
+};
 
-// Anything defined by scryfall itself goes here
-export const scryfall: Grammar = {
+// Anything defined by mtgql itself goes here
+export const mtgql: Grammar = {
   negation: {
-    pattern: new RegExp(`-(${keywordRegex})(?=(${operators}))`, 'i'),
-    alias: 'deleted',
+    pattern: new RegExp(`-(${keywordRegex})(?=(${operators}))`, "i"),
+    alias: "deleted",
     greedy: true,
   },
   quotedCube: {
     pattern: /(\b(?:cube|cubeo):)("[^"]*"|'[^']*')/,
     greedy: true,
     lookbehind: true,
-    alias: 'function',
+    alias: "function",
   },
   quotedSet: {
     pattern: /(\b(?:set|s|edition|e):)("[^"]*"|'[^']*')/,
     greedy: true,
     lookbehind: true,
-    alias: 'function',
+    alias: "function",
   },
   cubeString: {
     pattern: /(\b(?:cube|cubeo):)[^\s#)(]+(?=(\b|$))/i,
@@ -52,22 +56,22 @@ export const scryfall: Grammar = {
     lookbehind: true,
   },
   keyword: {
-    pattern: new RegExp(`(^|\\b)(${keywordRegex})(?=(${operators}))`, 'i'),
+    pattern: new RegExp(`(^|\\b)(${keywordRegex})(?=(${operators}))`, "i"),
   },
   use: {
     pattern: /(^|\s|)@(use|u):\w+(?=( |\)|\n|$))/,
-    alias: 'extension',
+    alias: "extension",
   },
-  'unrecognized-keyword': {
-    pattern: new RegExp(`(^|\\b)(\\w+)(?=(${operators}))`, 'i'),
-    alias: ['keyword', 'important'],
+  "unrecognized-keyword": {
+    pattern: new RegExp(`(^|\\b)(\\w+)(?=(${operators}))`, "i"),
+    alias: ["keyword", "important"],
   },
   operator: {
-    pattern: new RegExp(`\\(|\\)|${operators}|(\\b(and|or)\\b)|\\+\\+|@@`, 'i'),
+    pattern: new RegExp(`\\(|\\)|${operators}|(\\b(and|or)\\b)|\\+\\+|@@`, "i"),
   },
   manaCost: {
     pattern: /\{..?(\/.)?}/,
-    alias: 'string',
+    alias: "string",
     inside: {
       white: {
         pattern: /w/i,
@@ -91,53 +95,54 @@ export const scryfall: Grammar = {
   },
   regex: {
     pattern: /\/(\\\/|[^/])+\//,
-    inside: scryfallRegex,
+    inside: mtgqlRegex,
     greedy: true,
   },
-  'quoted-string': {
+  "quoted-string": {
     pattern: /("[^"]*"|'[^']*')/,
     greedy: true,
-    alias: 'function',
+    alias: "function",
   },
-  'unbalanced-string': {
+  "unbalanced-string": {
     pattern: /('.*"|".*')/,
     greedy: true,
-    alias: ['function', 'important'],
+    alias: ["function", "important"],
   },
   string: {
     pattern: new RegExp(`[^\\s#]+(?=(\\b|$))`),
   },
-}
+};
 
-// Anything built on top of scryfall goes here
-export const scryfallExtended: Grammar = {
-  'invalid-comment': {
+// Anything built on top of mtgql goes here
+export const mtgqlExtended: Grammar = {
+  "invalid-comment": {
     pattern: /^#.+/,
-    alias: ['keyword', 'important'],
+    alias: ["keyword", "important"],
   },
   comment: {
     pattern: /\n\s*#.*/,
   },
-  'sub-query': {
+  "sub-query": {
     pattern: /\n.*/,
-    inside: scryfall,
-    alias: ['sub-query'],
+    inside: mtgql,
+    alias: ["sub-query"],
   },
-  'base-query': {
+  "base-query": {
     pattern: /.*/,
-    inside: scryfall,
-    alias: ['main-query'],
+    inside: mtgql,
+    alias: ["main-query"],
   },
-}
+};
 
 const comment: Grammar = {
   url: {
-    pattern: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/,
-    alias: ['comment'],
-  }
-}
+    pattern:
+      /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=+$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=+$,\w]+@)[A-Za-z0-9.\-]+)((?:\/[+~%\/.\w\-_]*)?\??(?:[\-+=&;%@.\w_]*)#?(?:[.!\/\\\w]*))?)/,
+    alias: ["comment"],
+  },
+};
 
-export const scryfallExtendedMulti: Grammar = {
+export const mtgqlExtendedMulti: Grammar = {
   comment: {
     pattern: /(\n|^)\s*#.*(?=\n|$)/,
     inside: comment,
@@ -153,91 +158,93 @@ export const scryfallExtendedMulti: Grammar = {
   },
   venn: {
     pattern: /@(venn|v)/,
-    alias: ["extension"]
+    alias: ["extension"],
   },
   // 'base-query': {
   //   // pattern: /(?:^|\n\n+|(\n|^)\s*#.*(\n|$))(?!\s*#).*(\n|$)/,
   //   pattern: /(^|\n\n+)(?!\s*#).*(?=\n|$)/,
-  //   inside: scryfall,
+  //   inside: mtgql,
   //   alias: ['main-query'],
   //   // lookbehind: true,
   //   greedy: true,
   // },
-  'sub-query': {
+  "sub-query": {
     pattern: /.*(\n|$)/,
-    inside: scryfall,
-    alias: ['sub-query'],
+    inside: mtgql,
+    alias: ["sub-query"],
   },
-}
+};
 
 export const linkWrap = (env: Environment) => {
   switch (env.type) {
     case "negation":
-      env.tag = "a"
+      env.tag = "a";
+      if (!env.attributes) env.attributes = {};
       env.attributes.href = "https://scryfall.com/docs/syntax#negating";
-      env.attributes.target = '_blank'
-      env.attributes.rel = 'noreferrer noopener'
+      env.attributes.target = "_blank";
+      env.attributes.rel = "noreferrer noopener";
       break;
     case "extension":
     case "use":
+    case "dd":
     case "venn": {
       const filter = env.content.match(/^\s*@(\w+):?.*$/)[1];
       const href = extensionDocs[filter];
       if (href) {
-        env.tag = 'a';
+        env.tag = "a";
         env.attributes.href = href;
         if (!href.startsWith("/")) {
-          env.attributes.target = '_blank'
-          env.attributes.rel = 'noreferrer noopener'
+          env.attributes.target = "_blank";
+          env.attributes.rel = "noreferrer noopener";
         }
       }
       break;
     }
     case "keyword": {
-      const href = syntaxDocs[env.content]
+      const href = syntaxDocs[env.content];
       if (href) {
-        env.tag = 'a';
+        env.tag = "a";
         env.attributes.href = href;
         if (!href.startsWith("/")) {
-          env.attributes.target = '_blank'
-          env.attributes.rel = 'noreferrer noopener'
+          env.attributes.target = "_blank";
+          env.attributes.rel = "noreferrer noopener";
         }
       }
       break;
     }
     case "cubeString":
-      env.tag = 'a'
-      env.attributes.href = `/data/cube/${env.content}`
+      env.tag = "a";
+      env.attributes.href = `/data/cube/${env.content}`;
       break;
     case "setString":
-      env.tag = 'a'
-      env.attributes.href = `https://scryfall.com/search?q=set:"${env.content}"&unique=cards&as=grid&order=set`
-      env.attributes.target = '_blank'
-      env.attributes.rel = 'noreferrer noopener'
+      env.tag = "a";
+      env.attributes.href = `https://scryfall.com/search?q=set:"${env.content}"&unique=cards&as=grid&order=set`;
+      env.attributes.target = "_blank";
+      env.attributes.rel = "noreferrer noopener";
       break;
     case "quotedSet":
-      env.tag = 'a'
-      env.attributes.href = `https://scryfall.com/search?q=set:${env.content}&unique=cards&as=grid&order=set`
-      env.attributes.target = '_blank'
-      env.attributes.rel = 'noreferrer noopener'
+      env.tag = "a";
+      env.attributes.href = `https://scryfall.com/search?q=set:${env.content}&unique=cards&as=grid&order=set`;
+      env.attributes.target = "_blank";
+      env.attributes.rel = "noreferrer noopener";
       break;
     case "operator":
       if (Object.keys(OPERATORS).includes(env.content)) return;
       if (env.content.includes("&lt;")) return;
       if (env.content.includes(")")) return;
       if (env.content.includes("(")) return;
-      env.tag = 'a'
-      env.attributes.href = syntaxDocs[env.content]
-      env.attributes.target = '_blank'
-      env.attributes.rel = 'noreferrer noopener'
+      env.tag = "a";
+      env.attributes.href = syntaxDocs[env.content];
+      env.attributes.target = "_blank";
+      env.attributes.rel = "noreferrer noopener";
       break;
     case "url":
-      env.tag = 'a'
-      env.attributes.href = env.content
-      env.attributes.target = '_blank'
-      env.attributes.rel = 'noreferrer noopener'
+      env.tag = "a";
+      env.attributes.href = env.content;
+      env.attributes.target = "_blank";
+      env.attributes.rel = "noreferrer noopener";
   }
-}
+};
 
 export const hookReactDOM = (router: RemixRouter) => (env: Environment) => {
   if (!env.element) return;
@@ -256,6 +263,6 @@ export const hookReactDOM = (router: RemixRouter) => (env: Environment) => {
 
 export const useHighlightPrism = (deps: any[]) => {
   React.useLayoutEffect(() => {
-    Prism.highlightAll()
-  }, deps)
-}
+    Prism.highlightAll();
+  }, deps);
+};

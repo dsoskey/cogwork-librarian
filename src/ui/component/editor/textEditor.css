@@ -1,0 +1,165 @@
+.coglib-prism-theme {
+  /* copies prism theme */
+  font-family: var(--monospace-family);
+  font-size: 1em;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  overflow: auto;
+  border: none;
+}
+textarea.coglib-prism-theme {
+  padding: var(--toolbar-height, 1em) 1em 1em var(--gutter-width, 1em);
+  margin: 0.5em 0;
+}
+
+.query-editor {
+  --toolbar-height: 24px;
+  --gutter-width: 0.25em;
+  margin-top: var(--spacing-200);
+  margin-bottom: var(--spacing-200);
+  height: max-content;
+  display: grid;
+  position: relative;
+  grid-template-columns: auto auto 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "labels brown overlap";
+
+  &.separated {
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-areas:
+      ".      .     display"
+      "labels brown overlap"
+      ".      .     links";
+    .links {
+      grid-area: links;
+    }
+    .controller {
+      color: var(--light-color);
+    }
+    .display {
+      grid-area: display;
+    }
+    .overlay-toggle {
+      grid-area: labels;
+    }
+  }
+
+  &:focus-within {
+    outline: 2px inset var(--active);
+
+    * {
+      outline: none;
+    }
+  }
+
+  pre,
+  textarea {
+    margin-top: 0;
+    margin-bottom: 0;
+    overflow-y: clip;
+  }
+
+  .overlay-toggle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    padding: 0;
+    border: unset;
+    font-weight: bold;
+    width: var(--toolbar-height, 20px);
+    height: var(--toolbar-height, 20px);
+  }
+
+  .labels {
+    grid-area: labels;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    cursor: default;
+    padding-right: 0;
+    padding-left: var(--spacing-200);
+    width: 61px;
+
+    .venn,
+    .base {
+      background-color: var(--darkest-color);
+    }
+
+    .multi-code {
+      white-space: pre;
+    }
+  }
+
+  .run-query-button {
+    background-color: transparent;
+    border: 0;
+    padding: 0 var(--spacing-100) 0 0;
+    margin: 0;
+    top: 0.15em;
+    position: relative;
+    cursor: pointer;
+    aspect-ratio: 1/1;
+
+    &:disabled {
+      cursor: unset;
+    }
+  }
+
+  .links {
+    grid-area: overlap;
+    box-sizing: border-box;
+    display: inline-block;
+    background-color: color-mix(in srgb, var(--active), transparent 80%);
+    scrollbar-color: var(--active-mid-alpha) var(--darker-color);
+
+    &.show {
+      z-index: 4;
+    }
+    &.hide {
+      z-index: 1;
+    }
+
+    a:focus {
+      background-color: color-mix(in srgb, var(--active), transparent 80%);
+    }
+    :not(a) {
+      color: transparent;
+      background: transparent;
+    }
+  }
+
+  .controller {
+    caret-color: var(--active);
+    resize: none;
+    grid-area: overlap;
+    z-index: 3;
+    box-sizing: border-box;
+    overflow-x: auto;
+    scrollbar-color: var(--active-mid-alpha) var(--darker-color);
+    color: transparent;
+    background-color: transparent;
+
+    &::selection {
+      background-color: var(--active-low-alpha);
+    }
+    &::placeholder {
+      color: var(--active-mid-alpha);
+    }
+  }
+
+  .display {
+    z-index: 2;
+    box-sizing: border-box;
+    display: inline-block;
+    grid-area: overlap;
+
+    a {
+      text-decoration: none;
+    }
+  }
+}
