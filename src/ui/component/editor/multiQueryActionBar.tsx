@@ -3,7 +3,7 @@ import { rankInfo } from "./infoLines";
 import { useHighlightPrism } from "../../../api/local/syntaxHighlighting";
 import { QuerySetButton } from "../querySetButton";
 
-export const VENN_REGEXP = /^@(v|venn)(?=\()/;
+export const VENN_REGEXP = /^@(v|venn)\((.+)\)\((.+)\)$/;
 
 export const multiQueryInfo =
   (renderSubquery: (count: number) => string) =>

@@ -7,6 +7,8 @@ import cloneDeep from 'lodash/cloneDeep'
 
 const ALIAS_REGEXP = /^@(a|alias):/
 export const VENN_REGEXP = /^@(v|venn)/
+const DEFAULT_DOMAIN_REGEXP = /^@(dd|defaultDomain)\((.+)\)$/
+
 export function alias(_line: string): Result<Alias, ParserError> {
   const line = _line.trim();
   if (!/^@a(lias)?:/.test(line))
@@ -231,8 +233,10 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
         default:
           break;
       }
-    } else if (/^@(dd|defaultDomain)\((.+)\)$/.test(trimmed)) {
-      const matches = trimmed.match(/^@(dd|defaultDomain)\((.+)\)$/);
+    } else if (DEFAULT_DOMAIN_REGEXP.test(trimmed)) {
+      if (defaultDomain !== undefined)
+        return err({ query: trimmed, displayMessage: "Projects can only have one default domain" })
+      const matches = trimmed.match(DEFAULT_DOMAIN_REGEXP);
       defaultDomain = matches[matches.length - 1];
     }
   }
@@ -270,6 +274,8 @@ export function parseQuerySet(
           } else {
             return err({ query, displayMessage: `unknown alias ${name}` })
           }
+        } else if (DEFAULT_DOMAIN_REGEXP.test(query)) {
+          selectedQueries = [queryEnv.defaultDomain]
         } else if (!query.startsWith("#")) {
           const res = replaceUse(queryEnv.aliases, query)
 
@@ -297,8 +303,8 @@ export function parseQuerySet(
       if (VENN_REGEXP.test(base)) {
         return venn(base)
           .andThen((venn) => {
-            const leftReplaced = replaceUse(queryEnv.aliases, venn.left);
-            const rightReplaced = replaceUse(queryEnv.aliases, venn.right);
+            const leftReplaced = replaceUse(queryEnv.aliases, queryEnv.defaultDomain ? `${queryEnv.defaultDomain} (${venn.left})` : venn.left);
+            const rightReplaced = replaceUse(queryEnv.aliases, queryEnv.defaultDomain ? `${queryEnv.defaultDomain} (${venn.right})` : venn.right);
             return Result.combineWithAllErrors([leftReplaced, rightReplaced])
               .map(([left, right]) => ({
                 strategy: RunStrategy.Venn,
@@ -308,7 +314,7 @@ export function parseQuerySet(
               }))
               .mapErr((errors) => ({ query: base, displayMessage: errors.join("\n") }));
           })
-          .mapErr(e => ({ query: base, displayMessage: `syntax error for venn diagram query.\n${e}`}))
+          .mapErr((e: ParserError) => ({ query: base, displayMessage: `Error with venn query: ${e.message}\n\t${columnShower(base, e.offset)}`}))
       } else if (queryEnv.defaultMode === 'allsub') {
         base = ""
         sub = selectedQueries
