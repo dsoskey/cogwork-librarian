@@ -14,7 +14,12 @@ export const useIgnoreList = (): IgnoreList => {
   )
   const addIgnoredId = useCallback(
     (next) =>
-      setIgnoredIds((prev) => [...prev.filter((it) => it.length > 0), next]),
+      setIgnoredIds((prev) => {
+        if (prev.includes(next)) {
+          return prev.filter(it => it !== next && it.length > 0);
+        }
+        return [...prev.filter((it) => it.length > 0), next]
+      }),
     [setIgnoredIds]
   )
 
