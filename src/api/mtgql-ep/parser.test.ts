@@ -1,4 +1,4 @@
-import { alias, parseQuerySet, replaceUse, venn } from './parser'
+import { alias, parseQuerySet, replaceUse, unMultiline, venn } from './parser'
 import { Alias } from './types'
 import { weightAlgorithms } from '../queryRunnerCommon'
 
@@ -7,6 +7,29 @@ describe('alias', function() {
     const result = alias("@a:u(t:creature)")._unsafeUnwrap();
     const expected: Alias = { name: "u", query: "(t:creature)" };
     expect(result).toEqual(expected)
+  })
+})
+
+describe('unMultiline', function() {
+
+  it('should parse an alias real proper', function() {
+    const input = [
+      "",
+      "jerp\\",
+      "clerp",
+      "shamp",
+      "champ \\",
+      "jamp \\",
+      "buppy",
+    ];
+
+    const result = unMultiline(input);
+    expect(result).toEqual([
+      "",
+      "jerp clerp",
+      "shamp",
+      "champ jamp buppy"
+    ])
   })
 })
 

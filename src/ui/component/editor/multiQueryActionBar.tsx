@@ -2,6 +2,7 @@ import React from "react";
 import { rankInfo } from "./infoLines";
 import { useHighlightPrism } from "../../../api/local/syntaxHighlighting";
 import { QuerySetButton } from "../querySetButton";
+import { DEFAULT_MODE_REGEXP, DEFAULT_WEIGHT_REGEXP } from '../../../api/mtgql-ep/parser'
 
 export const VENN_REGEXP = /^@(v|venn)\((.+)\)\((.+)\)$/;
 
@@ -13,19 +14,28 @@ export const multiQueryInfo =
     }
     const result = [];
     let count = 0;
+    let isMultiline = false;
     for (const line of queries) {
-      if (line.trim().length === 0) {
+      const trimmed = line.trim();
+      if (trimmed.length === 0) {
         result.push("    ");
         count = 0;
-      } else if (line.trimStart().startsWith("#")) {
+      } else if (trimmed.startsWith("#")) {
         result.push(" ");
+      } else if (count === 0 && DEFAULT_WEIGHT_REGEXP.test(trimmed)) {
+        result.push("WGHT");
+      } else if (count === 0 && DEFAULT_MODE_REGEXP.test(trimmed)) {
+        result.push("MODE");
       } else if (count === 0) {
         result.push(VENN_REGEXP.test(line.trim()) ? "VENN" : "BASE");
         count += 1;
+      } else if (isMultiline) {
+        result.push(" ");
       } else {
         result.push(renderSubquery(count));
         count += 1;
       }
+      isMultiline = !trimmed.startsWith("#") && trimmed.endsWith("\\");
     }
     return result;
   };

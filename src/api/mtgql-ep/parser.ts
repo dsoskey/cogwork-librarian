@@ -8,6 +8,8 @@ import cloneDeep from 'lodash/cloneDeep'
 const ALIAS_REGEXP = /^@(a|alias):/
 export const VENN_REGEXP = /^@(v|venn)/
 const DEFAULT_DOMAIN_REGEXP = /^@(dd|defaultDomain)\((.+)\)$/
+export const DEFAULT_WEIGHT_REGEXP = /^@(dw|defaultWeight):/
+export const DEFAULT_MODE_REGEXP = /^@(dm|defaultMode):/
 
 export function alias(_line: string): Result<Alias, ParserError> {
   const line = _line.trim();
@@ -183,7 +185,7 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
         })
       }
       aliases[aliasOk.name] = aliasOk
-    } else if (/^@(dw|defaultWeight):/.test(trimmed)) {
+    } else if (DEFAULT_WEIGHT_REGEXP.test(trimmed)) {
       const index = trimmed.indexOf(":");
       const value = trimmed.substring(index + 1);
       switch (value) {
@@ -203,7 +205,7 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
             displayMessage: `unrecognized weight algorithm ${value}. choose zipf or uniform`
           })
       }
-    } else if (/^@(dm|defaultMode):/.test(trimmed)) {
+    } else if (DEFAULT_MODE_REGEXP.test(trimmed)) {
       const index = trimmed.indexOf(":");
       const value = trimmed.substring(index + 1);
       switch (value) {
@@ -257,15 +259,35 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
     .mapErr(e => ({ query: "", displayMessage: e.message }))
 }
 
+export function unMultiline(queries: string[]): string[] {
+
+  const unMultilined: string[] = [];
+  let currentQuery: string[] = [];
+  for (const query of queries) {
+    currentQuery.push(query.replace(/\s*\\\s*$/, ""));
+    const trimmed = query.trim();
+    if (!trimmed.endsWith("\\") && !trimmed.startsWith("#")) {
+      unMultilined.push(currentQuery.join(" "));
+      currentQuery = [];
+    }
+  }
+  if (currentQuery.length) {
+    unMultilined.push(currentQuery.join(" "));
+  }
+  return unMultilined
+}
+
 export function parseQuerySet(
   queries: string[],
   baseIndex: number
 ): Result<ParsedQuerySet, CogError>  {
-  return parseQueryEnv(queries)
+  const unMultilined = unMultiline(queries);
+  return parseQueryEnv(unMultilined)
     .andThen(queryEnv => {
       let selectedQueries: string[] = []
       let currentIndex = baseIndex
       while (currentIndex < queries.length && queries[currentIndex].trim() !== "") {
+        // we need to get the index without collapsing multilines
         const query = queries[currentIndex].trim()
         if (ALIAS_REGEXP.test(query)) {
           const name = query.substring(query.indexOf(":") + 1, query.indexOf("("))
@@ -291,7 +313,9 @@ export function parseQuerySet(
         }
         currentIndex++
       }
-      console.debug(selectedQueries)
+      // once we've selected our queries we can collapse multilines as we don't need the submitted index anymore
+      selectedQueries = unMultiline(selectedQueries);
+      console.debug("selected queries:", selectedQueries);
       if (selectedQueries.length === 0) {
         return err({
           query: queries[baseIndex],
@@ -315,7 +339,8 @@ export function parseQuerySet(
               .mapErr((errors) => ({ query: base, displayMessage: errors.join("\n") }));
           })
           .mapErr((e: ParserError) => ({ query: base, displayMessage: `Error with venn query: ${e.message}\n\t${columnShower(base, e.offset)}`}))
-      } else if (queryEnv.defaultMode === 'allsub') {
+      }
+      if (queryEnv.defaultMode === 'allsub') {
         base = ""
         sub = selectedQueries
       }
