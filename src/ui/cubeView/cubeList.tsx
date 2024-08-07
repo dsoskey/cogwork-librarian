@@ -46,6 +46,7 @@ const SORT_OPTIONS = [
     "word_count",
     "full_word_count"
 ]
+const DEFAULT_ORDERING = ["color_id", 'cmc', "creatures_first", 'type_line', 'name']
 
 const options: SearchOptions = {
     order: 'cmc',
@@ -100,10 +101,7 @@ export function CubeList({}: CubeListProps) {
         execute([query], 0);
     }
 
-    const [ordering, setOrdering] = useLocalStorage<any[]>(
-      "cube-sort.coglib.sosk.watch",
-      ["color_id", 'cmc', "creatures_first", 'type_line', 'name']
-    )
+    const [ordering, setOrdering] = useLocalStorage<any[]>("cube-sort.coglib.sosk.watch", DEFAULT_ORDERING)
     const sorted: OrderedCard[] = useMemo(() => {
         console.time("cardmap")
         const _cards = queryRunner.status === "success"
@@ -176,13 +174,14 @@ function SimpleFilterAndSort({ ordering, setOrdering, applyFilter, clearFilter, 
         <div className="cube-filter row center">
             <label className='row center'>
                 <span className="bold">filter: </span>
-                <Input language="scryfall" value={filterQuery} onChange={e => setFilterQuery(e.target.value)} onKeyDown={handleEnter} />
+                <Input language="mtgql" value={filterQuery} onChange={e => setFilterQuery(e.target.value)} onKeyDown={handleEnter} />
             </label>
             <button onClick={apply} disabled={filterQuery.length === 0}>Apply filter</button>
             <button onClick={clearFilter} disabled={!canClear}>Clear filter</button>
         </div>
         <Multiselect
           optionTransform={it => it.replace(/_/g, " ")}
+          defaultValue={DEFAULT_ORDERING}
           labelComponent={<span className="bold">sort: </span>} value={ordering} setValue={setOrdering}>
             {SORT_OPTIONS.map(value => {
                 return <option key={value} value={value}>

@@ -6,11 +6,12 @@ import "./multiselect.css"
 export interface MultiselectProps extends HTMLAttributes<HTMLSelectElement> {
   labelComponent: React.ReactNode
   value: string[]
+  defaultValue?: string[]
   setValue: Setter<string[]>
   optionTransform?: (s: string) => string
 }
 
-export function Multiselect({ optionTransform, labelComponent, value, setValue, ...props }: MultiselectProps) {
+export function Multiselect({ defaultValue, optionTransform, labelComponent, value, setValue, ...props }: MultiselectProps) {
   const transform = optionTransform ?? (it => it);
   return <div className="multiselect column">
     <div>
@@ -28,6 +29,7 @@ export function Multiselect({ optionTransform, labelComponent, value, setValue, 
           {props.children}
         </select>
       </label>
+      {defaultValue !== undefined && value !== defaultValue && <button onClick={()=> setValue(defaultValue)}>reset</button>}
     </div>
 
     <DragDropContext onDragEnd={e => {
