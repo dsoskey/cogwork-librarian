@@ -30,24 +30,24 @@ export const mtgql: Grammar = {
     greedy: true,
   },
   quotedCube: {
-    pattern: /(\b(?:cube|cubeo):)("[^"]*"|'[^']*')/,
+    pattern: /(\b(?:cube|cubeo):|=)("[^"]*"|'[^']*')/,
     greedy: true,
     lookbehind: true,
     alias: "function",
   },
   quotedSet: {
-    pattern: /(\b(?:set|s|edition|e):)("[^"]*"|'[^']*')/,
+    pattern: /(\b(?:set|s|edition|e):|=)("[^"]*"|'[^']*')/,
     greedy: true,
     lookbehind: true,
     alias: "function",
   },
   cubeString: {
-    pattern: /(\b(?:cube|cubeo):)[^\s#)(]+(?=(\b|$))/i,
+    pattern: /(\b(?:cube|cubeo):|=)[^\s#)(]+(?=(\b|$))/i,
     lookbehind: true,
     alias: "string",
   },
   setString: {
-    pattern: /(\b(?:set|s|edition|e):)[^\s#]+(?=(\b|$))/i,
+    pattern: /(\b(?:set|s|edition|e):|=)[^\s#]+(?=(\b|$))/i,
     lookbehind: true,
     alias: "string",
   },
@@ -61,6 +61,7 @@ export const mtgql: Grammar = {
   use: {
     pattern: /(^|\s|)@(use|u):\w+(?=( |\)|\n|$))/,
     alias: "extension",
+    lookbehind: true,
   },
   "unrecognized-keyword": {
     pattern: new RegExp(`(^|\\b)(\\w+)(?=(${operators}))`, "i"),

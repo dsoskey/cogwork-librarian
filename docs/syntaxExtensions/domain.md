@@ -7,7 +7,7 @@ Default domain is defined in its own paragraph and can reference aliases.
 @include:stdlib
 
 # short version is @dd
-@defaultDomain(-is:extra -cubeo:soskgy @use:newest)
+@defaultDomain(-is:extra -cube:soskgy @use:newest)
 
 year=2024
 ```

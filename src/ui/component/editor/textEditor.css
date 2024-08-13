@@ -82,8 +82,11 @@ textarea.coglib-prism-theme {
     flex-direction: column;
     cursor: default;
     padding-right: 0;
-    padding-left: var(--spacing-200);
-    width: 61px;
+    padding-left: 0;
+
+    .line-number {
+      color: color-mix(var(--color-interpolation), var(--dark300), var(--light600) 50%);
+    }
 
     .venn,
     .base {
@@ -93,6 +96,9 @@ textarea.coglib-prism-theme {
     .multi-code {
       white-space: pre;
     }
+  }
+  .labels > div {
+    padding-left: var(--spacing-200);
   }
 
   .run-query-button {

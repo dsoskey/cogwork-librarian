@@ -1,4 +1,4 @@
-import { alias, parseQuerySet, replaceUse, unMultiline, venn } from './parser'
+import { alias, parseQuerySet, replaceUse, collapseMultiline, venn } from './parser'
 import { Alias } from './types'
 import { weightAlgorithms } from '../queryRunnerCommon'
 
@@ -23,13 +23,8 @@ describe('unMultiline', function() {
       "buppy",
     ];
 
-    const result = unMultiline(input);
-    expect(result).toEqual([
-      "",
-      "jerp clerp",
-      "shamp",
-      "champ jamp buppy"
-    ])
+    const result = collapseMultiline(input);
+    expect(result).toEqual({"indexToCollapsedIndex": [0, 1, 1, 2, 3, 3, 3], "collapsed": ["", "jerp clerp", "shamp", "champ jamp buppy"]})
   })
 })
 

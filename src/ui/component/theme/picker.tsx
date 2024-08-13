@@ -102,6 +102,7 @@ function ThemeSample({ theme }: ThemeSampleProps) {
     <TextEditor
       disabled
       language='scryfall-extended-multi'
+      showLineNumbers
       setQueries={() => {}} queries={[SAVAI_SACRIFICE_EXAMPLE.prefix, ...SAVAI_SACRIFICE_EXAMPLE.queries]} />
   </div>
 }

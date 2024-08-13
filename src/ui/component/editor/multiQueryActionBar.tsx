@@ -44,17 +44,20 @@ const RENDER_QUERY_INFO = multiQueryInfo(rankInfo);
 export interface MultiQueryInfoBarProps {
   queries: string[];
   copyText: (mindex: number, maxdex: number) => void;
-  onSubmit?: (baseIndex: number) => void;
+  onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
+  showLineNumbers?: boolean;
 }
 export const MultiQueryActionBar = ({
   queries,
   copyText,
   canSubmit,
   onSubmit,
+  showLineNumbers,
 }: MultiQueryInfoBarProps) => {
   useHighlightPrism([queries]);
   const lineInfo = RENDER_QUERY_INFO(queries);
+  const numDigits = queries.length.toString().length;
 
   return (
     <pre tabIndex={-1} className="language-none labels">
@@ -74,13 +77,14 @@ export const MultiQueryActionBar = ({
             copyText(mindex, maxdex);
           }}
         >
+          {showLineNumbers && <code className={`multi-code line-number ${line.toLowerCase()}`}>{`${(index+1).toString().padStart(numDigits)} `}</code>}
           <code className={`multi-code ${line.toLowerCase()}`}>{line}</code>
           {(line === "BASE" || line === "VENN") && (
             <button
               onClick={(event) => {
                 if (canSubmit && onSubmit) {
                   event.stopPropagation();
-                  onSubmit(index);
+                  onSubmit(index, index);
                 }
               }}
               disabled={!canSubmit}

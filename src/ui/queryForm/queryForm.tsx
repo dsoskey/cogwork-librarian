@@ -34,7 +34,7 @@ const DatabaseSettings = () => {
 
 export interface QueryFormProps {
   status: TaskStatus
-  execute: (startIndex: number) => void
+  execute: (startIndex: number, selectedIndex: number) => void
   source: DataSource
   setSource: Setter<DataSource>
 }
@@ -63,6 +63,7 @@ export const QueryForm = ({
           setQueries={setQueries}
           onSubmit={execute}
           canSubmit={canSubmit}
+          showLineNumbers
           language='scryfall-extended-multi'
         />
       </div>

@@ -1,6 +1,6 @@
 import { RunStrategy } from '../queryRunnerCommon'
 
-export type QueryMode = "allsub" | "basesub" | "venn"
+export type QueryMode = "all" | "sub" | "solo" | "venn"
 export type QueryWeight = "uniform" | "zipf"
 
 export interface Alias {

@@ -153,7 +153,7 @@ export function replaceUse(aliases: { [key: string]: Alias }, _line: string): Re
 }
 
 
-const DEFAULT_MODE: QueryMode = "basesub"
+const DEFAULT_MODE: QueryMode = "sub"
 const DEFAULT_WEIGHT: QueryWeight = "zipf"
 export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogError> {
   const now = new Date();
@@ -207,10 +207,13 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
       }
     } else if (DEFAULT_MODE_REGEXP.test(trimmed)) {
       const index = trimmed.indexOf(":");
-      const value = trimmed.substring(index + 1);
+      let value = trimmed.substring(index + 1);
+      if (value === "allsub") value = "all";
+      if (value === "basesub") value = "sub";
       switch (value) {
-        case "allsub":
-        case "basesub":
+        case "all":
+        case "sub":
+        case "solo":
           if (defaultMode !== undefined) {
             return err({
               query: trimmed,
@@ -222,7 +225,7 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
         default:
           return err({
             query: trimmed,
-            displayMessage: `unrecognized aggregation mode ${value}. choose allsub or basesub`
+            displayMessage: `unrecognized aggregation mode ${value}. choose all, solo, or sub (default)`
           })
       }
     } else if (/^@(include|i):/.test(trimmed)) {
@@ -259,36 +262,57 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
     .mapErr(e => ({ query: "", displayMessage: e.message }))
 }
 
-export function unMultiline(queries: string[]): string[] {
+interface CollapsedQueries {
+  collapsed: string[]
+  // index -> lineIndex
+  // comments are ignored and map to -1
+  indexToCollapsedIndex: number[]
+}
 
-  const unMultilined: string[] = [];
+export function collapseMultiline(queries: string[]): CollapsedQueries {
+  const indexToCollapsedIndex: number[] = [];
+  const collapsed: string[] = [];
   let currentQuery: string[] = [];
   for (const query of queries) {
-    currentQuery.push(query.replace(/\s*\\\s*$/, ""));
     const trimmed = query.trim();
-    if (!trimmed.endsWith("\\") && !trimmed.startsWith("#")) {
-      unMultilined.push(currentQuery.join(" "));
-      currentQuery = [];
+    if (trimmed.startsWith("#")) {
+      indexToCollapsedIndex.push(-1);
+    } else {
+      indexToCollapsedIndex.push(collapsed.length);
+      currentQuery.push(query.replace(/\s*\\\s*$/, ""));
+      if (!trimmed.endsWith("\\")) {
+        collapsed.push(currentQuery.join(" "));
+        currentQuery = [];
+      }
     }
+
   }
   if (currentQuery.length) {
-    unMultilined.push(currentQuery.join(" "));
+    collapsed.push(currentQuery.join(" "));
   }
-  return unMultilined
+  return { indexToCollapsedIndex, collapsed }
 }
 
 export function parseQuerySet(
   queries: string[],
-  baseIndex: number
+  baseIndex: number,
+  _selectedIndex?: number,
 ): Result<ParsedQuerySet, CogError>  {
-  const unMultilined = unMultiline(queries);
-  return parseQueryEnv(unMultilined)
+  const selectedIndex = _selectedIndex ?? baseIndex;
+  const { collapsed: collapsed, indexToCollapsedIndex } = collapseMultiline(queries);
+
+  if (collapsed.length === 0) {
+    return err({
+      query: queries[baseIndex],
+      displayMessage: `empty query for base query at line ${baseIndex + 1}\n -${queries[baseIndex]}`
+    })
+  }
+  return parseQueryEnv(collapsed)
     .andThen(queryEnv => {
       let selectedQueries: string[] = []
-      let currentIndex = baseIndex
-      while (currentIndex < queries.length && queries[currentIndex].trim() !== "") {
-        // we need to get the index without collapsing multilines
-        const query = queries[currentIndex].trim()
+      let currentIndex = indexToCollapsedIndex[baseIndex];
+      while (currentIndex < collapsed.length && collapsed[currentIndex].trim() !== "") {
+        const query = collapsed[currentIndex].trim()
         if (ALIAS_REGEXP.test(query)) {
           const name = query.substring(query.indexOf(":") + 1, query.indexOf("("))
           if (queryEnv.aliases[name]) {
@@ -307,14 +331,18 @@ export function parseQuerySet(
               query,
               displayMessage: `syntax errors for query ${currentIndex + 1}:\n${error.message}${columnShower(query, error.offset)}`
             })
-          } else {
+          }
+
+          if (
+            queryEnv.defaultMode !== "solo" ||
+            // in solo mode collect base query and selected query
+            (selectedQueries.length < 2 && (currentIndex === indexToCollapsedIndex[selectedIndex] || currentIndex === indexToCollapsedIndex[baseIndex]))
+          ) {
             selectedQueries.push(res._unsafeUnwrap())
           }
         }
         currentIndex++
       }
-      // once we've selected our queries we can collapse multilines as we don't need the submitted index anymore
-      selectedQueries = unMultiline(selectedQueries);
       console.debug("selected queries:", selectedQueries);
       if (selectedQueries.length === 0) {
         return err({
@@ -340,7 +368,7 @@ export function parseQuerySet(
           })
           .mapErr((e: ParserError) => ({ query: base, displayMessage: `Error with venn query: ${e.message}\n\t${columnShower(base, e.offset)}`}))
       }
-      if (queryEnv.defaultMode === 'allsub') {
+      if (queryEnv.defaultMode === 'all') {
         base = ""
         sub = selectedQueries
       }

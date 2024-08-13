@@ -10,13 +10,12 @@ export const findQueryIndex = (
   value: string,
   cursorIndex: number,
 ): Result<number, Error> => {
-  let result = 0;
 
   // +1 includes character after the cursor
   const before = value.substring(0, cursorIndex + 1).split("\n");
   const valueByLine = value.split("\n");
   let index = before.length - 1;
-  while (index > 0 && result === 0) {
+  while (index > 0) {
     const currentLine = before[index].trim();
     const previousLine = before[index - 1].trim();
 
@@ -25,7 +24,7 @@ export const findQueryIndex = (
         return ok(index);
       } else {
         let forwardSearchIndex = index;
-        while (forwardSearchIndex < valueByLine.length - 1 && result === 0) {
+        while (forwardSearchIndex < valueByLine.length - 1) {
           const nextLine = valueByLine[forwardSearchIndex + 1].trim();
           if (nextLine.startsWith("#")) {
             forwardSearchIndex++;
@@ -37,7 +36,7 @@ export const findQueryIndex = (
     }
     index--;
   }
-  return ok(result);
+  return ok(0);
 };
 
 export const getLineIndex = (
@@ -61,11 +60,12 @@ export const getLineIndex = (
 export interface QueryInputProps {
   setQueries: React.Dispatch<React.SetStateAction<string[]>>;
   queries: string[];
-  onSubmit?: (baseIndex: number) => void;
+  onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
   placeholder?: string | undefined;
   language?: Language;
   disabled?: boolean;
+  showLineNumbers?: boolean;
 }
 
 export const TextEditor = ({
@@ -76,6 +76,7 @@ export const TextEditor = ({
   placeholder,
   language,
   disabled,
+  showLineNumbers,
 }: QueryInputProps) => {
   const separator = "\n";
   const value = queries.join(separator);
@@ -107,7 +108,8 @@ export const TextEditor = ({
           console.warn("cursor not on a query");
         }
         if (canSubmit) {
-          onSubmit?.(baseIndex);
+          const selectedIndex = getLineIndex(value, cursorIndex);
+          onSubmit?.(baseIndex, selectedIndex);
         }
       }
 
@@ -174,6 +176,7 @@ export const TextEditor = ({
         copyText={copyText}
         onSubmit={onSubmit}
         canSubmit={canSubmit}
+        showLineNumbers={showLineNumbers}
       />
       <button
         className="overlay-toggle"

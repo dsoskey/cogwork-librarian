@@ -38,7 +38,7 @@ export const SearchView = () => {
 
   const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>("showSavedCards", true)
 
-  const execute = (baseIndex: number) => {
+  const execute = (baseIndex: number, selectedIndex: number) => {
     console.debug(`submitting query at line ${baseIndex}`)
     if (baseIndex < 0 || baseIndex >= queries.length) {
       console.error("baseIndex is out of bounds")
@@ -46,7 +46,7 @@ export const SearchView = () => {
     }
     setExtendedParseError([])
 
-    parseQuerySet(queries, baseIndex)
+    parseQuerySet(queries, baseIndex, selectedIndex)
       .map(({ strategy, queries, getWeight, injectPrefix }) => {
         const executedAt = new Date();
         let promise

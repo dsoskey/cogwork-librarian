@@ -9,6 +9,6 @@ o:"+1/+1 counter"
 ci:gw c>0
 
 # This is especially helpful for comparing cube lists using the
-# cube oracle (`cubeo`) filter. See the 'cube' tab to manage your cube lists.
-@venn(cubeo:soskgy)(cubeo:blue-cube)
+# cube oracle (`cube:`) filter. See the 'cube' tab to manage your cube lists.
+@venn(cube:soskgy)(cube:blue-cube)
 ```
