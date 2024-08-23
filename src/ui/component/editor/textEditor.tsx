@@ -197,6 +197,9 @@ export const TextEditor = ({
         value={value}
         placeholder={placeholder}
         spellCheck={false}
+        autoCorrect="none"
+        autoCapitalize="off"
+        translate="no"
         onChange={(event) => {
           setQueries(event.target.value.split(separator));
         }}

@@ -100,5 +100,15 @@ export const PRESET_THEMES: { [key: string]: Theme } = {
     'active599': 'hsl(24, 85%, 60%, 100%)',
     'active575': 'hsl(24, 85%, 60%, 75%)',
     'active550': 'hsl(24, 85%, 60%, 50%)'
-  }
+  },
+  eva: {
+    "dark100":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 64%)",
+    "dark150":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 47%)",
+    "dark200":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 30%)",
+    "dark300":"hsl(296, 100%, 27%)",
+    "light600":"hsl(57, 100%, 56%)",
+    "active599":"hsl(90, 83%, 61%, 100%)",
+    "active575":"color-mix(in oklch, var(--active599), transparent 20%)",
+    "active550":"color-mix(in oklch, var(--active599), transparent 35%)",
+  },
 }
