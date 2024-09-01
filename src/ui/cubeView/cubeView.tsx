@@ -8,7 +8,7 @@ import { Modal } from '../component/modal'
 import { RefreshButton } from '../component/cube/refreshButton'
 import { ScryfallIcon } from '../component/scryfallIcon'
 import { LoaderText } from '../component/loaders'
-import { CopyToClipboardButton, useCopyToClipboard } from '../component/copyToClipboardButton'
+import { CopyToClipboardButton } from '../component/copyToClipboardButton'
 import { CubeNotFoundView } from './notFoundView'
 import {
   CubeViewModelContext,
@@ -127,13 +127,15 @@ export function CubeView() {
 
           <h4>otags</h4>
           <div className='row wrap'>
-            {cubeViewModel.otags && cubeViewModel.otags[activeCard.index].otags.map(it => <Link to={`/data/otag/${it}`}
-                                                                                                key={it}>{it}</Link>)}
+            {cubeViewModel.otags && cubeViewModel.otags[activeCard.index]?.otags
+              .map(it => <Link to={`/data/otag/${it}`} key={it}>{it}</Link>)}
           </div>
 
           <h4>atags</h4>
           <div className='row wrap'>
-            {cubeViewModel.itags && cubeViewModel.itags[activeCard.index].itags.map(it => <Link to={`/data/itag/${it}`} key={it}>{it}</Link>)}
+            {cubeViewModel.itags && cubeViewModel.itags[activeCard.index]?.itags
+              // .map(it => <Link to={`/data/itag/${it}`} key={it}>{it}</Link>)}
+              .map(it => <span key={it}>{it}</span>)}
           </div>
 
           <h3>notes</h3>
