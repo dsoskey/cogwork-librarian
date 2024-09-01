@@ -1,36 +1,46 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Setter } from 'src/types'
 
 export interface PageControlProps {
-  page: number
-  setPage: Setter<number>
+  pageNumber: number
+  setPageNumber: Setter<number>
   // last index on page
   upperBound: number
   pageSize: number
-  cardCount: number
+  count: number
+}
+
+export function usePageControl(pageSize, initialPageNumber: number = 0) {
+  const [pageNumber, setPageNumber] = useState<number>(initialPageNumber);
+  const lowerBound = pageNumber * pageSize
+  const upperBound = (pageNumber + 1) * pageSize
+  return {
+    pageNumber, setPageNumber,
+    lowerBound, upperBound,
+  }
 }
 
 export const PageControl = ({
-  page,
-  setPage,
+  pageNumber,
+  setPageNumber,
   pageSize,
-  cardCount,
+  count,
   upperBound,
 }: PageControlProps) => (
   <div className='page-numbers'>
-    <button onClick={() => setPage(0)} disabled={page === 0}>
+    <button onClick={() => setPageNumber(0)} disabled={pageNumber === 0}>
       {'|<<'}
     </button>
-    <button onClick={() => setPage((prev) => prev - 1)} disabled={page === 0}>
+    <button onClick={() => setPageNumber((prev) => prev - 1)} disabled={pageNumber === 0}>
       {'< previous'}
     </button>
     <button
-      onClick={() => setPage((prev) => prev + 1)}
-      disabled={upperBound >= cardCount}
+      onClick={() => setPageNumber((prev) => prev + 1)}
+      disabled={upperBound >= count}
     >{`next ${pageSize} >`}</button>
     <button
-      onClick={() => setPage(Math.floor(cardCount / pageSize))}
-      disabled={upperBound >= cardCount}
+      onClick={() => setPageNumber(Math.floor(count / pageSize))}
+      disabled={upperBound >= count}
     >
       {'>>|'}
     </button>

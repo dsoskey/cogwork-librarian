@@ -3,6 +3,7 @@ import {
   Language,
   useHighlightPrism,
 } from '../../api/local/syntaxHighlighting'
+import "./input.css"
 
 export interface InputProps extends HTMLAttributes<HTMLInputElement> {
   value: string
@@ -37,20 +38,25 @@ export const Input = ({ value, onChange, language, ...rest }: InputProps) => {
 
   return (
     <div className='query-editor query-input' onKeyDown={handleDown}>
-      <code ref={linker}
-        tabIndex={-1}
-        aria-hidden
-        className={`language-${language ?? 'none'} links match-braces ${
-          revealLinks ? 'show' : 'hide'
-        }`}>{value}</code>
+      <pre ref={linker}
+           tabIndex={-1}
+           aria-hidden
+           className={`language-${language ?? 'none'} links match-braces ${
+             revealLinks ? 'show' : 'hide'
+           }`}
+      ><code>{value}</code></pre>
       <input
         {...rest}
         ref={controller}
-        className='controller coglib-prism-theme'
+        className={`controller coglib-prism-theme ${rest.className}`}
         value={value}
         onChange={onChange}
       />
-      <code ref={faker} className={`language-${language ?? 'none'} display match-braces`}>{value}</code>
+      <pre ref={faker}
+            aria-hidden
+            tabIndex={-1}
+            className={`language-${language ?? 'none'} display match-braces`}>
+        <code>{value}</code></pre>
     </div>
   )
 }

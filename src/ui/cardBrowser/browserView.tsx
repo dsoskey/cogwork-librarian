@@ -5,7 +5,7 @@ import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { EnrichedCard, RunStrategy } from '../../api/queryRunnerCommon'
 import { DataSource, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
-import { PageControl } from './pageControl'
+import { PageControl, usePageControl } from './pageControl'
 import { useViewportListener } from '../viewport'
 import { TopBar } from './topBar'
 import { ActiveCollection, CardDisplayInfo, DisplayType } from './types'
@@ -88,9 +88,9 @@ export const BrowserView = React.memo(({
 
   const [pageSize] = useLocalStorage('page-size', PAGE_SIZE)
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
-  const [page, _setPage] = useState(0)
+  const { pageNumber, setPageNumber, lowerBound, upperBound } = usePageControl(pageSize, 0);
   const setPage = (n: number) => {
-    _setPage(n)
+    setPageNumber(n)
     setTimeout(() => {
       topOfResults.current?.scrollIntoView({
         block: "start",
@@ -99,13 +99,11 @@ export const BrowserView = React.memo(({
       })
     }, 100)
   }
-  const lowerBound = page * pageSize + 1
-  const upperBound = (page + 1) * pageSize
   useEffect(() => {
     setPage(0)
   }, [result, vc.activeSections])
   const currentPage = useMemo(
-    () => activeCards.slice(lowerBound - 1, upperBound),
+    () => activeCards.slice(lowerBound, upperBound),
     [activeCards, lowerBound, upperBound]
   )
   const showCards = activeCards.length > 0 && status !== 'error'
@@ -120,11 +118,11 @@ export const BrowserView = React.memo(({
     <VennControl {...vc} cards={cards} />: null;
 
   const pageControl = showCards ? <PageControl
-    page={page}
-    setPage={setPage}
+    pageNumber={pageNumber}
+    setPageNumber={setPage}
     pageSize={pageSize}
     upperBound={upperBound}
-    cardCount={activeCards.length}
+    count={activeCards.length}
   /> : null
 
   const downloadButton = <div>
@@ -160,7 +158,7 @@ export const BrowserView = React.memo(({
           setVisibleDetails={setVisibleDetails}
           revealDetails={revealDetails}
           setRevealDetails={setRevealDetails}
-          lowerBound={lowerBound}
+          lowerBound={lowerBound + 1}
           upperBound={upperBound}
           displayType={displayType}
           setDisplayType={setDisplayType}

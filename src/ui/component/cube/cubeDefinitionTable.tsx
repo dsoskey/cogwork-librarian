@@ -1,7 +1,7 @@
 import React, { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Cube } from 'mtgql'
 import './cubeDefinitionTable.css'
-import { PageControl } from '../../cardBrowser/pageControl'
+import { PageControl, usePageControl } from '../../cardBrowser/pageControl'
 import { BulkCubeImporterContext } from '../../../api/cubecobra/useBulkCubeImporter'
 import { Modal } from '../modal'
 import { BulkImportMessage } from '../../data/bulkCubeSiteImporter'
@@ -101,7 +101,7 @@ export const CubeTable = ({ cubes }: CubeTableProps) => {
   }, [checkedIds])
 
   const pageSize = 20
-  const [page, setPage] = useState<number>(0)
+  const { pageNumber, setPageNumber, lowerBound, upperBound } = usePageControl(pageSize, 0);
   const [filterString, _setFilterString] = useState<string>("")
   const [filteredCubes, setFilteredCubes] = useState<Cube[] | undefined>(undefined)
 
@@ -119,8 +119,6 @@ export const CubeTable = ({ cubes }: CubeTableProps) => {
       }
     }, 250)
   }
-  const lowerBound = page * pageSize
-  const upperBound = (page + 1) * pageSize
 
   const currentCubes = useMemo(
     () => {
@@ -143,9 +141,9 @@ export const CubeTable = ({ cubes }: CubeTableProps) => {
         </div>
         <div className='select-actions center'>
           <PageControl
-            page={page} setPage={setPage}
+            pageNumber={pageNumber} setPageNumber={setPageNumber}
             upperBound={upperBound} pageSize={pageSize}
-            cardCount={cubes?.length}
+            count={cubes?.length}
           />
           {checkedIds.size > 0 && <>
             <button onClick={() => setShowDeleteModal(true)} disabled={isRunning}>

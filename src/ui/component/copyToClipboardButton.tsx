@@ -31,12 +31,13 @@ const DEFAULT_BUTTON_TEXT = {
 }
 
 interface CopyToClipboardButtonProps extends HTMLAttributes<HTMLButtonElement> {
-  copyText: string
+  copyText: string | (() => string)
   children?: React.ReactNode
   buttonText?: Partial<Record<TaskStatus, React.ReactNode>>
+  titleText?: Partial<Record<TaskStatus, string>>
   className?: string
 }
-export const CopyToClipboardButton = ({ buttonText, copyText, className, children, ...rest }: CopyToClipboardButtonProps) => {
+export const CopyToClipboardButton = ({ titleText, buttonText, copyText, className, children, ...rest }: CopyToClipboardButtonProps) => {
   const { status, onClick } = useCopyToClipboard(copyText);
   let content =  DEFAULT_BUTTON_TEXT[status];
   if (children) {
@@ -47,6 +48,7 @@ export const CopyToClipboardButton = ({ buttonText, copyText, className, childre
 
   return <button
     {...rest}
+    title={rest.title ?? titleText[status] ?? ""}
     className={className}
     disabled={status !== 'unstarted'}
     onClick={onClick}

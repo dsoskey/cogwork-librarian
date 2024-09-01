@@ -1,4 +1,4 @@
-import { cogDB, MANIFEST_ID, toManifest } from './db'
+import { cogDB, COGDB_FILTER_PROVIDER, MANIFEST_ID, toManifest } from './db'
 import { downloadCards } from './populate'
 import * as Scry from 'scryfall-sdk'
 import { downloadIllustrationTags, downloadOracleTags } from '../scryfall/tagger'
@@ -6,12 +6,12 @@ import { normCardList,
   NormedCard,
   QueryRunner,
   MQLParser,
-  CachingFilterProvider,
   FilterNode, identityNode,
 } from 'mtgql'
 import { BulkDataType } from 'scryfall-sdk/out/api/BulkData'
 import { downloadSets } from '../scryfall/set'
 import { ImportTarget } from './useCogDB'
+import { invertItags, invertOtags } from './types/tags'
 
 self.onmessage = (_event) => {
   const event = _event.data
@@ -51,7 +51,7 @@ async function sendCardDBToMemory(filter?: string) {
   const count = (await cogDB.card.count()) + (await cogDB.customCard.count())
   postMessage({ type: 'count', data: count })
   const node: FilterNode = filter ?
-    await QueryRunner.parseFilterNode(MQLParser, new CachingFilterProvider(cogDB), filter)
+    await QueryRunner.parseFilterNode(MQLParser, COGDB_FILTER_PROVIDER, filter)
       .unwrapOr(identityNode()) :
     identityNode();
 
@@ -157,6 +157,8 @@ async function loadOracleTags() {
   const tags = await downloadOracleTags()
   postMessage({ type: "oracle-tag-downloaded", data: tags.length })
   await cogDB.oracleTag.bulkPut(tags)
+  const inverted = invertOtags(tags);
+  await cogDB.cardToOtag.bulkPut(inverted)
   postMessage({ type: 'oracle-tag-end' })
 }
 
@@ -164,6 +166,8 @@ async function loadIllustrationTags() {
   const tags = await downloadIllustrationTags()
   postMessage({ type: "illustration-tag-downloaded", data: tags.length })
   await cogDB.illustrationTag.bulkPut(tags)
+  const inverted = invertItags(tags);
+  await cogDB.cardToItag.bulkPut(inverted);
   postMessage({ type: 'illustration-tag-end' })
 }
 

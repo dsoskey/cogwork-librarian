@@ -19,6 +19,8 @@ import { CubeOverview } from './cubeOverview'
 import { CubeList } from './cubeList'
 import { FlagContext } from '../flags'
 import { ManaCost } from '../card/manaCost'
+import { CubeSearchTable } from './cubeSearchTable'
+import { COPY_TEXT_EMOJIS, COPY_TITLE } from '../cardBrowser/cardViews/searchHoverActions'
 
 const shareButtonText = {
   unstarted: '🔗',
@@ -30,7 +32,6 @@ export function CubeView() {
   const showDebugInfo = useContext(FlagContext).flags.showDebugInfo;
   const cubeViewModel = useCubeViewModel();
   const { cube, oracleMap, activeCard, setActiveCard } = cubeViewModel;
-  const clipboardHandler = useCopyToClipboard(() => JSON.stringify(activeCard, undefined, 2))
 
   const onPrintSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const normedCard = oracleMap[activeCard.oracle_id][0]
@@ -72,6 +73,11 @@ export function CubeView() {
            target='_blank'
            title="view on scryfall "
         ><ScryfallIcon size="1.5em" /></a>
+        {showDebugInfo && <CopyToClipboardButton
+          copyText={() => JSON.stringify(activeCard, undefined, 2)}
+          buttonText={COPY_TEXT_EMOJIS}
+          titleText={COPY_TITLE}
+        />}
       </div>}
       onClose={() => setActiveCard(undefined)}>
       {activeCard && <div className="row active-card-root">
@@ -92,49 +98,57 @@ export function CubeView() {
               <button onClick={saveActiveCard}>save</button>
             </div>
           </div>
-          <div>
-            <div className="row baseline">
-              <h3>mana cost</h3>
-              {activeCard.mana_cost && <ManaCost manaCost={activeCard.mana_cost} />}
+        <div>
+          <div className='row baseline'>
+            <h3>mana cost</h3>
+            {activeCard.mana_cost && <ManaCost manaCost={activeCard.mana_cost} />}
 
-              <h3>mana value</h3>
-              <div>{activeCard.cmc?.toString()}</div>
-            </div>
-
-            <h3>colors</h3>
-            <div className="row">{activeCard.colors
-              ?.map(it => <span key={it}>{it}</span>)}</div>
-
-            {activeCard.color_category && <><h3>color category</h3>
-            <div>{activeCard.color_category}</div></>}
-
-            <h3>type line</h3>
-            <div>{activeCard.type_line}</div>
-
-            <h3>rarity</h3>
-            <div>{activeCard.rarity}</div>
-
-            <h3>tags</h3>
-            <div className='row'>{activeCard.tags
-              ?.map(it => <span key={it}>{it}</span>)}</div>
-
-            <h3>notes</h3>
-            <div>{activeCard.notes ?? "~"}</div>
-
-            <h3>status</h3>
-            <div>{activeCard.status}</div>
-
-            {showDebugInfo && <pre onClick={clipboardHandler.onClick}>
-              <code>{JSON.stringify(activeCard, undefined, 2)}</code>
-            </pre>}
+            <h3>mana value</h3>
+            <div>{activeCard.cmc?.toString()}</div>
           </div>
+
+          <h3>colors</h3>
+          <div className='row'>{activeCard.colors
+            ?.map(it => <span key={it}>{it}</span>)}</div>
+
+          {activeCard.color_category && <><h3>color category</h3>
+            <div>{activeCard.color_category}</div>
+          </>}
+
+          <h3>type line</h3>
+          <div>{activeCard.type_line}</div>
+
+          <h3>rarity</h3>
+          <div>{activeCard.rarity}</div>
+
+          <h3>tags</h3>
+          <div className='row'>{activeCard.tags
+            ?.map(it => <span key={it}>{it}</span>)}</div>
+
+          <h4>otags</h4>
+          <div className='row wrap'>
+            {cubeViewModel.otags && cubeViewModel.otags[activeCard.index].otags.map(it => <Link to={`/data/otag/${it}`}
+                                                                                                key={it}>{it}</Link>)}
+          </div>
+
+          <h4>atags</h4>
+          <div className='row wrap'>
+            {cubeViewModel.itags && cubeViewModel.itags[activeCard.index].itags.map(it => <Link to={`/data/itag/${it}`} key={it}>{it}</Link>)}
+          </div>
+
+          <h3>notes</h3>
+          <div>{activeCard.notes ?? '~'}</div>
+
+          <h3>status</h3>
+          <div>{activeCard.status}</div>
+        </div>
       </div>}
     </Modal>
   </CubeViewModelContext.Provider>
 }
 
 function CubeModelView() {
-  const { cube } = useContext(CubeViewModelContext);
+  const { cube } = useContext(CubeViewModelContext)
   const { pathname } = useLocation()
 
   return <>
@@ -156,6 +170,7 @@ function CubeModelView() {
       <div className="cube-subroutes row">
         <Link to={`/cube/${cube.key}`} className={pathname === `/cube/${cube.key}` ? "active-link" : ""}>overview</Link>
         <Link to={`/cube/${cube.key}/list`} className={pathname === `/cube/${cube.key}/list` ? "active-link" : ""}>list</Link>
+        <Link to={`/cube/${cube.key}/table`} className={pathname === `/cube/${cube.key}/table` ? "active-link" : ""}>search table</Link>
         <div>
           {cube.source !== "list" && <>
             <CopyToClipboardButton
@@ -172,6 +187,7 @@ function CubeModelView() {
     </div>
     <Routes>
       <Route path="/list" element={<CubeList />}/>
+      <Route path="/table" element={<CubeSearchTable />}/>
       <Route path="" element={<CubeOverview />}/>
     </Routes>
   </>

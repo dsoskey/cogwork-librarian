@@ -1,0 +1,41 @@
+.cube-search-table {
+    font-family: "Comic Sans MS", system-ui, sans-serif;
+    margin: var(--spacing-300);
+
+    pre[class*="language-s"],
+    code[class*="language-s"] {
+        margin: unset;
+        padding: unset;
+    }
+
+
+    .search-row-input {
+        width: 100%;
+    }
+    .query-editor:has(.search-row-input) {
+        width: 100%;
+    }
+    .error-indicator {
+        border:none;
+        border-radius: var(--border-radius);
+    }
+
+    tr:nth-child(odd) .display {
+        background: var(--dark-color);
+    }
+
+    td:first-child {
+        min-width: 300px;
+    }
+
+    .percentage {
+        font-size: .9em;
+        font-style: italic;
+
+    }
+
+    tr.loading {
+        font-style: oblique;
+        color: color-mix(var(--color-interpolation), var(--dark300), var(--light600) 50%);
+    }
+}

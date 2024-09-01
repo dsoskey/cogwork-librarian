@@ -10,7 +10,7 @@ import { useQueryCoordinator } from '../useQueryCoordinator'
 import { displayMessage } from '../../error'
 import { Card, NormedCard, SearchOptions, QueryRunner, CachingFilterProvider } from 'mtgql'
 import { useMemo, useState } from 'react'
-import { cogDB } from './db'
+import { cogDB, COGDB_FILTER_PROVIDER } from './db'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]
@@ -20,12 +20,10 @@ export const useMemoryQueryRunner = ({ corpus }: MemoryQueryRunnerProps): Coglib
     useQueryCoordinator()
   const [runStrategy, setRunStrategy] = useState<RunStrategy>(RunStrategy.Search)
   const searchCards = useMemo(() => {
-    const filters = new CachingFilterProvider(cogDB);
-    return QueryRunner.generateSearchFunction(corpus, filters)
+    return QueryRunner.generateSearchFunction(corpus, COGDB_FILTER_PROVIDER)
   }, [corpus])
   const generateVennDiagram = useMemo(() => {
-    const filters = new CachingFilterProvider(cogDB);
-    return QueryRunner.generateVennDiagram(corpus, filters)
+    return QueryRunner.generateVennDiagram(corpus, COGDB_FILTER_PROVIDER)
   }, [corpus])
 
   const runQuery: QueryRunnerFunc = (

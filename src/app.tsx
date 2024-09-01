@@ -22,6 +22,8 @@ import { NotFoundView } from './ui/notFoundView'
 import { ErrorBoundary } from 'react-error-boundary'
 import { RenderErrorFallback } from './ui/renderErrorFallback'
 import { DefaultLayout } from './ui/layout/defaultLayout'
+import { TagManager } from './ui/data/tagManager'
+import { OtagView } from './ui/views/tag/otagView'
 
 export const App = () => {
   const { pathname } = useLocation()
@@ -61,6 +63,8 @@ export const App = () => {
                         <Route path="/data/cube/*" element={<CubeRedirect />} />
                         <Route path="/cube/:key/*" element={<CubeView />} />
                         <Route path='/data/card' element={<CardDataView />}/>
+                        <Route path='/data/otag/:tag' element={<OtagView />}/>
+                        <Route path='/data/otag' element={<TagManager />}/>
                         <Route path='/cube' element={<CubeDataView />}/>
                         <Route
                           path='/saved'

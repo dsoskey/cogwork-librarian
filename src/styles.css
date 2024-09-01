@@ -39,6 +39,15 @@
   color: var(--light-color);
   scrollbar-color: var(--light-color) var(--dark-color);
 
+  --data-w: #f5f5f5;
+  --data-u: #30e7ff;
+  --data-b: #bd7dfc;
+  --data-r: #ff7b7d;
+  --data-g: #32cd32;
+  --data-m: goldenrod;
+  --data-c: silver;
+  --on-data: #1f1f1f;
+
   --monospace-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
@@ -178,18 +187,93 @@ p {
 
 table {
   border-collapse: collapse;
+
+  tbody {
+    .w, .u, .b, .r, .g, .m, .c {
+      color: var(--on-data);
+    }
+  }
+}
+
+table.sticky-header thead {
+  position: sticky;
+  top:0;
 }
 
 thead {
   background-color: var(--darkest-color);
 }
 
-tbody {
+th.w {
+  background-color: color-mix(in oklch, var(--data-w), #000 15%);
+}
+th.u {
+  background-color: color-mix(in oklch, var(--data-u), #000 15%);
+}
+th.b {
+  background-color: color-mix(in oklch, var(--data-b), #000 15%);
+}
+th.r {
+  background-color: color-mix(in oklch, var(--data-r), #000 15%);
+}
+th.g {
+  background-color: color-mix(in oklch, var(--data-g), #000 15%);
+}
+th.m {
+  background-color: color-mix(in oklch, var(--data-m), #000 15%);
+}
+th.c {
+  background-color: color-mix(in oklch, var(--data-c), #000 15%);
+}
+
+tbody tr {
   background-color: var(--dark-color);
+}
+td.w {
+  background-color: var(--data-w);
+}
+td.u {
+  background-color: var(--data-u);
+}
+td.b {
+  background-color: var(--data-b);
+}
+td.r {
+  background-color: var(--data-r);
+}
+td.g {
+  background-color: var(--data-g);
+}
+td.m {
+  background-color: var(--data-m);
+}
+td.c {
+  background-color: var(--data-c);
 }
 
 tbody tr:nth-child(even) {
   background-color: var(--darker-color);
+}
+tbody tr:nth-child(even) td.w {
+  background-color: color-mix(in oklch, var(--data-w), #000 5%);
+}
+tbody tr:nth-child(even) td.u {
+  background-color: color-mix(in oklch, var(--data-u), #000 5%);
+}
+tbody tr:nth-child(even) td.b {
+  background-color: color-mix(in oklch, var(--data-b), #000 5%);
+}
+tbody tr:nth-child(even) td.r {
+  background-color: color-mix(in oklch, var(--data-r), #000 5%);
+}
+tbody tr:nth-child(even) td.g {
+  background-color: color-mix(in oklch, var(--data-g), #000 5%);
+}
+tbody tr:nth-child(even) td.m {
+  background-color: color-mix(in oklch, var(--data-m), #000 5%);
+}
+tbody tr:nth-child(even) td.c {
+  background-color: color-mix(in oklch, var(--data-c), #000 5%);
 }
 
 th, td {

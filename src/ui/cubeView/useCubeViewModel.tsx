@@ -8,6 +8,7 @@ import { useKeyValList } from '../hooks/useKeyValList'
 import _groupBy from 'lodash/groupBy'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Setter } from '../../types'
+import { CardToIllustrationTag, CardToOracleTag } from '../../api/local/types/tags'
 
 export interface OrderedCard extends Card, Omit<CubeCard, "name"|"cmc"|"colors"|"rarity"> {
   index: number
@@ -32,6 +33,8 @@ function LoadingError({ cardCount, refreshCubeCards }) {
 
 export interface CubeViewModel {
   cube: Cube | undefined | null
+  otags: CardToOracleTag[] | undefined | null
+  itags: CardToIllustrationTag[] | undefined | null
   cards: OrderedCard[]
   loadingError: React.ReactNode,
   oracleList: NormedCard[]
@@ -50,6 +53,12 @@ export function useCubeViewModel(): CubeViewModel {
 
   // highly cursed, don't do this lol
   const cube = useLiveQuery(() => cogDBClient.getCube(key), [key, dbStatus], null)
+  const otags = useLiveQuery(() =>
+    cards.length === 0 ? null :
+    cogDBClient.cardToOtag.bulkGet(cards.map(it => it.oracle_id)), [cards])
+  const itags = useLiveQuery(() =>
+    cards.length === 0 ? null :
+      cogDBClient.cardToItag.bulkGet(cards.map(it => it.illustration_id)), [cards])
   const needsMigration = cube && cube.cards === undefined
   const refreshCubeCards = async () => {
     try {
@@ -120,7 +129,7 @@ export function useCubeViewModel(): CubeViewModel {
 
   return {
     cards, cube, loadingError,
-    oracleList, oracleMap,
+    oracleList, oracleMap, otags, itags,
     activeCard, setActiveCard,
   }
 }

@@ -19,8 +19,8 @@ textarea.coglib-prism-theme {
 .query-editor {
   --toolbar-height: 24px;
   --gutter-width: 0.25em;
-  margin-top: var(--spacing-200);
-  margin-bottom: var(--spacing-200);
+  /*margin-top: var(--spacing-200);*/
+  /*margin-bottom: var(--spacing-200);*/
   height: max-content;
   display: grid;
   position: relative;
@@ -120,11 +120,12 @@ textarea.coglib-prism-theme {
     grid-area: overlap;
     box-sizing: border-box;
     display: inline-block;
-    background-color: color-mix(in srgb, var(--active), transparent 80%);
     scrollbar-color: var(--active-mid-alpha) var(--darker-color);
 
     &.show {
       z-index: 4;
+      background-color: color-mix(in srgb, var(--active), transparent 80%);
+
     }
     &.hide {
       z-index: 1;

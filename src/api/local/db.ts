@@ -1,10 +1,20 @@
 import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import { Block, CardSet, Cube, DataProvider, IllustrationTag, NormedCard, OracleTag } from 'mtgql'
+import {
+  Block,
+  CachingFilterProvider,
+  CardSet,
+  Cube,
+  DataProvider,
+  IllustrationTag,
+  NormedCard,
+  OracleTag
+} from 'mtgql'
 import { DataSource } from '../../types'
 import { Project } from './types/project'
 import { RunStrategy } from '../queryRunnerCommon'
 import { ThemeDefinition } from './types/theme'
+import { CardToIllustrationTag, CardToOracleTag } from './types/tags'
 
 export interface Collection {
   id: string // used for NormedCard.collectionId
@@ -58,7 +68,9 @@ export class TypedDexie extends Dexie implements DataProvider {
   customCard!: Table<NormedCard>
   cube!: Table<Cube>
   oracleTag!: Table<OracleTag>
+  cardToOtag!: Table<CardToOracleTag>
   illustrationTag!: Table<IllustrationTag>
+  cardToItag!: Table<CardToIllustrationTag>
   block!: Table<Block>
   set!: Table<CardSet>
   history!: Table<QueryHistory>
@@ -226,7 +238,13 @@ export class TypedDexie extends Dexie implements DataProvider {
     this.version(16).stores({
       set: 'id, code, name'
     })
+
+    this.version(17).stores({
+      cardToOtag: 'oracle_id',
+      cardToItag: 'id',
+    })
   }
 }
 export const cogDB = new TypedDexie()
+export const COGDB_FILTER_PROVIDER = new CachingFilterProvider(cogDB)
 

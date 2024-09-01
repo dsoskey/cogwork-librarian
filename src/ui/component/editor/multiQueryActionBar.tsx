@@ -2,7 +2,7 @@ import React from "react";
 import { rankInfo } from "./infoLines";
 import { useHighlightPrism } from "../../../api/local/syntaxHighlighting";
 import { QuerySetButton } from "../querySetButton";
-import { DEFAULT_MODE_REGEXP, DEFAULT_WEIGHT_REGEXP } from '../../../api/mtgql-ep/parser'
+import { DEFAULT_MODE_REGEXP, DEFAULT_WEIGHT_REGEXP, INCLUDE_REGEXP } from '../../../api/mtgql-ep/parser'
 
 export const VENN_REGEXP = /^@(v|venn)\((.+)\)\((.+)\)$/;
 
@@ -22,6 +22,8 @@ export const multiQueryInfo =
         count = 0;
       } else if (trimmed.startsWith("#")) {
         result.push(" ");
+      } else if (count === 0 && INCLUDE_REGEXP.test(trimmed)) {
+        result.push("MPRT");
       } else if (count === 0 && DEFAULT_WEIGHT_REGEXP.test(trimmed)) {
         result.push("WGHT");
       } else if (count === 0 && DEFAULT_MODE_REGEXP.test(trimmed)) {

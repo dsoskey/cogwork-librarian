@@ -10,6 +10,7 @@ export const VENN_REGEXP = /^@(v|venn)/
 const DEFAULT_DOMAIN_REGEXP = /^@(dd|defaultDomain)\((.+)\)$/
 export const DEFAULT_WEIGHT_REGEXP = /^@(dw|defaultWeight):/
 export const DEFAULT_MODE_REGEXP = /^@(dm|defaultMode):/
+export const INCLUDE_REGEXP = /^@(include|i):/
 
 export function alias(_line: string): Result<Alias, ParserError> {
   const line = _line.trim();
@@ -228,7 +229,7 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
             displayMessage: `unrecognized aggregation mode ${value}. choose all, solo, or sub (default)`
           })
       }
-    } else if (/^@(include|i):/.test(trimmed)) {
+    } else if (INCLUDE_REGEXP.test(trimmed)) {
       const index = trimmed.indexOf(":");
       const value = trimmed.substring(index + 1);
       switch (value) {

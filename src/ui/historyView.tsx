@@ -68,10 +68,10 @@ export const HistoryView = () => {
         <h2>query history</h2>
         {count > 0 && <span>({upperBound - limit + 1}-{upperBound} of {count})</span>}
         {count > limit && <>
-          <PageControl page={page} setPage={setPage} upperBound={upperBound} pageSize={limit} cardCount={count} /></>}
+          <PageControl pageNumber={page} setPageNumber={setPage} upperBound={upperBound} pageSize={limit} count={count} /></>}
       </div>
       {history.map(it => <HistoryItem key={it.executedAt.toISOString()} history={it} />)}
-      {count > limit && <PageControl page={page} setPage={setPage} upperBound={upperBound} pageSize={limit} cardCount={count} />}
+      {count > limit && <PageControl pageNumber={page} setPageNumber={setPage} upperBound={upperBound} pageSize={limit} count={count} />}
     </>}
   </div>
 }

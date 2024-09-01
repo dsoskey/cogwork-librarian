@@ -1,0 +1,5 @@
+.query-input {
+    pre[class*="language-"] {
+        padding: unset;
+    }
+}
