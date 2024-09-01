@@ -45,10 +45,14 @@ export const CopyToClipboardButton = ({ titleText, buttonText, copyText, classNa
   } else if (buttonText) {
     content = buttonText[status]
   }
+  let title = rest.title
+  if (titleText) {
+    title = titleText[status] ?? ""
+  }
 
   return <button
     {...rest}
-    title={rest.title ?? titleText[status] ?? ""}
+    title={title}
     className={className}
     disabled={status !== 'unstarted'}
     onClick={onClick}
