@@ -6,4 +6,5 @@ Add `@include:stdlib` in its own paragraph to make the following aliases availab
 |------------|-------------------------------------------------------------------------------------------------|
 | `released` | filters cards that have been released as of today, the day you execute the query                |
 | `newest`   | `order:released direction:desc`                                                                 |
+| `newest`   | `order:released direction:asc`                                                                 |
 | `bar`      | filters cards that fit the Bar Cube brewer's guidelines (no counters, tokens, back faces, etc.) | 
