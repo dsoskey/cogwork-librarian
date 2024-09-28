@@ -54,7 +54,7 @@ export function CubeTags({}: CubeTagsProps) {
 }
 
 export function TagLink({ value }:DataProps) {
-    if (value === "_total_") return "Total"
+    if (value === "_total_") return "total"
     return <Link to={`/data/otag/${value}`}>{value}</Link>
 }
 

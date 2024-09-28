@@ -33,6 +33,7 @@
     display: flex;
     flex-direction: column;
     align-items: end;
+    gap: var(--spacing-100);
 }
 
 .topbar .open-cogwork {
@@ -56,4 +57,15 @@
 
 .topbar .venn :focus-visible {
     outline-color: var(--dark-color);
+}
+
+.download-button input[type=number] {
+    width: 50px;
+    -moz-appearance: textfield;
+    appearance: textfield;
+    &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    margin-right: var(--spacing-100);
 }

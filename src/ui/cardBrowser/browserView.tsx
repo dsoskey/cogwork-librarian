@@ -114,9 +114,6 @@ export const BrowserView = React.memo(({
     return null
   }
 
-  const vennControl = runStrategy === RunStrategy.Venn ?
-    <VennControl {...vc} cards={cards} />: null;
-
   const pageControl = showCards ? <PageControl
     pageNumber={pageNumber}
     setPageNumber={setPage}
@@ -124,16 +121,6 @@ export const BrowserView = React.memo(({
     upperBound={upperBound}
     count={activeCards.length}
   /> : null
-
-  const downloadButton = <div>
-    <span className="bold">download:&nbsp;</span>
-    <button onClick={() => handleDownload(result.map(it => it.data.name).join("\n"), 'txt')}>
-      card names
-    </button>
-    <button onClick={() => handleDownload(JSON.stringify(result.map(it => it.data)), 'json')}>
-      json
-    </button>
-  </div>
 
   const isCardDisplay = (displayType === 'cards' || displayType === 'render')
 
@@ -145,8 +132,10 @@ export const BrowserView = React.memo(({
       <div className='content'>
         <TopBar
           pageControl={pageControl}
-          downloadButton={downloadButton}
-          vennControl={vennControl}
+          downloadButton={<DownloadButton searchResult={result} />}
+          vennControl={runStrategy === RunStrategy.Venn
+            ? <VennControl {...vc} cards={cards} />
+            : null}
           cardsPerRowControl={cardsPerRowControl}
           errors={errors}
           source={source}
@@ -210,3 +199,48 @@ export const BrowserView = React.memo(({
       </div>
     </div>
 })
+
+export interface DownloadButtonProps {
+  searchResult: Array<EnrichedCard>
+}
+
+export function DownloadButton({ searchResult }: DownloadButtonProps) {
+  const [value, setValue] = useState<number>(NaN)
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(Math.abs(parseInt(event.target.value)));
+  }
+  const sliceCount = value === 0 || isNaN(value) ? undefined : value;
+
+  return <div className="download-button">
+    <span className="bold">download <input
+      type="number" pattern="[0-9]*"
+      placeholder="all"
+      value={value}
+      onChange={handleChange}
+      onKeyDown={event => {
+        if (event.key !== "Tab" && event.key !== "Backspace" && !/\d/.test(event.key)) {
+          event.preventDefault()
+        }
+      }}
+    />:&nbsp;</span>
+    <button onClick={() => {
+      handleDownload(
+        searchResult.slice(0, sliceCount)
+          .map(printName).join("\n"), 'txt')
+    }}>
+      card names
+    </button>
+    <button onClick={() => {
+      handleDownload(JSON.stringify(
+        searchResult.slice(0, sliceCount)
+          .map(it => it.data)), 'json')
+    }}>
+      json
+    </button>
+  </div>
+}
+
+function printName(card: EnrichedCard) {
+  if (card.data.layout === "split") return card.data.name
+  return card.data.name.replace(/\/\/.*$/, "")
+}

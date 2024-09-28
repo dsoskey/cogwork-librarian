@@ -5,7 +5,7 @@ import { useState } from 'react'
 export const useLocalStorage = <T>(
   key: string,
   initialValue: T | (() => T),
-  construct: (T) => T = (i) => i
+  construct: (arg: T) => T = (i) => i
 ) => {
   // State to store our value
   // Pass initial state function to useState so logic is only executed once
