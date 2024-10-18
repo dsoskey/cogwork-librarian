@@ -2,12 +2,20 @@
     margin: unset;
 }
 
+.update-timestamp {
+    margin-right: var(--spacing-200);
+}
+
 .cube-view-root {
     .header {
         margin: 0 var(--spacing-300);
         display: flex;
         flex-direction: column;
         gap: var(--spacing-200);
+    }
+
+    .card-list-root {
+        margin-top: var(--spacing-300);
     }
 
     .list-control {
@@ -19,6 +27,31 @@
 
     .card-view {
         margin: unset;
+    }
+    @media screen {
+        .print-page {
+            display: none;
+        }
+    }
+    @media print {
+        .masthead,
+        .list-control,
+        .transform-button,
+        .header,
+        .result-container {
+            display: none !important;
+        }
+        .card-view {
+            width: 63.5mm;
+        }
+        .print-page {
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            flex-wrap: wrap;
+            padding-top: .25in;
+            padding-bottom: .25in;
+        }
     }
 
     h2 {
@@ -51,6 +84,7 @@
 }
 
 .cube-overview {
+    margin-top: var(--spacing-200);
     display: flex;
     justify-content: center;
     align-items: start;

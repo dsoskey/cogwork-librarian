@@ -78,12 +78,15 @@ button {
   border-bottom-color: var(--darker-color);
   border-right-color: var(--darker-color);
   color: var(--active-mid-alpha);
+  transition-property: color, background-color;
+  transition-duration: 100ms;
+  transition-timing-function: ease-out;
+
   cursor: pointer;
   border-width: 2px;
   border-style: solid;
   box-sizing: border-box;
   text-align: center;
-  padding: 1px 4px;
   font-family: system-ui, sans-serif;
   font-size: .8333333em;
 }
@@ -131,9 +134,16 @@ select {
   background-color: var(--darker-color);
   color: var(--light-color);
 }
+select:hover:not(:disabled) {
+  border-color: var(--active-mid-alpha);
+}
 
 .bold {
   font-weight: bold;
+}
+
+.gone {
+  opacity: 0;
 }
 
 input[type="checkbox"].custom {
@@ -349,6 +359,13 @@ th, td {
 .masthead {
   margin: var(--spacing-200);
   align-items: start;
+}
+
+@media print {
+  .footer,
+  .masthead {
+    display: none;
+  }
 }
 
 .masthead #page-title {

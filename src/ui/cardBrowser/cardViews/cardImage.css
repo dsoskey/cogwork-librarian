@@ -51,15 +51,22 @@
     right: 8%;
     background-color: transparent;
     border-color: transparent;
+    transition: transform 400ms ease-in-out, rotate 400ms ease-in-out;
+    border-radius: 4px;
     font-size: 1.75em;
     cursor: pointer;
 }
 .flip-button {
     top: 30%;
+    &[data-flipped="true"] {
+        rotate: 90deg;
+    }
 }
 .transform-button {
     top: 11%;
-
+    &[data-transformed="true"] {
+        transform: rotateY(180deg);
+    }
 }
 .flip-button:hover,
 .transform-button:hover {

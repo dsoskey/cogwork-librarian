@@ -5,6 +5,7 @@ import { CubeViewModelContext, OrderedCard } from './useCubeViewModel'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { CardsPerRowControl } from '../component/cardsPerRowControl'
 import { useViewportListener } from '../viewport'
+import { PrintPage } from './printPage'
 
 export interface CardResultsLayoutProps {
   cards: () => OrderedCard[]
@@ -17,9 +18,9 @@ export function CardResultsLayout({ cards, filterControl, extraControls }: CardR
   const { cube, setActiveCard } = useContext(CubeViewModelContext);
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
   const [showCustomImage, setShowCustomImage] = useLocalStorage('cards-custom-image', true)
-  const { ordering, setOrdering, sorted } = useCubeSort((cards));
+  const { ordering, setOrdering, sorted } = useCubeSort(cards);
 
-  return <div>
+  return <div className="card-list-root">
     <div className='list-control'>
       {filterControl}
       <CubeSort setOrdering={setOrdering} ordering={ordering} />
@@ -37,16 +38,19 @@ export function CardResultsLayout({ cards, filterControl, extraControls }: CardR
       </div>
     </div>
 
-    {sorted.length > 0 && <div className='result-container'>
-      {sorted.map((card, i) => <CardImageView
-        key={card.id + i.toString()}
-        className={`_${cardsPerRow}`}
-        card={{ data: card, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
-        onClick={() => setActiveCard(card)}
-        altImageUri={showCustomImage ? card.alt_image_uri : undefined}
-        altImageBackUri={showCustomImage ? card.alt_image_back_uri : undefined}
-      />)}
-    </div>}
+    {sorted.length > 0 && <>
+      <div className='result-container'>
+        {sorted.map((card, i) => <CardImageView
+          key={card.id + i.toString()}
+          className={`_${cardsPerRow}`}
+          card={{ data: card, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
+          onClick={() => setActiveCard(card)}
+          altImageUri={showCustomImage ? card.alt_image_uri : undefined}
+          altImageBackUri={showCustomImage ? card.alt_image_back_uri : undefined}
+        />)}
+      </div>
+      <PrintPage cards={sorted} />
+    </>}
   </div>;
 }
 

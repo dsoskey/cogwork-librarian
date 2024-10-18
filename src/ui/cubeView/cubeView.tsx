@@ -169,12 +169,14 @@ function CubeModelView() {
           {cube.source === "list" && "a text list"}
         </em>
       </div>
-      <div className="cube-subroutes row">
-        <Link to={`/cube/${cube.key}`} className={pathname === `/cube/${cube.key}` ? "active-link" : ""}>overview</Link>
-        <Link to={`/cube/${cube.key}/list`} className={pathname === `/cube/${cube.key}/list` ? "active-link" : ""}>list</Link>
-        <Link to={`/cube/${cube.key}/table`} className={pathname === `/cube/${cube.key}/table` ? "active-link" : ""}>search table</Link>
+      <div className='cube-subroutes row baseline'>
+        <Link to={`/cube/${cube.key}`} className={pathname === `/cube/${cube.key}` ? 'active-link' : ''}>overview</Link>
+        <Link to={`/cube/${cube.key}/list`}
+              className={pathname === `/cube/${cube.key}/list` ? 'active-link' : ''}>list</Link>
+        <Link to={`/cube/${cube.key}/table`} className={pathname === `/cube/${cube.key}/table` ? 'active-link' : ''}>search
+          table</Link>
         <div>
-          {cube.source !== "list" && <>
+          {cube.source !== 'list' && <>
             <CopyToClipboardButton
               copyText={`${window.location.protocol}//${window.location.host}/cube/${cube.key}?source=${cube.source}`}
               title={`copy share link to keyboard`}
@@ -182,14 +184,20 @@ function CubeModelView() {
             />
             <RefreshButton toSubmit={[cube]} />
           </>}
-          {" "}
-          <span className="bold">last updated:</span> {cube.last_updated?.toLocaleString() ?? "~"}
+          <button
+            disabled={pathname !== `/cube/${cube.key}/list`}
+            className={pathname === `/cube/${cube.key}/list` ? '' : 'gone'}
+            onClick={print}
+            title='print cube proxies'>🖨️
+          </button>
+          {' '}
+          <span className='bold'>last updated:</span> {cube.last_updated?.toLocaleString() ?? '~'}
         </div>
       </div>
     </div>
     <Routes>
-      <Route path="/list" element={<CubeList />}/>
-      <Route path="/table" element={<CubeSearchTable />}/>
+      <Route path='/list' element={<CubeList />} />
+      <Route path='/table' element={<CubeSearchTable />} />
       <Route path="" element={<CubeOverview />}/>
     </Routes>
   </>

@@ -10,7 +10,7 @@ export interface PageControlProps {
   count: number
 }
 
-export function usePageControl(pageSize, initialPageNumber: number = 0) {
+export function usePageControl(pageSize: number, initialPageNumber: number = 0) {
   const [pageNumber, setPageNumber] = useState<number>(initialPageNumber);
   const lowerBound = pageNumber * pageSize
   const upperBound = (pageNumber + 1) * pageSize

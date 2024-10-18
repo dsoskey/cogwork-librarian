@@ -64,12 +64,14 @@ export const CardImage = ({ card, altImageUri, altImageBackUri }: CardImageProps
     {canTransform && (
       <button
         className='transform-button'
+        data-transformed={transformed}
         onClick={onTransformCLick}
         title='transform'
       >🔄</button>
     )}
     {card.layout === "flip" && (
       <button
+        data-flipped={flipped}
         className="flip-button"
         onClick={onFlipClick}
         title="flip"
