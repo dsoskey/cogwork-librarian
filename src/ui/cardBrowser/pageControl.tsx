@@ -39,7 +39,7 @@ export const PageControl = ({
       disabled={upperBound >= count}
     >{`next ${pageSize} >`}</button>
     <button
-      onClick={() => setPageNumber(Math.floor(count / pageSize))}
+      onClick={() => setPageNumber(Math.ceil(count / pageSize) - 1)}
       disabled={upperBound >= count}
     >
       {'>>|'}

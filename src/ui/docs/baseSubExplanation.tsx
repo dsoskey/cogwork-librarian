@@ -22,7 +22,7 @@ export const BaseSubExplanation = () => {
     <ol>
       <li>combine the base query with each subquery</li>
       <li>
-        weigh each query, assigning that weight to each card in the query
+        weigh each combined query, assigning that weight to each card in the query
       </li>
       <li>aggregate cards by total query weight</li>
     </ol>
