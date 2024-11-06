@@ -19,7 +19,7 @@ import { CubeOverview } from './cubeOverview'
 import { CubeList } from './cubeList'
 import { FlagContext } from '../flags'
 import { ManaCost } from '../card/manaCost'
-import { CubeSearchTable } from './cubeSearchTable'
+import { CubeSearchTable } from './searchTable/cubeSearchTable'
 import { COPY_TEXT_EMOJIS, COPY_TITLE } from '../cardBrowser/cardViews/searchHoverActions'
 
 const shareButtonText = {
