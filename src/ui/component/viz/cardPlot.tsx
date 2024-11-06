@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Card } from 'mtgql'
 import { EnrichedCard } from '../../../api/queryRunnerCommon'
-import { PlotFunction, plotFunctionLookup } from './types'
+import { PlotFunction, PLOT_FUNCTIONS } from './types'
 import {
   ChartEvent, ChartOptions, Chart,
   ScatterController, PointElement, LinearScale,
@@ -19,8 +19,8 @@ export interface CardPlotProps {
 }
 
 export function CardPlot({ cards, xfunc, yfunc, onPointClick }: CardPlotProps) {
-  const xFunction = plotFunctionLookup[xfunc]
-  const yFunction = plotFunctionLookup[yfunc]
+  const xFunction = PLOT_FUNCTIONS[xfunc]
+  const yFunction = PLOT_FUNCTIONS[yfunc]
   const style = getComputedStyle(document.documentElement)
 
   const data = useMemo(() => {

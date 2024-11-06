@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { Card } from "mtgql";
+import { Card } from 'mtgql'
 import { EnrichedCard } from '../../../api/queryRunnerCommon'
-import { PlotFunction, plotFunctionLookup } from './types'
+import { GroupFunction, PlotFunction, PLOT_FUNCTIONS, GROUP_FUNCTIONS } from './types'
 import _groupBy from 'lodash/groupBy'
 import {
   ChartOptions, Chart, ChartEvent,
@@ -10,28 +10,46 @@ import {
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip)
 import { Bar } from 'react-chartjs-2'
 
+
+export function use1DData(cards: EnrichedCard[], xfunc: PlotFunction, xGroup: GroupFunction) {
+  const xFunctionRep = PLOT_FUNCTIONS[xfunc]
+  const xGroupRep = GROUP_FUNCTIONS[xGroup]
+  return useMemo(() => {
+    const ungroupedRawValues = _groupBy(cards, (car) => xFunctionRep.getDatum(car.data))
+    const subgroupedData = _groupBy(cards, (card) => xGroupRep.getGroup(card.data));
+    const datasets = Object.entries(subgroupedData)
+      .map(([groupKey, value]) => {
+        const metadata = xGroupRep.getGroupMetadata(groupKey)
+        const rawValues = _groupBy(value, (car) => xFunctionRep.getDatum(car.data))
+        const data = Object.keys(ungroupedRawValues).map(key => {
+          return { x: key, y: rawValues[key]?.length ?? 0 }
+        })
+        return {
+          data,
+          backgroundColor: metadata.color ?? getComputedStyle(document.documentElement).getPropertyValue('--active'),
+          rawValues,
+          order: metadata.order,
+          groupKey,
+        }
+      })
+
+    const chartData = { datasets }
+    return [chartData, ungroupedRawValues]
+  }, [cards, xfunc, xGroup])
+}
+
 export interface CardHistogramProps {
   cards: EnrichedCard[]
   xfunc: PlotFunction
+  xgroup?: GroupFunction
   onClick?: (cards: Card[]) => void;
 }
 
-export function CardHistogram({ cards, xfunc, onClick }: CardHistogramProps) {
-  const xFunction = plotFunctionLookup[xfunc]
+export function CardHistogram({ cards, xfunc, xgroup, onClick }: CardHistogramProps) {
+  const xFunctionRep = PLOT_FUNCTIONS[xfunc]
+  const xGroupRep = GROUP_FUNCTIONS[xgroup]
   const style = getComputedStyle(document.documentElement)
-
-  const [chartData, rawData] = useMemo(() => {
-    const rawValues = _groupBy(cards, (car) => xFunction.getDatum(car.data))
-    const data = {
-      datasets: [
-        {
-          data: Object.entries(rawValues).map(([k, v]) => ({ x: k, y: v.length })),
-          backgroundColor: style.getPropertyValue('--active')
-        }
-      ]
-    }
-    return [data, rawValues]
-  }, [cards, xfunc])
+  const [chartData, rawData] = use1DData(cards, xfunc, xgroup)
 
   let lightColor = style.getPropertyValue('--light-color')
   const gridColor = `color-mix(in oklch, ${lightColor}, transparent 70%)`
@@ -40,8 +58,9 @@ export function CardHistogram({ cards, xfunc, onClick }: CardHistogramProps) {
     responsive: true,
     scales: {
       x: {
+        stacked: true,
         title: {
-          text: xFunction.text,
+          text: xFunctionRep.text,
           display: true,
           color: lightColor
         },
@@ -52,6 +71,7 @@ export function CardHistogram({ cards, xfunc, onClick }: CardHistogramProps) {
         }
       },
       y: {
+        stacked: true,
         title: {
           text: 'count',
           display: true,
@@ -79,10 +99,17 @@ export function CardHistogram({ cards, xfunc, onClick }: CardHistogramProps) {
           family: 'Monospace'
         },
         callbacks: {
-          title: ctx => `${xFunction.text}: ${ctx[0].label}`,
+          title: ctx => {
+            const xLabel = ctx[0].label
+            // @ts-ignore
+            const xGroup = ctx[0].dataset.groupKey
+            const groupLabel = xLabel !== xGroup ? ` ${xGroupRep.text}: ${xGroup}` : "";
+            return `${xFunctionRep.text}: ${xLabel}${groupLabel}`
+          },
           label: ctx => `total: ${ctx.formattedValue}`,
           footer: ctx => {
-            const cards = rawData[ctx[0].label]
+            // @ts-ignore
+            const cards = chartData.datasets[ctx[0].datasetIndex].rawValues[ctx[0].label]
             const sortedValues = cards.map(it => it.data.name.replace(/ \/\/.*$/, '')).sort()
             return cardListToolTipText(sortedValues)
           }

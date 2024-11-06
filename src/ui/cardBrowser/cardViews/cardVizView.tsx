@@ -1,7 +1,7 @@
 import React from 'react'
 import { EnrichedCard } from '../../../api/queryRunnerCommon'
 import { Setter } from '../../../types'
-import { PlotFunction, plotFunctionLookup } from '../../component/viz/types'
+import { GROUP_FUNCTIONS, GroupFunction, PLOT_FUNCTIONS, PlotFunction } from '../../component/viz/types'
 import { CardPlot } from '../../component/viz/cardPlot'
 import { CardHistogram } from '../../component/viz/cardHistogram'
 import { useLocalStorage } from '../../../api/local/useLocalStorage'
@@ -34,6 +34,7 @@ export const vizTypeLookup: Record<VizType, VizTypeRep> = {
 export function CardVizView({ cards }: CardVizViewProps) {
   const [vizType, setVizType] = useLocalStorage<VizType>("vizType", VizType.plot);
   const [xFunc, setXFunc] = useLocalStorage<PlotFunction>("xFunc", PlotFunction.year);
+  const [xGroup, setXGroup]= useLocalStorage<GroupFunction>("xGroup", GroupFunction.none);
   const [yFunc, setYFunc]= useLocalStorage<PlotFunction>("yFunc", PlotFunction.fullWordCount);
   const vizTypeRep = vizTypeLookup[vizType];
 
@@ -46,10 +47,11 @@ export function CardVizView({ cards }: CardVizViewProps) {
         </select>
       </label>
       <PlotFuncSelect func={xFunc} setFunc={setXFunc} label="x axis:" />
+      {vizTypeRep.numAxes === 1 && <GroupFuncSelect func={xGroup} setFunc={setXGroup} label="subgroup:" />}
       {vizTypeRep.numAxes === 2 && <PlotFuncSelect func={yFunc} setFunc={setYFunc} label="y axis:" />}
     </div>
     {vizType === VizType.plot && <CardPlot cards={cards} xfunc={xFunc} yfunc={yFunc} />}
-    {vizType === VizType.hist && <CardHistogram cards={cards} xfunc={xFunc} />}
+    {vizType === VizType.hist && <CardHistogram cards={cards} xfunc={xFunc} xgroup={xGroup} />}
   </div>;
 }
 
@@ -66,7 +68,24 @@ function PlotFuncSelect({ func, setFunc, label }: PlotFuncSelectProps) {
     <select value={func} onChange={e => {
     setFunc(parseInt(e.target.value) as PlotFunction)
   }}>
-    {Object.entries(plotFunctionLookup).map(([k, v]) => <option key={k} value={k}>{v.text}</option>)}
+    {Object.entries(PLOT_FUNCTIONS).map(([k, v]) => <option key={k} value={k}>{v.text}</option>)}
+    </select>
+  </label>;
+}
+
+interface GroupFuncSelectProps {
+  func: GroupFunction
+  setFunc: Setter<GroupFunction>
+  label: React.ReactNode
+}
+
+function GroupFuncSelect({ func, setFunc, label }: GroupFuncSelectProps) {
+  return <label>
+    <span>{label}{" "}</span>
+    <select value={func} onChange={e => {
+      setFunc(parseInt(e.target.value) as GroupFunction)
+    }}>
+      {Object.entries(GROUP_FUNCTIONS).map(([k, v]) => <option key={k} value={k}>{v.text}</option>)}
     </select>
   </label>;
 }

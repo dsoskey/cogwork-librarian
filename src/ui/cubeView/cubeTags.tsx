@@ -4,7 +4,7 @@ import { LoaderText } from '../component/loaders'
 import { DataProps, DataTable } from '../data/dataTable'
 import { Link } from 'react-router-dom'
 import _sortBy from 'lodash/sortBy'
-import "./cubeSearch.css"
+import "./searchTable/cubeSearchTable.css"
 import { CardToOracleTag } from '../../api/local/types/tags'
 export interface CubeTagsProps {
 

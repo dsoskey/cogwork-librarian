@@ -16,19 +16,12 @@ import { Setter } from '../../../types'
 import { Modal } from '../../component/modal'
 import { isFunction } from 'lodash'
 import { getColors } from './tempColorUtil'
+import { colorKey } from '../../component/viz/types'
 export interface CubeSearchTableProps {}
 
 function colorBreakdown(cards: Card[], tag: string) {
     return cards.reduce((acc, card) => {
-        let key: string;
-        let colors = getColors(card)
-        if (colors.length === 0) {
-            key = "c";
-        } else if (colors.length > 1) {
-            key = "m";
-        } else {
-            key = colors[0].toLowerCase()
-        }
+        const key = colorKey(card)
         acc[key]++;
         acc.total++;
         return acc
