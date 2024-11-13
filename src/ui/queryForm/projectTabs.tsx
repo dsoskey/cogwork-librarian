@@ -5,6 +5,8 @@ import { downloadText } from '../download'
 import { serializeProject } from '../../api/local/types/project'
 import { ModalState, ProjectModal } from './projectModal'
 import cloneDeep from 'lodash/cloneDeep'
+import { useLocalStorage } from '../../api/local/useLocalStorage'
+import { InfoModal } from '../component/infoModal'
 
 interface ProjectTabProps {
   canClose: boolean
@@ -113,6 +115,8 @@ export const ProjectTabs = () => {
   const { openProject, path } = project;
   const [_, title] = splitPath(path)
   const [modalState, setModalState] = useState<ModalState>(ModalState.Closed)
+  const [oldIgnoreIds, setOldIgnoreIds] = useLocalStorage("ignore-list", []);
+  const { setIgnoredIds } = useContext(ProjectContext);
   const [tabState, dispatchTabState] = useReducer(reducer, "tab-state.coglib.sosk.watch", (key) => {
     const storageResult = localStorage.getItem(key);
     if (storageResult) {
@@ -159,6 +163,17 @@ export const ProjectTabs = () => {
           downloadText(text, title, "md")
         }}>export {title}</button>
       </div>
+      {oldIgnoreIds.length > 0 && <InfoModal
+        buttonContent="migrate ignore-list"
+        info={<>
+         <p>Instead of a single global ignore-list, each project now has its own ignore-list. You've used the global ignore-list feature in the past. Permanently move global ignore-list to the current project?</p>
+         <button onClick={() => {
+           setIgnoredIds(oldIgnoreIds)
+           setOldIgnoreIds([])
+         }}>do migration</button>
+        </>}
+        title={<h2>Migrate ignore-list</h2>}
+      />}
     </div>
     <ProjectModal
       modalState={modalState}

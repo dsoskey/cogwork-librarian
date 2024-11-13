@@ -31,14 +31,15 @@ export interface ProjectDao {
   savedCards: CardEntry[]
   setSavedCards: Setter<CardEntry[]>
   ignoredIds: string[]
+  setIgnoredIds: Setter<string[]>
   toggleIgnoreId: (id: string) => void;
   addCard: (card: Card) => void;
 }
 
 const defaultDao: ProjectDao = {
   ignoredIds: [],
-  toggleIgnoreId: defaultFunction("ProjectDao.setCurrentIndex"),
-
+  toggleIgnoreId: defaultFunction("ProjectDao.toggleIgnoreId"),
+  setIgnoredIds: defaultFunction("ProjectDao.setIgnoredIds"),
   currentIndex: 0,
   currentLine: '',
   setCurrentIndex: defaultFunction("ProjectDao.setCurrentIndex"),
@@ -90,16 +91,16 @@ export function useProjectDao(): ProjectDao {
       : undefined
   )
 
-  const [ignoredIds, _setIgnoredIds] = useLocalStorage<string[]>('project.ignore-list', [])
+  const [ignoredIds, setIgnoredIds] = useLocalStorage<string[]>('project.ignore-list', [])
   const toggleIgnoreId = useCallback(
     (next: string) =>
-      _setIgnoredIds((prev) => {
+      setIgnoredIds((prev) => {
         if (prev.includes(next)) {
           return prev.filter(it => it !== next && it.length > 0);
         }
         return [...prev.filter((it) => it.length > 0), next]
       }),
-    [_setIgnoredIds]);
+    [setIgnoredIds]);
 
   const loadMemory = useCallback((project: Project) => {
     setInitialPath(project.path);
@@ -112,12 +113,12 @@ export function useProjectDao(): ProjectDao {
       setCurrentLine(serializeEntry(project.savedCards[0]))
       setCurrentIndex(0)
     }
-    _setIgnoredIds(project.ignoredCards);
+    setIgnoredIds(project.ignoredCards);
     _setUpdatedAt(project.updatedAt);
   }, [
     currentIndex, setInitialPath,
     _setCurrentPath, _setQueries, _setSavedCards,
-    setCurrentLine, setCurrentIndex, _setIgnoredIds, _setUpdatedAt
+    setCurrentLine, setCurrentIndex, setIgnoredIds, _setUpdatedAt
   ])
   const saveMemory = async () => {
     if (initialPath !== currentPath) {
@@ -338,6 +339,6 @@ export function useProjectDao(): ProjectDao {
     path: currentPath,
     currentLine, setCurrentLine,
     currentIndex, setCurrentIndex,
-    ignoredIds, toggleIgnoreId,
+    ignoredIds, toggleIgnoreId, setIgnoredIds
   }
 }
