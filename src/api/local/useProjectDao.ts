@@ -30,10 +30,15 @@ export interface ProjectDao {
   setCurrentIndex: Setter<number>
   savedCards: CardEntry[]
   setSavedCards: Setter<CardEntry[]>
+  ignoredIds: string[]
+  toggleIgnoreId: (id: string) => void;
   addCard: (card: Card) => void;
 }
 
 const defaultDao: ProjectDao = {
+  ignoredIds: [],
+  toggleIgnoreId: defaultFunction("ProjectDao.setCurrentIndex"),
+
   currentIndex: 0,
   currentLine: '',
   setCurrentIndex: defaultFunction("ProjectDao.setCurrentIndex"),
@@ -85,7 +90,17 @@ export function useProjectDao(): ProjectDao {
       : undefined
   )
 
-  const [ignoredIds, _setIgnoredIds] = useLocalStorage<string[]>('ignore-list', [])
+  const [ignoredIds, _setIgnoredIds] = useLocalStorage<string[]>('project.ignore-list', [])
+  const toggleIgnoreId = useCallback(
+    (next: string) =>
+      _setIgnoredIds((prev) => {
+        if (prev.includes(next)) {
+          return prev.filter(it => it !== next && it.length > 0);
+        }
+        return [...prev.filter((it) => it.length > 0), next]
+      }),
+    [_setIgnoredIds]);
+
   const loadMemory = useCallback((project: Project) => {
     setInitialPath(project.path);
     _setCurrentPath(project.path);
@@ -323,5 +338,6 @@ export function useProjectDao(): ProjectDao {
     path: currentPath,
     currentLine, setCurrentLine,
     currentIndex, setCurrentIndex,
+    ignoredIds, toggleIgnoreId,
   }
 }

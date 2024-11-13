@@ -1,7 +1,6 @@
 import { QueryForm } from './queryForm/queryForm'
 import { BrowserView } from './cardBrowser/browserView'
 import React, { useContext, useState } from 'react'
-import { useIgnoreList } from '../api/useIgnoreList'
 import { ProjectContext } from '../api/local/useProjectDao'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 import { DataSource } from '../types'
@@ -26,7 +25,6 @@ export const SearchView = () => {
   const cogDB = useContext(CogDBContext)
   const project = useContext(ProjectContext)
   const { queries, addCard } = project
-  const { ignoredIds, addIgnoredId } = useIgnoreList()
 
   const [source, setSource] = useLocalStorage<DataSource>('source', 'local')
   const queryRunner = {
@@ -101,8 +99,8 @@ export const SearchView = () => {
         status={queryRunner.status}
         errors={errorsToDisplay}
         addCard={addCard}
-        addIgnoredId={addIgnoredId}
-        ignoredIds={ignoredIds}
+        addIgnoredId={project.toggleIgnoreId}
+        ignoredIds={project.ignoredIds}
         source={source}
         runStrategy={queryRunner.runStrategy ?? RunStrategy.Search}
       />
