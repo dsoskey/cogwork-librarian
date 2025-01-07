@@ -16,6 +16,7 @@ import combatBoxText from '../../../docs/syntaxReference/combatBox/text.md'
 import combatBoxExample from '../../../docs/syntaxReference/combatBox/example.md'
 import andorText from '../../../docs/syntaxReference/andOr/text.md'
 import andorExample from '../../../docs/syntaxReference/andOr/example.md'
+import sortOrderText from '../../../docs/syntaxReference/sort/text.md'
 import { MDDoc, titleificate } from './renderer'
 import isText from '../../../docs/syntaxReference/is/text.md'
 import { Link } from 'react-router-dom'
@@ -29,13 +30,14 @@ export const syntaxSectionTitles = [
   combatBoxText,
   andorText,
   isText,
+  sortOrderText,
 ].map(titleificate);
 
 export const SyntaxDocs = () => {
   return <div className='user-guide-root'>
     <h2>Query syntax</h2>
     <p>
-      cogwork librarian's local query processor uses a reverse-engineered
+      Cogwork Librarian's local query processor uses a reverse-engineered
       variant of Scryfall's syntax. This page only covers Scryfall-compatible syntax;
       see <Link to="/user-guide/extended-syntax">our extended syntax guide</Link>
       {' '}for more information on cogwork librarian's extra search features.
@@ -47,7 +49,7 @@ export const SyntaxDocs = () => {
       >
         report any inconsistencies
       </a>{' '}
-      you find between Scryfall and cogwork librarian so we can make this
+      you find between Scryfall and Cogwork Librarian so we can make this
       tool the best it can be together :)
 
     </p>
@@ -63,6 +65,7 @@ export const SyntaxDocs = () => {
     {/* Tags oracle, art, cubes */}
     <BasicSyntaxSection textMd={andorText} exampleMd={andorExample} />
     <MDDoc className='single-section-docs'>{isText}</MDDoc>
+    <MDDoc className="single-section-docs">{sortOrderText}</MDDoc>
 
     <h2 className='todo-supported-color'>supported keywords</h2>
     <ul>

@@ -60,7 +60,7 @@ export const DocsView = () => {
   return <div className='docs-view'>
     <NavBar />
     <div className='docs-content'>
-      <span className='alert'>&nbsp;these docs are under active construction!&nbsp;</span>
+      <div className='alert'>&nbsp;these docs are under active construction!&nbsp;</div>
       <Routes>
         <Route path="getting-started" element={<GettingStartedDocs />} />
         <Route path="advanced-techniques" element={<AdvancedTechniqueDocs />} />

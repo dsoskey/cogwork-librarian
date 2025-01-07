@@ -16,7 +16,7 @@ See the tables below for the full list of supported and documented `is` filters.
 | back             | cards with non-default back                                                                                          | ✔                 | ✔        |
 | battleland       | bfz typed dual lands. see `tangoland`                                                                                | ✔                 | ✔        |
 | bear             | cards that are 2 mana 2/2s                                                                                           | ✔                 | ✔        |
-| belzenlok        | not implemented                                                                                                      | –                 | ✔        |
+| belzenlok        | story characters Demonlord Belzenlok claimed to be                                                                   | –                 | ✔        |
 | bicycleland      | akh cycling dual lands. see `bikeland`                                                                               | ✔                 | ✔        |
 | bikeland         | akh cycling dual lands. see `cycleland`                                                                              | ✔                 | ✔        |
 | bondland         | multiplayer untapped dual lands from battlebond                                                                      | ✔                 | ✔        |

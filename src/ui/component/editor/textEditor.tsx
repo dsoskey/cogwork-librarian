@@ -176,6 +176,7 @@ export const TextEditor = ({
         copyText={copyText}
         onSubmit={onSubmit}
         canSubmit={canSubmit}
+        showSubmit
         showLineNumbers={showLineNumbers}
       />
       <button

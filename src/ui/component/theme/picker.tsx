@@ -103,7 +103,9 @@ function ThemeSample({ theme }: ThemeSampleProps) {
       disabled
       language='scryfall-extended-multi'
       showLineNumbers
-      setQueries={() => {}} queries={[SAVAI_SACRIFICE_EXAMPLE.prefix, ...SAVAI_SACRIFICE_EXAMPLE.queries]} />
+      setQueries={() => {}}
+      queries={SAVAI_SACRIFICE_EXAMPLE.queries}
+    />
   </div>
 }
 

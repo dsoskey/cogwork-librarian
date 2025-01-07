@@ -12,6 +12,7 @@
       "dom",
       "es5",
       "scripthost",
+      "es2021",
       "es2020.promise",
       "es2015.collection",
       "es2015.promise"

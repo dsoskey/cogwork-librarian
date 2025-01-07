@@ -6,6 +6,7 @@ import dbBasics from '../../../docs/gettingStarted/dbBasics.md'
 import editorBasics from '../../../docs/gettingStarted/editorBasics.md'
 import searchResults from '../../../docs/gettingStarted/searchResults.md'
 import savedCards from '../../../docs/gettingStarted/savedCards.md'
+import { KNIGHTS_EXAMPLE } from '../../api/example'
 
 export const gettingStartedSectionTitles = [
   editorBasics,
@@ -19,7 +20,7 @@ export const GettingStartedDocs = () => {
   return <div>
     <MDDoc>{intro}</MDDoc>
     <MDDoc>{editorBasics}</MDDoc>
-    <BaseSubExplanation/>
+    <BaseSubExplanation example={KNIGHTS_EXAMPLE} />
     <MDDoc>{searchResults}</MDDoc>
     <MDDoc>{savedCards}</MDDoc>
     <MDDoc>{dbBasics}</MDDoc>

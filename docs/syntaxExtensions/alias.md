@@ -5,7 +5,7 @@ Define aliases in their own paragraph in the format `@alias:NAME(QUERY)`
 Press ▶️ next to the alias definition to run it as its own query
 
 ```scryfall-extended-multi
-@alias:innistrad(s:vow or s:mid or s:ema or s:soi or s:avr or s:dka or s:isd unique:cards)
+@alias:innistrad(s:vow,mid,ema,soi,avr,dka,isd unique:cards)
 
 @alias:importantTypes(t:zombie or t:spirit or t:human or t:vampire or t:werewolf)
 

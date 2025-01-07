@@ -5,6 +5,8 @@ import remarkGfm from 'remark-gfm'
 import { ScryfallIcon } from '../component/scryfallIcon'
 import { CoglibIcon } from '../component/coglibIcon'
 import { Components } from 'react-markdown/lib/ast-to-react'
+import { CopyToClipboardButton } from '../component/copyToClipboardButton'
+import { MultiQueryActionBar } from '../component/editor/multiQueryActionBar'
 
 export const titleificate = (titleable: string) => {
   const [title] = titleable.split("\n\n")
@@ -45,17 +47,20 @@ export const renderer = {
       }
     }
     return <td {...rest}>{component}</td>
-  }
-  // pre: ({ node, ...props }) => {
-  //   // useHighlightPrism([]);
-  //   console.log(node);
-  //   const copyText = node.children[0]?.children[0]?.value;
-  //   return <div className=''>
-  //     <CopyToClipboardButton copyText={copyText} className='copy-button' />
-  //     <pre {...props} />
-  //   </div>
-  // },
+  },
+}
 
+export function newPre({ node, ...props }) {
+  const copyText = node.children[0]?.children[0]?.value;
+  return <div className='query-editor'>
+    <MultiQueryActionBar
+      queries={copyText.split("\n")}
+      copyText={()=>{}}
+      showLineNumbers
+    />
+    <CopyToClipboardButton copyText={copyText} className='copy-button' />
+    <pre className="display" {...props} />
+  </div>
 }
 
 interface MCDocProps {
@@ -66,11 +71,11 @@ interface MCDocProps {
 /**
  * default config for Document section in ReactMarkdown.
  */
-export const MDDoc = ({ children, className }: MCDocProps) => {
+export const MDDoc = ({ children, className, overrides }: MCDocProps) => {
   return <ReactMarkdown
     className={className}
     remarkPlugins={[remarkGfm]}
-    components={renderer}>
+    components={{...renderer, ...overrides}}>
     {children}
   </ReactMarkdown>
 }

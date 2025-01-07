@@ -2,12 +2,12 @@ import { singleQueryInfo } from '../component/editor/singleQueryActionBar'
 import { rankInfo } from '../component/editor/infoLines'
 import { injectPrefix as _injectPrefix, SCORE_PRECISION, weightAlgorithms } from '../../api/queryRunnerCommon'
 import React from 'react'
-import { KNIGHTS_EXAMPLE } from '../../api/example'
+import { QueryExample } from '../../api/example'
 
-const EXAMPLE = KNIGHTS_EXAMPLE
-const injectPrefix = _injectPrefix(EXAMPLE.prefix)
+export const BaseSubExplanation = ({ example }: { example: QueryExample }) => {
 
-export const BaseSubExplanation = () => {
+  const injectPrefix = _injectPrefix(example.queries[0])
+  const subqueries = example.queries.slice(1)
   return <>
     <h3 id="basesub-query-model">
       <a href="#basesub-query-model">#</a>
@@ -32,20 +32,17 @@ export const BaseSubExplanation = () => {
     <div className='example-query'>
       <pre className='language-none labels'>
         <code>
-          {singleQueryInfo(rankInfo)([
-            EXAMPLE.prefix,
-            ...EXAMPLE.queries,
-          ]).join('\n')}
+          {singleQueryInfo(rankInfo)(example.queries).join('\n')}
         </code>
       </pre>
       <pre className='language-scryfall-extended'>
-          <code>{[EXAMPLE.prefix, ...EXAMPLE.queries].join('\n')}</code>
+          <code>{example.queries.join('\n')}</code>
         </pre>
     </div>
 
     <p>cogwork librarian transforms the queries into this:</p>
     <pre className='language-scryfall'>
-        <code>{EXAMPLE.queries.map(injectPrefix).join('\n')}</code>
+        <code>{subqueries.map(injectPrefix).join('\n')}</code>
       </pre>
     <p>
       this lets you treat the first query as the total set of cards you want
@@ -62,7 +59,7 @@ export const BaseSubExplanation = () => {
     <div className='example-query'>
       <pre className='language-none labels'>
         <code>
-          {EXAMPLE.queries.map((_, index) =>
+          {subqueries.map((_, index) =>
             `[${weightAlgorithms
               .zipf(index)
               .toFixed(SCORE_PRECISION)}]`).join('\n')}
@@ -70,7 +67,7 @@ export const BaseSubExplanation = () => {
       </pre>
       <pre className='language-scryfall'>
         <code>
-          {EXAMPLE.queries
+          {subqueries
             .map(injectPrefix)
             .join('\n')}
         </code>

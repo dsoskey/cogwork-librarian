@@ -8,6 +8,10 @@
     margin: 0 var(--spacing-300);
     flex: 5;
 
+    .alert {
+        margin-bottom: var(--spacing-300);
+    }
+
     & > * {
       max-width: 60rem;
     }
@@ -15,6 +19,9 @@
 
 .docs-content h3 {
     font-size: 1.25em;
+    a[href^=\#] {
+        font-size: .95em;
+    }
 }
 
 .docs-view .docs-sidenav {
@@ -60,6 +67,20 @@
     background-color: var(--darker-color);
     padding: var(--spacing-100);
     border-radius: var(--border-radius);
+}
+
+.docs-view {
+    .query-editor {
+        a {
+            text-decoration: underline;
+        }
+    }
+}
+.docs-view .copy-button {
+    position: absolute;
+    z-index: 10;
+    top: var(--spacing-100);
+    right: var(--spacing-100);
 }
 
 .docs-sidenav :is(a.active, a:hover, a:focus-visible),

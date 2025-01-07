@@ -11,7 +11,7 @@ export const ExampleSection = ({ example }: ExampleSectionProps) => {
   return <div>
     <div className='row center'>
       <h4>{example.title}</h4>
-      <CopyToClipboardButton copyText={[example.prefix, ...example.queries].join('\n')} />
+      <CopyToClipboardButton copyText={example.queries.join('\n')} />
     </div>
     {example.description !== undefined && (
       <p>{example.description}</p>
@@ -19,14 +19,11 @@ export const ExampleSection = ({ example }: ExampleSectionProps) => {
     <div className='example-query'>
           <pre className='language-none'>
             <code>
-              {multiQueryInfo(rankInfo)([
-                example.prefix,
-                ...example.queries,
-              ]).join('\n')}
+              {multiQueryInfo(rankInfo)(example.queries).join('\n')}
             </code>
           </pre>
       <pre className='language-scryfall-extended-multi'>
-            <code>{[example.prefix, ...example.queries].join('\n')}</code>
+            <code>{example.queries.join('\n')}</code>
           </pre>
     </div>
   </div>

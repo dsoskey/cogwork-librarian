@@ -49,6 +49,7 @@ export interface MultiQueryInfoBarProps {
   onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
   showLineNumbers?: boolean;
+  showSubmit?: boolean;
 }
 export const MultiQueryActionBar = ({
   queries,
@@ -56,6 +57,7 @@ export const MultiQueryActionBar = ({
   canSubmit,
   onSubmit,
   showLineNumbers,
+  showSubmit,
 }: MultiQueryInfoBarProps) => {
   useHighlightPrism([queries]);
   const lineInfo = RENDER_QUERY_INFO(queries);
@@ -81,7 +83,7 @@ export const MultiQueryActionBar = ({
         >
           {showLineNumbers && <code className={`multi-code line-number ${line.toLowerCase()}`}>{`${(index+1).toString().padStart(numDigits)} `}</code>}
           <code className={`multi-code ${line.toLowerCase()}`}>{line}</code>
-          {(line === "BASE" || line === "VENN") && (
+          {showSubmit && (line === "BASE" || line === "VENN") && (
             <button
               onClick={(event) => {
                 if (canSubmit && onSubmit) {
