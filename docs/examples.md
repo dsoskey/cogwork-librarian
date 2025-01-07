@@ -78,7 +78,7 @@ t:artifact
 
 ### Skill checks
 
-This search identifies card printings that may read poorly to new cube drafters due to text unexpected gameplay or text errata.
+This search identifies card printings that may read poorly to new cube drafters, from unintuitive mechanics to errata'd rules text.
 
 ```scryfall-extended-multi
 # Uncomment this to search sub-queries one at a time
@@ -113,7 +113,5 @@ t:wall date<9ed order:released
 date>=3ed date<tmp (o:/destroy .* be regenerated/ or (o:/sacrifices? / -o:/sacrifice.*:/ -o:"as an additional cost") or "Lake of the Dead")
 o:/\bindestructible\b/ date<ths
 o:"can't be blocked." date<ths
-
-o:"If you don't, put it into its owner's graveyard."
 ```
 
