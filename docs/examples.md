@@ -1,6 +1,6 @@
 ### Generic planeswalker reanimation
 
-The base query uses a regular expression (aka regex) to find several kinds of reanimation
+The base query uses a regex to find several kinds of reanimation
 effects with a single oracle text search. `.*`, regex-speak for finding any number of any kind of character,
 matches any type or quantity of reanimation target. The subqueries filter out
 most reanimation spells whose text doesn't mention planeswalkers or
