@@ -1,5 +1,5 @@
 import { ColorBreakdown } from '../cubeTags'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { HTMLProps, useEffect, useRef, useState } from 'react'
 import { Card, SearchError, SearchOptions } from 'mtgql'
 import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
 import { Modal } from '../../component/modal'
@@ -8,6 +8,18 @@ import { Input } from '../../component/input'
 import { ResultAsync } from 'neverthrow'
 import { Dictionary } from 'lodash'
 import { getColors } from './tempColorUtil'
+
+export enum CellDisplayMode {
+  simple,
+  perentage,
+  asfan,
+}
+
+export const CELLS: Record<CellDisplayMode, string> = {
+  [CellDisplayMode.simple]: 'count only',
+  [CellDisplayMode.perentage]: 'percentage',
+  [CellDisplayMode.asfan]: 'as-fan'
+}
 
 export interface ShownQuery {
   query: string
@@ -23,7 +35,8 @@ interface CubeSearchRowProps {
   flop: boolean
   cardCounts: Dictionary<OrderedCard[]>
   setCardsToShow: (cards: ShownQuery) => void;
-  showPercentages: boolean
+  cellDisplayMode: CellDisplayMode
+  packSize: number
 }
 
 export function CubeSearchRow({
@@ -35,7 +48,8 @@ export function CubeSearchRow({
   total,
   cardCounts,
   setCardsToShow,
-  showPercentages
+  cellDisplayMode,
+  packSize
 }: CubeSearchRowProps) {
   const [result, setResult] = useState<OrderedCard[]>([])
   const [loading, setLoading] = useState(true)
@@ -130,7 +144,8 @@ export function CubeSearchRow({
     loading={loading}
     breakdown={buckets}
     total={total}
-    showPercentages={showPercentages}
+    cellDisplayMode={cellDisplayMode}
+    packSize={packSize}
     isSubTotal>
     <Input
       className='search-row-input'
@@ -150,7 +165,8 @@ interface ColorBreakdownRowProps {
   children: React.ReactNode
   error?: SearchError
   onCellClick: (colorKey: string) => void;
-  showPercentages: boolean
+  cellDisplayMode: CellDisplayMode
+  packSize: number
 }
 
 export function ColorBreakdownRow({
@@ -160,7 +176,8 @@ export function ColorBreakdownRow({
   breakdown,
   total,
   isSubTotal,
-  showPercentages,
+  cellDisplayMode,
+  packSize,
   children
 }: ColorBreakdownRowProps) {
   const [open, setOpen] = useState(false)
@@ -176,44 +193,83 @@ export function ColorBreakdownRow({
       {error && <button className='error-indicator' onClick={() => setOpen(true)}
       >⚠️</button>}
     </td>
-    <td onClick={() => onCellClick('total')}>{breakdown.total}
-      {isSubTotal && showPercentages &&
-        <span className='percentage'>{' ('}{(breakdown.total / total * 100).toPrecision(2)}%)</span>}
-    </td>
-    <td onClick={() => onCellClick('w')} className='w'>
-      {breakdown.w}
-      {showPercentages &&
-        <span className='percentage'>{" "}({(breakdown.w / denominator * 100).toPrecision(2)}%)</span>
-      }</td>
-    <td onClick={() => onCellClick('u')} className='u'>
-      {breakdown.u}
-      {showPercentages &&
-        <span className='percentage'>{" "}({(breakdown.u / denominator * 100).toPrecision(2)}%)</span>
-      }</td>
-    <td onClick={() => onCellClick('b')} className='b'>
-      {breakdown.b}
-      {showPercentages &&
-        <span className='percentage'>{" "}({(breakdown.b / denominator * 100).toPrecision(2)}%)</span>
-      }</td>
-    <td onClick={() => onCellClick('r')} className='r'>
-      {breakdown.r}
-      {showPercentages &&
-        <span className='percentage'>{" "}({(breakdown.r / denominator * 100).toPrecision(2)}%)</span>
-      }</td>
-    <td onClick={() => onCellClick('g')} className='g'>
-      {breakdown.g}
-      {showPercentages &&
-        <span className='percentage'>{" "}({(breakdown.g / denominator * 100).toPrecision(2)}%)</span>
-      }</td>
-    <td onClick={() => onCellClick('m')} className='m'>
-      {breakdown.m}
-      {showPercentages &&
-        <span className='percentage'>{" "}({(breakdown.m / denominator * 100).toPrecision(2)}%)</span>
-      }</td>
-    <td onClick={() => onCellClick('c')} className='c'>
-      {breakdown.c}
-      {showPercentages &&
-        <span className='percentage'>{" "}({(breakdown.c / denominator * 100).toPrecision(2)}%)</span>
-      }</td>
+    <ColorBreakdownCell
+      onClick={() => onCellClick('total')}
+      numerator={breakdown.total}
+      denominator={denominator}
+      cellDisplayMode={isSubTotal ? cellDisplayMode : CellDisplayMode.simple}
+      packSize={packSize}
+    />
+    <ColorBreakdownCell
+      onClick={() => onCellClick('w')} className='w'
+      numerator={breakdown.w}
+      denominator={denominator}
+      cellDisplayMode={cellDisplayMode}
+      packSize={packSize}
+    />
+    <ColorBreakdownCell
+      onClick={() => onCellClick('u')} className='u'
+      numerator={breakdown.u}
+      denominator={denominator}
+      cellDisplayMode={cellDisplayMode}
+      packSize={packSize}
+    />
+    <ColorBreakdownCell
+      onClick={() => onCellClick('b')} className='b'
+      numerator={breakdown.b}
+      denominator={denominator}
+      cellDisplayMode={cellDisplayMode}
+      packSize={packSize}
+    />
+    <ColorBreakdownCell
+      onClick={() => onCellClick('r')} className='r'
+      numerator={breakdown.r}
+      denominator={denominator}
+      cellDisplayMode={cellDisplayMode}
+      packSize={packSize}
+    />
+    <ColorBreakdownCell
+      onClick={() => onCellClick('g')} className='g'
+      numerator={breakdown.g}
+      denominator={denominator}
+      cellDisplayMode={cellDisplayMode}
+      packSize={packSize}
+    />
+    <ColorBreakdownCell
+      onClick={() => onCellClick('m')} className='m'
+      numerator={breakdown.m}
+      denominator={denominator}
+      cellDisplayMode={cellDisplayMode}
+      packSize={packSize}
+    />
+    <ColorBreakdownCell
+      onClick={() => onCellClick('c')} className='c'
+      numerator={breakdown.c}
+      denominator={denominator}
+      cellDisplayMode={cellDisplayMode}
+      packSize={packSize}
+    />
   </tr>
+}
+
+interface ColorBreakdownCellProps extends HTMLProps<HTMLTableCellElement>{
+  numerator: number
+  denominator: number
+  cellDisplayMode: CellDisplayMode
+  packSize: number
+}
+
+function ColorBreakdownCell({ numerator, denominator, cellDisplayMode, packSize, ...rest }: ColorBreakdownCellProps) {
+  return <td {...rest}>
+    {numerator}
+    {cellDisplayMode === CellDisplayMode.simple && null}
+    {cellDisplayMode === CellDisplayMode.perentage &&
+      <span className='percentage'>
+        {` (${(numerator / denominator * 100).toPrecision(2)}%)`}
+      </span>}
+    {cellDisplayMode === CellDisplayMode.asfan &&
+      <span className='percentage'>
+        {` (${(numerator / denominator * packSize||0).toFixed(1)})`}
+      </span>}
+  </td>;
 }

@@ -10,13 +10,14 @@ import _groupBy from 'lodash/groupBy'
 import { useLocalStorage } from '../../../api/local/useLocalStorage'
 import { CardResultsLayout } from '../cardResults'
 import { InfoModal } from '../../component/infoModal'
-import { ColorBreakdownRow, CubeSearchRow, ShownQuery } from './row'
+import { CellDisplayMode, CELLS, ColorBreakdownRow, CubeSearchRow, ShownQuery } from './row'
 import { DEFAULT_QUERIES, TABLE_PRESETS } from './presets'
 import { Setter } from '../../../types'
 import { Modal } from '../../component/modal'
 import { isFunction } from 'lodash'
 import { getColors } from './tempColorUtil'
 import { colorKey } from '../../component/viz/types'
+
 export interface CubeSearchTableProps {}
 
 function colorBreakdown(cards: Card[], tag: string) {
@@ -34,7 +35,8 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
     const { cards, cube } = useContext(CubeViewModelContext);
     const cardCount = useMemo(() => _groupBy(cards, "oracle_id"),[cards]);
 
-    const [showPercentage, setShowPercentage] = useLocalStorage("show-percentage",true);
+    const [cellDisplayMode, setCellDisplayMode] = useLocalStorage<CellDisplayMode>("cube-cell-displaymode", CellDisplayMode.perentage)
+    const [packSize, setPackSize] = useLocalStorage<number>(`pack-count-${cube.key}`, 15);
     const [cardsToShow, _setCardsToShow] = useState<ShownQuery>({
         query: "",
         cards: [],
@@ -143,25 +145,38 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
 
     return <div className="cube-search-table-root">
         <div className="table-controls">
-            <InfoModal
-              title={<h2>Cube search table</h2>}
-              info={<p>
-                  Each row has an editable search query and the query results broken down by color category.
-                  Click a table cell to show the cards that match that cell's query.
-                  Edit the query rows like any multiline text box,
-                  using <code>Enter</code> and <code>Backspace</code> to add and remove rows.
-                  Navigate the query rows using <code>Up</code> and <code>Down</code>.
-              </p>}
-            />
-            <PresetSelector setQueries={bulkSetQuery} cards={cards} />
-            <label className='row center'>
-                <input
-                  type='checkbox' className='custom'
-                  checked={showPercentage}
-                  onChange={() => setShowPercentage(p => !p)}
+            <div>
+                <InfoModal
+                  title={<h2>Cube search table</h2>}
+                  info={<p>
+                      Each row has an editable search query and the query results broken down by color category.
+                      Click a table cell to show the cards that match that cell's query.
+                      Edit the query rows like any multiline text box,
+                      using <code>Enter</code> and <code>Backspace</code> to add and remove rows.
+                      Navigate the query rows using <code>Up</code> and <code>Down</code>.
+                  </p>}
                 />
-                <span>show percentages</span>
+                <PresetSelector setQueries={bulkSetQuery} cards={cards} />
+            </div>
+
+            <label className='row baseline'>
+                <span className="form-label">cell calculation: </span>
+                <select
+                  value={cellDisplayMode}
+                  onChange={event => setCellDisplayMode(parseInt(event.target.value))}>
+                    {Object.entries(CELLS).map(([key, value]) => <option key={key} value={key}>{value}</option>)}
+                </select>
             </label>
+            {cellDisplayMode === CellDisplayMode.asfan &&
+              <label className='row center'>
+                  <span className='form-label'>pack size: </span>
+                  <input
+                    type='number'
+                    value={packSize}
+                    onChange={event => setPackSize(parseInt(event.target.value))}
+                  />
+              </label>
+            }
         </div>
         <table className="cube-search-table">
             <thead>
@@ -182,7 +197,8 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
               onCellClick={onCellClick}
               breakdown={totalbucket}
               total={totalbucket.total}
-              showPercentages={showPercentage}
+              cellDisplayMode={cellDisplayMode}
+              packSize={packSize}
             >
                 total
             </ColorBreakdownRow>
@@ -197,7 +213,8 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
                 total={totalbucket.total}
                 cardCounts={cardCount}
                 onKeyDown={onKeyDown(i)}
-                showPercentages={showPercentage}
+                cellDisplayMode={cellDisplayMode}
+                packSize={packSize}
               />
             )))}
             </tbody>
