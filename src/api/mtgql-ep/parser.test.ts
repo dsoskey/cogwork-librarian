@@ -4,7 +4,7 @@ import { weightAlgorithms } from '../queryRunnerCommon'
 
 describe('alias', function() {
   it('should parse an alias real proper', function() {
-    const result = alias("@a:u(t:creature)")._unsafeUnwrap();
+    const result = alias("@a:u(t:creature)");
     const expected: Alias = { name: "u", query: "(t:creature)" };
     expect(result).toEqual(expected)
   })
@@ -40,7 +40,7 @@ describe('venn', function() {
     ]
     testCases.forEach(([msg, left, right]) => {
       it(`should create a venn for ${msg}`, function() {
-        const result = venn(newVenn(left, right))._unsafeUnwrap();
+        const result = venn(newVenn(left, right));
         expect(result).toEqual({ left, right })
       })
     })
@@ -56,8 +56,9 @@ describe('venn', function() {
     ]
     testCases.forEach(([msg, input]) => {
       it(`should throw an error for ${msg}`, function() {
-        const result = venn(input);
-        expect(result.isErr()).toEqual(true);
+        expect(() => {
+          venn(input)
+        }).toThrow()
       })
     })
   })
@@ -70,7 +71,7 @@ describe('replaceUse', function() {
       a: { name: "a", query: "foo" },
       b: { name: "b", query: "bingus" },
     };
-    const result = replaceUse(aliases, input)._unsafeUnwrap();
+    const result = replaceUse(aliases, input);
 
     expect(result).toEqual("foo or bingus");
   })
@@ -82,7 +83,7 @@ describe('replaceUse', function() {
       b: { name: "b", query: "@u:c or bingus" },
       c: { name: "c", query: "blammo" },
     };
-    const result = replaceUse(aliases, input)._unsafeUnwrap();
+    const result = replaceUse(aliases, input);
 
     expect(result).toEqual("foo or blammo or bingus");
   })
@@ -95,50 +96,51 @@ describe('replaceUse', function() {
       c: { name: "c", query: "@u:d" },
       d: { name: "d", query: "@u:b" }
     };
+    expect(() => {
+      replaceUse(aliases, input);
+    }).toThrow()
 
-    const result = replaceUse(aliases, input);
-    expect(result.isErr()).toEqual(true);
   })
 })
 
 describe('parseQuerySet', function() {
   describe('alias/use', function() {
     it('should error for aliases with no name', function() {
-      const result = parseQuerySet(["@alias:(commander:rb)"], 0)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet(["@alias:(commander:rb)"], 0)
+      }).toThrow()
     })
 
     it('should error for aliases with a missing (', function() {
-      const result = parseQuerySet(["@alias:domaincommander:rb)"], 0)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet(["@alias:domaincommander:rb)"], 0)
+      }).toThrow()
     })
 
     it('should error for aliases with a missing )', function() {
-      const result = parseQuerySet(["@alias:domain(commander:rb"], 0)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet(["@alias:domain(commander:rb"], 0)
+      }).toThrow()
     })
 
     it('should error for duplicate aliases', function() {
-      const result = parseQuerySet([
-        "@dm:allsub",
-        "",
-        "@alias:domain(is:extra)",
-        "",
-        "@alias:domain(commander:rb)",
-        "",
-        "o:flying @use:domain kw:trample"
-      ], 6)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet([
+          "@dm:allsub",
+          "",
+          "@alias:domain(is:extra)",
+          "",
+          "@alias:domain(commander:rb)",
+          "",
+          "o:flying @use:domain kw:trample"
+        ], 6)
+      }).toThrow()
     })
 
     it('should error for a use with no matching alias', function() {
-      const result = parseQuerySet(["@use:fake"], 0)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet(["@use:fake"], 0)
+      }).toThrow()
     })
 
     it('should run an alias as a standalone query', function() {
@@ -146,7 +148,7 @@ describe('parseQuerySet', function() {
         "@dm:allsub",
         "",
         "@alias:domain(commander:rb)",
-      ], 2)._unsafeUnwrap()
+      ], 2)
 
       expect(result.queries).toEqual(["(commander:rb)"])
     })
@@ -158,7 +160,7 @@ describe('parseQuerySet', function() {
         "@alias:domain(commander:rb)",
         "",
         "o:flying @use:domain kw:trample"
-      ], 4)._unsafeUnwrap()
+      ], 4)
 
       expect(result.queries).toEqual(["o:flying (commander:rb) kw:trample"])
     })
@@ -166,23 +168,23 @@ describe('parseQuerySet', function() {
 
   describe('defaultWeight', function() {
     it('should error when defaultWeight isnt recognized', function() {
-      const result = parseQuerySet([
-        "@dw:zipg"
-      ], 0)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet([
+          "@dw:zipg"
+        ], 0)
+      }).toThrow()
     })
 
     it('should error for duplicate defaultWeights', function() {
-      const result = parseQuerySet([
-        "@defaultWeight:zipf",
-        "",
-        "@dw:uniform",
-        "",
-        "who cares?"
-      ], 4)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet([
+          "@defaultWeight:zipf",
+          "",
+          "@dw:uniform",
+          "",
+          "who cares?"
+        ], 4)
+      }).toThrow()
     })
 
     it('should set the correct weight algorithm for zipf', function() {
@@ -190,8 +192,7 @@ describe('parseQuerySet', function() {
         "@dw:zipf",
         "",
         "o:flying"
-      ], 2)._unsafeUnwrap()
-
+      ], 2)
 
       expect(result.getWeight).toEqual(weightAlgorithms.zipf)
     })
@@ -201,8 +202,7 @@ describe('parseQuerySet', function() {
         "@dw:uniform",
         "",
         "o:flying"
-      ], 2)._unsafeUnwrap()
-
+      ], 2)
 
       expect(result.getWeight).toEqual(weightAlgorithms.uniform)
     })
@@ -210,23 +210,23 @@ describe('parseQuerySet', function() {
 
   describe('defaultMode', function() {
     it('should error when defaultMode isnt recognized', function() {
-      const result = parseQuerySet([
-        "@dm:nosub"
-      ], 0)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet([
+          "@dm:nosub"
+        ], 0)
+      }).toThrow()
     })
 
     it('should error for duplicate defaultWeights', function() {
-      const result = parseQuerySet([
-        "@defaultMode:allsub",
-        "",
-        "@dm:basesub",
-        "",
-        "who cares?"
-      ], 4)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet([
+          "@defaultMode:allsub",
+          "",
+          "@dm:basesub",
+          "",
+          "who cares?"
+        ], 4)
+      }).toThrow()
     })
 
     it('should count each line as a subquery for allsub', function() {
@@ -238,7 +238,7 @@ describe('parseQuerySet', function() {
         "query2",
         "",
         "kw:flying",
-      ], 2)._unsafeUnwrap()
+      ], 2)
 
       expect(result.queries).toEqual(["query1", "query2"])
       expect(result.injectPrefix("query1")).toEqual("query1")
@@ -252,23 +252,22 @@ describe('parseQuerySet', function() {
         "query2",
         "",
         "kw:flying",
-      ], 2)._unsafeUnwrap()
+      ], 2)
 
       expect(result.queries).toEqual(["query2"])
       expect(result.injectPrefix("query2")).toEqual("query1 (query2)")
-
     })
   })
 
   describe('comments', function() {
     it('should error for a paragraph full of comments', function() {
-      const result = parseQuerySet([
-        "# commnt",
-        "# comment",
-        "# comment",
-      ], 0)
-
-      expect(result.isErr()).toEqual(true)
+      expect(() => {
+        parseQuerySet([
+          "# commnt",
+          "# comment",
+          "# comment",
+        ], 0)
+      }).toThrow()
     })
   })
 })

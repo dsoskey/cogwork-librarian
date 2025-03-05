@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Language, useHighlightPrism } from "../../../api/local/syntaxHighlighting";
 import { MultiQueryActionBar } from "./multiQueryActionBar";
-import { ok, Result } from "neverthrow";
 import "./textEditor.css";
 
 const MIN_TEXTAREA_HEIGHT = 32;
@@ -9,7 +8,7 @@ const MIN_TEXTAREA_HEIGHT = 32;
 export const findQueryIndex = (
   value: string,
   cursorIndex: number,
-): Result<number, Error> => {
+): number => {
 
   // +1 includes character after the cursor
   const before = value.substring(0, cursorIndex + 1).split("\n");
@@ -21,7 +20,7 @@ export const findQueryIndex = (
 
     if (currentLine.length > 0 && previousLine.length === 0) {
       if (!currentLine.startsWith("#")) {
-        return ok(index);
+        return index;
       } else {
         let forwardSearchIndex = index;
         while (forwardSearchIndex < valueByLine.length - 1) {
@@ -29,14 +28,14 @@ export const findQueryIndex = (
           if (nextLine.startsWith("#")) {
             forwardSearchIndex++;
           } else {
-            return ok(forwardSearchIndex + 1);
+            return forwardSearchIndex + 1;
           }
         }
       }
     }
     index--;
   }
-  return ok(0);
+  return 0;
 };
 
 export const getLineIndex = (
@@ -99,17 +98,11 @@ export const TextEditor = ({
 
     if (event.metaKey || event.ctrlKey) {
       if (event.key === "Enter") {
-        let baseIndex = 0;
         const cursorIndex = controller.current?.selectionStart ?? 0;
         const queryIndex = findQueryIndex(value, cursorIndex);
-        if (queryIndex.isOk()) {
-          baseIndex = queryIndex._unsafeUnwrap();
-        } else {
-          console.warn("cursor not on a query");
-        }
         if (canSubmit) {
           const selectedIndex = getLineIndex(value, cursorIndex);
-          onSubmit?.(baseIndex, selectedIndex);
+          onSubmit?.(queryIndex, selectedIndex);
         }
       }
 

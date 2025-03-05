@@ -14,7 +14,6 @@ import {
   weightAlgorithms,
 } from '../queryRunnerCommon'
 import { useQueryCoordinator } from '../useQueryCoordinator'
-import { ResultAsync } from 'neverthrow'
 
 class MyCards extends MagicQuerier {
   public searchCount(query: string, options?: SearchOptions | number) {
@@ -47,55 +46,51 @@ export const useScryfallQueryRunner = ({
     index: number,
     options: SearchOptions,
     injectPrefixx?: (query: string) => string,
-  ) =>
-    ResultAsync.fromPromise(
-      new Promise((resolve, reject) => {
-        const weight = getWeight(index)
-        const preparedQuery = injectPrefixx ? injectPrefixx(query) : injectPrefix(query)
-        const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
-        rawData.current[preparedQuery] = []
-        if (cache.current[_cacheKey] === undefined) {
-          cache.current[_cacheKey] = []
-          MY_CARDS.searchCount(preparedQuery, options).on('data', (data) => {
-            report.setTotalCards((prev) => prev + data)
-          })
-          Scry.Cards.search(preparedQuery, options)
-            .on('data', (_data) => {
-              // Hack: change types to bridge from scryfall-sdk.Card to mtgql.Card
-              const data = _data as Card;
-              rawData.current[preparedQuery].push({
-                data,
-                weight,
-                matchedQueries: [query],
-              })
-              cache.current[_cacheKey].push({
-                data,
-                weight,
-                matchedQueries: [query],
-              })
-              report.addCardCount()
-            })
-            .on('done', () => {
-              report.addComplete()
-              resolve(query)
-            })
-            .on('error', (e) => {
-              report.addError()
-              reject(e)
-            })
-        } else {
-          rawData.current[preparedQuery] = cloneDeep(cache.current[_cacheKey])
-          report.addCardCount(rawData.current[preparedQuery].length)
-          report.addComplete()
-          resolve(preparedQuery)
-        }
-      }),
-      (e) => ({
-        query,
-        displayMessage: e.toLocaleString(),
-        debugMessage: e.toLocaleString(),
+  ) => new Promise((resolve, reject) => {
+    const weight = getWeight(index)
+    const preparedQuery = injectPrefixx ? injectPrefixx(query) : injectPrefix(query)
+    const _cacheKey = `${preparedQuery}:${JSON.stringify(options)}`
+    rawData.current[preparedQuery] = []
+    if (cache.current[_cacheKey] === undefined) {
+      cache.current[_cacheKey] = []
+      MY_CARDS.searchCount(preparedQuery, options).on('data', (data) => {
+        report.setTotalCards((prev) => prev + data)
       })
-    )
+      Scry.Cards.search(preparedQuery, options)
+        .on('data', (_data) => {
+          // Hack: change types to bridge from scryfall-sdk.Card to mtgql.Card
+          const data = _data as Card;
+          rawData.current[preparedQuery].push({
+            data,
+            weight,
+            matchedQueries: [query],
+          })
+          cache.current[_cacheKey].push({
+            data,
+            weight,
+            matchedQueries: [query],
+          })
+          report.addCardCount()
+        })
+        .on('done', () => {
+          report.addComplete()
+          resolve(query)
+        })
+        .on('error', (e) => {
+          report.addError()
+          reject({
+            query,
+            displayMessage: e.toLocaleString(),
+            debugMessage: e.toLocaleString(),
+          })
+        })
+    } else {
+      rawData.current[preparedQuery] = cloneDeep(cache.current[_cacheKey])
+      report.addCardCount(rawData.current[preparedQuery].length)
+      report.addComplete()
+      resolve(preparedQuery)
+    }
+  })
 
   return {
     run: execute(runQuery),

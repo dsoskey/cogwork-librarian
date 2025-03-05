@@ -1,6 +1,5 @@
-import { err, ok, Result } from 'neverthrow'
 import { Alias, ParsedQuerySet, ParserError, QueryEnvironment, QueryMode, QueryWeight, Venn } from './types'
-import { CogError, columnShower } from '../../error'
+import { columnShower } from '../../error'
 import { stdlib } from './aliasLibs'
 import { injectPrefix, RunStrategy, weightAlgorithms } from '../queryRunnerCommon'
 import cloneDeep from 'lodash/cloneDeep'
@@ -12,53 +11,58 @@ export const DEFAULT_WEIGHT_REGEXP = /^@(dw|defaultWeight):/
 export const DEFAULT_MODE_REGEXP = /^@(dm|defaultMode):/
 export const INCLUDE_REGEXP = /^@(include|i):/
 
-export function alias(_line: string): Result<Alias, ParserError> {
+export function alias(_line: string): Alias {
   const line = _line.trim();
   if (!/^@a(lias)?:/.test(line))
-    return err({ offset: 0, message: "alias must start with @a: or @alias:" });
+    throw new ParserError('alias must start with "@a:" or "@alias:".', 0);
 
   const colon = line.indexOf(":");
 
   let firstLeftParen = line.indexOf("(")
   if (firstLeftParen === colon+1) {
-    return err({ message:`missing alias name`, offset: colon })
+    throw new ParserError(`Alias is missing a name.`, colon)
   } else if (firstLeftParen === -1) {
-    return err({ message:`missing alias open parens`, offset: line.length - 1 })
+    throw new ParserError(`Alias is missing open parens.`, colon + 1)
   }
   if (line[line.length - 1] !== ")") {
-    return err({ message:`missing alias close parens`, offset: line.length - 1 })
+    throw new ParserError(`Alias is missing close parens.`, line.length - 1)
   }
 
   const name = line.substring(colon+1, firstLeftParen);
   const query = line.substring(firstLeftParen, line.length);
   let offset = query.indexOf(`@u:${name}`);
   if (offset !== -1)
-    return err({ offset, message: `Alias uses its own name`});
+    throw new ParserError(
+      `Alias ${name} can't reference itself.`,
+      offset + firstLeftParen + 3
+    );
   offset = query.indexOf(`@use:${name}`);
   if (offset !== -1)
-    return err({ offset, message: `Alias uses its own name`});
+    throw new ParserError(
+      `Alias ${name} can't reference itself.`,
+      offset + firstLeftParen + 5
+    );
 
-  return ok<Alias>({ name, query })
+  return { name, query }
 }
 
-function resolveAliases(aliases: { [name: string]: Alias }): Result<{ [name: string]: Alias }, ParserError> {
+function resolveAliases(aliases: { [name: string]: Alias }): { [name: string]: Alias } {
   const copy = cloneDeep(aliases);
 
   for (const key in copy) {
     const value = aliases[key];
     const res = replaceUse(aliases, value.query);
-    if (res.isErr()) return err(res._unsafeUnwrapErr());
 
-    copy[key] = { name: key, query: res._unsafeUnwrap() }
+    copy[key] = { name: key, query: res }
   }
 
-  return ok(copy)
+  return copy
 }
 
-export function venn(_line: string): Result<Venn, ParserError> {
+export function venn(_line: string): Venn {
   const line = _line.trim();
   if (!line.startsWith("@venn("))
-    return err({ offset: 0, message: "venn must start with @venn(" });
+    throw new ParserError('Venn search must start with "@venn("', 0);
 
   let depth = 1;
   let index = 6;
@@ -80,19 +84,16 @@ export function venn(_line: string): Result<Venn, ParserError> {
   }
 
   if (index === line.length) {
-    return err({
-      offset: index - 1,
-      message: depth > 0
-        ? "missing closing parentheses on left query"
-        : "missing right query"
-    });
+    throw new ParserError(depth > 0
+      ? "Venn search is missing closing parentheses on left query."
+      : "Venn search is missing right query.", index-1)
   }
 
   const leftStart = 6;
   const leftEnd = index - 1;
 
   if (line[index++] !== "(")
-    return err({ offset: index - 1, message: "missing opening parentheses on right query" });
+    throw new ParserError("Venn search is missing opening parentheses on right query.", index-1)
 
   const rightStart = index;
   depth = 1;
@@ -115,20 +116,20 @@ export function venn(_line: string): Result<Venn, ParserError> {
   }
 
   if (depth > 0)
-    return err({ offset: index, message: "missing closing parentheses on right query"});
+    throw new ParserError("Venn search is missing closing parentheses on right query.", index);
   if (index !== line.length)
-    return err({ offset: index, message: "extra stuff found after venn(<left>)(<right>)"});
+    throw new ParserError("Extra stuff found after @venn(<left>)(<right>)", index);
 
   const rightEnd = index - 1;
 
-  return ok({
+  return {
     left: line.substring(leftStart, leftEnd),
     right: line.substring(rightStart, rightEnd),
-  })
+  }
 }
 
 
-export function replaceUse(aliases: { [key: string]: Alias }, _line: string): Result<string, ParserError> {
+export function replaceUse(aliases: { [key: string]: Alias }, _line: string): string {
   let result = _line.trim();
   const usedAliasSet = new Set<string>();
 
@@ -139,8 +140,10 @@ export function replaceUse(aliases: { [key: string]: Alias }, _line: string): Re
     for (let i = matches.length - 1; i >= 0; i--) {
       const match = matches[i];
       const name = match[2];
-      if (usedAliasSet.has(name)) return err({ offset: searchFor.lastIndex - name.length, message: `Alias ${name} is part of a cycle.`})
-      if (!aliases[name]) return err({ offset: searchFor.lastIndex - name.length, message: `unknown alias ${name}` });
+      if (usedAliasSet.has(name))
+        throw new ParserError(`Alias ${name} is part of a cycle.`, result.lastIndexOf(match[0]) + match[1].length + 1)
+      if (!aliases[name])
+        throw new ParserError(`Unknown alias ${name}`, result.lastIndexOf(match[0]) + match[1].length + 1)
 
       namesUsedThisStep.add(name);
       result = result.slice(0, match.index)
@@ -150,13 +153,13 @@ export function replaceUse(aliases: { [key: string]: Alias }, _line: string): Re
     namesUsedThisStep.forEach(it => usedAliasSet.add(it));
   }
 
-  return ok(result);
+  return result;
 }
 
 
 const DEFAULT_MODE: QueryMode = "sub"
 const DEFAULT_WEIGHT: QueryWeight = "zipf"
-export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogError> {
+export function parseQueryEnv(lines: string[]): QueryEnvironment {
   const now = new Date();
   const aliases: { [name: string]: Alias } = {}
   let defaultMode: QueryMode | undefined = undefined
@@ -167,25 +170,27 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
     const line = lines[i]
     const trimmed = line.trim()
     if (ALIAS_REGEXP.test(trimmed)) {
-      const aliasRes = alias(trimmed)
-      if (aliasRes.isErr()) {
-        const {message, offset} = aliasRes.error
-        return err({
+      let aliasResult: Alias
+      try {
+        aliasResult = alias(trimmed);
+
+      } catch (e) {
+        const {message, offset} = e;
+        throw {
           query: trimmed,
-          displayMessage: `syntax error for query ${i + 1} at col ${
-            offset + 1
-          }: ${message}\n` + columnShower(trimmed, offset)
-        })
+          displayMessage: `Syntax error for query ${i + 1} at col ${offset + 1}:`
+            + `\n\t${columnShower(trimmed, offset)}`
+            + `\n\t${message}`
+        }
       }
-      const aliasOk = aliasRes.value
-      if (aliases[aliasOk.name] !== undefined) {
-        return err({
+      if (aliases[aliasResult.name] !== undefined) {
+        throw {
           query: trimmed,
-          displayMessage: `duplicate aliases named ${aliasOk.name} detected.\n`
-            + `- @alias:${aliasOk.name}${aliases[aliasOk.name].query}\n- ${trimmed}`
-        })
+          displayMessage: `Duplicate aliases named ${aliasResult.name} detected.\n`
+            + `- @alias:${aliasResult.name}${aliases[aliasResult.name].query}\n- ${trimmed}`
+        }
       }
-      aliases[aliasOk.name] = aliasOk
+      aliases[aliasResult.name] = aliasResult
     } else if (DEFAULT_WEIGHT_REGEXP.test(trimmed)) {
       const index = trimmed.indexOf(":");
       const value = trimmed.substring(index + 1);
@@ -193,18 +198,18 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
         case "zipf":
         case "uniform":
           if (defaultWeight !== undefined) {
-            return err({
+            throw {
               query: trimmed,
               displayMessage:"duplicate default weights detected"
-            })
+            }
           }
           defaultWeight = value
           break;
         default:
-          return err({
+          throw {
             query: trimmed,
             displayMessage: `unrecognized weight algorithm ${value}. choose zipf or uniform`
-          })
+          }
       }
     } else if (DEFAULT_MODE_REGEXP.test(trimmed)) {
       const index = trimmed.indexOf(":");
@@ -216,18 +221,18 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
         case "sub":
         case "solo":
           if (defaultMode !== undefined) {
-            return err({
+            throw {
               query: trimmed,
               displayMessage: "duplicate default modes detected"
-            })
+            }
           }
           defaultMode = value
           break;
         default:
-          return err({
+          throw {
             query: trimmed,
             displayMessage: `unrecognized aggregation mode ${value}. choose all, solo, or sub (default)`
-          })
+          }
       }
     } else if (INCLUDE_REGEXP.test(trimmed)) {
       const index = trimmed.indexOf(":");
@@ -241,26 +246,23 @@ export function parseQueryEnv(lines: string[]): Result<QueryEnvironment, CogErro
       }
     } else if (DEFAULT_DOMAIN_REGEXP.test(trimmed)) {
       if (defaultDomain !== undefined)
-        return err({ query: trimmed, displayMessage: "Projects can only have one default domain" })
+        throw { query: trimmed, displayMessage: "Projects can only have one default domain" }
       const matches = trimmed.match(DEFAULT_DOMAIN_REGEXP);
       defaultDomain = matches[matches.length - 1];
     }
   }
 
   if (defaultDomain !== undefined) {
-    const replaceResult = replaceUse(aliases, defaultDomain);
-    if (replaceResult.isErr()) return err({ query: "", displayMessage: replaceResult._unsafeUnwrapErr().message });
-    defaultDomain = replaceResult._unsafeUnwrap();
+    defaultDomain = replaceUse(aliases, defaultDomain);
   }
 
-  return resolveAliases(aliases)
-    .map(resolvedAliases => ({
-      aliases: resolvedAliases,
-      defaultMode: defaultMode ?? DEFAULT_MODE,
-      defaultWeight: defaultWeight ?? DEFAULT_WEIGHT,
-      defaultDomain,
-    }))
-    .mapErr(e => ({ query: "", displayMessage: e.message }))
+  const resolvedAliases = resolveAliases(aliases);
+  return {
+    aliases: resolvedAliases,
+    defaultMode: defaultMode ?? DEFAULT_MODE,
+    defaultWeight: defaultWeight ?? DEFAULT_WEIGHT,
+    defaultDomain,
+  }
 }
 
 interface CollapsedQueries {
@@ -298,95 +300,89 @@ export function parseQuerySet(
   queries: string[],
   baseIndex: number,
   _selectedIndex?: number,
-): Result<ParsedQuerySet, CogError>  {
+): ParsedQuerySet  {
   const selectedIndex = _selectedIndex ?? baseIndex;
   const { collapsed: collapsed, indexToCollapsedIndex } = collapseMultiline(queries);
 
   if (collapsed.length === 0) {
-    return err({
+    throw {
       query: queries[baseIndex],
       displayMessage: `empty query for base query at line ${baseIndex + 1}\n -${queries[baseIndex]}`
-    })
+    }
   }
-  return parseQueryEnv(collapsed)
-    .andThen(queryEnv => {
-      let selectedQueries: string[] = []
-      let currentIndex = indexToCollapsedIndex[baseIndex];
-      while (currentIndex < collapsed.length && collapsed[currentIndex].trim() !== "") {
-        const query = collapsed[currentIndex].trim()
-        if (ALIAS_REGEXP.test(query)) {
-          const name = query.substring(query.indexOf(":") + 1, query.indexOf("("))
-          if (queryEnv.aliases[name]) {
-            selectedQueries = [queryEnv.aliases[name].query]
-          } else {
-            return err({ query, displayMessage: `unknown alias ${name}` })
-          }
-        } else if (DEFAULT_DOMAIN_REGEXP.test(query)) {
-          selectedQueries = [queryEnv.defaultDomain]
-        } else if (!query.startsWith("#")) {
-          const res = replaceUse(queryEnv.aliases, query)
-
-          if (res.isErr()) {
-            const error = res._unsafeUnwrapErr()
-            return err({
-              query,
-              displayMessage: `syntax errors for query ${currentIndex + 1}:\n${error.message}${columnShower(query, error.offset)}`
-            })
-          }
-
-          if (
-            queryEnv.defaultMode !== "solo" ||
-            // in solo mode collect base query and selected query
-            (selectedQueries.length < 2 && (currentIndex === indexToCollapsedIndex[selectedIndex] || currentIndex === indexToCollapsedIndex[baseIndex]))
-          ) {
-            selectedQueries.push(res._unsafeUnwrap())
-          }
+  const queryEnv = parseQueryEnv(collapsed);
+  let selectedQueries: string[] = []
+  let currentIndex = indexToCollapsedIndex[baseIndex];
+  while (currentIndex < collapsed.length && collapsed[currentIndex].trim() !== "") {
+    const query = collapsed[currentIndex].trim()
+    if (ALIAS_REGEXP.test(query)) {
+      const name = query.substring(query.indexOf(":") + 1, query.indexOf("("))
+      if (queryEnv.aliases[name]) {
+        selectedQueries = [queryEnv.aliases[name].query]
+      } else {
+        throw { query, displayMessage: `unknown alias ${name}` }
+      }
+    } else if (DEFAULT_DOMAIN_REGEXP.test(query)) {
+      selectedQueries = [queryEnv.defaultDomain]
+    } else if (!query.startsWith("#")) {
+      try {
+        const res = replaceUse(queryEnv.aliases, query)
+        if (
+          queryEnv.defaultMode !== "solo" ||
+          // in solo mode collect base query and selected query
+          (selectedQueries.length < 2 && (currentIndex === indexToCollapsedIndex[selectedIndex] || currentIndex === indexToCollapsedIndex[baseIndex]))
+        ) {
+          selectedQueries.push(res)
         }
-        currentIndex++
+      } catch (e) {
+        const error = e as ParserError
+        throw {
+          query,
+          displayMessage: `Syntax errors for query ${currentIndex + 1} at col ${error.offset + 1}:`
+            + `\n\t${columnShower(query, error.offset)}`
+            + `\n\t${error.message}`
+        }
       }
-      console.debug("selected queries:", selectedQueries);
-      if (selectedQueries.length === 0) {
-        return err({
-          query: queries[baseIndex],
-          displayMessage: `empty query for base query at line ${baseIndex + 1}\n -${queries[baseIndex]}`
-        })
-      }
+    }
+    currentIndex++
+  }
+  console.debug("selected queries:", selectedQueries);
+  if (selectedQueries.length === 0) {
+    throw {
+      query: queries[baseIndex],
+      displayMessage: `Empty query for base query at line ${baseIndex + 1}\n -${queries[baseIndex]}`
+    }
+  }
 
-      let [base, ...sub] = selectedQueries
-      if (VENN_REGEXP.test(base)) {
-        return venn(base)
-          .andThen((venn) => {
-            const leftReplaced = replaceUse(queryEnv.aliases, queryEnv.defaultDomain ? `${queryEnv.defaultDomain} (${venn.left})` : venn.left);
-            const rightReplaced = replaceUse(queryEnv.aliases, queryEnv.defaultDomain ? `${queryEnv.defaultDomain} (${venn.right})` : venn.right);
-            return Result.combineWithAllErrors([leftReplaced, rightReplaced])
-              .map(([left, right]) => ({
-                strategy: RunStrategy.Venn,
-                queries: [left, right, ...sub],
-                injectPrefix: ()=>"",
-                getWeight: weightAlgorithms[queryEnv.defaultWeight],
-              }))
-              .mapErr((errors) => ({ query: base, displayMessage: errors.join("\n") }));
-          })
-          .mapErr((e: ParserError) => ({ query: base, displayMessage: `Error with venn query: ${e.message}\n\t${columnShower(base, e.offset)}`}))
-      }
-      if (queryEnv.defaultMode === 'all') {
-        base = ""
-        sub = selectedQueries
-      }
+  let [base, ...sub] = selectedQueries
+  if (VENN_REGEXP.test(base)) {
+    const venned = venn(base);
+    const leftReplaced = replaceUse(queryEnv.aliases, queryEnv.defaultDomain ? `${queryEnv.defaultDomain} (${venned.left})` : venned.left);
+    const rightReplaced = replaceUse(queryEnv.aliases, queryEnv.defaultDomain ? `${queryEnv.defaultDomain} (${venned.right})` : venned.right);
+    return {
+      strategy: RunStrategy.Venn,
+      queries: [leftReplaced, rightReplaced, ...sub],
+      injectPrefix: ()=>"",
+      getWeight: weightAlgorithms[queryEnv.defaultWeight],
+    }
+  }
+  if (queryEnv.defaultMode === 'all') {
+    base = ""
+    sub = selectedQueries
+  }
 
-      let prefixFunc = injectPrefix(base)
-      if (queryEnv.defaultDomain !== undefined) {
-        // assign old prefix func to new variable to prevent recursion
-        const inner = prefixFunc;
-        prefixFunc = (query) =>
-          `${queryEnv.defaultDomain} (${inner(query)})`
-      }
+  let prefixFunc = injectPrefix(base)
+  if (queryEnv.defaultDomain !== undefined) {
+    // assign old prefix func to new variable to prevent recursion
+    const inner = prefixFunc;
+    prefixFunc = (query) =>
+      `${queryEnv.defaultDomain} (${inner(query)})`
+  }
 
-      return ok({
-        strategy: RunStrategy.Search,
-        queries: sub,
-        injectPrefix: prefixFunc,
-        getWeight: weightAlgorithms[queryEnv.defaultWeight],
-      })
-    })
+  return {
+    strategy: RunStrategy.Search,
+    queries: sub,
+    injectPrefix: prefixFunc,
+    getWeight: weightAlgorithms[queryEnv.defaultWeight],
+  }
 }

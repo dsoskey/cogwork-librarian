@@ -44,39 +44,41 @@ export const SearchView = () => {
     }
     setExtendedParseError([])
 
-    parseQuerySet(queries, baseIndex, selectedIndex)
-      .map(({ strategy, queries, getWeight, injectPrefix }) => {
-        const executedAt = new Date();
-        let promise
-        if (strategy === RunStrategy.Venn && queryRunner.generateVenn !== undefined) {
-          const [left, right, ...rest] = queries
-          promise = queryRunner.generateVenn(left, right, rest, options, getWeight)
-        } else {
-          promise = queryRunner.run(queries, options, injectPrefix, getWeight)
-        }
-        promise.then(() =>
-            cogDBClient.history.put({
-              rawQueries: queries,
-              baseIndex,
-              source,
-              strategy,
-              executedAt,
-              projectPath: project.path,
-            })
-          ).catch(error => {
-            console.error(error)
-            cogDBClient.history.put({
-              rawQueries: queries,
-              baseIndex,
-              source,
-              strategy,
-              errorText: error.toString(),
-              executedAt,
-              projectPath: project.path,
-            })
-          })
+    try {
+      const querySet = parseQuerySet(queries, baseIndex, selectedIndex);
+      const { strategy, getWeight, injectPrefix } = querySet;
+      const executedAt = new Date();
+      let promise: Promise<void>
+      if (strategy === RunStrategy.Venn && queryRunner.generateVenn !== undefined) {
+        const [left, right, ...rest] = queries
+        promise = queryRunner.generateVenn(left, right, rest, options, getWeight)
+      } else {
+        promise = queryRunner.run(querySet.queries, options, injectPrefix, getWeight)
+      }
+      promise.then(() =>
+        cogDBClient.history.put({
+          rawQueries: querySet.queries,
+          baseIndex,
+          source,
+          strategy,
+          executedAt,
+          projectPath: project.path,
+        })
+      ).catch(error => {
+        console.error(error)
+        cogDBClient.history.put({
+          rawQueries: querySet.queries,
+          baseIndex,
+          source,
+          strategy,
+          errorText: error.toString(),
+          executedAt,
+          projectPath: project.path,
+        })
       })
-      .mapErr(it => setExtendedParseError([it]))
+    } catch (error) {
+      setExtendedParseError([error])
+    }
   }
 
   return<div className='search-view-root'>

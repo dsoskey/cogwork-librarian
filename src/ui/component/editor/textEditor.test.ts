@@ -19,28 +19,28 @@ describe('findQueryIndex', function() {
     it('finds the correct line for the first query', () => {
       const index = query.indexOf("o:")
 
-      const result = findQueryIndex(query, index)._unsafeUnwrap()
+      const result = findQueryIndex(query, index)
 
       expect(result).toEqual(0)
     })
     it('finds the correct line for the second query', () => {
       const index = query.indexOf("mill")
 
-      const result = findQueryIndex(query, index)._unsafeUnwrap()
+      const result = findQueryIndex(query, index)
 
       expect(result).toEqual(7)
     })
     it('empty lines count for the previous query', () => {
       const index = query.indexOf("\ncommander")
 
-      const result = findQueryIndex(query, index)._unsafeUnwrap()
+      const result = findQueryIndex(query, index)
 
       expect(result).toEqual(0)
     })
     it('when cursor is at the front of a query, that query is picked', () => {
       const index = query.indexOf("eternal")
 
-      const result = findQueryIndex(query, index)._unsafeUnwrap()
+      const result = findQueryIndex(query, index)
 
       expect(result).toEqual(12)
     })
@@ -64,7 +64,7 @@ describe('findQueryIndex', function() {
     it('ignores commented lines below a base query', () => {
       const index = commentfulQuery.indexOf('o:graveyard')
 
-      const result = findQueryIndex(commentfulQuery, index)._unsafeUnwrap()
+      const result = findQueryIndex(commentfulQuery, index)
 
       expect(result).toEqual(0)
     })
@@ -72,7 +72,7 @@ describe('findQueryIndex', function() {
     it('ignores commented lines above a base query', () => {
       const index = commentfulQuery.indexOf('mill')
 
-      const result = findQueryIndex(commentfulQuery, index)._unsafeUnwrap()
+      const result = findQueryIndex(commentfulQuery, index)
 
       expect(result).toEqual(7)
     })
@@ -80,7 +80,7 @@ describe('findQueryIndex', function() {
     it('commented lines above a base query are associated with that base query', () => {
       const index = commentfulQuery.indexOf('# this')
 
-      const result = findQueryIndex(commentfulQuery, index)._unsafeUnwrap()
+      const result = findQueryIndex(commentfulQuery, index)
 
       expect(result).toEqual(7)
     })

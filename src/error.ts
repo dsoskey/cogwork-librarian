@@ -30,5 +30,5 @@ export const displayMessage = (error: SearchError, index: number) => {
 
 
 export function columnShower (query: string, offset: number): string {
-  return `${query}\n\t${' '.repeat(offset > 0 ? offset : 1)}^`
+  return `${query}\n\t${' '.repeat(offset >= 0 ? offset : 0)}^`
 }

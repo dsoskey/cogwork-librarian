@@ -19,39 +19,39 @@ export function CubeList({}: CubeListProps) {
     const { cube, cards, oracleList, loadingError, setActiveCard } = useContext(CubeViewModelContext);
     const queryRunner = useMemoryQueryRunner({ corpus: oracleList });
 
-    const execute = (queries: string[], baseIndex: number) => {
-        parseQuerySet(queries, baseIndex)
-          .map(({ strategy, queries, getWeight, injectPrefix }) => {
-              const executedAt = new Date();
-              let promise
-              if (strategy === RunStrategy.Venn && queryRunner.generateVenn !== undefined) {
-                  const [left, right, ...rest] = queries
-                  promise = queryRunner.generateVenn(left, right, rest, options, getWeight)
-              } else {
-                  promise = queryRunner.run(queries, options, injectPrefix, getWeight)
-              }
-              promise.then(() =>
-                cogDBClient.history.put({
-                    rawQueries: queries,
-                    baseIndex,
-                    source: 'local',
-                    strategy,
-                    executedAt,
-                    projectPath: `/.coglib/cube/${cube.key}`,
-                })
-              ).catch(error => {
-                  console.error(error)
-                  cogDBClient.history.put({
-                      rawQueries: queries,
-                      baseIndex,
-                      source: 'local',
-                      strategy,
-                      errorText: error.toString(),
-                      executedAt,
-                      projectPath: `/.coglib/cube/${cube.key}`,
-                  })
-              })
-          })
+    const execute = async (inputQueries: string[], baseIndex: number) => {
+      const { strategy, queries, getWeight, injectPrefix } = await parseQuerySet(inputQueries, baseIndex)
+      const executedAt = new Date();
+      let promise: Promise<void>
+      if (strategy === RunStrategy.Venn && queryRunner.generateVenn !== undefined) {
+          const [left, right, ...rest] = queries
+          promise = queryRunner.generateVenn(left, right, rest, options, getWeight)
+      } else {
+          promise = queryRunner.run(queries, options, injectPrefix, getWeight)
+      }
+
+      try {
+        await promise;
+        cogDBClient.history.put({
+          rawQueries: queries,
+          baseIndex,
+          source: 'local',
+          strategy,
+          executedAt,
+          projectPath: `/.coglib/cube/${cube.key}`,
+        })
+      } catch (error) {
+        console.error(error)
+        cogDBClient.history.put({
+          rawQueries: queries,
+          baseIndex,
+          source: 'local',
+          strategy,
+          errorText: error.toString(),
+          executedAt,
+          projectPath: `/.coglib/cube/${cube.key}`,
+        })
+      }
     }
     const applySimpleFilter = (query: string) => {
         execute([`cube=${cube.key} ++ (${query})`], 0);

@@ -5,7 +5,6 @@ import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
 import { Modal } from '../../component/modal'
 import { OrderedCard } from '../useCubeViewModel'
 import { Input } from '../../component/input'
-import { ResultAsync } from 'neverthrow'
 import { Dictionary } from 'lodash'
 import { getColors } from './tempColorUtil'
 
@@ -29,7 +28,7 @@ export interface ShownQuery {
 interface CubeSearchRowProps {
   query: string
   setQuery: (query: string) => void
-  searchCards: (query: string, searchOptions: SearchOptions) => ResultAsync<Card[], SearchError>
+  searchCards: (query: string, searchOptions: SearchOptions) => Promise<Card[]>
   total: number
   onKeyDown: any
   flop: boolean
@@ -62,13 +61,7 @@ export function CubeSearchRow({
     setError(undefined)
     try {
       const searchResult = await searchCards(q, { order: 'cmc' })
-      searchResult
-        .map(it => setResult(it as OrderedCard[]))
-        .mapErr(error => {
-          console.error(error)
-          setError(error)
-
-        })
+      setResult(searchResult as OrderedCard[])
     } catch (error) {
       console.error(error)
       setError(error)

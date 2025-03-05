@@ -20,9 +20,12 @@ export interface QueryEnvironment {
   defaultWeight: QueryWeight
 }
 
-export interface ParserError {
-  message: string,
-  offset: number,
+export class ParserError extends Error {
+  readonly offset: number
+  constructor(message: string, offset: number) {
+    super(message)
+    this.offset = offset
+  }
 }
 
 export interface ParsedQuerySet {

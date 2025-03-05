@@ -79,7 +79,7 @@
     "micromark-util-chunked": "^2.0.0",
     "micromark-util-symbol": "^2.0.0",
     "moo": "^0.5.2",
-    "mtgql": "1.6.3",
+    "mtgql": "^3.0.1",
     "nearley": "^2.20.1",
     "neverthrow": "^6.0.0",
     "prismjs": "^1.29.0",

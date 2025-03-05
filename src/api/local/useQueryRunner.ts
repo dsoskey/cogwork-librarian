@@ -8,9 +8,9 @@ import {
 } from '../queryRunnerCommon'
 import { useQueryCoordinator } from '../useQueryCoordinator'
 import { displayMessage } from '../../error'
-import { Card, NormedCard, SearchOptions, QueryRunner, CachingFilterProvider } from 'mtgql'
+import { Card, NormedCard, SearchOptions, QueryRunner } from 'mtgql'
 import { useMemo, useState } from 'react'
-import { cogDB, COGDB_FILTER_PROVIDER } from './db'
+import { COGDB_FILTER_PROVIDER } from './db'
 
 interface MemoryQueryRunnerProps extends QueryRunnerProps {
   corpus: NormedCard[]
@@ -26,7 +26,7 @@ export const useMemoryQueryRunner = ({ corpus }: MemoryQueryRunnerProps): Coglib
     return QueryRunner.generateVennDiagram(corpus, COGDB_FILTER_PROVIDER)
   }, [corpus])
 
-  const runQuery: QueryRunnerFunc = (
+  const runQuery: QueryRunnerFunc = async (
     query: string,
     index: number,
     options: SearchOptions,
@@ -41,31 +41,29 @@ export const useMemoryQueryRunner = ({ corpus }: MemoryQueryRunnerProps): Coglib
     const weight = getWeight(index)
     const preparedQuery = injectPrefix(query)
     rawData.current[preparedQuery] = []
-    return searchCards(preparedQuery, options)
-      .map(cardResult => {
-        const cards: EnrichedCard[] = cardResult.map((card: Card) => ({
-          data: card,
-          weight,
-          matchedQueries: [query],
-        }))
-        rawData.current[preparedQuery] = cards
-        report.addCardCount(cards.length)
-        report.addComplete()
-        return preparedQuery;
+    try {
+      const cardResult = await searchCards(preparedQuery, options)
+      const cards: EnrichedCard[] = cardResult.map((card: Card) => ({
+        data: card,
+        weight,
+        matchedQueries: [query],
+      }))
+      rawData.current[preparedQuery] = cards
+      report.addCardCount(cards.length)
+      report.addComplete()
+      return preparedQuery;
+    } catch (error) {
+      report.addError()
+      const { query, message } = error
+      return Promise.reject({
+        query,
+        debugMessage: message,
+        displayMessage: displayMessage(error, index),
       })
-      .mapErr(error => {
-        report.addError()
-        const { query, message } = error
-        // better error handling is coming, i swear
-        return {
-          query,
-          debugMessage: message,
-          displayMessage: displayMessage(error, index),
-        }
-      })
+    }
   }
 
-  const runVennQuery = (left: string, right: string, sub: string, options: SearchOptions, weight: number, index: number) => {
+  const runVennQuery = async (left: string, right: string, sub: string, options: SearchOptions, weight: number, index: number) => {
     if (corpus.length === 0) {
       console.warn(`ran query against an empty corpus\nintersect(${left})(${right})\n${sub}`)
       return
@@ -76,32 +74,30 @@ export const useMemoryQueryRunner = ({ corpus }: MemoryQueryRunnerProps): Coglib
     const preparedLeft = injectPrefix(left)(sub)
     const preparedRight = injectPrefix(right)(sub)
 
-    return generateVennDiagram(preparedLeft, preparedRight, options)
-      .map(diagram => {
-        const { cards, leftIds, bothIds, rightIds } = diagram
+    try {
+      const diagram = await generateVennDiagram(preparedLeft, preparedRight, options)
+      const { cards, leftIds, bothIds, rightIds } = diagram
 
-        rawData.current[sub] = cards.map((card: Card) => ({
-          data: card,
-          weight,
-          matchedQueries: [sub],
-          left: leftIds.has(card.id),
-          both: bothIds.has(card.id),
-          right: rightIds.has(card.id),
-        }))
-        report.addCardCount(cards.length)
-        report.addComplete()
-        return sub;
+      rawData.current[sub] = cards.map((card: Card) => ({
+        data: card,
+        weight,
+        matchedQueries: [sub],
+        left: leftIds.has(card.id),
+        both: bothIds.has(card.id),
+        right: rightIds.has(card.id),
+      }))
+      report.addCardCount(cards.length)
+      report.addComplete()
+      return sub;
+    } catch (error) {
+      report.addError()
+      const { query, message } = error
+      return Promise.reject({
+        query,
+        debugMessage: message,
+        displayMessage: displayMessage(error, index),
       })
-      .mapErr(error => {
-        report.addError()
-        const { query, message } = error
-        // better error handling is coming, i swear
-        return {
-          query,
-          debugMessage: message,
-          displayMessage: displayMessage(error, index),
-        }
-      })
+    }
   }
 
   return {

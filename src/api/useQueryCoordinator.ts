@@ -82,9 +82,9 @@ export const useQueryCoordinator = (): QueryExecutor => {
         ])
 
         const errors = promiseResults
-          .filter((it) => it.status === 'fulfilled' && it.value?.isErr())
+          .filter((it) => it.status === "rejected")
           // @ts-ignore
-          .map((it) => it.value.error)
+          .map((it) => it.reason)
 
         setErrors(errors)
         setStatus(errors.length ? 'error' : 'success')
@@ -137,9 +137,9 @@ export const useQueryCoordinator = (): QueryExecutor => {
         ])
 
         const errors = promiseResults
-          .filter((it) => it.status === 'fulfilled' && it.value?.isErr())
+          .filter((it) => it.status === 'rejected')
           // @ts-ignore
-          .map((it) => it.value.error)
+          .map((it) => it.reason)
 
         setErrors(errors)
         setStatus(errors.length ? 'error' : 'success')

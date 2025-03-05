@@ -1,6 +1,5 @@
 import { TaskStatus } from 'src/types'
 import { QueryReport } from 'src/api/useReporter'
-import { ResultAsync } from 'neverthrow'
 import { Card, SearchOptions } from 'mtgql'
 import { CogError } from '../error'
 
@@ -10,7 +9,7 @@ export type QueryRunnerFunc = (
   options: SearchOptions,
   injectPrefix?: (query: string) => string,
   getWeight?: (index:number) => number,
-) => ResultAsync<string, CogError>
+) => Promise<string>
 
 export type VennRunnerFunc = (
   left: string,
@@ -18,7 +17,7 @@ export type VennRunnerFunc = (
   sub: string,
   options: SearchOptions,
   weight: number, index: number
-) => ResultAsync<string, CogError>
+) => Promise<string>
 
 export type ErrorMap = { [key: string]: CogError }
 
