@@ -21,12 +21,19 @@ import { downloadText } from '../download'
 import { SearchHoverActions } from './cardViews/searchHoverActions'
 import { CardsPerRowControl } from '../component/cardsPerRowControl'
 import { CardVizView } from './cardViews/cardVizView'
+import { Layout } from 'mtgql/build/generated/models/Layout'
 
 const handleDownload = (text: string, ext: string) => {
   const now = new Date()
   const fileName = `coglib-results-${now.toISOString().replace(/:/g, "-")}`
   downloadText(text, fileName, ext)
 }
+
+const ROTATED_LAYOUTS = new Set<Layout>([
+  'split',
+  'planar',
+  "art_series",
+])
 
 interface BrowserViewProps {
   status: TaskStatus
@@ -107,6 +114,10 @@ export const BrowserView = React.memo(({
     [activeCards, lowerBound, upperBound]
   )
   const showCards = activeCards.length > 0 && status !== 'error'
+  const rotateCards = useMemo(() =>
+    currentPage
+    .filter(it => (ROTATED_LAYOUTS.has(it.data.layout) || it.data.type_line?.includes("Battle")) && !it.data.keywords.includes("Aftermath"))
+    .length === currentPage.length, [currentPage])
 
   useHighlightPrism([result, revealDetails, visibleDetails])
 
@@ -125,7 +136,7 @@ export const BrowserView = React.memo(({
   const isCardDisplay = (displayType === 'cards' || displayType === 'render')
 
   const cardsPerRowControl = isCardDisplay && viewport.width > 1024
-    ? <CardsPerRowControl cardsPerRow={cardsPerRow} setCardsPerRow={setCardsPerRow} />
+    ? <CardsPerRowControl cardsPerRow={cardsPerRow} setCardsPerRow={setCardsPerRow} disabled={rotateCards} />
     : undefined;
 
   return <div className='results' ref={topOfResults}>
@@ -174,7 +185,7 @@ export const BrowserView = React.memo(({
               }
               return (
                 <CardImageView
-                  className={`_${cardsPerRow}`}
+                  className={`_${cardsPerRow}${rotateCards?" rotated":""}`}
                   onAdd={onAdd}
                   hoverContent={<SearchHoverActions card={card} onAdd={onAdd} onIgnore={onIgnore} />}
                   key={card.data.id + index}

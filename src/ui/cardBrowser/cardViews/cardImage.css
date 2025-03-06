@@ -17,6 +17,7 @@
     left: 0;
     backface-visibility: hidden;
     transition: rotate 400ms ease, transform 400ms ease-in-out;
+    aspect-ratio: var(--card-aspect-ratio);
 }
 
 .card-image.lea img {

@@ -27,7 +27,6 @@
         left: 4%;
         display: flex;
         flex-direction: row;
-        /*background-color: transparent;*/
     }
 
     .hover-actions button {
@@ -47,6 +46,16 @@
         font-size: 1.5em;
         background-color: transparent;
     }
+    &.rotated {
+        transform: rotate(90deg);
+
+        .hover-actions {
+            transform: rotate(-90deg);
+            rotation-point: center;
+            bottom: 12%;
+            left: 78%;
+        }
+    }
 }
 
 @media (min-width: 1024px) {
@@ -65,14 +74,32 @@
     .card-view._16 {
         width: 6.5%;
     }
+    .card-view.rotated {
+        margin: -4% 3.6%;
+        width: 17.8%;
+        padding-top: 0.5%;
+        padding-bottom: 0.5%;
+    }
 }
 @media (max-width: 1024px) and (min-width: 768px) {
     .card-view {
         width: 32%;
+        &.rotated {
+            width: 23.5%;
+            margin: -4.9% 4.7%;
+            padding-top: 0.4%;
+            padding-bottom: 0.4%;
+        }
     }
 }
 @media (max-width: 768px) {
     .card-view {
         width: 49%;
+        &.rotated {
+            width: 35%;
+            margin: -6.9% 7%;
+            padding-top: unset;
+            padding-bottom: unset;
+        }
     }
 }
