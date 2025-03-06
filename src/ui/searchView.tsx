@@ -50,7 +50,7 @@ export const SearchView = () => {
       const executedAt = new Date();
       let promise: Promise<void>
       if (strategy === RunStrategy.Venn && queryRunner.generateVenn !== undefined) {
-        const [left, right, ...rest] = queries
+        const [left, right, ...rest] = querySet.queries
         promise = queryRunner.generateVenn(left, right, rest, options, getWeight)
       } else {
         promise = queryRunner.run(querySet.queries, options, injectPrefix, getWeight)

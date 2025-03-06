@@ -1,6 +1,6 @@
 import { alias, parseQuerySet, replaceUse, collapseMultiline, venn } from './parser'
 import { Alias } from './types'
-import { weightAlgorithms } from '../queryRunnerCommon'
+import { RunStrategy, weightAlgorithms } from '../queryRunnerCommon'
 
 describe('alias', function() {
   it('should parse an alias real proper', function() {
@@ -42,6 +42,24 @@ describe('venn', function() {
       it(`should create a venn for ${msg}`, function() {
         const result = venn(newVenn(left, right));
         expect(result).toEqual({ left, right })
+      })
+    })
+
+    it("should handle venn diagram not on the first line", function() {
+      const input = [
+        "t:creature",
+        "",
+        "t:artifact",
+        "",
+        "@venn(left)(right)",
+      ]
+      const result = parseQuerySet(input, input.length - 1)
+      expect({
+        strategy: result.strategy,
+        queries: result.queries,
+      }).toEqual({
+        strategy: RunStrategy.Venn,
+        queries: ["left", "right"],
       })
     })
   })
