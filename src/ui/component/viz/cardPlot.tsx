@@ -29,8 +29,7 @@ export function CardPlot({ cards, xfunc, yfunc, onPointClick }: CardPlotProps) {
       datasets: [
         {
 
-          data: cards.map(_card => {
-            const card = _card.data
+          data: cards.map(card => {
             const x = xFunction.getDatum(card)
             const y = yFunction.getDatum(card)
 

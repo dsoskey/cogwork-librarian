@@ -15,12 +15,12 @@ export function use1DData(cards: EnrichedCard[], xfunc: PlotFunction, xGroup: Gr
   const xFunctionRep = PLOT_FUNCTIONS[xfunc]
   const xGroupRep = GROUP_FUNCTIONS[xGroup]
   return useMemo(() => {
-    const ungroupedRawValues = _groupBy(cards, (car) => xFunctionRep.getDatum(car.data))
-    const subgroupedData = _groupBy(cards, (card) => xGroupRep.getGroup(card.data));
+    const ungroupedRawValues = _groupBy(cards, xFunctionRep.getDatum)
+    const subgroupedData = _groupBy(cards, xGroupRep.getGroup);
     const datasets = Object.entries(subgroupedData)
       .map(([groupKey, value]) => {
         const metadata = xGroupRep.getGroupMetadata(groupKey)
-        const rawValues = _groupBy(value, (car) => xFunctionRep.getDatum(car.data))
+        const rawValues = _groupBy(value, xFunctionRep.getDatum)
         const data = Object.keys(ungroupedRawValues).map(key => {
           return { x: key, y: rawValues[key]?.length ?? 0 }
         })

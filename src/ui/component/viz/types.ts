@@ -1,15 +1,17 @@
 import { Card, SortFunctions } from 'mtgql'
 import { getColors } from '../../cubeView/searchTable/tempColorUtil'
 
+import { EnrichedCard, SCORE_PRECISION } from '../../../api/queryRunnerCommon'
 export enum PlotFunction {
   year,
   wordCount,
   fullWordCount,
   cmc,
+  weight,
 }
 
 interface PlotFunctionRepresentation {
-  getDatum: (card: Card) => number | string
+  getDatum: (card: Card | EnrichedCard) => number | string
   text: string
   range?: [number, number],
   categories?: string[],
@@ -18,12 +20,12 @@ interface PlotFunctionRepresentation {
 
 export const PLOT_FUNCTIONS: Record<PlotFunction, PlotFunctionRepresentation> = {
   [PlotFunction.year]: {
-    getDatum: card => SortFunctions.byReleased(card).getFullYear(),
+    getDatum: card => SortFunctions.byReleased("data" in card ? card.data : card).getFullYear(),
     text: 'year'
   },
   [PlotFunction.wordCount]: {
     getDatum: card => {
-      const result = SortFunctions.byWordCount(card)
+      const result = SortFunctions.byWordCount("data" in card ? card.data : card)
       return isNaN(result) ? 0 : result
     },
     text: 'word count',
@@ -31,17 +33,21 @@ export const PLOT_FUNCTIONS: Record<PlotFunction, PlotFunctionRepresentation> = 
   },
   [PlotFunction.fullWordCount]: {
     getDatum: card => {
-      const result = SortFunctions.byFullWordCount(card)
+      const result = SortFunctions.byFullWordCount("data" in card ? card.data : card)
       return isNaN(result) ? 0 : result
     },
     text: 'full word count',
     binSize: 1
   },
   [PlotFunction.cmc]: {
-    getDatum: card => card.cmc ?? 0,
+    getDatum: card => ("data" in card ? card.data : card).cmc ?? 0,
     text: 'mana value',
     binSize: 1
   },
+  [PlotFunction.weight]: {
+    getDatum: card => "weight" in card ? Number.parseFloat(card.weight.toPrecision(SCORE_PRECISION)) : 1,
+    text: "search weight",
+  }
 }
 
 export enum GroupFunction {
@@ -58,7 +64,7 @@ export interface GroupMetadata {
 
 export interface GroupFunctionRepresentation {
   text: string
-  getGroup: (card: Card) => string | number
+  getGroup: (card: Card | EnrichedCard) => string | number
   getGroupMetadata: (group: string | number) => GroupMetadata
 }
 
@@ -86,7 +92,7 @@ export const GROUP_FUNCTIONS: Record<GroupFunction, GroupFunctionRepresentation>
   },
   [GroupFunction.cmc]: {
     text: "mana value",
-    getGroup: (card: Card) => card.cmc,
+    getGroup: (card: Card | EnrichedCard) => ("data" in card ? card.data : card).cmc,
     getGroupMetadata: (group: number) => {
       const style = getComputedStyle(document.documentElement)
       let active = style.getPropertyValue('--active')
@@ -99,7 +105,7 @@ export const GROUP_FUNCTIONS: Record<GroupFunction, GroupFunctionRepresentation>
   },
   [GroupFunction.rarity]: {
     text: "rarity",
-    getGroup: (card: Card) => card.rarity,
+    getGroup: (card: Card | EnrichedCard) => ("data" in card ? card.data : card).rarity,
     getGroupMetadata: (group: string) => {
       switch (group) {
         case "common": return { order: 6, color: "#f5f5f5"}
@@ -113,9 +119,9 @@ export const GROUP_FUNCTIONS: Record<GroupFunction, GroupFunctionRepresentation>
   }
 }
 
-export function colorKey(card: Card): string {
+export function colorKey(card: Card | EnrichedCard): string {
   let key: string;
-  let colors = getColors(card)
+  let colors = getColors("data" in card ? card.data : card)
   if (colors.length === 0) {
     key = "c";
   } else if (colors.length > 1) {
