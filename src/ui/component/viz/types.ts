@@ -8,14 +8,14 @@ export enum PlotFunction {
   fullWordCount,
   cmc,
   weight,
+  set
 }
 
 interface PlotFunctionRepresentation {
   getDatum: (card: Card | EnrichedCard) => number | string
   text: string
-  range?: [number, number],
-  categories?: string[],
-  binSize?: number,
+  binSize?: number
+  sortOrder?: (it: { x: string, y: number }) => number | "x" | "y"
 }
 
 export const PLOT_FUNCTIONS: Record<PlotFunction, PlotFunctionRepresentation> = {
@@ -47,6 +47,11 @@ export const PLOT_FUNCTIONS: Record<PlotFunction, PlotFunctionRepresentation> = 
   [PlotFunction.weight]: {
     getDatum: card => "weight" in card ? Number.parseFloat(card.weight.toPrecision(SCORE_PRECISION)) : 1,
     text: "search weight",
+  },
+  [PlotFunction.set]: {
+    text: "set",
+    getDatum: card => ("data" in card ? card.data : card).set_name,
+    sortOrder: (it) => -it.y
   }
 }
 

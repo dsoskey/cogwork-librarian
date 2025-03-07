@@ -1,3 +1,7 @@
+.project-bar {
+    margin-bottom: var(--spacing-200);
+}
+
 .project-tab {
     padding: var(--spacing-100);
     border: var(--dark-color) inset 2px;

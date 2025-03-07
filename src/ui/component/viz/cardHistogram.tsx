@@ -9,6 +9,7 @@ import {
 } from 'chart.js'
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip)
 import { Bar } from 'react-chartjs-2'
+import sortBy from 'lodash/sortBy'
 
 
 export function use1DData(cards: EnrichedCard[], xfunc: PlotFunction, xGroup: GroupFunction) {
@@ -21,9 +22,12 @@ export function use1DData(cards: EnrichedCard[], xfunc: PlotFunction, xGroup: Gr
       .map(([groupKey, value]) => {
         const metadata = xGroupRep.getGroupMetadata(groupKey)
         const rawValues = _groupBy(value, xFunctionRep.getDatum)
-        const data = Object.keys(ungroupedRawValues).map(key => {
+        let data = Object.keys(ungroupedRawValues).map(key => {
           return { x: key, y: rawValues[key]?.length ?? 0 }
         })
+        if (xFunctionRep.sortOrder) {
+          data = sortBy(data, [xFunctionRep.sortOrder])
+        }
         return {
           data,
           backgroundColor: metadata.color ?? getComputedStyle(document.documentElement).getPropertyValue('--active'),
