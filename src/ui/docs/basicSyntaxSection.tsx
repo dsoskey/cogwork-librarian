@@ -10,7 +10,7 @@ export const BasicSyntaxSection = ({ textMd, exampleMd }: BasicSyntaxSectionProp
   return <>
     <MDDoc>{title}</MDDoc>
     <div className='basic-syntax-root'>
-      <div><MDDoc>{rest.join("\n\n")}</MDDoc></div>
+      <div className="text"><MDDoc>{rest.join("\n\n")}</MDDoc></div>
       <MDDoc className='example'>{exampleMd}</MDDoc>
     </div>
   </>

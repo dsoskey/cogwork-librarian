@@ -106,8 +106,8 @@ export function CardHistogram({ cards, xfunc, xgroup, onClick }: CardHistogramPr
           title: ctx => {
             const xLabel = ctx[0].label
             // @ts-ignore
-            const xGroup = ctx[0].dataset.groupKey
-            const groupLabel = xLabel !== xGroup ? ` ${xGroupRep.text}: ${xGroup}` : "";
+            const xGroupKey = ctx[0].dataset.groupKey
+            const groupLabel = xLabel !== xGroupKey && xgroup !== GroupFunction.none ? ` ${xGroupRep.text}: ${xGroupKey}` : "";
             return `${xFunctionRep.text}: ${xLabel}${groupLabel}`
           },
           label: ctx => `total: ${ctx.formattedValue}`,

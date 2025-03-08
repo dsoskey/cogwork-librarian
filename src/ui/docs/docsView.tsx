@@ -59,7 +59,7 @@ export const DocsView = () => {
   useHighlightPrism([pathname])
   return <div className='docs-view'>
     <NavBar />
-    <div className='docs-content'>
+    <main className='docs-content'>
       <div className='alert'>&nbsp;these docs are under active construction!&nbsp;</div>
       <Routes>
         <Route path="getting-started" element={<GettingStartedDocs />} />
@@ -69,6 +69,6 @@ export const DocsView = () => {
         <Route path="keyboard-shortcuts" element={<MDDoc>{keyboardShortcuts}</MDDoc>} />
         <Route path="" element={<LandingPage />} />
       </Routes>
-    </div>
+    </main>
   </div>
 }

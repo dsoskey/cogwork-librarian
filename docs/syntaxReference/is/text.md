@@ -3,7 +3,7 @@
 The `is` filter is a collection of premade queries that are supported by Scryfall.
 Some filters read better with the alias `has`, which is equivalent to `is`.
 Similarly, `not` is equivalent to `-is`.
-See the tables below for the full list of supported and documented `is` filters.
+See the table below for the full list of supported and documented `is` filters.
 
 | Filter name      | Description                                                                                                          | Cogwork Librarian | Scryfall |
 |------------------|----------------------------------------------------------------------------------------------------------------------|-------------------|----------|

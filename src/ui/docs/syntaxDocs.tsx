@@ -12,6 +12,16 @@ import typeText from '../../../docs/syntaxReference/type/text.md'
 import typeExample from '../../../docs/syntaxReference/type/example.md'
 import textBoxText from '../../../docs/syntaxReference/textBox/text.md'
 import textBoxExample from '../../../docs/syntaxReference/textBox/example.md'
+import tagsText from '../../../docs/syntaxReference/tags/text.md'
+import tagsExample from '../../../docs/syntaxReference/tags/example.md'
+import cubeText from '../../../docs/syntaxReference/cube/text.md'
+import cubeExample from '../../../docs/syntaxReference/cube/example.md'
+import formatText from '../../../docs/syntaxReference/format/text.md'
+import formatExample from '../../../docs/syntaxReference/format/example.md'
+import setText from '../../../docs/syntaxReference/sets/text.md'
+import setExample from '../../../docs/syntaxReference/sets/example.md'
+import pricesText from '../../../docs/syntaxReference/prices/text.md'
+import pricesExample from '../../../docs/syntaxReference/prices/example.md'
 import combatBoxText from '../../../docs/syntaxReference/combatBox/text.md'
 import combatBoxExample from '../../../docs/syntaxReference/combatBox/example.md'
 import andorText from '../../../docs/syntaxReference/andOr/text.md'
@@ -28,9 +38,14 @@ export const syntaxSectionTitles = [
   typeText,
   textBoxText,
   combatBoxText,
+  formatText,
+  setText,
+  cubeText,
+  tagsText,
   andorText,
   isText,
   sortOrderText,
+  pricesText,
 ].map(titleificate);
 
 export const SyntaxDocs = () => {
@@ -59,21 +74,16 @@ export const SyntaxDocs = () => {
     <BasicSyntaxSection textMd={typeText} exampleMd={typeExample} />
     <BasicSyntaxSection textMd={textBoxText} exampleMd={textBoxExample} />
     <BasicSyntaxSection textMd={combatBoxText} exampleMd={combatBoxExample} />
+    <BasicSyntaxSection textMd={formatText} exampleMd={formatExample} />
     {/* Layout  */}
-    {/* Format */}
     {/* Artist */}
-    {/* Tags oracle, art, cubes */}
+
+    <BasicSyntaxSection textMd={setText} exampleMd={setExample} />
+    <BasicSyntaxSection textMd={cubeText} exampleMd={cubeExample} />
+    <BasicSyntaxSection textMd={tagsText} exampleMd={tagsExample} />
     <BasicSyntaxSection textMd={andorText} exampleMd={andorExample} />
     <MDDoc className='single-section-docs'>{isText}</MDDoc>
     <MDDoc className="single-section-docs">{sortOrderText}</MDDoc>
-
-    <h2 className='todo-supported-color'>supported keywords</h2>
-    <ul>
-      {Object.keys(FILTER_KEYWORDS).map((keyword) => (
-        <li key={keyword}>
-          <a href={syntaxDocs[keyword]}>{keyword}</a>
-        </li>
-      ))}
-    </ul>
+    <BasicSyntaxSection textMd={pricesText} exampleMd={pricesExample} />
   </div>
 }

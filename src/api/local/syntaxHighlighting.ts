@@ -219,6 +219,7 @@ export const linkWrap = (env: Environment) => {
       break;
     case "setString":
       env.tag = "a";
+      // todo: fix link for comma-separated list
       env.attributes.href = `https://scryfall.com/search?q=set:"${env.content}"&unique=cards&as=grid&order=set`;
       env.attributes.target = "_blank";
       env.attributes.rel = "noreferrer noopener";

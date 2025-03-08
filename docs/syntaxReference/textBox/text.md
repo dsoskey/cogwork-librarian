@@ -1,7 +1,7 @@
 ### text box
 
 Use `o` to search within a card's oracle text. In the search string, `~` is replaced by the card's name.
-- aliases: `o`, `oracle`
+- aliases: `o`, `oracle`, `text`
 - operators: `:`, `=`
 - valid input: rawtext, "strings of characters", regular expressions
 

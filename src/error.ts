@@ -23,8 +23,11 @@ export const displayMessage = (error: SearchError, index: number) => {
       .pop()
     baseMessage = `unknown keyword "${badKeyword}" in query ${index + 1}`
   }
+  const footerMessage = error.type === "internal"
+    ? "\n\tPlease report this message using the 'report a bug' link in the footer."
+    : "";
 
-  return `${baseMessage}\n\t${columnShower(query, offset)}\n\t${error.message}`
+  return `${baseMessage}\n\t${columnShower(query, offset)}\n\t${error.message}${footerMessage}`
 }
 
 

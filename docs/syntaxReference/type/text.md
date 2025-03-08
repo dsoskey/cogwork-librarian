@@ -1,4 +1,4 @@
-### type
+### types
 
 Use `type` to find cards by type, subtype, or supertype. 
 

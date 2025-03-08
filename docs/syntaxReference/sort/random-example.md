@@ -1,7 +1,7 @@
 ### Generating random cubes
 
 Cogwork Librarian makes it simple to generate random cubes from a single query set.
-Combine [order:random]() and [limit]() to generate the amount of each searchable effect.
+Combine [order:random](/user-guide/syntax-guide#order-&-direction) and [limit](/user-guide/query-syntax#limit) to generate the amount of each searchable effect.
 Include `order:random` in your base query along with the card pool you want to pick from.
 Each subquery represents the different kinds of cards you want in the cube; use `limit:N`
 to set how many cards to randomly pick for a given subquery. To ensure you generate exactly the total number of 

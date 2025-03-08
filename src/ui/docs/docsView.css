@@ -33,6 +33,7 @@
     box-shadow: 2px 2px 2px 0 var(--gray-68-shadow);
     height: fit-content;
     top: 0;
+    left: 0;
     flex: 1;
 }
 
