@@ -10,6 +10,8 @@ import { Link } from 'react-router-dom'
 import { ExtendedSyntaxDocs } from './extendedSyntaxDocs'
 import { AdvancedTechniqueDocs } from './advancedTechniqueDocs'
 import { NavBar } from './navBar'
+import { Masthead } from '../component/masthead'
+import { Footer } from '../footer'
 
 const LandingCard = ({ title, href, description }) => {
   return <Link to={href} className='landing-card'>
@@ -26,26 +28,26 @@ const LandingPage = () => {
       <LandingCard
         href='/user-guide/getting-started'
         title='Getting started'
-        description='learn the basics of running queries and managing data' />
+        description='Learn the basics of running queries and managing data' />
       <LandingCard
         href='/user-guide/advanced-techniques'
         title='Advanced query techniques'
-        description='take searches to the next level, study sample queries, and learn to love regular expressions' />
+        description='Take searches to the next level, study sample queries, and learn to love regular expressions' />
     </div>
     <h3>Reference</h3>
     <div className='user-guide-cards'>
       <LandingCard
         href='/user-guide/keyboard-shortcuts'
         title='Keyboard shortcuts'
-        description='' />
+        description='Keep your hands on the keyboard for maximum flow' />
       <LandingCard
         href='/user-guide/query-syntax'
         title='Query syntax'
-        description="exhaustive documentation for cogwork librarian's base search syntax" />
+        description="Exhaustive documentation for Cogwork Librarian's base search syntax" />
       <LandingCard
         href='/user-guide/syntax-extension'
         title='Syntax extensions'
-        description='all search syntax exclusive to cogwork librarian' />
+        description='All search syntax exclusive to Cogwork Librarian' />
     </div>
   </div>
 }
@@ -58,6 +60,7 @@ export const DocsView = () => {
 
   useHighlightPrism([pathname])
   return <div className='docs-view'>
+    <Masthead />
     <NavBar />
     <main className='docs-content'>
       <div className='alert'>&nbsp;these docs are under active construction!&nbsp;</div>
@@ -69,6 +72,7 @@ export const DocsView = () => {
         <Route path="keyboard-shortcuts" element={<MDDoc>{keyboardShortcuts}</MDDoc>} />
         <Route path="" element={<LandingPage />} />
       </Routes>
+      <Footer />
     </main>
   </div>
 }

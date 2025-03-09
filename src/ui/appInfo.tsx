@@ -34,23 +34,23 @@ export const AppInfo = () => {
 
   return (
     <>
-      <h2>what is cogwork librarian?</h2>
+      <h2>what is Cogwork Librarian?</h2>
       <p>
-        <span onClick={tryLock}>cogwork librarian</span> wants to help you brainstorm and build cubes, battle
+        <span onClick={tryLock}>Cogwork Librarian</span> wants to help you brainstorm and build cubes, battle
         boxes, and other custom magic formats. craft more complex queries to
         find the cards that fit your environment or archetype. save cards to
         your list for easy export. ignore cards you want to exclude from all
-        future search results. load a custom list of cards that fit scryfall's
-        card format to power the most custom environments with scryfall's
+        future search results. load a custom list of cards that fit Scryfall's
+        card format to power the most custom environments with Scryfall's
         syntax.
       </p>
 
       <h2>
-        why should i use cogwork librarian? why not use scryfall directly?
+        why should i use Cogwork Librarian? why not use Scryfall directly?
       </h2>
       <p>
-        for the average one-off search query, scryfall is more than sufficient.
-        cogwork librarian offers some key advantages over scryfall:
+        for the average one-off search query, Scryfall is more than sufficient.
+        Cogwork Librarian offers some key advantages over Scryfall:
       </p>
       <ol>
         <li>
@@ -60,22 +60,22 @@ export const AppInfo = () => {
           that you care about
         </li>
         <li>
-          the in-memory query processor allows cogwork librarian to run
+          The in-memory query processor allows Cogwork Librarian to run
           offline after the initial database download. this also makes the
-          search orders of magnitude faster than communicating with scryfall
+          search orders of magnitude faster than communicating with Scryfall
           directly. why wait for answers<span onClick={() => setPin1(true)}>?</span>
         </li>
         <li>
-          cogwork librarian works with any scryfall-compatible list of cards,
-          including custom cards! download any of scryfall's bulk data sets
-          through cogwork librarian itself, or import your own json file to
+          Cogwork Librarian works with any Scryfall-compatible list of cards,
+          including custom cards! download any of Scryfall's bulk data sets
+          through Cogwork Librarian itself, or import your own json file to
           use a custom data set.
         </li>
       </ol>
 
       <h2>
         okay all of those are great but it's not enough for me yet. what else
-        will cogwork librarian do in the future?
+        will Cogwork Librarian do in the future?
       </h2>
       <p>
         while nothing on this list is a guarantee, here are some features i'm
@@ -92,7 +92,7 @@ export const AppInfo = () => {
 
       <h2>this looks cool<span onClick={clickPin2}>!</span> how can i contribute?</h2>
       <p>
-        at the moment, i need people to test cogwork librarian. try it out for
+        at the moment, i need people to test Cogwork Librarian. try it out for
         your next cube project and see if it helps you level up your queries.{' '}
         <a
           href='https://github.com/dsoskey/cogwork-librarian/issues/new?assignees=&labels=bug&template=bug_report.md&title='

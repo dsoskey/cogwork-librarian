@@ -16,7 +16,7 @@ export const TagImporter = () => {
     <h4>you want some tags?</h4>
     {missingTags.length > 0
       ? <span>it looks like your database lacks tags! bet you want some, huh?</span>
-      : <span>your database already has tags, but maybe you want to get the latest tags from scryfall?</span>
+      : <span>your database already has tags, but maybe you want to get the latest tags from Scryfall?</span>
     }
     <span>
       <button

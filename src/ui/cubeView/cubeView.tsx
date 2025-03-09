@@ -71,7 +71,7 @@ export function CubeView() {
         <a href={activeCard?.scryfall_uri.replace(/\?.+$/, "")}
            rel='noreferrer'
            target='_blank'
-           title="view on scryfall "
+           title="view on Scryfall "
         ><ScryfallIcon size="1.5em" /></a>
         {showDebugInfo && <CopyToClipboardButton
           copyText={() => JSON.stringify(activeCard, undefined, 2)}

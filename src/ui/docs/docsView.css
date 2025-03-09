@@ -1,56 +1,79 @@
 .docs-view {
     position: relative;
-    display: flex;
-    flex-direction: row;
-}
+    --masthead-height: 4.5rem;
+    --nav-width: 15rem;
 
-.docs-view .docs-content {
-    margin: 0 var(--spacing-300);
-    flex: 5;
-
-    .alert {
-        margin-bottom: var(--spacing-300);
+    .masthead {
+        position: fixed;
+        background-color: var(--dark-color);
+        width: 100%;
+        border-bottom: 1px solid var(--darker-color);
+        box-shadow: 0 2px 2px 0 var(--darker-color-subdued);
+        z-index: 100;
     }
 
-    & > * {
-      max-width: 60rem;
+    .docs-content {
+        display: block;
+        padding-top: var(--masthead-height);;
+        margin-right: var(--spacing-300);
+        margin-left: var(--nav-width);
+        margin-bottom: 0;
+
+        h3 {
+            margin-top: calc(-1 * var(--masthead-height));
+            padding-top: calc(var(--masthead-height) + var(--spacing-100));
+            font-size: 1.25em;
+            a[href^=\#] {
+                font-size: .95em;
+                user-select: none;
+            }
+        }
+
+        .alert {
+            margin-top: var(--spacing-300);
+            margin-bottom: var(--spacing-300);
+        }
+
+        & > * {
+            max-width: 60rem;
+        }
     }
-}
 
-.docs-content h3 {
-    font-size: 1.25em;
-    a[href^=\#] {
-        font-size: .95em;
+    .docs-sidenav {
+        background: var(--darker-color);
+        position: fixed;
+        padding: var(--spacing-300);
+        padding-right: var(--spacing-400);
+        border-bottom: 1px solid var(--gray-68);
+        border-right: 1px solid var(--gray-68);
+        box-shadow: 2px 2px 2px 0 var(--gray-68-shadow);
+        top: var(--masthead-height);
+        left: 0;
+        bottom: 0;
+        overflow-y: scroll;
+        width: fit-content;
+        flex: 1;
+
+        h4 {
+            padding-left: var(--spacing-300);
+        }
+        ul {
+            padding-left: var(--spacing-400);
+            list-style: none;
+            margin: var(--spacing-200);
+        }
     }
-}
 
-.docs-view .docs-sidenav {
-    background: var(--darker-color);
-    position: sticky;
-    padding: var(--spacing-200);
-    border-bottom: 1px solid var(--gray-68);
-    border-right: 1px solid var(--gray-68);
-    box-shadow: 2px 2px 2px 0 var(--gray-68-shadow);
-    height: fit-content;
-    top: 0;
-    left: 0;
-    flex: 1;
-}
-
-.docs-view .docs-sidenav h4 {
-    padding-left: var(--spacing-300);
-}
-
-.docs-view .docs-sidenav ul {
-    padding-left: var(--spacing-400);
-    list-style: none;
-    margin: var(--spacing-200);
+    .footer {
+        margin-left: -1rem;
+    }
 }
 
 .user-guide-cards {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
+    padding: var(--spacing-300) 0;
 }
 
 .landing-card {

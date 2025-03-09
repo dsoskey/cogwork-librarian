@@ -49,16 +49,16 @@ export const Footer = () => {
       <InnertubeWidget />
       <div className='legalese'>
         <p>
-          Portions of cogwork librarian are unofficial Fan Content permitted
+          Portions of Cogwork Librarian are unofficial Fan Content permitted
           under the Wizards of the Coast Fan Content Policy. The literal and
           graphical information presented on this site about Magic: The
           Gathering, including card images, mana symbols, and Oracle text, is
           copyright Wizards of the Coast, LLC, a subsidiary of Hasbro, Inc.
-          cogwork librarian is not produced by or endorsed by Wizards of the
+          Cogwork Librarian is not produced by or endorsed by Wizards of the
           Coast.
         </p>
         <p>
-          The Scryfall logo is copyright Scryfall, LLC. cogwork librarian is not
+          The Scryfall logo is copyright Scryfall, LLC. Cogwork Librarian is not
           produced by or endorsed by Scryfall, LLC.
         </p>
         <p>

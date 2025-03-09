@@ -105,7 +105,7 @@ export const CardDataView = () => {
 
       {outOfDate && (
         <div className='alert'>
-          cogwork librarian's syntax has updated since you last synced
+          Cogwork Librarian's syntax has updated since you last synced
           your database, so new queries may not function. to fix the
           issue, re-import your data file the same way you did last time
           and save to local database. if you've never imported a data set,

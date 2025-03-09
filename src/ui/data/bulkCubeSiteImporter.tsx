@@ -15,7 +15,7 @@ const encodeObject = (obj: {[u:string]:string[]}) => Object.entries(obj)
 export const CUBE_IMPORT_MESSAGES = {
   "querying-cubesite": "downloading cube lists",
   "finding-oracle-ids": "finding associated cards",
-  "scryfall-lookup": "querying scryfall for cards not in the database",
+  "scryfall-lookup": "querying Scryfall for cards not in the database",
   "generating-cube-definitions": "generating cube definitions",
   "saving-to-db": "propagating cube definitions to the database",
   "refresh-memory": "reloading memory",

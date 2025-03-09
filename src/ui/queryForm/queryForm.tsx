@@ -13,9 +13,9 @@ import { FlagContext } from '../flags'
 
 const description: Record<DataSource, String> = {
   scryfall:
-    'fetches from scryfall using its API. Supports full scryfall syntax, but larger query sets will take longer to process.',
+    'Fetches from Scryfall using its API. Supports full Scryfall syntax, but larger query sets will take longer to process.',
   local:
-    'processes queries against a local database of oracle cards, so it runs an order of magnitude faster than communicating with scryfall',
+    'Processes queries against a local database of oracle cards, so it runs an order of magnitude faster than communicating with Scryfall',
 }
 
 const DatabaseSettings = () => {
@@ -109,10 +109,10 @@ export const QueryForm = ({
                 onChange={() => setSource('scryfall')}
               />
             </div>
-            <label htmlFor={`source-scryfall`}>scryfall</label>
+            <label htmlFor={`source-scryfall`}>Scryfall</label>
             <InfoModal title={<h2 className='row center'>
               <ScryfallIcon size={iconSize} />
-              <span>data source: scryfall</span>
+              <span>data source: Scryfall</span>
             </h2>} info={description['scryfall']} />
             <DBStatusLoader />
           </div>

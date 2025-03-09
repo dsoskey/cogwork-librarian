@@ -55,7 +55,7 @@ export const SyntaxDocs = () => {
       Cogwork Librarian's local query processor uses a reverse-engineered
       variant of Scryfall's syntax. This page only covers Scryfall-compatible syntax;
       see <Link to="/user-guide/extended-syntax">our extended syntax guide</Link>
-      {' '}for more information on cogwork librarian's extra search features.
+      {' '}for more information on Cogwork Librarian's extra search features.
       please{' '}
       <a
         href='https://github.com/dsoskey/cogwork-librarian/issues/new?assignees=&labels=bug&template=bug_report.md&title='

@@ -57,27 +57,25 @@ export const App = () => {
               <DndProvider backend={HTML5Backend}>
                 <ErrorBoundary FallbackComponent={RenderErrorFallback}>
                   <div className='root'>
-                    {pathname === "/" && <SearchView />}
-                    {pathname !== "/" && <DefaultLayout>
                       <Routes>
-                        <Route path="/data/cube/*" element={<CubeRedirect />} />
-                        <Route path="/cube/:key/*" element={<CubeView />} />
-                        <Route path='/data/card' element={<CardDataView />}/>
-                        <Route path='/data/otag/:tag' element={<OtagView />}/>
-                        <Route path='/data/otag' element={<TagManager />}/>
-                        <Route path='/cube' element={<CubeDataView />}/>
+                        <Route path="/data/cube/*" element={<DefaultLayout><CubeRedirect /></DefaultLayout>} />
+                        <Route path="/cube/:key/*" element={<DefaultLayout><CubeView /></DefaultLayout>} />
+                        <Route path='/data/card' element={<DefaultLayout><CardDataView /></DefaultLayout>}/>
+                        <Route path='/data/otag/:tag' element={<DefaultLayout><OtagView /></DefaultLayout>}/>
+                        <Route path='/data/otag' element={<DefaultLayout><TagManager /></DefaultLayout>}/>
+                        <Route path='/cube' element={<DefaultLayout><CubeDataView /></DefaultLayout>}/>
                         <Route
                           path='/saved'
-                          element={<SavedCardsEditor {...project} />}
+                          element={<DefaultLayout><SavedCardsEditor {...project} /></DefaultLayout>}
                         />
-                        <Route path='/about-me' element={<AppInfo />} />
-                        <Route path='/whats-next/*' element={<WhatsNext />} />
+                        <Route path='/about-me' element={<DefaultLayout><AppInfo /></DefaultLayout>} />
+                        <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
                         <Route path='/user-guide/*' element={<DocsView />} />
-                        <Route path='/history' element={<HistoryView />} />
-                        <Route path="/settings" element={<SettingsView />} />
-                        <Route path="*" element={<NotFoundView />} />
+                        <Route path='/history' element={<DefaultLayout><HistoryView /></DefaultLayout>} />
+                        <Route path="/settings" element={<DefaultLayout><SettingsView /></DefaultLayout>} />
+                        <Route path="/" element={<SearchView />} />
+                        <Route path="*" element={<DefaultLayout><NotFoundView /></DefaultLayout>} />
                       </Routes>
-                    </DefaultLayout>}
                     <Toaster />
                   </div>
                 </ErrorBoundary>

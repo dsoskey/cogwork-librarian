@@ -357,7 +357,7 @@ th, td {
 }
 
 .masthead {
-  margin: var(--spacing-200);
+  padding: var(--spacing-200);
   align-items: start;
 }
 
