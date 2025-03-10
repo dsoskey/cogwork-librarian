@@ -42,12 +42,12 @@ export const mtgql: Grammar = {
     alias: "function",
   },
   cubeString: {
-    pattern: /(\b(?:cube|cubeo):|=)[^\s#)(]+(?=(\b|$))/i,
+    pattern: /(\b(?:cube|cubeo)[:=])[^\s#)(]+(?=(\b|$))/i,
     lookbehind: true,
     alias: "string",
   },
   setString: {
-    pattern: /(\b(?:set|s|edition|e):|=)[^\s#]+(?=(\b|$))/i,
+    pattern: /(\b(?:set|s|edition|e)[:=])[^\s#]+(?=(\b|$))/i,
     lookbehind: true,
     alias: "string",
   },

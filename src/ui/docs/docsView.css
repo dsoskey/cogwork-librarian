@@ -15,7 +15,6 @@
     .docs-content {
         display: block;
         padding-top: var(--masthead-height);;
-        margin-right: var(--spacing-300);
         margin-left: var(--nav-width);
         margin-bottom: 0;
 
@@ -50,9 +49,9 @@
         top: var(--masthead-height);
         left: 0;
         bottom: 0;
-        overflow-y: scroll;
+        overflow-y: auto;
         width: fit-content;
-        flex: 1;
+        scrollbar-color: var(--light-color) var(--darker-color);
 
         h4 {
             padding-left: var(--spacing-300);
@@ -65,7 +64,8 @@
     }
 
     .footer {
-        margin-left: -1rem;
+        margin-left: -1.1rem;
+        margin-right: -1.1rem;
     }
 }
 
