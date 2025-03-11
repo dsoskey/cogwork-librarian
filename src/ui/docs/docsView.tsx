@@ -63,13 +63,12 @@ export const DocsView = () => {
     <Masthead />
     <NavBar />
     <main className='docs-content'>
-      <div className='alert'>&nbsp;these docs are under active construction!&nbsp;</div>
       <Routes>
         <Route path="getting-started" element={<GettingStartedDocs />} />
         <Route path="advanced-techniques" element={<AdvancedTechniqueDocs />} />
         <Route path="query-syntax" element={<SyntaxDocs />} />
         <Route path="syntax-extension" element={<ExtendedSyntaxDocs />} />
-        <Route path="keyboard-shortcuts" element={<MDDoc>{keyboardShortcuts}</MDDoc>} />
+        <Route path="keyboard-shortcuts" element={<div><MDDoc>{keyboardShortcuts}</MDDoc></div>} />
         <Route path="" element={<LandingPage />} />
       </Routes>
       <Footer />

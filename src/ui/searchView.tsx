@@ -1,6 +1,6 @@
 import { QueryForm } from './queryForm/queryForm'
 import { BrowserView } from './cardBrowser/browserView'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ProjectContext } from '../api/local/useProjectDao'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 import { DataSource } from '../types'
@@ -80,6 +80,17 @@ export const SearchView = () => {
       setExtendedParseError([error])
     }
   }
+
+  useEffect(() => {
+    const handleFocusShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "'") {
+        const element = document.querySelector(".query-editor .controller");
+        element?.focus?.()
+      }
+    }
+    document.addEventListener("keydown", handleFocusShortcut)
+    return () => document.removeEventListener("keydown", handleFocusShortcut)
+  }, [])
 
   return<div className='search-view-root'>
     <div className='query-panel'>

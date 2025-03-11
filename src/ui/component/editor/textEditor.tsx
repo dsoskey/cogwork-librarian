@@ -103,6 +103,7 @@ export const TextEditor = ({
         if (canSubmit) {
           const selectedIndex = getLineIndex(value, cursorIndex);
           onSubmit?.(queryIndex, selectedIndex);
+          controller.current?.blur()
         }
       }
 

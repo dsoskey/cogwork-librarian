@@ -13,10 +13,14 @@
     }
 
     .docs-content {
-        display: block;
         padding-top: var(--masthead-height);;
         margin-left: var(--nav-width);
         margin-bottom: 0;
+        min-height: calc(100vh - var(--masthead-height));
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
 
         h3 {
             margin-top: calc(-1 * var(--masthead-height));
