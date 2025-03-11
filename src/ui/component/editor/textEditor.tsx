@@ -97,6 +97,9 @@ export const TextEditor = ({
     }
 
     if (event.metaKey || event.ctrlKey) {
+      if (event.shiftKey && (event.key === "ArrowRight" || event.key === "ArrowLeft")) {
+        event.stopPropagation();
+      }
       if (event.key === "Enter") {
         const cursorIndex = controller.current?.selectionStart ?? 0;
         const queryIndex = findQueryIndex(value, cursorIndex);
