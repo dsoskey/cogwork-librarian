@@ -84,7 +84,39 @@ describe('findQueryIndex', function() {
 
       expect(result).toEqual(7)
     })
-    it.todo("what happens when first line is a comment AND theres no break between it and the first query?")
+    it("what happens when first line is a comment AND theres no break between it and the first query?", function() {
+      const query =
+        "# https://coglib.sosk.watch\n"+
+        'fo:"less to cast for"\n'+
+        "\n"+
+        'fo:"less to cast, where X"\n' +
+        "\n"+
+        'fo:"pays for {1}"'
+
+      const index = query.indexOf('fo:"less to cast for')
+
+      const result = findQueryIndex(query, index)
+
+      expect(result).toEqual(1)
+    })
+    it("what happens when first N lines is a comment AND theres no break between it and the first query?", function() {
+      const query =
+        "# https://coglib.sosk.watch\n"+
+        "# https://coglib.sosk.watch\n"+
+        "# https://coglib.sosk.watch\n"+
+        "# https://coglib.sosk.watch\n"+
+        'fo:"less to cast for"\n'+
+        "\n"+
+        'fo:"less to cast, where X"\n' +
+        "\n"+
+        'fo:"pays for {1}"'
+
+      const index = query.indexOf('fo:"less to cast for')
+
+      const result = findQueryIndex(query, index)
+
+      expect(result).toEqual(4)
+    })
     it.todo("what happens when first line is a comment AND theres a break between it and the first query?")
     it.todo('what happens when a comment is in between 2 breaks?')
     it.todo("what happens when last line is a comment AND theres no break between it and the previous query?")

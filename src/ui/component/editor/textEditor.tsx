@@ -35,6 +35,12 @@ export const findQueryIndex = (
     }
     index--;
   }
+  // if we get to the front of the query and its a comment,
+  // that means all lines before the cursor's line are comments.
+  // return the cursor's line index
+  if (before[index].startsWith("#")) {
+    return before.length - 1;
+  }
   return 0;
 };
 
