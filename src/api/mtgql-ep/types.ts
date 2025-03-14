@@ -5,6 +5,7 @@ export type QueryWeight = "uniform" | "zipf"
 
 export interface Alias {
   name: string
+  description?: string
   query: string
 }
 

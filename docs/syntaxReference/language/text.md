@@ -1,6 +1,6 @@
 ### language
 
-Use `lang:SHORT_CODE` to match printings in a specific language, `lang:any` to find cards printed in any language, and `in:LANGUAGE_CODE` to find cards ever printed in a specific language.
+Use `lang` to match printings in a specific language, `lang:any` to find cards printed in any language, and `in:LANGUAGE` to find cards ever printed in a specific language.
 `new:language` finds the first printing of a card with a new language. 
 If you're going to be searching a lot of non-english cards, you need to use a non-default bulk data source for your database.
 - aliases: `lang`, `language`

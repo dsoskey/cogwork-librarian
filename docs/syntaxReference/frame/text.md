@@ -16,4 +16,4 @@ Search for stamped printings with `stamp`.
 
 `border` finds printings with a certain border color.
 - operators: `:`, `=`
-- values: `black`, `white`, `silver`, `gold`, `borderless`
+- values: `black`, `white`, `silver`, `gold`, `borderless`, `yellow`
