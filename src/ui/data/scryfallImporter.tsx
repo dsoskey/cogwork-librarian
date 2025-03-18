@@ -9,6 +9,7 @@ import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { Input } from '../component/input'
 import { FormField } from '../component/formField'
 import { parseISO } from 'date-fns'
+import { DBStatusLoader } from '../component/dbStatusLoader'
 
 export interface ScryfallImporterProps {
   importTargets: ImportTarget[]
@@ -16,7 +17,7 @@ export interface ScryfallImporterProps {
 
 const OUTPUT_FORMAT = "YYYY-MM-dd HH:mm"
 export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
-  const { memStatus, dbStatus, dbReport, loadManifest } = useContext(CogDBContext)
+  const { memStatus, dbStatus, loadManifest } = useContext(CogDBContext)
 
   const [targetDefinition, setTargetDefinition] = useState<BulkDataDefinition | undefined>();
   const [bulkDataDefinitions, setBulkDataDefinitions] = useState<BulkDataDefinition[]>([]);
@@ -56,16 +57,7 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
         <div>{it.description}</div>
       </div>
     ))}
-    {dbStatus === 'loading' && <>
-      <span>{DB_INIT_MESSAGES[dbReport.complete]}</span>
-      <div className='column'>
-        <LoaderBar width={500} count={dbReport.complete} total={dbReport.totalQueries} />
-        {memStatus === "loading" && dbReport.totalCards > 0 && <LoaderBar
-          width={500} label='cards loaded'
-          count={dbReport.cardCount} total={dbReport.totalCards}
-        />}
-      </div>
-    </>}
+    <DBStatusLoader />
     <FormField
       title="import filter"
       description="cards that match this filter will be loaded into the database during importing"

@@ -5,7 +5,7 @@ import { ScryfallIcon } from '../component/scryfallIcon'
 import { CoglibIcon } from '../component/coglibIcon'
 import { InfoModal } from '../component/infoModal'
 import { CogDBContext } from '../../api/local/useCogDB'
-import { DBStatusLoader } from '../component/dbStatusLoader'
+import { MemStatusLoader, DBStatusLoader } from '../component/dbStatusLoader'
 import { Link } from 'react-router-dom'
 import { ProjectContext } from '../../api/local/useProjectDao'
 import { ProjectTabs } from './projectTabs'
@@ -39,12 +39,12 @@ export interface QueryFormProps {
   setSource: Setter<DataSource>
 }
 
-export const QueryForm = ({
+export function QueryForm({
   status,
   execute,
   source,
   setSource,
-}: QueryFormProps) => {
+}: QueryFormProps) {
   const { queries, setQueries } = useContext(ProjectContext);
   const { memStatus } = useContext(CogDBContext);
   const { searchSource } = useContext(FlagContext).flags;
@@ -67,7 +67,7 @@ export const QueryForm = ({
           language='scryfall-extended-multi'
         />
       </div>
-      {!searchSource && <div style={{ width: 500 }}><DBStatusLoader /></div>}
+      {!searchSource && <CombinedStatusLoader />}
       {searchSource &&
         <div className='row center execute-controls'>
           <label><span className='bold'>data source:</span></label>
@@ -114,9 +114,20 @@ export const QueryForm = ({
               <ScryfallIcon size={iconSize} />
               <span>data source: Scryfall</span>
             </h2>} info={description['scryfall']} />
-            <DBStatusLoader />
+            <CombinedStatusLoader />
           </div>
         </div>}
     </div>
   )
+}
+
+function CombinedStatusLoader() {
+  const { dbStatus, memStatus } = useContext(CogDBContext);
+
+  return <div className='db-info-holder'>
+    <DBStatusLoader />
+    <MemStatusLoader />
+    {memStatus === "error" || dbStatus === "error" &&
+      <div>Go to the <Link to="/data/card">database manager</Link> to fix your import query.</div>}
+  </div>
 }

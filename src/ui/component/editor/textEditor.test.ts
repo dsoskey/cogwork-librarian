@@ -117,6 +117,19 @@ describe('findQueryIndex', function() {
 
       expect(result).toEqual(4)
     })
+    it("should handle the cursor being on the last character of a single line query with the first line being a comment and the next line being a space", function(){
+      const query =
+        '# https://coglib.sosk.watch\n' +
+        'fo:"less to cast for"\n' +
+        '\n' +
+        'fo:"less to cast, where X"\n'
+      // cursor position after for"
+      const index = 49
+
+      const result = findQueryIndex(query, index);
+
+      expect(result).toEqual(1)
+    })
     it.todo("what happens when first line is a comment AND theres a break between it and the first query?")
     it.todo('what happens when a comment is in between 2 breaks?')
     it.todo("what happens when last line is a comment AND theres no break between it and the previous query?")

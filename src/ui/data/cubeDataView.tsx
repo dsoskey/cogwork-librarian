@@ -22,12 +22,15 @@ export const CubeDataView = () => {
   const [error, setError] = useState("")
   const [foundCards, setFoundCards] = useState<NormedCard[]>([])
 
-  const { source, setSource } = useContext(BulkCubeImporterContext)
-  const [importType, setImportType] = useState<CubeSource>(source)
+  const { setSource, status, isRunning } = useContext(BulkCubeImporterContext)
+  const [importType, setImportType] = useState<CubeSource | undefined>(undefined)
 
   const listImporter = useContext(ListImporterContext)
 
-  const existingCubes = useLiveQuery(async () => sortBy(await cogDB.cube.toArray(), [(it) => it.key.toLowerCase()]))
+  const existingCubes = useLiveQuery(
+    async () => sortBy(await cogDB.cube.toArray(), [(it) => it.key.toLowerCase()]),
+    [status, isRunning],
+  )
 
   const [showConfirmation, setShowConfirmation] = useState(false)
 
@@ -41,13 +44,11 @@ export const CubeDataView = () => {
       setError("")
       setShowConfirmation(true)
     } else {
-      const oracle_ids = cards.map(it => it.oracle_id)
-      const print_ids = cards.map(it => it.printings[0].id)
       const now = new Date();
       await cogDB.cube.put({ key,
         cards: cards.map(it => ({ print_id: it.printings[0].id, oracle_id: it.oracle_id })),
-        oracle_ids,
-        print_ids,
+        oracle_ids:[],
+        print_ids:[],
         name: key,
         description: "",
         canonical_id: key,
@@ -136,8 +137,8 @@ export const CubeDataView = () => {
         {CUBE_SOURCE_TO_LABEL[sourceOption]}
       </label>))}
     </h3>
-    {importType !== "list" && <BulkCubeSiteImporter />}
-    {importType === "list" && <CubeListImporter
+    {importType && importType !== "list" && <BulkCubeSiteImporter />}
+    {importType && importType === "list" && <CubeListImporter
       cardsToImport={cardsToImport}
       setCardsToImport={setCardsToImport}
       setCards={setCards}

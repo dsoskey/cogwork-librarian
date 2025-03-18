@@ -2,13 +2,14 @@ import { createContext, SetStateAction, useRef, useState } from 'react'
 import { Setter, TaskStatus } from '../../types'
 import { cogDB, isScryfallManifest, Manifest } from './db'
 import { migrateCubes, putFile } from './populate'
-import { NormedCard, isOracleVal, normCardList } from 'mtgql'
+import { NormedCard, isOracleVal, normCardList, SearchError } from 'mtgql'
 import { QueryReport, useReporter } from '../useReporter'
 import _isFunction  from 'lodash/isFunction'
 import { useLocalStorage } from './useLocalStorage'
 import { defaultPromise } from '../context'
 import { CubeCard } from 'mtgql/build/types/cube'
 import * as Scryfall from 'scryfall-sdk'
+import { displayMessage } from '../../error'
 
 export const DB_LOAD_MESSAGES = [
   "loading cubes",
@@ -35,7 +36,9 @@ export type ImportTarget = 'memory' | 'db'
 
 export interface CogDB {
   dbStatus: TaskStatus
+  dbError: string
   memStatus: TaskStatus
+  memError: string
   dbReport: QueryReport
   memory: NormedCard[]
   cardByOracle: (id: string) => NormedCard | undefined
@@ -55,7 +58,9 @@ export interface CogDB {
 
 const defaultDB: CogDB = {
   dbStatus: 'unstarted',
+  dbError: "",
   memStatus: 'unstarted',
+  memError: "",
   memory: [],
   cardByOracle: () => {
     console.error("CogDB.cardByOracle called without a provider!")
@@ -92,7 +97,9 @@ export const CogDBContext = createContext(defaultDB)
 export const useCogDB = (): CogDB => {
   const dbReport = useReporter()
   const [dbStatus, setDbStatus] = useState<TaskStatus>('unstarted')
+  const [dbError, setDbError] = useState<string>('')
   const [memStatus, setMemStatus] = useState<TaskStatus>('loading')
+  const [memError, setMemError] = useState<string>('')
 
   const [memory, rawSetMemory] = useState<NormedCard[]>([])
   const rezzy = useRef<NormedCard[]>([])
@@ -162,6 +169,13 @@ export const useCogDB = (): CogDB => {
       case 'error':
         console.error('waaaaaa', data)
         break
+      case 'filter-error':
+        const error = data as SearchError;
+        const nextMemError = `In-memory database load failed due to invalid search query.\n${displayMessage(error, 0)}`;
+        setMemError(nextMemError);
+        setMemStatus(prev => prev === 'loading' ? 'error' : prev)
+        setDbStatus(prev => prev === 'loading' ? 'error' : prev)
+        break
       default:
         console.error(`unknown message [${type}] from db worker`)
         break
@@ -226,6 +240,13 @@ export const useCogDB = (): CogDB => {
         console.error('waaaaaa', data)
         setMemStatus(prev => prev === 'loading' ? 'error' : prev)
         setDbStatus(prev => prev === 'loading' ? 'error' : prev)
+        break;
+      case 'filter-error':
+        const error = data as SearchError;
+        const nextDbError = `Database import failed due to invalid search query.\n${displayMessage(error, 0)}`;
+        setDbError(nextDbError);
+        setMemStatus(prev => prev === 'loading' ? 'error' : prev)
+        setDbStatus(prev => prev === 'loading' ? 'error' : prev)
         break
       default:
         console.error(`unknown message [${type}] from db worker`)
@@ -239,6 +260,8 @@ export const useCogDB = (): CogDB => {
     const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
     rezzy.current = []
     setMemStatus('loading')
+    setMemError("")
+    setDbError("")
     console.time(`loading mem`)
 
     const cardManifest = await cogDB.collection.get("the_one")
@@ -361,8 +384,10 @@ export const useCogDB = (): CogDB => {
 
   return {
     dbStatus,
+    dbError,
     saveToDB,
     memStatus,
+    memError,
     manifest,
     setManifest,
     memory,

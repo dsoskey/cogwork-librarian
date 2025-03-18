@@ -25,6 +25,9 @@ const router = createBrowserRouter([
 Prism.languages['scryfall'] = mtgql
 Prism.languages['scryfall-extended'] = mtgqlExtended
 Prism.languages['scryfall-extended-multi'] = mtgqlExtendedMulti
+Prism.languages['mtgql'] = mtgql
+Prism.languages['mtgql-extended'] = mtgqlExtended
+Prism.languages['mtgql-extended-multi'] = mtgqlExtendedMulti
 
 Prism.hooks.add('wrap', linkWrap)
 Prism.hooks.add('complete', hookReactDOM(router))

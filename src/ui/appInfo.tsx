@@ -82,7 +82,6 @@ export const AppInfo = () => {
         looking to implement:
       </p>
       <ul>
-        <li>locally-sourced syntax documentation</li>
         <li>query history</li>
         <li>shareable search links</li>
         <li>

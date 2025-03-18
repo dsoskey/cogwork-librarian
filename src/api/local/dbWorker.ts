@@ -2,11 +2,12 @@ import { cogDB, COGDB_FILTER_PROVIDER, MANIFEST_ID, toManifest } from './db'
 import { downloadCards } from './populate'
 import * as Scry from 'scryfall-sdk'
 import { downloadIllustrationTags, downloadOracleTags } from '../scryfall/tagger'
-import { normCardList,
+import {
+  normCardList,
   NormedCard,
   QueryRunner,
   MQLParser,
-  FilterNode, identityNode,
+  FilterNode, identityNode, CachingFilterProvider
 } from 'mtgql'
 import { BulkDataType } from 'scryfall-sdk/out/api/BulkData'
 import { downloadSets } from '../scryfall/set'
@@ -50,10 +51,16 @@ async function sendCardDBToMemory(filter?: string) {
 
   const count = (await cogDB.card.count()) + (await cogDB.customCard.count())
   postMessage({ type: 'count', data: count })
-  const node: FilterNode = filter ?
-    await QueryRunner.parseFilterNode(MQLParser, COGDB_FILTER_PROVIDER, filter)
-      .unwrapOr(identityNode()) :
-    identityNode();
+  let node: FilterNode;
+  try {
+    node = filter
+      ? await QueryRunner.parseFilterNode(MQLParser, COGDB_FILTER_PROVIDER, filter)
+      : identityNode();
+
+  } catch (error) {
+    postMessage({ type: 'filter-error', data: error });
+    return
+  }
 
   const processCard = (card: NormedCard) =>  {
     index++
@@ -81,6 +88,15 @@ async function initOfficialDB(type: BulkDataType, targets: ImportTarget[], filte
   if (targets.length === 0) {
     throw Error("No targets specified!")
   }
+  // pre-check if filter will have a parse error
+  if (filter) {
+    try {
+      await QueryRunner.parseFilterNode(MQLParser, new CachingFilterProvider(cogDB), filter);
+    } catch (error) {
+      postMessage({ type: "filter-error", data: error })
+      return;
+    }
+  }
   const bulkDataDefinition = await Scry.BulkData.definitionByType(type)
   const manifest = toManifest(bulkDataDefinition, filter)
   postMessage({ type: 'manifest', data: { manifest, shouldSetManifest: targets.find(it => it === 'memory') }})
@@ -92,29 +108,28 @@ async function initOfficialDB(type: BulkDataType, targets: ImportTarget[], filte
   await loadIllustrationTags();
   await loadSetsAndBlocks();
 
-  let res;
+  let cardsToImport: NormedCard[] = [];
   if (manifest.filter) {
-    const qr = new QueryRunner({ corpus: cards, dataProvider: cogDB });
-    const result = await qr.search(filter);
-    if (result.isOk()) {
-      const raw = result._unsafeUnwrap()
-      res = normCardList(raw);
-      console.debug(`filtered to ${raw.length} cards`)
-    } else {
-      postMessage({ type: "filter-error", data: result._unsafeUnwrapErr() })
-      res = normCardList(cards);
+    const qr = QueryRunner.fromCardList({ corpus: cards, dataProvider: cogDB });
+    try {
+      const searchResult = await qr.search(filter);
+      cardsToImport = normCardList(searchResult);
+      console.debug(`filtered to ${searchResult.length} cards`)
+    } catch (error) {
+      postMessage({ type: "filter-error", data: error })
+      return;
     }
   } else {
-    res = normCardList(cards);
+    cardsToImport = normCardList(cards);
   }
 
-  console.debug(res)
+  console.debug(cardsToImport)
 
-  postMessage({ type: "normed-cards", data: res.length })
+  postMessage({ type: "normed-cards", data: cardsToImport.length })
 
   if (targets.find(it => it === 'memory')) {
     let index = 0
-    for (const card of res) {
+    for (const card of cardsToImport) {
       index++
       postMessage({ type: 'card', data: { card, index } })
     }
@@ -123,7 +138,7 @@ async function initOfficialDB(type: BulkDataType, targets: ImportTarget[], filte
 
   if (targets.find(it => it === 'db')) {
     const toSave: NormedCard[] = []
-    for (const card of res) {
+    for (const card of cardsToImport) {
       if (card.oracle_id === undefined) {
         console.warn(`card with no oracle_id: ${card.name}`)
         console.debug(card)

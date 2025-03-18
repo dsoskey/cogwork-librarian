@@ -50,14 +50,15 @@ export const isScryfallManifest = (s: string): boolean =>
 export const toManifest = (
   bulkDataDefinition: BulkDataDefinition,
   filter: string = ""
-): Manifest => ({
-  ...bulkDataDefinition,
-  id: MANIFEST_ID,
-  name: bulkDataDefinition.uri,
-  lastUpdated: new Date(),
-  filter: filter.trim(),
-  bulkUrl: bulkDataDefinition.download_uri,
-})
+): Manifest => {
+  return ({
+    ...bulkDataDefinition,
+    id: MANIFEST_ID,
+    lastUpdated: new Date(),
+    filter: filter.trim(),
+    bulkUrl: bulkDataDefinition.download_uri
+  })
+}
 
 export class TypedDexie extends Dexie implements DataProvider {
   LAST_UPDATE = new Date('2023-11-20')

@@ -85,6 +85,7 @@ button {
   cursor: pointer;
   border-width: 2px;
   border-style: solid;
+  border-radius: var(--border-radius);
   box-sizing: border-box;
   text-align: center;
   font-family: system-ui, sans-serif;
@@ -133,6 +134,7 @@ input::placeholder {
 select {
   background-color: var(--darker-color);
   color: var(--light-color);
+  border-radius: var(--border-radius);
 }
 select:hover:not(:disabled) {
   border-color: var(--active-mid-alpha);

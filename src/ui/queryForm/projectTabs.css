@@ -5,6 +5,7 @@
 .project-tab {
     padding: var(--spacing-100);
     border: var(--dark-color) inset 2px;
+    border-radius: var(--border-radius);
     cursor: pointer;
 }
 

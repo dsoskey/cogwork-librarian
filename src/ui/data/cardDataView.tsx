@@ -5,11 +5,12 @@ import { ScryfallImporter } from './scryfallImporter'
 import { CardFileImporter } from './cardFileImporter'
 import { CardListImporter } from './cardListImporter'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { cogDB } from '../../api/local/db'
+import { cogDB, Collection } from '../../api/local/db'
 import { TagImporter } from './tagImporter'
 import { Input } from '../component/input'
 import { FormField } from '../component/formField'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
+import { MemStatusLoader } from '../component/dbStatusLoader'
 
 export const IMPORT_SOURCE = {
   scryfall: 'scryfall',
@@ -27,7 +28,7 @@ export const sourceToLabel: Record<ImportSource, string> = {
 }
 
 const dateString = (date: Date) =>
-  `${date.getFullYear()}.${date.getMonth().toString().padStart(2, "0")}.${date.getDay().toString().padStart(2, "0")}-${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`
+  `${date.getFullYear()}.${(date.getMonth()+1).toString().padStart(2, "0")}.${(date.getDate()+1).toString().padStart(2, "0")}-${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`
 
 interface TargetCheckboxProps {
   importTargets: ImportTarget[]
@@ -51,14 +52,15 @@ const TargetCheckbox = ({ importTargets, setImportTargets, target }: TargetCheck
   </label>
 }
 
-const ManifestView = ({ manifest }) => {
+const ManifestView = ({ manifest }: { manifest: Collection }) => {
   useHighlightPrism([manifest.filter]);
   return <>
     <div>
-      <span className="bold">source:</span> <code>{manifest.name}</code>
-    </div>
-    <div>
-      <span className="bold">type:</span> <code>{manifest.type}</code>
+      <span className="bold">source: </span>
+      <code>{manifest.bulkUrl
+        ? <a href={manifest.bulkUrl}>{manifest.name}</a>
+        : manifest.name
+      }</code>
     </div>
     <div>
       <span className="bold">last updated:</span>{' '}
@@ -139,6 +141,7 @@ export const CardDataView = () => {
           dbStatus === 'loading' || memStatus === 'loading' ? 'ing' : ''
         } local database`}
       </button>}
+      <MemStatusLoader />
     </section>
     {dbStatus === "success" && <TagImporter />}
     <section className='db-import'>

@@ -9,7 +9,10 @@ export type Language =
   | "regex"
   | "mtgql"
   | "mtgql-extended"
-  | "mtgql-extended-multi";
+  | "mtgql-extended-multi"
+  | "scryfall"
+  | "scryfall-extended"
+  | "scryfall-extended-multi";
 const keywordRegex = Object.values(FILTER_KEYWORDS).join("|");
 
 const operators = Object.values(OPERATORS).join("|");
