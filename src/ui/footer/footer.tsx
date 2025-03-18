@@ -1,8 +1,9 @@
 import React from 'react'
 import "./footer.css"
-import { InnertubeWidget } from './component/innertubeWidget'
+import { InnertubeWidget } from '../component/innertubeWidget'
+import { AsSeenOn } from './asSeenOn'
 
-export const Footer = () => {
+export function Footer() {
   return (
     <footer className='footer'>
       <div className='links'>
@@ -46,7 +47,12 @@ export const Footer = () => {
           </a>{" "}☕️
         </div>
       </div>
-      <InnertubeWidget />
+      <div className="row">
+        <InnertubeWidget />
+        <a href='https://open.spotify.com/episode/3FzTQvEsejQbg8FjuJJ7dk?si=b3a484641b304fc3' target="_blank" rel="noreferrer">
+          <AsSeenOn />
+        </a>
+      </div>
       <div className='legalese'>
         <p>
           Portions of Cogwork Librarian are unofficial Fan Content permitted
