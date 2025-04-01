@@ -53,6 +53,7 @@ export interface CogDB {
   saveToDB: (manifest?: Manifest, cards?: NormedCard[]) => Promise<void>
   resetDB: () => Promise<void>
   loadManifest: (manifest: Manifest, targets: ImportTarget[], filter: string) => Promise<void>
+  loadMtgJSONDB: (targets: ImportTarget[], filter: string) => Promise<void>
   cardByName: (name: string, fuzzy?: boolean) => (NormedCard | undefined)
 }
 
@@ -87,6 +88,7 @@ const defaultDB: CogDB = {
   saveToDB: () => Promise.reject("CogDB.saveToDB called without a provider!"),
   resetDB: () => Promise.reject("CogDB.resetDB called without a provider!"),
   loadManifest: () => Promise.reject("CogDB.loadManifest called without a provider!"),
+  loadMtgJSONDB: () => Promise.reject("CogDB.loadMtgJSONDB called without a provider!"),
   outOfDate: false,
 }
 
@@ -318,6 +320,24 @@ export const useCogDB = (): CogDB => {
     worker.postMessage({ type: 'init', data: { bulkType: manifest.type, targets, filter } })
   }
 
+  const loadMtgJSONDB = async (targets: ImportTarget[], filter: string) => {
+    console.debug("starting worker")
+    // @ts-ignore
+    const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
+    if (targets.find(it => it === 'memory')) {
+      rezzy.current = []
+    }
+    dbReport.reset(DB_INIT_MESSAGES.length)
+    setMemStatus('loading')
+    setDbStatus("loading")
+    console.time(`loading mem`)
+
+    console.debug('refreshing db')
+    worker.onmessage = handleInitDB
+    worker.postMessage({ type: 'init', data: { bulkType: "mtgjson", targets, filter } })
+
+  }
+
   const cardByName = (name: string, fuzzy: boolean = false): NormedCard | undefined => {
     // todo: add fuzzing
     const fuzzed = fuzzy ? name : name
@@ -397,6 +417,7 @@ export const useCogDB = (): CogDB => {
     setMemory,
     resetDB,
     loadManifest,
+    loadMtgJSONDB,
     dbReport,
     outOfDate: (manifest?.lastUpdated ?? EPOCH) < cogDB.LAST_UPDATE,
     cardByName,

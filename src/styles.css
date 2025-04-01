@@ -531,6 +531,7 @@ th, td {
   padding: var(--spacing-200) var(--spacing-300);
   font-weight: bold;
   width: fit-content;
+  border-radius: var(--border-radius);
 }
 
 .alert * {

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { ObjectValues, Setter, TaskStatus } from '../../types'
 import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
-import { ScryfallImporter } from './scryfallImporter'
+import { ScryfallImporter, ScryfallImporterProps } from './scryfallImporter'
 import { CardFileImporter } from './cardFileImporter'
 import { CardListImporter } from './cardListImporter'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -10,19 +10,20 @@ import { TagImporter } from './tagImporter'
 import { Input } from '../component/input'
 import { FormField } from '../component/formField'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
-import { MemStatusLoader } from '../component/dbStatusLoader'
+import { DBStatusLoader, MemStatusLoader } from '../component/dbStatusLoader'
+import { useLocalStorage } from '../../api/local/useLocalStorage'
 
-export const IMPORT_SOURCE = {
+const IMPORT_SOURCE = {
   scryfall: 'scryfall',
-  cubeCobra: 'cubeCobra',
+  mtgjson: 'mtgjson',
   file: 'file',
   text: 'text',
 } as const
-export type ImportSource = ObjectValues<typeof IMPORT_SOURCE>
+type ImportSource = ObjectValues<typeof IMPORT_SOURCE>
 
-export const sourceToLabel: Record<ImportSource, string> = {
+const SOURCE_TO_LABEL: Record<ImportSource, string> = {
   scryfall: 'scryfall',
-  cubeCobra: 'cube cobra',
+  mtgjson: 'MTGJSON',
   file: 'a file',
   text: 'a text list',
 }
@@ -157,7 +158,7 @@ export const CardDataView = () => {
             checked={source === importSource}
             onChange={() => setImportSource(source as ImportSource)}
           />
-          {sourceToLabel[source]}
+          {SOURCE_TO_LABEL[source]}
         </label>))}
         <span>to</span>
         <TargetCheckbox target='memory' importTargets={importTargets} setImportTargets={setImportTargets} />
@@ -169,6 +170,7 @@ export const CardDataView = () => {
         dbImportStatus={dbImportStatus}
         setDbImportStatus={setDbImportStatus}
       />}
+      {importSource === "mtgjson" && <MTGJSONImporter importTargets={importTargets} />}
       {importSource === "text" && <CardListImporter
         importTargets={importTargets}
         dbImportStatus={dbImportStatus}
@@ -176,4 +178,35 @@ export const CardDataView = () => {
       />}
     </section>
   </>
+}
+
+function MTGJSONImporter({ importTargets }: ScryfallImporterProps) {
+  const { memStatus, dbStatus, loadMtgJSONDB } = useContext(CogDBContext);
+  const [filter, setFilter] = useLocalStorage<string>("db-import-filter-1", "-is:extra ++");
+
+  const importFromMtgJSON = async () => {
+      await loadMtgJSONDB(importTargets, filter);
+  }
+
+  return <div>
+    <div className="alert">Beta feature!</div>
+    <p className="prose">
+      MTGJSON is an alternate database source to Scryfall.
+      It contains the originally printed text and type of most cards, a notable gap in Scryfall's data.
+      Cogwork Librarian enables searching on these fields with <code>ogtext</code>, <code>ogtype</code>, <code>has:erratatext</code>, <code>has:erratatype</code>, and <code>has:nooriginaltext</code>.
+      While using this beta integration, some other search features may not be available.
+    </p>
+    <DBStatusLoader />
+    <FormField
+      title="import filter"
+      description="cards that match this filter will be loaded into the database during importing"
+    >
+      <Input onChange={e => setFilter(e.target.value)} value={filter} language="scryfall" placeholder="No filter will be applied" />
+    </FormField>
+    <button
+      disabled={dbStatus === 'loading' || memStatus === 'loading'}
+      onClick={importFromMtgJSON}>
+      import
+    </button>
+  </div>
 }

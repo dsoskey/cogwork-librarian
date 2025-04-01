@@ -1,4 +1,4 @@
-import { cogDB, COGDB_FILTER_PROVIDER, MANIFEST_ID, toManifest } from './db'
+import { cogDB, COGDB_FILTER_PROVIDER, Manifest, MANIFEST_ID, toManifest } from './db'
 import { downloadCards } from './populate'
 import * as Scry from 'scryfall-sdk'
 import { downloadIllustrationTags, downloadOracleTags } from '../scryfall/tagger'
@@ -7,12 +7,13 @@ import {
   NormedCard,
   QueryRunner,
   MQLParser,
-  FilterNode, identityNode, CachingFilterProvider
+  FilterNode, identityNode, CachingFilterProvider, Card
 } from 'mtgql'
 import { BulkDataType } from 'scryfall-sdk/out/api/BulkData'
 import { downloadSets } from '../scryfall/set'
 import { ImportTarget } from './useCogDB'
 import { invertItags, invertOtags } from './types/tags'
+import { downloadMTGJSONDB } from '../mtgjson'
 
 self.onmessage = (_event) => {
   const event = _event.data
@@ -84,7 +85,7 @@ async function sendCardDBToMemory(filter?: string) {
   postMessage({ type: 'end' })
 }
 
-async function initOfficialDB(type: BulkDataType, targets: ImportTarget[], filter?: string) {
+async function initOfficialDB(type: BulkDataType | "mtgjson", targets: ImportTarget[], filter?: string) {
   if (targets.length === 0) {
     throw Error("No targets specified!")
   }
@@ -97,11 +98,25 @@ async function initOfficialDB(type: BulkDataType, targets: ImportTarget[], filte
       return;
     }
   }
-  const bulkDataDefinition = await Scry.BulkData.definitionByType(type)
-  const manifest = toManifest(bulkDataDefinition, filter)
-  postMessage({ type: 'manifest', data: { manifest, shouldSetManifest: targets.find(it => it === 'memory') }})
 
-  const cards = await downloadCards(bulkDataDefinition)
+  let manifest: Manifest;
+  let cards: Card[];
+  if (type === "mtgjson") {
+    manifest = {
+      filter, id: MANIFEST_ID, lastUpdated: new Date(), name: 'mtgjson all printings', type: 'mtgjson'
+    }
+
+    postMessage({ type: 'manifest', data: { manifest, shouldSetManifest: targets.find(it => it === 'memory') }})
+
+    cards = await downloadMTGJSONDB();
+  } else {
+    const bulkDataDefinition = await Scry.BulkData.definitionByType(type)
+    manifest = toManifest(bulkDataDefinition, filter)
+
+    postMessage({ type: 'manifest', data: { manifest, shouldSetManifest: targets.find(it => it === 'memory') }})
+
+    cards = await downloadCards(bulkDataDefinition);
+  }
   postMessage({ type: "downloaded-cards" })
 
   await loadOracleTags();
@@ -122,8 +137,6 @@ async function initOfficialDB(type: BulkDataType, targets: ImportTarget[], filte
   } else {
     cardsToImport = normCardList(cards);
   }
-
-  console.debug(cardsToImport)
 
   postMessage({ type: "normed-cards", data: cardsToImport.length })
 

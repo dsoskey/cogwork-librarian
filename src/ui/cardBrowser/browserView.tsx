@@ -226,7 +226,7 @@ export function DownloadButton({ searchResult }: DownloadButtonProps) {
     <span className="bold">download <input
       type="number" pattern="[0-9]*"
       placeholder="all"
-      value={value}
+      value={isNaN(value) ? "":value}
       onChange={handleChange}
       onKeyDown={event => {
         if (event.key !== "Tab" && event.key !== "Backspace" && !/\d/.test(event.key)) {

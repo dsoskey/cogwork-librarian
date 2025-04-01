@@ -36,7 +36,7 @@ export const CardImageView = ({
 
   const handleHoverOn = () => {
     if (hoverContent) {
-      cardViewRef.current?.focus()
+      cardViewRef.current?.focus({ preventScroll: true })
       setHovered(true)
     }
   }
