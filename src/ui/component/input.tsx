@@ -9,9 +9,10 @@ export interface InputProps extends HTMLAttributes<HTMLInputElement> {
   value: string
   onChange: ChangeEventHandler<HTMLInputElement>
   language?: Language
+  placeholder?: string
 }
 
-export const Input = ({ value, onChange, language, ...rest }: InputProps) => {
+export const Input = ({ value, onChange, language, placeholder, ...rest }: InputProps) => {
   const controller = useRef<HTMLInputElement>()
   const faker = useRef<HTMLPreElement>()
   const linker = useRef<HTMLPreElement>()
@@ -35,6 +36,7 @@ export const Input = ({ value, onChange, language, ...rest }: InputProps) => {
       }
     }
   }
+  const displayValue = value.length > 0 ? value : placeholder
 
   return (
     <div className='query-editor query-input' onKeyDown={handleDown}>
@@ -44,7 +46,7 @@ export const Input = ({ value, onChange, language, ...rest }: InputProps) => {
            className={`language-${language ?? 'none'} links match-braces ${
              revealLinks ? 'show' : 'hide'
            }`}
-      ><code>{value}</code></pre>
+      ><code>{displayValue}</code></pre>
       <input
         {...rest}
         ref={controller}
@@ -56,7 +58,7 @@ export const Input = ({ value, onChange, language, ...rest }: InputProps) => {
             aria-hidden
             tabIndex={-1}
             className={`language-${language ?? 'none'} display match-braces`}>
-        <code>{value}</code></pre>
+        <code>{displayValue}</code></pre>
     </div>
   )
 }

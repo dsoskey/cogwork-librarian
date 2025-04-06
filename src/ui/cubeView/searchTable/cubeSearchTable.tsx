@@ -6,7 +6,6 @@ import { ColorBreakdown } from '../cubeTags'
 import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
 import _cloneDeep from 'lodash/cloneDeep'
 import { useMultiInputEditor } from '../../hooks/useMultiInputEditor'
-import _groupBy from 'lodash/groupBy'
 import { useLocalStorage } from '../../../api/local/useLocalStorage'
 import { CardResultsLayout } from '../cardResults'
 import { InfoModal } from '../../component/infoModal'
@@ -33,7 +32,6 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
     // optimization: make this a range to check rather than flopping all rows on a line split
     const [flop, setFlop] = useState(false);
     const { cards, cube } = useContext(CubeViewModelContext);
-    const cardCount = useMemo(() => _groupBy(cards, "oracle_id"),[cards]);
 
     const [cellDisplayMode, setCellDisplayMode] = useLocalStorage<CellDisplayMode>("cube-cell-displaymode", CellDisplayMode.perentage)
     const [packSize, setPackSize] = useLocalStorage<number>(`pack-count-${cube.key}`, 15);
@@ -211,7 +209,6 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
                 setQuery={(it) => setQuery(i, it)}
                 searchCards={searchCards}
                 total={totalbucket.total}
-                cardCounts={cardCount}
                 onKeyDown={onKeyDown(i)}
                 cellDisplayMode={cellDisplayMode}
                 packSize={packSize}

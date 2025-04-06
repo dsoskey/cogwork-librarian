@@ -32,7 +32,6 @@ interface CubeSearchRowProps {
   total: number
   onKeyDown: any
   flop: boolean
-  cardCounts: Dictionary<OrderedCard[]>
   setCardsToShow: (cards: ShownQuery) => void;
   cellDisplayMode: CellDisplayMode
   packSize: number
@@ -45,7 +44,6 @@ export function CubeSearchRow({
   setQuery,
   searchCards,
   total,
-  cardCounts,
   setCardsToShow,
   cellDisplayMode,
   packSize
@@ -60,7 +58,7 @@ export function CubeSearchRow({
 
     setError(undefined)
     try {
-      const searchResult = await searchCards(q, { order: 'cmc' })
+      const searchResult = await searchCards(`${q} ++`, { order: 'cmc' })
       setResult(searchResult as OrderedCard[])
     } catch (error) {
       console.error(error)
@@ -126,8 +124,8 @@ export function CubeSearchRow({
     } else {
       key = colors[0].toLowerCase()
     }
-    acc[key] += cardCounts[card.oracle_id]?.length ?? 1
-    acc.total += cardCounts[card.oracle_id]?.length ?? 1
+    acc[key]++;
+    acc.total++;
     return acc
   }, { tag: query, w: 0, u: 0, b: 0, r: 0, g: 0, m: 0, c: 0, total: 0 })
 
@@ -144,6 +142,7 @@ export function CubeSearchRow({
       className='search-row-input'
       language='scryfall-extended-multi'
       value={query}
+      placeholder="*"
       onChange={handleChange}
       onKeyDown={handleKeyDown}
     />
@@ -258,7 +257,7 @@ function ColorBreakdownCell({ numerator, denominator, cellDisplayMode, packSize,
     {cellDisplayMode === CellDisplayMode.simple && null}
     {cellDisplayMode === CellDisplayMode.perentage &&
       <span className='percentage'>
-        {` (${(numerator / denominator * 100).toPrecision(2)}%)`}
+        {` (${numerator === denominator ? "100" :  (numerator / denominator * 100).toPrecision(2)}%)`}
       </span>}
     {cellDisplayMode === CellDisplayMode.asfan &&
       <span className='percentage'>
