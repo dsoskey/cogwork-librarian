@@ -11,4 +11,5 @@
 .slug {
     padding: var(--spacing-100);
     border: var(--light-color) inset 2px;
+    border-radius: var(--border-radius);
 }

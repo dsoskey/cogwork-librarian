@@ -1,14 +1,11 @@
 import React, { useContext } from 'react'
-import { ScryfallIcon } from '../../component/scryfallIcon'
+import { ScryfallIcon } from '../../icons/scryfallIcon'
 import { FlagContext } from '../../flags'
 import { EnrichedCard } from '../../../api/queryRunnerCommon'
-import { CopyToClipboardButton } from '../../component/copyToClipboardButton'
-
-export const COPY_TEXT_EMOJIS = {
-  unstarted: '📑',
-  success: '✅',
-  error: '🚨',
-}
+import { LINK_BUTTON_ICONS, CopyToClipboardButton } from '../../component/copyToClipboardButton'
+import { BlockIcon } from '../../icons/block'
+import { AddIcon } from '../../icons/add'
+import { DEFAULT_SIZE } from '../../icons/base'
 
 export const COPY_TITLE = {
   unstarted: 'copy json',
@@ -30,17 +27,19 @@ export function SearchHoverActions({ card, onAdd, onIgnore }: SearchHoverActions
       rel='noopener'
     >
       <button title='open in Scryfall'>
-        <ScryfallIcon size='1em' />
+        <ScryfallIcon size={DEFAULT_SIZE} />
       </button>
     </a>
     {showDebugInfo && <CopyToClipboardButton
       titleText={COPY_TITLE}
-      buttonText={COPY_TEXT_EMOJIS}
+      buttonText={LINK_BUTTON_ICONS}
       copyText={() => JSON.stringify(card.data, undefined, 2)}
     />}
-    {onIgnore && <button title='ignore' onClick={onIgnore}>🚫</button>}
+    {onIgnore && <button title='ignore' onClick={onIgnore}>
+      <BlockIcon />
+    </button>}
     {onAdd && <button title='add to list' onClick={onAdd}>
-      <span className='add-icon'>+</span>
+      <AddIcon />
     </button>}
   </div>
 }

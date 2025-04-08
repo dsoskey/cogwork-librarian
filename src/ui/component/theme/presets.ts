@@ -11,6 +11,38 @@ export const PRESET_THEMES: { [key: string]: Theme } = {
     active575: 'hsl(180, 100%, 69%, 75%)',
     active550: 'hsl(180, 100%, 69%, 50%)'
   },
+  "recross the paths": {
+    "dark100":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 64%)",
+    "dark150":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 47%)",
+    "dark200":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 30%)",
+    "dark300":"hsl(204,96%,16%)",
+    "light600":"hsl(29,96%,50%)",
+    "active599":"hsl(57,99%,50%)",
+    "active575":"color-mix(in oklch, var(--active599), white 15%)",
+    "active550":"color-mix(in oklch, var(--active599), white 45%)",
+  },
+  jazz: {
+    "dark100":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--active599) 14%), black 10%)",
+    "dark150":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--active599) 14%), black 05%)",
+    "dark200":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--active599) 14%), black 0.5%)",
+    "dark300":"hsl(0,0%,100%)",
+    "light600":"hsl(249, 54%, 32%)",
+    "active599":"hsl(180, 94%, 39%)",
+    "active575":"color-mix(in oklch, var(--active599), transparent 20%)",
+    "active550":"color-mix(in oklch, var(--active599), transparent 35%)",
+  },
+  "jazz 2": {
+    "dark100": "color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 94%), black 66%)",
+    "dark150": "color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 94%), black 54%)",
+    "dark200": "color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 94%), black 42%)",
+    "dark300": "hsl(0, 0%, 100%)",
+    "light600": "hsl(239, 99%, 68%)",
+    "active599":"hsl(180, 94%, 39%)",
+
+    // "active599": "hsl(159, 100%, 42%, 100%)",
+    "active575": "color-mix(in oklch, var(--active599), transparent 20%)",
+    "active550": "color-mix(in oklch, var(--active599), transparent 35%)",
+  },
   "'97": {
     dark100: 'hsl(349, 31%, 12%)',
     dark150: 'hsl(349, 20%, 20%)',
@@ -101,16 +133,6 @@ export const PRESET_THEMES: { [key: string]: Theme } = {
     'active575': 'hsl(24, 85%, 60%, 75%)',
     'active550': 'hsl(24, 85%, 60%, 50%)'
   },
-  "recross the paths": {
-    "dark100":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 64%)",
-    "dark150":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 47%)",
-    "dark200":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 30%)",
-    "dark300":"hsl(204,96%,16%)",
-    "light600":"hsl(29,96%,50%)",
-    "active599":"hsl(57,99%,50%)",
-    "active575":"color-mix(in oklch, var(--active599), white 15%)",
-    "active550":"color-mix(in oklch, var(--active599), white 45%)",
-  },
   eva: {
     "dark100":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 64%)",
     "dark150":"color-mix(in oklch, color-mix(in oklch, var(--dark300), var(--light600) 14%), black 47%)",
@@ -121,4 +143,5 @@ export const PRESET_THEMES: { [key: string]: Theme } = {
     "active575":"color-mix(in oklch, var(--active599), transparent 20%)",
     "active550":"color-mix(in oklch, var(--active599), transparent 35%)",
   },
+
 }

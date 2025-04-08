@@ -24,10 +24,13 @@ import { RenderErrorFallback } from './ui/renderErrorFallback'
 import { DefaultLayout } from './ui/layout/defaultLayout'
 import { TagManager } from './ui/data/tagManager'
 import { OtagView } from './ui/views/tag/otagView'
+import { ContextMenu, handleClickOutsideContextMenu } from './ui/component/contextMenu/contextMenu'
+import Prism from 'prismjs'
+import { hookContextMenu } from './api/local/syntaxHighlighting'
 
 export const App = () => {
-  const { pathname } = useLocation()
   const { } = useContext(FlagContext).flags;
+  const [cubeContext, setCubeContext] = useState<string>("")
 
   const cogDB = useCogDB()
   const listImporter = useListImporter(cogDB)
@@ -46,6 +49,7 @@ export const App = () => {
   }
   useEffect(() => {
     cogDB.resetDB()
+    Prism.hooks.add("complete", hookContextMenu(setCubeContext))
   }, [])
 
   return (
@@ -56,7 +60,7 @@ export const App = () => {
             <ToasterContext.Provider value={{ messages, addMessage, dismissMessage }}>
               <DndProvider backend={HTML5Backend}>
                 <ErrorBoundary FallbackComponent={RenderErrorFallback}>
-                  <div className='root'>
+                  <div className='root' onClick={handleClickOutsideContextMenu}>
                       <Routes>
                         <Route path="/data/cube/*" element={<DefaultLayout><CubeRedirect /></DefaultLayout>} />
                         <Route path="/cube/:key/*" element={<DefaultLayout><CubeView /></DefaultLayout>} />
@@ -77,6 +81,7 @@ export const App = () => {
                         <Route path="*" element={<DefaultLayout><NotFoundView /></DefaultLayout>} />
                       </Routes>
                     <Toaster />
+                    <ContextMenu contextKey={cubeContext} />
                   </div>
                 </ErrorBoundary>
               </DndProvider>

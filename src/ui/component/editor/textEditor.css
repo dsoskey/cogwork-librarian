@@ -63,16 +63,13 @@ textarea.coglib-prism-theme {
     overflow-y: clip;
   }
 
-  .overlay-toggle {
+  .editor-controls {
+    display:flex;
+    flex-direction: row;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 5;
-    padding: 0;
-    border: unset;
-    font-weight: bold;
-    width: var(--toolbar-height, 20px);
-    height: var(--toolbar-height, 20px);
   }
 
   .labels {
@@ -109,6 +106,8 @@ textarea.coglib-prism-theme {
     top: 0.15em;
     position: relative;
     cursor: pointer;
+    min-width: unset;
+    min-height: unset;
     aspect-ratio: 1/1;
 
     &:disabled {

@@ -1,5 +1,5 @@
 import { AdminPanel } from '../adminPanel'
-import { CoglibIcon } from './coglibIcon'
+import { CoglibIcon } from '../icons/coglibIcon'
 import { Link } from 'react-router-dom'
 import React, { useContext, useEffect } from 'react'
 import { FlagContext } from '../flags'

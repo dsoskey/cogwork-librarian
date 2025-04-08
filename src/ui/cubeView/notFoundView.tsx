@@ -3,6 +3,8 @@ import { useBulkCubeImporter } from '../../api/cubecobra/useBulkCubeImporter'
 import React, { useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { LoaderText } from '../component/loaders'
+import cubeArtisanIcon from '../icons/cubeartisan-favicon.ico'
+import cubeCobraIcon from '../icons/cubecobra-favicon.ico'
 
 export function CubeNotFoundView() {
   const { key } = useParams()
@@ -20,16 +22,22 @@ export function CubeNotFoundView() {
 
   return <div className='header row baseline'>
     <h2>{cubekey} not found in local database</h2>
-    <div>
-      <button disabled={isRunning} onClick={() => {
+    <div className="row center">
+      <button className="row center" disabled={isRunning} onClick={() => {
         setSource('cubeartisan')
         attemptImport([cubekey], 'cubeartisan')
-      }}>import from cubeartisan
+      }}>
+        import from cubeartisan
+        &nbsp;
+        <img src={cubeArtisanIcon} height="18px" />
       </button>
-      <button disabled={isRunning} onClick={() => {
+      <button className="row center" disabled={isRunning} onClick={() => {
         setSource('cubecobra')
         attemptImport([cubekey], 'cubecobra')
-      }}>import from cubecobra
+      }}>
+        import from cubecobra
+        &nbsp;
+        <img src={cubeCobraIcon} height="18px" />
       </button>
     </div>
     {notFound && <div className='alert'>{cubekey} not found in {source}</div>}

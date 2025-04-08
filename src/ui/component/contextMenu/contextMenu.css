@@ -1,0 +1,17 @@
+#context-menu {
+    display: none;
+    position: absolute;
+    z-index: 99;
+    background: var(--dark-color);
+    padding: var(--spacing-200);
+    border-radius: var(--border-radius);
+    top: 50%;
+    left: 50%;
+    box-shadow: 0px 0px 2px 2px var(--gray-68-shadow);
+
+    .cube-link {
+        color: #cc99cd;
+        background-color: var(--darker-color);
+        font-family: var(--monospace-family);
+    }
+}

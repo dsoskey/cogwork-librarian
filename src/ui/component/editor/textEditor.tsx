@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { Language, useHighlightPrism } from "../../../api/local/syntaxHighlighting";
 import { MultiQueryActionBar } from "./multiQueryActionBar";
 import "./textEditor.css";
+import { RectangleIcon } from '../../icons/rectangle'
+import { RectangleCloseIcon } from '../../icons/rectangleClose'
+import { COPY_BUTTON_ICONS, CopyToClipboardButton } from '../copyToClipboardButton'
 
 const MIN_TEXTAREA_HEIGHT = 32;
 
@@ -185,28 +188,36 @@ export const TextEditor = ({
         showSubmit
         showLineNumbers={showLineNumbers}
       />
-      <button
-        className="overlay-toggle"
-        title={
-          revealLinks
-            ? "close overlay (ctrl/cmd + \\)"
-            : "open overlay (ctrl/cmd + \\)"
-        }
-        onClick={() => setRevealLinks((prev) => !prev)}
-      >
-        {revealLinks ? "⊠" : "⧈"}️
-      </button>
+      <div className="editor-controls">
+        <button
+          className='overlay-toggle'
+          title={
+            revealLinks
+              ? 'close overlay (ctrl/cmd + \\)'
+              : 'open overlay (ctrl/cmd + \\)'
+          }
+          onClick={() => setRevealLinks((prev) => !prev)}
+        >
+          {revealLinks ? <RectangleCloseIcon /> : <RectangleIcon />}️
+        </button>
+        <CopyToClipboardButton
+          copyText={queries.join("\n")}
+          title="Copy to clipboard"
+          buttonText={COPY_BUTTON_ICONS}
+        />
+      </div>
+
 
       <textarea
         disabled={disabled}
         ref={controller}
-        className="controller coglib-prism-theme"
+        className='controller coglib-prism-theme'
         value={value}
         placeholder={placeholder}
         spellCheck={false}
-        autoCorrect="none"
-        autoCapitalize="off"
-        translate="no"
+        autoCorrect='none'
+        autoCapitalize='off'
+        translate='no'
         onChange={(event) => {
           setQueries(event.target.value.split(separator));
         }}

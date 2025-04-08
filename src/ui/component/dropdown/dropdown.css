@@ -1,7 +1,8 @@
 .dropdown {
     position: relative;
     border-radius: var(--border-radius);
-    color: var(--active-mid-alpha)
+    color: var(--active-mid-alpha);
+    z-index: 10;
 }
 
 .dropdown:hover {

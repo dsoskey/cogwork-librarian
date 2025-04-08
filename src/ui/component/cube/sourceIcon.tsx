@@ -1,5 +1,5 @@
-import cubecobraImage from './cubecobra-favicon.ico'
-import cubeartisanImage from './cubeartisan-favicon.ico'
+import cubecobraImage from '../../icons/cubecobra-favicon.ico'
+import cubeartisanImage from '../../icons/cubeartisan-favicon.ico'
 import React from 'react'
 import { Cube, CubeSource } from 'mtgql'
 

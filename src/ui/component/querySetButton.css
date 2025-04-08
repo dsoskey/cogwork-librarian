@@ -1,5 +1,10 @@
-.loading-button .background {
-  fill: var(--active);
+.loading-button {
+  .background {
+    fill: var(--active);
+  }
+  .play {
+    fill: var(--dark-color);
+  }
 }
 
 .run-query-button:hover:not(:disabled) {

@@ -146,7 +146,7 @@ export const CardDataView = () => {
     </section>
     {dbStatus === "success" && <TagImporter />}
     <section className='db-import'>
-      <h4 className='row'>
+      <h4 className='row baseline'>
         <span>import from</span>
         {Object.keys(IMPORT_SOURCE).filter(it => it !== "cubeCobra").map(source => (<label key={source}
           className={`input-link ${source === importSource ? "active-link" : ""}`}

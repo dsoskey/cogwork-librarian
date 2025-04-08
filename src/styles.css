@@ -35,6 +35,8 @@
   --spacing-400: 16px;
   --spacing-500: 32px;
 
+  --interaction-size-min: 24px;
+
   background-color: var(--dark-color);
   color: var(--light-color);
   scrollbar-color: var(--light-color) var(--dark-color);
@@ -72,24 +74,32 @@ body {
 
 .button-like,
 button {
-  background-color: var(--dark-color);
-  border-top-color: var(--gray-42);
-  border-left-color: var(--gray-42);
-  border-bottom-color: var(--darker-color);
-  border-right-color: var(--darker-color);
-  color: var(--active-mid-alpha);
+  --text-color: var(--active-mid-alpha);
+  --bkgd-color: var(--dark-color);
+
+  background-color: var(--bkgd-color);
+  color: var(--text-color);
+
   transition-property: color, background-color;
   transition-duration: 100ms;
   transition-timing-function: ease-out;
 
   cursor: pointer;
-  border-width: 2px;
-  border-style: solid;
+  border-width: 0;
   border-radius: var(--border-radius);
   box-sizing: border-box;
+  min-width: var(--interaction-size-min);
+  min-height: var(--interaction-size-min);
   text-align: center;
   font-family: system-ui, sans-serif;
   font-size: .8333333em;
+
+
+
+  .square {
+    padding: var(--spacing-100);
+    aspect-ratio: 1/1;
+  }
 }
 
 button:disabled {
@@ -103,18 +113,14 @@ button:disabled {
 .button-like.disabled,
 .button-like:disabled,
 button:disabled {
-  background-color: var(--darker-color-subdued);
-  border-bottom-color: var(--darkest-color);
-  border-right-color: var(--darkest-color);
-  color: var(--active-low-alpha);
+  --text-color: var(--active-low-alpha);
+  --bkgd-color: var(--darker-color-subdued);
 }
 
 button:hover:not(:disabled),
 .button-like:hover:not(:disabled) {
-  color: var(--dark-color);
-  background-color: var(--active-mid-alpha);
-  border-bottom-color: var(--active);
-  border-right-color: var(--active);
+  --text-color: var(--dark-color);
+  --bkgd-color: var(--active-mid-alpha);
 }
 
 input {
@@ -135,6 +141,8 @@ select {
   background-color: var(--darker-color);
   color: var(--light-color);
   border-radius: var(--border-radius);
+  min-width: var(--interaction-size-min);
+  min-height: var(--interaction-size-min);
 }
 select:hover:not(:disabled) {
   border-color: var(--active-mid-alpha);
@@ -576,26 +584,16 @@ th, td {
   flex-direction: row;
   align-items: center;
   cursor: pointer;
-}
-.scryfall-input * {
-  cursor: inherit;
-}
-.scryfall-input input[type=radio] {
-  appearance: none;
-  height: 20px;
-  background-color: transparent;
-  translate: 0 -.2em;
-  border-radius: 100%;
-}
-.scryfall-input label.checked {
-  color: var(--active);
-}
-.scryfall-input input[type=radio]::before {
-  content: url("./ui/component/scryfallIcon.svg");
-  position:relative;
-}
-.scryfall-input input[type=radio]:checked::before {
-  content: url("./ui/component/scryfallIconChecked.svg");
+
+  * {
+    cursor: inherit;
+  }
+  input[type=radio] {
+    appearance: none;
+  }
+  label.checked {
+    color: var(--active);
+  }
 }
 
 .db-import .file {

@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { BulkCubeImporterContext } from '../../../api/cubecobra/useBulkCubeImporter'
 import { groupBy } from 'lodash'
 import { Cube } from 'mtgql'
+import { RefreshIcon } from '../../icons/refresh'
 
 export interface RefreshButtonProps {
   toSubmit: Cube[]
@@ -19,6 +20,6 @@ export function RefreshButton({ toSubmit }: RefreshButtonProps) {
   }
 
   return <button onClick={importCheckedCubeIds} disabled={isRunning} title="refresh from source">
-    {"🔄"}
+    <RefreshIcon />
   </button>
 }

@@ -6,9 +6,9 @@ import './cubeView.css'
 import { CUBE_SOURCE_TO_LABEL, cubeLink } from '../component/cube/sourceIcon'
 import { Modal } from '../component/modal'
 import { RefreshButton } from '../component/cube/refreshButton'
-import { ScryfallIcon } from '../component/scryfallIcon'
+import { ScryfallIcon } from '../icons/scryfallIcon'
 import { LoaderText } from '../component/loaders'
-import { CopyToClipboardButton } from '../component/copyToClipboardButton'
+import { LINK_BUTTON_ICONS, CopyToClipboardButton } from '../component/copyToClipboardButton'
 import { CubeNotFoundView } from './notFoundView'
 import {
   CubeViewModelContext,
@@ -20,13 +20,9 @@ import { CubeList } from './cubeList'
 import { FlagContext } from '../flags'
 import { ManaCost } from '../card/manaCost'
 import { CubeSearchTable } from './searchTable/cubeSearchTable'
-import { COPY_TEXT_EMOJIS, COPY_TITLE } from '../cardBrowser/cardViews/searchHoverActions'
+import { COPY_TITLE } from '../cardBrowser/cardViews/searchHoverActions'
+import { PrinterIcon } from '../icons/printer'
 
-const shareButtonText = {
-  unstarted: '🔗',
-  success: '✅',
-  error: '🚫',
-}
 
 export function CubeView() {
   const showDebugInfo = useContext(FlagContext).flags.showDebugInfo;
@@ -75,7 +71,7 @@ export function CubeView() {
         ><ScryfallIcon size="1.5em" /></a>
         {showDebugInfo && <CopyToClipboardButton
           copyText={() => JSON.stringify(activeCard, undefined, 2)}
-          buttonText={COPY_TEXT_EMOJIS}
+          buttonText={LINK_BUTTON_ICONS}
           titleText={COPY_TITLE}
         />}
       </div>}
@@ -169,7 +165,7 @@ function CubeModelView() {
           {cube.source === "list" && "a text list"}
         </em>
       </div>
-      <div className='cube-subroutes row baseline'>
+      <div className='cube-subroutes row center'>
         <Link to={`/cube/${cube.key}`} className={pathname === `/cube/${cube.key}` ? 'active-link' : ''}>overview</Link>
         <Link to={`/cube/${cube.key}/list`}
               className={pathname === `/cube/${cube.key}/list` ? 'active-link' : ''}>list</Link>
@@ -180,7 +176,8 @@ function CubeModelView() {
             <CopyToClipboardButton
               copyText={`${window.location.protocol}//${window.location.host}/cube/${cube.key}?source=${cube.source}`}
               title={`copy share link to keyboard`}
-              buttonText={shareButtonText}
+              buttonText={LINK_BUTTON_ICONS}
+              className="square"
             />
             <RefreshButton toSubmit={[cube]} />
           </>}
@@ -188,11 +185,10 @@ function CubeModelView() {
             disabled={pathname !== `/cube/${cube.key}/list`}
             className={pathname === `/cube/${cube.key}/list` ? '' : 'gone'}
             onClick={print}
-            title='print cube proxies'>🖨️
+            title='print cube proxies'><PrinterIcon />
           </button>
-          {' '}
-          <span className='bold'>last updated:</span> {cube.last_updated?.toLocaleString() ?? '~'}
         </div>
+        <div><span className='bold'>last updated:</span> {cube.last_updated?.toLocaleString() ?? '~'}</div>
       </div>
     </div>
     <Routes>

@@ -4,6 +4,7 @@ import "prismjs/components/prism-regex.js";
 import { FILTER_KEYWORDS, OPERATORS } from "mtgql";
 import { extensionDocs, syntaxDocs } from "./syntaxDocs";
 import { Router as RemixRouter } from '@remix-run/router'
+import { closeContextMenu, openContextMenu } from '../../ui/component/contextMenu/contextMenu'
 
 export type Language =
   | "regex"
@@ -218,7 +219,7 @@ export const linkWrap = (env: Environment) => {
     }
     case "cubeString":
       env.tag = "a";
-      env.attributes.href = `/data/cube/${env.content}`;
+      env.attributes.href = `/cube/${env.content}`;
       break;
     case "setString":
       env.tag = "a";
@@ -262,6 +263,24 @@ export const hookReactDOM = (router: RemixRouter) => (env: Environment) => {
         e.preventDefault()
         router.navigate(tag.href.replace(window.location.toString(), "/"))
       }, {capture:true})
+    }
+  }
+}
+
+export const hookContextMenu = (setCubeContext: (id: string) => void) => (env: Environment) => {
+  if (!env.element) return;
+  const element: Element = env.element
+  const atags = element.getElementsByTagName("a");
+  for (let i = 0; i < atags.length; i++) {
+    const tag = atags.item(i);
+    if (tag.href.includes("/cube/")) {
+      tag.addEventListener("click", () => closeContextMenu())
+      tag.addEventListener("contextmenu", e => {
+        const bounds = tag.getBoundingClientRect()
+        e.preventDefault();
+        openContextMenu(bounds.right + 2, bounds.top - 4.5);
+        setCubeContext(tag.text)
+      })
     }
   }
 }

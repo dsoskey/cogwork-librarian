@@ -10,6 +10,7 @@ import { Input } from '../component/input'
 import { FormField } from '../component/formField'
 import { parseISO } from 'date-fns'
 import { DBStatusLoader } from '../component/dbStatusLoader'
+import { ScryfallIcon } from '../icons/scryfallIcon'
 
 export interface ScryfallImporterProps {
   importTargets: ImportTarget[]
@@ -39,20 +40,19 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
   return <div className='scryfall-import'>
     {bulkDataDefinitions.map((it) => (
       <div key={it.uri} className="scryfall-option">
-        <div className='scryfall-input'>
-          <input
-            id={`source-${it.type}`}
-            type='radio'
-            value={it.type}
-            checked={it.type === targetDefinition?.type}
-            onChange={() => setTargetDefinition(it)}
-          />
-          <label className={it.type === targetDefinition?.type ? "checked" : ""} htmlFor={`source-${it.type}`}>
+          <label className={`scryfall-input${it.type === targetDefinition?.type ? " checked" : ""}`} htmlFor={`source-${it.type}`}>
+            <ScryfallIcon size={24} isActive={it.type === targetDefinition?.type} />
+            <input
+              id={`source-${it.type}`}
+              type='radio'
+              value={it.type}
+              checked={it.type === targetDefinition?.type}
+              onChange={() => setTargetDefinition(it)}
+            />
             {it.name}
             <code className='size'>{humanFileSize(it.size)}</code>
             {" "}{parseISO(it.updated_at).toLocaleString()}
           </label>
-        </div>
 
         <div>{it.description}</div>
       </div>

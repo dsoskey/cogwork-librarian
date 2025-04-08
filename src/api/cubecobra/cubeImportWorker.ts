@@ -28,6 +28,8 @@ async function searchCubes({ cubeIds, source }: SearchInput) {
     case 'cubecobra':
       await searchCubeCobra(cubeIds)
       break;
+    default:
+      throw Error(`Unknown cube source ${source}`)
   }
 }
 

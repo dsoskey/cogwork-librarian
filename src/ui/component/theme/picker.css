@@ -41,11 +41,12 @@
     padding-bottom: var(--spacing-400);
     padding-left: var(--spacing-400);
     border: 2px solid var(--light-color);
-    overflow-x: clip;
-}
 
-.theme-sample * {
-    overflow-x: clip;
+    .controller,
+    .display,
+    .links {
+        overflow-x: clip;
+    }
 }
 
 .color-blend {

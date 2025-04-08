@@ -41,19 +41,14 @@
         padding: 0;
     }
 
-    .add-icon {
-        font-weight: bold;
-        font-size: 1.5em;
-        background-color: transparent;
-    }
     &.rotated {
         transform: rotate(90deg);
 
         .hover-actions {
             transform: rotate(-90deg);
             rotation-point: center;
-            bottom: 12%;
-            left: 78%;
+            bottom: 17%;
+            left: 66%;
         }
     }
 }

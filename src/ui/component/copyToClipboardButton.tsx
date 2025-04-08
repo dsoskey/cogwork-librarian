@@ -1,6 +1,10 @@
 import React, { HTMLAttributes, useState } from 'react'
 import { TaskStatus } from '../../types'
 import _isFunction from 'lodash/isFunction'
+import { LinkIcon } from '../icons/link'
+import { CheckIcon } from '../icons/check'
+import { ErrorIcon } from '../icons/error'
+import { CopyIcon } from '../icons/copy'
 
 export function useCopyToClipboard(copyText: (() => string) | string) {
   const [status, setStatus] =
@@ -23,6 +27,19 @@ export function useCopyToClipboard(copyText: (() => string) | string) {
 
   return { onClick, status }
 }
+
+export const LINK_BUTTON_ICONS = {
+  unstarted: <LinkIcon/>,
+  success: <CheckIcon/>,
+  error: <ErrorIcon/>,
+}
+
+export const COPY_BUTTON_ICONS = {
+  unstarted: <CopyIcon/>,
+  success: <CheckIcon/>,
+  error: <ErrorIcon/>,
+}
+
 
 const DEFAULT_BUTTON_TEXT = {
   unstarted: 'copy to clipboard',
@@ -47,7 +64,7 @@ export const CopyToClipboardButton = ({ titleText, buttonText, copyText, classNa
   }
   let title = rest.title
   if (titleText) {
-    title = titleText[status] ?? ""
+    title = titleText[status] ?? "Copy to clipboard"
   }
 
   return <button

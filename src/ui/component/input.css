@@ -1,4 +1,10 @@
 .query-input {
+    &,
+    .controller,
+    .display,
+    .links {
+        border-radius: var(--border-radius);
+    }
     pre[class*="language-"] {
         padding: unset;
     }

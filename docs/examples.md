@@ -76,7 +76,7 @@ t:artifact
 *
 ```
 
-### Skill checks
+### Trivia checks
 
 This search identifies card printings that may read poorly to new cube drafters, from unintuitive mechanics to errata'd rules text.
 
