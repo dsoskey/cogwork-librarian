@@ -38,8 +38,6 @@ export const PRESET_THEMES: { [key: string]: Theme } = {
     "dark300": "hsl(0, 0%, 100%)",
     "light600": "hsl(239, 99%, 68%)",
     "active599":"hsl(180, 94%, 39%)",
-
-    // "active599": "hsl(159, 100%, 42%, 100%)",
     "active575": "color-mix(in oklch, var(--active599), transparent 20%)",
     "active550": "color-mix(in oklch, var(--active599), transparent 35%)",
   },

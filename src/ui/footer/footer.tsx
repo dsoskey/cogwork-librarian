@@ -2,49 +2,54 @@ import React from 'react'
 import "./footer.css"
 import { InnertubeWidget } from '../component/innertubeWidget'
 import { AsSeenOn } from './asSeenOn'
+import { BugIcon } from '../icons/bug'
+import { GithubIcon } from '../icons/github'
+import { CoinIcon } from '../icons/coins'
+import { LightbulbIcon } from '../icons/lightbulb'
 
 export function Footer() {
   return (
     <footer className='footer'>
       <div className='links'>
-        <div>
+        <div className="row center">
           <a
             href='https://github.com/dsoskey/cogwork-librarian'
             rel='noreferrer'
             target='_blank'
           >
             github
-          </a>{' '}
-          🐙
+          </a>
+          <GithubIcon fill="var(--light-color)"/>
         </div>
-        <div>
+        <div className="row center">
           <a
             href='https://github.com/dsoskey/cogwork-librarian/issues/new?assignees=&labels=bug&template=bug_report.md&title='
             rel='noreferrer'
             target='_blank'
           >
             report a bug
-          </a>{' '}
-          🦟
+          </a>
+          <BugIcon fill="var(--light-color)" />
         </div>
-        <div>
+        <div className="row center">
           <a
             href='https://github.com/dsoskey/cogwork-librarian/issues/new?assignees=&labels=enhancement&template=feature_request.md&title='
             rel='noreferrer'
             target='_blank'
           >
             feature request
-          </a>{' '}
-          💡
+          </a>
+          <LightbulbIcon fill="var(--light-color)"/>
         </div>
-        <div>
+        <div className="row center">
           <a
             href="https://ko-fi.com/cogworklibrarian"
             rel="noreferrer"
             target="_blank"
           >
             donate
-          </a>{" "}☕️
+          </a>
+          <CoinIcon fill="var(--light-color)"/>
         </div>
       </div>
       <div className="row">
