@@ -22,6 +22,7 @@ import { ManaCost } from '../card/manaCost'
 import { CubeSearchTable } from './searchTable/cubeSearchTable'
 import { COPY_TITLE } from '../cardBrowser/cardViews/searchHoverActions'
 import { PrinterIcon } from '../icons/printer'
+import { ComboListView } from './comboListView'
 
 
 export function CubeView() {
@@ -146,7 +147,8 @@ export function CubeView() {
 }
 
 function CubeModelView() {
-  const { cube } = useContext(CubeViewModelContext)
+  const { cube, cards } = useContext(CubeViewModelContext)
+  const { cubeCombos } = useContext(FlagContext).flags;
   const { pathname } = useLocation()
 
   return <>
@@ -171,6 +173,9 @@ function CubeModelView() {
               className={pathname === `/cube/${cube.key}/list` ? 'active-link' : ''}>list</Link>
         <Link to={`/cube/${cube.key}/table`} className={pathname === `/cube/${cube.key}/table` ? 'active-link' : ''}>search
           table</Link>
+        {cubeCombos && <Link to={`/cube/${cube.key}/combos`} className={pathname === `/cube/${cube.key}/combos` ? 'active-link' : ''}>
+          combos
+        </Link>}
         <div>
           {cube.source !== 'list' && <>
             <CopyToClipboardButton
@@ -194,6 +199,7 @@ function CubeModelView() {
     <Routes>
       <Route path='/list' element={<CubeList />} />
       <Route path='/table' element={<CubeSearchTable />} />
+      {cubeCombos && <Route path='/combos' element={<ComboListView cards={cards} />} />}
       <Route path="" element={<CubeOverview />}/>
     </Routes>
   </>

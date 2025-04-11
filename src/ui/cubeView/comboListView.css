@@ -1,0 +1,24 @@
+.combo-list-root {
+    margin: var(--spacing-300);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-200);
+}
+
+.combo-variant-root {
+    width: 300px;
+    padding: var(--spacing-400);
+    aspect-ratio: 1/1;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--light-color);
+    box-shadow: var(--shadow-center-blurred) var(--gray-68-shadow);
+
+    ul {
+        list-style: none;
+        padding-top: var(--spacing-100);
+        padding-bottom: var(--spacing-100);
+        padding-left: var(--spacing-200);
+        margin: unset;
+    }
+}

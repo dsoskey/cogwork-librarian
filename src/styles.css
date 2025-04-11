@@ -51,6 +51,7 @@
   --on-data: #1f1f1f;
 
   --monospace-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  --shadow-center-blurred: 0 0 2px 2px;
 }
 
 a {

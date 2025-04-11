@@ -6,10 +6,10 @@ const config: ClientConfig = {
     showDebugInfo: false,
     adminMode: false,
     displayTypes: true,
-    docsUpdate: false,
     edhrecOverlay: false,
     proxyTest: false,
     searchSource: false,
+    cubeCombos: false,
   }
 }
 

@@ -4,9 +4,9 @@ export const FLAG_NAMES = {
   adminMode: 'adminMode',
   showDebugInfo: 'showDebugInfo',
   displayTypes: 'displayTypes',
-  docsUpdate: 'docsUpdate',
   edhrecOverlay: 'edhrecOverlay',
   proxyTest: 'proxyTest',
-  searchSource: "searchSource"
+  searchSource: "searchSource",
+  cubeCombos: 'cubeCombos',
 } as const
 export type Flag = ObjectValues<typeof FLAG_NAMES>

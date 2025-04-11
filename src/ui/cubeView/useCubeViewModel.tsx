@@ -52,7 +52,11 @@ export function useCubeViewModel(): CubeViewModel {
   const [activeCard, setActiveCard] = useState<OrderedCard | undefined>();
 
   // highly cursed, don't do this lol
-  const cube = useLiveQuery(() => cogDBClient.getCube(key), [key, dbStatus], null)
+  const cube = useLiveQuery(() => {
+    if (dbStatus === "success")
+      return cogDBClient.getCube(key)
+    return null
+  }, [key, dbStatus], null)
   const otags = useLiveQuery(() =>
     cards.length === 0 ? null :
     cogDBClient.cardToOtag.bulkGet(cards.map(it => it.oracle_id)), [cards])
@@ -124,7 +128,7 @@ export function useCubeViewModel(): CubeViewModel {
   }
 
   useEffect(() => {
-    if (cube) refreshCubeCards().catch(console.error)
+    if (cube && dbStatus === "success") refreshCubeCards().catch(console.error)
   }, [cube, dbStatus])
 
   return {
