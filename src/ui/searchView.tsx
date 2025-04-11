@@ -33,6 +33,7 @@ export const SearchView = () => {
   }[source]
   const [extendedParseError, setExtendedParseError] = useState<CogError[]>([])
   const errorsToDisplay = extendedParseError.length > 0 ? extendedParseError : queryRunner.errors
+  const [lastQueries, setLastQueries] = useState<string[]>([])
 
   const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>("showSavedCards", true)
 
@@ -55,6 +56,7 @@ export const SearchView = () => {
       } else {
         promise = queryRunner.run(querySet.queries, options, injectPrefix, getWeight)
       }
+      setLastQueries(querySet.rawQueries);
       promise.then(() =>
         cogDBClient.history.put({
           rawQueries: querySet.queries,
@@ -107,6 +109,7 @@ export const SearchView = () => {
         setSource={setSource}
       />
       <BrowserView
+        lastQueries={lastQueries}
         report={queryRunner.report}
         result={queryRunner.result}
         status={queryRunner.status}

@@ -106,7 +106,7 @@ export function mtgjsonSetToScryfallCard(set: MTGJSONSet): Card[] {
       oracle_id: card.identifiers.scryfallOracleId,
       all_parts: undefined, //todo
       arena_id: card.identifiers.mtgArenaId ? parseInt(card.identifiers.mtgArenaId) : undefined,
-      artist: card.artist,
+      artist: card.artist ?? "",
       artist_ids: card.artistIds,
       attraction_lights: card.attractionLights,
       booster: boosterTypes.has(set.type),
@@ -193,7 +193,7 @@ export function mtgjsonSetToScryfallCard(set: MTGJSONSet): Card[] {
       const sides = [card, ...card.otherFaceIds.map(id => mtgjsonCards[idtoIndex[id]])];
       toPush.card_faces = sides.map(side => ({
         object: "card_face",
-        artist: side.artist,
+        artist: side.artist ?? "",
         artist_id: side.artistIds ? side.artistIds[sideToIndex[side.side]] : undefined,
         cmc: side.faceManaValue,
         color_indicator: side.colorIndicator as Color[],

@@ -19,9 +19,10 @@ interface CardImageProps {
   card: Card
   altImageUri?: string
   altImageBackUri?: string
+  highlight?: boolean
 }
 
-export const CardImage = ({ card, altImageUri, altImageBackUri }: CardImageProps) => {
+export const CardImage = ({ card, altImageUri, altImageBackUri, highlight }: CardImageProps) => {
   const { edhrecOverlay } = useContext(FlagContext).flags;
   const [transformed, setTransformed] = useState(false);
   const [flipped, setFlipped] = useState(false);
@@ -69,6 +70,7 @@ export const CardImage = ({ card, altImageUri, altImageBackUri }: CardImageProps
         title='transform'
       >🔄</button>
     )}
+    {highlight && <div className="highlight"/>}
     {card.layout === "flip" && (
       <button
         data-flipped={flipped}

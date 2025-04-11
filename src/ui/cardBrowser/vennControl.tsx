@@ -45,7 +45,7 @@ export const VennControl = ({ rightText, leftText, cards, activeSections, toggle
   const r = 30
   const height = "75"
   const width = "210"
-  return <svg className='venn' viewBox={`0 0 ${width} ${height}`} height={`${height}px`} width={`${width}px`}>
+  return <svg className='venn-control-root' viewBox={`0 0 ${width} ${height}`} height={`${height}px`} width={`${width}px`}>
     {/*<rect x="0" y="0" width={width} height={height} fill="green"/>*/}
     <defs>
       <clipPath id="both-clip">

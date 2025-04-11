@@ -6,15 +6,11 @@ import { QueryReport } from '../../api/useReporter'
 import { CogError } from '../../error'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { FlagContext } from '../flags'
-import { ActiveCollection, activeCollections, DisplayType } from './types'
 import './topBar.css'
 import { SearchError } from '../component/searchError'
 import { useViewportListener } from '../viewport'
+import { LastQueryDisplay } from './lastQueryDisplay'
 
-const collectionOptions: Record<ActiveCollection, string> = {
-  search: 'results',
-  ignore: 'ignored'
-}
 
 interface TopBarProps {
   // report metadata
@@ -22,24 +18,18 @@ interface TopBarProps {
   status: TaskStatus
   errors: CogError[]
   report: QueryReport
-  searchCount: number
-  ignoreCount: number
   // details control
   pageControl: React.ReactNode
   downloadButton: React.ReactNode
   vennControl: React.ReactNode
   cardsPerRowControl: React.ReactNode
+  highlightFilterControl: React.ReactNode;
+  displayTypesControl: React.ReactNode;
   visibleDetails: string[]
   setVisibleDetails: Setter<string[]>
   revealDetails: boolean
   setRevealDetails: Setter<boolean>
-  // page control
-  lowerBound: number
-  upperBound: number
-  displayType: DisplayType,
-  setDisplayType: Setter<DisplayType>
-  activeCollection: ActiveCollection
-  setActiveCollection: Setter<ActiveCollection>
+  lastQueries: string[]
 }
 
 export const TopBar = ({
@@ -47,25 +37,19 @@ export const TopBar = ({
   downloadButton,
   vennControl,
   cardsPerRowControl,
+  highlightFilterControl,
+  displayTypesControl,
+  lastQueries,
   status,
   report,
-  searchCount,
-  ignoreCount,
   setVisibleDetails,
   visibleDetails,
   setRevealDetails,
   revealDetails,
-  lowerBound,
-  upperBound,
   source,
   errors,
-  displayType,
-  setDisplayType,
-  activeCollection,
-  setActiveCollection,
 }: TopBarProps) => {
-  const { showDebugInfo, displayTypes } = useContext(FlagContext).flags
-  const { mobile } = useViewportListener()
+  const { showDebugInfo } = useContext(FlagContext).flags
   const errorText = useMemo(
     () => errors.map((it) => `- ${it.displayMessage}`).join('\n\n'),
     [errors]
@@ -112,69 +96,56 @@ export const TopBar = ({
           </div>
         </>)}
         {errors.length > 0 && <SearchError report={report} source={source} errors={errors}/>}
-        {status === 'success' && (<>
-          <div>
-            {searchCount > 0 && `${lowerBound} – ${Math.min(upperBound, searchCount)} of ${searchCount} cards`}
-            {searchCount > 0 && ignoreCount > 0 && `. ignored ${ignoreCount} cards`}
-            {searchCount === 0 &&
-              "0 cards found. We'll have more details on that soon :)"}
-          </div>
-          {report.start && report.end && (
-            <div>
-              {source} query ran in {(report.end - report.start) / 1000}
-              {' '}seconds
-            </div>
-          )}
+        {status === 'success' && (<div className="column">
+          <LastQueryDisplay lastQueries={lastQueries} />
+          {highlightFilterControl}
           {showDebugInfo && <div>
-            <input
-              id='show-details'
-              type='checkbox'
-              checked={revealDetails}
-              onChange={() => setRevealDetails((prev) => !prev)}
-            />
-            <label htmlFor='show-details'>show query debug info</label>
-            {revealDetails && (
-              <div className='detail-controls'>
-                <div>
-                  <input
-                    id='show-weight'
-                    type='checkbox'
-                    checked={visibleDetails.includes(WEIGHT)}
-                    onChange={toggleWeight}
-                  />
-                  <label htmlFor='show-weight'>weight</label>
-                </div>
-                <div>
-                  <input
-                    id='show-queries'
-                    type='checkbox'
-                    checked={visibleDetails.includes(QUERIES)}
-                    onChange={toggleQueries}
-                  />
-                  <label htmlFor='show-queries'>queries</label>
-                </div>
+            {report.start && report.end && (
+              <div>
+                {source} query ran in {(report.end - report.start) / 1000}
+                {' '}seconds
               </div>
             )}
+            <div>
+              <input
+                id='show-details'
+                type='checkbox'
+                checked={revealDetails}
+                onChange={() => setRevealDetails((prev) => !prev)}
+              />
+              <label htmlFor='show-details'>show query debug info</label>
+              {revealDetails && (
+                <div className='detail-controls'>
+                  <div>
+                    <input
+                      id='show-weight'
+                      type='checkbox'
+                      checked={visibleDetails.includes(WEIGHT)}
+                      onChange={toggleWeight}
+                    />
+                    <label htmlFor='show-weight'>weight</label>
+                  </div>
+                  <div>
+                    <input
+                      id='show-queries'
+                      type='checkbox'
+                      checked={visibleDetails.includes(QUERIES)}
+                      onChange={toggleQueries}
+                    />
+                    <label htmlFor='show-queries'>queries</label>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>}
-          {mobile && vennControl}
-        </>)}
+          {/*{mobile && vennControl}*/}
+        </div>)}
       </div>
-      {status === 'success' && !mobile && vennControl}
+      {status === 'success' && vennControl}
       <div className='result-controls'>
         {pageControl}
         {downloadButton}
-        {displayTypes && <label className='display-type'>
-          <span className="bold">show{" "}</span>
-          <select value={activeCollection}
-                  onChange={event => setActiveCollection(event.target.value as ActiveCollection)}>
-            {Object.values(activeCollections).map(it => <option key={it} value={it}>{collectionOptions[it]}</option>)}
-          </select>
-          <span className="bold">{" "}as:{" "}</span>
-          <select value={displayType} onChange={event => setDisplayType(event.target.value as DisplayType)}>
-            <option value="cards">images</option>
-            <option value="viz">data viz (alpha)</option>
-          </select>
-        </label>}
+        {displayTypesControl}
         {cardsPerRowControl}
       </div>
     </div>

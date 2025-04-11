@@ -1,15 +1,17 @@
-import React, { KeyboardEvent, useContext, useRef, useState } from 'react'
+import React, { KeyboardEvent, useContext, useMemo, useRef, useState } from 'react'
 import { EnrichedCard, SCORE_PRECISION } from '../../../api/queryRunnerCommon'
 import { WEIGHT, QUERIES } from '../constants'
 import { FlagContext } from '../../flags'
 import "./cardImageView.css"
 import { CardImage } from './cardImage'
 import { CardCustomRender } from '../../card/cardCustomRender'
+import { Card } from 'mtgql'
 
 export interface CardImageViewProps {
   className?: string
   card: EnrichedCard
   onClick?: () => void
+  highlightFilter: (card: Card) => boolean
   showRender?: boolean
   revealDetails?: boolean
   visibleDetails?: string[]
@@ -29,6 +31,7 @@ export const CardImageView = ({
   onClick,
   hoverContent,
   altImageBackUri, altImageUri,
+  highlightFilter,
 }: CardImageViewProps) => {
   const { showDebugInfo } = useContext(FlagContext).flags
   const [hovered, setHovered] = useState(false)
@@ -59,6 +62,8 @@ export const CardImageView = ({
 
   const href = card.data.scryfall_uri.replace(/\?.*$/, '')
 
+  const highlightCard = useMemo(() => highlightFilter(card.data), [highlightFilter, card]);
+
   return (
     <div className={`card-view ${card.data.set} ${className}`} ref={cardViewRef}
       tabIndex={-1} onClick={onClick}
@@ -73,6 +78,7 @@ export const CardImageView = ({
     >
       {showRender && <CardCustomRender card={card.data} />}
       {!showRender && <CardImage
+        highlight={highlightCard}
         card={card.data}
         altImageBackUri={altImageBackUri}
         altImageUri={altImageUri}

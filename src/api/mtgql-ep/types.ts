@@ -31,7 +31,8 @@ export class ParserError extends Error {
 
 export interface ParsedQuerySet {
   strategy: RunStrategy,
-  queries: string[]
+  queries: string[],
+  rawQueries: string[],
   injectPrefix: (query: string) => string
   getWeight: (index: number) => number
 }

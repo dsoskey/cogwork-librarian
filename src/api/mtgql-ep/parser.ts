@@ -360,6 +360,7 @@ export function parseQuerySet(
     const leftReplaced = replaceUse(queryEnv.aliases, queryEnv.defaultDomain ? `${queryEnv.defaultDomain} (${venned.left})` : venned.left);
     const rightReplaced = replaceUse(queryEnv.aliases, queryEnv.defaultDomain ? `${queryEnv.defaultDomain} (${venned.right})` : venned.right);
     return {
+      rawQueries: selectedQueries,
       strategy: RunStrategy.Venn,
       queries: [leftReplaced, rightReplaced, ...sub],
       injectPrefix: ()=>"",
@@ -380,6 +381,7 @@ export function parseQuerySet(
   }
 
   return {
+    rawQueries: selectedQueries,
     strategy: RunStrategy.Search,
     queries: sub,
     injectPrefix: prefixFunc,

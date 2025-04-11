@@ -20,6 +20,22 @@
     aspect-ratio: var(--card-aspect-ratio);
 }
 
+.card-image .highlight {
+    position: relative;
+    grid-area: overlap;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    background-color: var(--active-low-alpha);
+    border-radius: var(--card-border-radius);
+}
+
+.card-image.lea .highlight {
+    border-radius: 7% / 5.5%;
+}
+
 .card-image.lea img {
     clip-path: inset(0 0 0 0 round 7% / 5.5%);
 }
@@ -48,7 +64,7 @@
 .flip-button,
 .transform-button {
     position: absolute;
-    z-index: 2;
+    z-index: 4;
     right: 8%;
     background-color: transparent;
     border-color: transparent;
@@ -76,7 +92,7 @@
 
 .edhrec-lol {
     position: absolute;
-    z-index: 2;
+    z-index: 4;
     bottom: 2%;
     right: 2%;
     background-color: var(--dark-color);

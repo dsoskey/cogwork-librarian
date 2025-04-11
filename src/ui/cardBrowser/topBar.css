@@ -1,21 +1,53 @@
 .topbar {
     display: flex;
     flex-direction: row;
+    gap: var(--spacing-200);
     justify-content: space-between;
     background-color: var(--dark-color);
     padding: var(--spacing-200);
     border-bottom: solid 1px var(--gray-68);
     box-shadow: 0 2px 2px 0 var(--gray-68-shadow);
+
+    .result-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+        gap: var(--spacing-100);
+    }
+
+    .venn-control-root {
+        color: var(--darker-color);
+        * {
+            cursor: pointer;
+        }
+        .bordered {
+            stroke: var(--darker-color);
+            stroke-width: 2;
+        }
+        :focus-visible {
+            outline-color: var(--dark-color);
+        }
+    }
+}
+
+pre[class*="language-"].last-query {
+    margin: unset;
+    a {
+        text-decoration: underline;
+    }
 }
 
 @media (min-width: 769px) {
     .topbar {
         position: sticky;
-        z-index: 3;
+        z-index: 10;
         top: -1px;
     }
+    .topbar > .result-info {
+        flex: 2;
+    }
     .topbar > * {
-        flex: 1
+        flex: 1;
     }
 }
 
@@ -23,41 +55,11 @@
     .topbar {
         flex-wrap: wrap;
     }
+    .result-info {
+        width: 100%;
+    }
 }
 
-.topbar .result-info {
-    margin-left: var(--spacing-200);
-}
-
-.topbar .result-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: end;
-    gap: var(--spacing-100);
-}
-
-.topbar .open-cogwork {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: var(--spacing-200);
-}
-.topbar .venn {
-    color: var(--darker-color)
-}
-
-.topbar .venn * {
-    cursor: pointer;
-}
-
-.topbar .venn .bordered {
-    stroke: var(--darker-color);
-    stroke-width: 2;
-}
-
-.topbar .venn :focus-visible {
-    outline-color: var(--dark-color);
-}
 
 .download-button input[type=number] {
     width: 50px;
@@ -68,4 +70,10 @@
         margin: 0;
     }
     margin-right: var(--spacing-100);
+}
+
+.highlight-filter-root {
+    .query-editor {
+        width: 100%;
+    }
 }

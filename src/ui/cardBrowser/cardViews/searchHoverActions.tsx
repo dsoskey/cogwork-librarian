@@ -19,7 +19,6 @@ export interface SearchHoverActionsProps {
   onIgnore?: () => void
 }
 export function SearchHoverActions({ card, onAdd, onIgnore }: SearchHoverActionsProps) {
-  const { showDebugInfo } = useContext(FlagContext).flags
   return <div className='hover-actions'>
     <a
       href={card.data.scryfall_uri.replace(/\?.+$/, '')}
@@ -30,11 +29,11 @@ export function SearchHoverActions({ card, onAdd, onIgnore }: SearchHoverActions
         <ScryfallIcon size={DEFAULT_SIZE} />
       </button>
     </a>
-    {showDebugInfo && <CopyToClipboardButton
+    <CopyToClipboardButton
       titleText={COPY_TITLE}
       buttonText={LINK_BUTTON_ICONS}
       copyText={() => JSON.stringify(card.data, undefined, 2)}
-    />}
+    />
     {onIgnore && <button title='ignore' onClick={onIgnore}>
       <BlockIcon />
     </button>}

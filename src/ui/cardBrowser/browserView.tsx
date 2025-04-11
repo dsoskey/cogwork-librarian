@@ -5,7 +5,7 @@ import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { EnrichedCard, RunStrategy } from '../../api/queryRunnerCommon'
 import { DataSource, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
-import { PageControl, usePageControl } from './pageControl'
+import { PageControl, PageInfo, usePageControl } from './pageControl'
 import { useViewportListener } from '../viewport'
 import { TopBar } from './topBar'
 import { ActiveCollection, CardDisplayInfo, DisplayType } from './types'
@@ -22,6 +22,10 @@ import { SearchHoverActions } from './cardViews/searchHoverActions'
 import { CardsPerRowControl } from '../component/cardsPerRowControl'
 import { CardVizView } from './cardViews/cardVizView'
 import { Layout } from 'mtgql/build/generated/models/Layout'
+import { useHighlightFilter } from './useHighlightFilter'
+import { FlagContext } from '../flags'
+import { DisplayTypesControl } from './displayTypesControl'
+import { HighlightFilterControl } from './highlightFilterControl'
 
 const handleDownload = (text: string, ext: string) => {
   const now = new Date()
@@ -36,6 +40,7 @@ const ROTATED_LAYOUTS = new Set<Layout>([
 ])
 
 interface BrowserViewProps {
+  lastQueries: string[]
   status: TaskStatus
   result: Array<EnrichedCard>
   runStrategy: RunStrategy
@@ -57,21 +62,26 @@ export const BrowserView = React.memo(({
   source,
   report,
   errors,
+  lastQueries,
 }: BrowserViewProps) => {
   const { addMessage, dismissMessage } = useContext(ToasterContext)
+  const { displayTypes } = useContext(FlagContext).flags
   const viewport = useViewportListener()
   const [activeCollection, setActiveCollection] = useState<ActiveCollection>('search')
   const vc = useVennControl()
   const [displayType, setDisplayType] = useLocalStorage<DisplayType>('display-type', 'cards')
   const topOfResults = useRef<HTMLDivElement>()
 
+  const [filterQuery, setFilterQuery] = useState<string>('')
+  const { highlightFilter, error: highlightError } = useHighlightFilter(filterQuery, lastQueries)
+
   const cards: CardDisplayInfo = useMemo(() => {
     const ignoredIdSet = new Set(ignoredIds)
     const displayInfo: CardDisplayInfo = { bothCount: 0, ignore: [], leftCount: 0, rightCount: 0, search: [] }
     for (const card of result) {
-      displayInfo.bothCount += card.both ? 1:0
-      displayInfo.leftCount += card.left ? 1:0
-      displayInfo.rightCount += card.right ? 1:0
+      displayInfo.bothCount += card.both ? 1 : 0
+      displayInfo.leftCount += card.left ? 1 : 0
+      displayInfo.rightCount += card.right ? 1 : 0
       const ignored = ignoredIdSet.has(card.data.oracle_id)
       if (runStrategy === RunStrategy.Venn ? !ignored && vc.activeSections.find(sec => card[sec]) : !ignored) {
         displayInfo.search.push(card)
@@ -90,19 +100,19 @@ export const BrowserView = React.memo(({
     visibleDetails,
     setVisibleDetails,
     revealDetails,
-    setRevealDetails,
+    setRevealDetails
   } = useDebugDetails()
 
   const [pageSize] = useLocalStorage('page-size', PAGE_SIZE)
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
-  const { pageNumber, setPageNumber, lowerBound, upperBound } = usePageControl(pageSize, 0);
+  const { pageNumber, setPageNumber, lowerBound, upperBound } = usePageControl(pageSize, 0)
   const setPage = (n: number) => {
     setPageNumber(n)
     setTimeout(() => {
       topOfResults.current?.scrollIntoView({
-        block: "start",
-        inline: "nearest",
-        behavior: "smooth"
+        block: 'start',
+        inline: 'nearest',
+        behavior: 'smooth'
       })
     }, 100)
   }
@@ -116,8 +126,8 @@ export const BrowserView = React.memo(({
   const showCards = activeCards.length > 0 && status !== 'error'
   const rotateCards = useMemo(() =>
     currentPage
-    .filter(it => (ROTATED_LAYOUTS.has(it.data.layout) || it.data.type_line?.includes("Battle")) && !it.data.keywords.includes("Aftermath"))
-    .length === currentPage.length, [currentPage])
+      .filter(it => (ROTATED_LAYOUTS.has(it.data.layout) || it.data.type_line?.includes('Battle')) && !it.data.keywords.includes('Aftermath'))
+      .length === currentPage.length, [currentPage])
 
   useHighlightPrism([result, revealDetails, visibleDetails])
 
@@ -125,90 +135,106 @@ export const BrowserView = React.memo(({
     return null
   }
 
-  const pageControl = showCards ? <PageControl
-    pageNumber={pageNumber}
-    setPageNumber={setPage}
-    pageSize={pageSize}
-    upperBound={upperBound}
-    count={activeCards.length}
-  /> : null
+  const pageControl = showCards ? <div className='row center wrap'>
+    <PageInfo
+      searchCount={cards.search.length}
+      ignoreCount={cards.ignore.length}
+      lowerBound={lowerBound + 1}
+      upperBound={upperBound}
+    />
+    <PageControl
+      pageNumber={pageNumber}
+      setPageNumber={setPage}
+      pageSize={pageSize}
+      upperBound={upperBound}
+      count={activeCards.length}
+    />
+  </div> : null
 
   const isCardDisplay = (displayType === 'cards' || displayType === 'render')
 
+  const displayTypesControl = displayTypes ?
+    <DisplayTypesControl
+      displayType={displayType}
+      setDisplayType={setDisplayType}
+      activeCollection={activeCollection}
+      setActiveCollection={setActiveCollection}
+    /> : null
+
   const cardsPerRowControl = isCardDisplay && viewport.width > 1024
     ? <CardsPerRowControl cardsPerRow={cardsPerRow} setCardsPerRow={setCardsPerRow} disabled={rotateCards} />
-    : undefined;
+    : undefined
 
   return <div className='results' ref={topOfResults}>
-      <div className='content'>
-        <TopBar
-          pageControl={pageControl}
-          downloadButton={<DownloadButton searchResult={result} />}
-          vennControl={runStrategy === RunStrategy.Venn
-            ? <VennControl {...vc} cards={cards} />
-            : null}
-          cardsPerRowControl={cardsPerRowControl}
-          errors={errors}
-          source={source}
-          status={status}
-          report={report}
-          searchCount={cards.search.length}
-          ignoreCount={cards.ignore.length}
-          visibleDetails={visibleDetails}
-          setVisibleDetails={setVisibleDetails}
-          revealDetails={revealDetails}
-          setRevealDetails={setRevealDetails}
-          lowerBound={lowerBound + 1}
-          upperBound={upperBound}
-          displayType={displayType}
-          setDisplayType={setDisplayType}
-          activeCollection={activeCollection}
-          setActiveCollection={setActiveCollection}
-        />
+    <div className='content'>
+      <TopBar
+        highlightFilterControl={<HighlightFilterControl
+          filterQuery={filterQuery}
+          setFilterQuery={setFilterQuery}
+          highlightError={highlightError}
+        />}
+        displayTypesControl={displayTypesControl}
+        lastQueries={lastQueries}
+        pageControl={pageControl}
+        downloadButton={<DownloadButton searchResult={result} />}
+        vennControl={runStrategy === RunStrategy.Venn
+          ? <VennControl {...vc} cards={cards} />
+          : null}
+        cardsPerRowControl={cardsPerRowControl}
+        errors={errors}
+        source={source}
+        status={status}
+        report={report}
+        visibleDetails={visibleDetails}
+        setVisibleDetails={setVisibleDetails}
+        revealDetails={revealDetails}
+        setRevealDetails={setRevealDetails}
+      />
 
-        {showCards && <>
-          <div className='result-container'>
-            {isCardDisplay && currentPage.map((card, index) => {
-              const onAdd = () => {
-                addCard(card.data)
-                const id = addMessage(`Added ${card.data.name} to saved cards`, false)
-                setTimeout(() => {
-                  dismissMessage(id)
-                }, DISMISS_TIMEOUT_MS)
-              }
-              const onIgnore = () => {
-                addIgnoredId(card.data.oracle_id)
-                const id = addMessage(`Ignored ${card.data.name} from future searches`, false)
-                setTimeout(() => {
-                  dismissMessage(id)
-                }, DISMISS_TIMEOUT_MS)
-              }
-              return (
-                <CardImageView
-                  className={`_${cardsPerRow}${rotateCards?" rotated":""}`}
-                  onAdd={onAdd}
-                  hoverContent={<SearchHoverActions card={card} onAdd={onAdd} onIgnore={onIgnore} />}
-                  key={card.data.id + index}
-                  card={card}
-                  showRender={displayType === "render"}
-                  revealDetails={revealDetails}
-                  visibleDetails={visibleDetails}
-                />
-              )
-            })}
-            {displayType === "viz" && <div className="viz-container">
-              <CardVizView cards={result} />
-              <CardListView result={currentPage} />
-            </div>}
-            {displayType === 'json' && <CardJsonView result={currentPage} />}
-            {displayType === 'list' && <CardListView result={currentPage} />}
-          </div>
-          {viewport.mobile && <div className='bottom-page-control'>
-            {pageControl}
+      {showCards && <>
+        <div className='result-container'>
+          {isCardDisplay && currentPage.map((card, index) => {
+            const onAdd = () => {
+              addCard(card.data)
+              const id = addMessage(`Added ${card.data.name} to saved cards`, false)
+              setTimeout(() => {
+                dismissMessage(id)
+              }, DISMISS_TIMEOUT_MS)
+            }
+            const onIgnore = () => {
+              addIgnoredId(card.data.oracle_id)
+              const id = addMessage(`Ignored ${card.data.name} from future searches`, false)
+              setTimeout(() => {
+                dismissMessage(id)
+              }, DISMISS_TIMEOUT_MS)
+            }
+            return (
+              <CardImageView
+                className={`_${cardsPerRow}${rotateCards ? ' rotated' : ''}`}
+                onAdd={onAdd}
+                hoverContent={<SearchHoverActions card={card} onAdd={onAdd} onIgnore={onIgnore} />}
+                key={card.data.id + index}
+                card={card}
+                showRender={displayType === 'render'}
+                revealDetails={revealDetails}
+                visibleDetails={visibleDetails}
+                highlightFilter={highlightFilter}
+              />
+            )
+          })}
+          {displayType === 'viz' && <div className='viz-container'>
+            <CardVizView cards={result} />
+            <CardListView result={currentPage} />
           </div>}
-        </>}
-      </div>
+          {displayType === 'json' && <CardJsonView result={currentPage} />}
+          {displayType === 'list' && <CardListView result={currentPage} />}
+        </div>
+        {viewport.mobile && <div className='bottom-page-control'>
+          {pageControl}
+        </div>}
+      </>}
     </div>
+  </div>
 })
 
 export interface DownloadButtonProps {
