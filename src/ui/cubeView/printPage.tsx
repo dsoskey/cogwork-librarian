@@ -27,6 +27,7 @@ export function PrintPage({ cards }: PrintPageProps) {
             {chunk.map((card, i) => <CardImageView
               key={card.id + i.toString()}
               card={{ data: card, matchedQueries: [], weight: 1 }}
+              highlightFilter={() => false}
             />)}
         </div>)}
     </>;

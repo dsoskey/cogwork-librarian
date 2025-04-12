@@ -45,6 +45,7 @@ export function OtagView({}: OtagViewProps) {
       {page?.map(card => <CardImageView
         key={card.id}
         card={{data:card, weight: 0, matchedQueries:[]}}
+        highlightFilter={() => false}
         hoverContent={<SearchHoverActions card={{data:card, weight: 0, matchedQueries:[]}} />}
       />)}
     </div>

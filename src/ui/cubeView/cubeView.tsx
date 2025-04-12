@@ -83,6 +83,7 @@ export function CubeView() {
               card={{ data: activeCard, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
               altImageUri={activeCard.alt_image_uri}
               altImageBackUri={activeCard.alt_image_back_uri}
+              highlightFilter={() => false}
             />
             <div>
               <select value={activeCard.id} onChange={onPrintSelect}>
