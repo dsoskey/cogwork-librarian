@@ -734,3 +734,35 @@ body:has(.query-panel) {
   width: auto;
   flex: 1
 }
+
+.info-key {
+  font-style: oblique;
+}
+
+.disengaged {
+  cursor: no-drop;
+}
+
+.engaged,
+.info-key:hover {
+  cursor: crosshair;
+  color: var(--active);
+  font-weight: bolder;
+}
+
+.themed-icon {
+  .dark {
+    fill: var(--active);
+  }
+  .light {
+    fill: var(--dark-color);
+  }
+  &.hoverable:hover {
+    .dark {
+      fill: var(--dark-color);
+    }
+    .light {
+      fill: var(--active);
+    }
+  }
+}

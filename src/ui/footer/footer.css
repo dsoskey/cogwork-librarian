@@ -14,10 +14,14 @@
         display: flex;
         flex-direction: row;
         gap: var(--spacing-400);
+        svg:hover,
+        & > *:hover {
+            --text-color: var(--active);
+        }
     }
 
     a {
-        color: var(--light-color);
+        color: var(--text-color);
     }
 
     .iwroot {

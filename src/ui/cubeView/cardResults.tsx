@@ -43,6 +43,7 @@ export function CardResultsLayout({ cards, filterControl, extraControls }: CardR
         {sorted.map((card, i) => <CardImageView
           key={card.id + i.toString()}
           className={`_${cardsPerRow}`}
+          highlightFilter={() => false}
           card={{ data: card, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
           onClick={() => setActiveCard(card)}
           altImageUri={showCustomImage ? card.alt_image_uri : undefined}
