@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'
 import gitcube from "../../docs/design/gitcube.md";
 import { Route, Routes } from 'react-router'
 import { MDDoc } from './docs/renderer'
-import { CommandersSpellbook } from './icons/commandersSpellbook'
 
 export const AppInfo = () => {
   const { setFlag } = useContext(FlagContext)
@@ -35,7 +34,6 @@ export const AppInfo = () => {
 
   return (
     <>
-      <CommandersSpellbook />
       <h2>what is Cogwork Librarian?</h2>
       <p>
         <span className={pin1 ? "info-key" : "disengaged"} onClick={tryLock}>Cogwork Librarian</span>
