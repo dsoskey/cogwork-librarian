@@ -9,7 +9,7 @@ const config: ClientConfig = {
     edhrecOverlay: false,
     proxyTest: false,
     searchSource: false,
-    cubeCombos: false,
+    cubeCombos: true,
   }
 }
 

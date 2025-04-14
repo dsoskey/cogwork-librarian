@@ -52,6 +52,9 @@
 
   --monospace-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   --shadow-center-blurred: 0 0 2px 2px;
+
+  --svg-background: var(--dark-color);
+  --svg-stroke: var(--active);
 }
 
 a {
@@ -115,12 +118,14 @@ button:disabled {
 .button-like:disabled,
 button:disabled {
   --text-color: var(--active-low-alpha);
+  --svg-stroke: var(--active-low-alpha);
   --bkgd-color: var(--darker-color-subdued);
 }
 
 button:hover:not(:disabled),
 .button-like:hover:not(:disabled) {
   --text-color: var(--dark-color);
+  --svg-stroke: var(--dark-color);
   --bkgd-color: var(--active-mid-alpha);
 }
 
@@ -351,6 +356,11 @@ th, td {
   align-items: center;
 }
 
+.column.space-between,
+.row.space-between {
+  justify-content: space-between;
+}
+
 .row.wrap {
   flex-wrap: wrap;
 }
@@ -411,6 +421,8 @@ th, td {
 .input-link:hover,
 .cube-subroutes a:hover,
 .masthead a:hover {
+  --svg-background: var(--active);
+  --svg-stroke: var(--dark-color);
   color: var(--dark-color);
   background-color: var(--active-mid-alpha);
   border-color: var(--active-low-alpha) inset;
@@ -419,6 +431,8 @@ th, td {
 .input-link.active-link, .input-link:focus-visible,
 .cube-subroutes .active-link, .cube-subroutes a:focus-visible,
 .masthead .active-link, .masthead a:focus-visible {
+  --svg-background: var(--active);
+  --svg-stroke: var(--dark-color);
   color: var(--dark-color);
   background-color: var(--active);
   border-color: var(--active-mid-alpha) inset;
@@ -751,18 +765,11 @@ body:has(.query-panel) {
 }
 
 .themed-icon {
-  .dark {
-    fill: var(--active);
+  .background {
+    fill: var(--svg-background);
   }
-  .light {
-    fill: var(--dark-color);
+  .stroke {
+    fill: var(--svg-stroke);
   }
-  &.hoverable:hover {
-    .dark {
-      fill: var(--dark-color);
-    }
-    .light {
-      fill: var(--active);
-    }
-  }
+
 }

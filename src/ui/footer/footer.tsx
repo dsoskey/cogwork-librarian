@@ -19,7 +19,7 @@ export function Footer() {
           >
             github
           </a>
-          <GithubIcon fill="var(--light-color)"/>
+          <GithubIcon />
         </div>
         <div className="row center">
           <a
@@ -29,7 +29,7 @@ export function Footer() {
           >
             report a bug
           </a>
-          <BugIcon fill="var(--light-color)" />
+          <BugIcon />
         </div>
         <div className="row center">
           <a
@@ -39,7 +39,7 @@ export function Footer() {
           >
             feature request
           </a>
-          <LightbulbIcon fill="var(--light-color)"/>
+          <LightbulbIcon />
         </div>
         <div className="row center">
           <a
@@ -49,7 +49,7 @@ export function Footer() {
           >
             donate
           </a>
-          <CoinIcon fill="var(--light-color)"/>
+          <CoinIcon />
         </div>
       </div>
       <div className="row">

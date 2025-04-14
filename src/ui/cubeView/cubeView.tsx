@@ -23,6 +23,7 @@ import { CubeSearchTable } from './searchTable/cubeSearchTable'
 import { COPY_TITLE } from '../cardBrowser/cardViews/searchHoverActions'
 import { PrinterIcon } from '../icons/printer'
 import { ComboListView } from './comboListView'
+import { CommandersSpellCompact } from '../icons/commandersSpellbook'
 
 
 export function CubeView() {
@@ -174,8 +175,12 @@ function CubeModelView() {
               className={pathname === `/cube/${cube.key}/list` ? 'active-link' : ''}>list</Link>
         <Link to={`/cube/${cube.key}/table`} className={pathname === `/cube/${cube.key}/table` ? 'active-link' : ''}>search
           table</Link>
-        {cubeCombos && <Link to={`/cube/${cube.key}/combos`} className={pathname === `/cube/${cube.key}/combos` ? 'active-link' : ''}>
-          combos
+        {cubeCombos && <Link
+          to={`/cube/${cube.key}/combos`}
+          title="powered by Commander's Spellbook!"
+          className={`row center ${pathname === `/cube/${cube.key}/combos` ? 'active-link' : ''}`}
+        >
+          combos <CommandersSpellCompact height="15" />
         </Link>}
         <div>
           {cube.source !== 'list' && <>

@@ -4,6 +4,7 @@ import { LoaderText } from '../component/loaders'
 import { OrderedCard } from './useCubeViewModel'
 import { PaginatedFindMyCombosResponseList, Variant } from '@space-cow-media/spellbook-client'
 import { CardLink } from '../card/CardLink'
+import { CommandersSpellCompact } from '../icons/commandersSpellbook'
 import "./comboListView.css"
 
 export interface ListComboViewProps {
@@ -23,20 +24,20 @@ export function ComboListView({cards}: ListComboViewProps) {
       )
       break;
     case 'unstarted':
-      content = null
-      break;
     case 'loading':
       content = <LoaderText text='Loading combos' />
       break;
     case 'error':
       content = <div className='alert'>
-        <h2>error loading combos:</h2>
+        <h4>error loading combos:</h4>
         <pre><code>{loadingError}</code></pre>
       </div>
       break;
   }
 
-  return <div className="combo-list-root">{content}</div>
+  return <div className='combo-list-root'>
+    <div className='content'>{content}</div>
+  </div>
 }
 
 
@@ -46,14 +47,19 @@ export interface ComboVariantProps {
 
 export function ComboVariant({ variant }: ComboVariantProps) {
   return <div className='combo-variant-root'>
-    <h3>cards needed</h3>
+    <h4 className="row center space-between">cards needed <a
+      href={`https://commanderspellbook.com/combo/${variant.id}`}
+      title="View on Commander's Spellbook"
+      rel='noreferrer' target='_blank'>
+      <CommandersSpellCompact height='18' />
+    </a></h4>
     <ul>
       {variant.uses.map(it => <li key={it.card.id}>
         {it.quantity > 1 ? `${it.quantity} ` : ''}
         <CardLink name={it.card.name} id={it.card.oracleId} />
       </li>)}
     </ul>
-    <h3>combo result</h3>
+    <h4>combo result</h4>
     <ul>
       {variant.produces.map(it =>
         <li key={it.feature.id}>

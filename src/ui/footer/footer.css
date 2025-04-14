@@ -14,9 +14,11 @@
         display: flex;
         flex-direction: row;
         gap: var(--spacing-400);
-        svg:hover,
+        --text-color: var(--light-color);
+        --svg-stroke: var(--light-color);
         & > *:hover {
             --text-color: var(--active);
+            --svg-stroke: var(--active);
         }
     }
 
