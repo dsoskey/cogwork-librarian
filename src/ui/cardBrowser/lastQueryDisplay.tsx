@@ -28,6 +28,7 @@ export function LastQueryDisplay({lastQueries }: LastQueryDisplayProps) {
     />
     <div className="editor-controls">
       <button
+        disabled={lastQueries.length === 1}
         title={expanded ? "Hide subqueries" : "Show subqueries"}
         onClick={() => setExpanded(prev => !prev)}>
         {expanded ? <ArrowInIcon /> : <ArrowOutIcon />}

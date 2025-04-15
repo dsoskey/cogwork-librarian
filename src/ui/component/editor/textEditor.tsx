@@ -177,7 +177,7 @@ export const TextEditor = ({
   }, []);
   return (
     <div
-      className={`query-editor ${separateLayers ? "separated" : ""}`}
+      className={`query-editor focusable ${separateLayers ? "separated" : ""}`}
       onKeyDown={handleDown}
     >
       <MultiQueryActionBar

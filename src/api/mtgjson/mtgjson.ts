@@ -1,4 +1,3 @@
-
 import {
   Border,
   Card,
@@ -6,13 +5,16 @@ import {
   CardFrame,
   CardSecurityStamp,
   Color,
-  FrameEffect, Game,
-  ImageUris, parseProducedMana,
+  FrameEffect,
+  Game,
+  ImageUris,
+  parseProducedMana,
   PromoType,
-  Rarity, SetType
+  Rarity,
+  SetType
 } from 'mtgql'
 
-import { MTGJSONSet, AllPrintings } from './types'
+import { AllPrintings, MTGJSONSet } from './types'
 import { Layout } from 'mtgql/build/generated/models/Layout'
 
 const sideToIndex = {
@@ -184,7 +186,7 @@ export function mtgjsonSetToScryfallCard(set: MTGJSONSet): Card[] {
       variation: false, // todo
       variation_of: '', // todo
       watermark: card.watermark,
-      original_text: card.originalText,
+      original_text: modernizeSymbols(card.originalText??""),
       original_type: card.originalType,
     }
     if (card.otherFaceIds) {
@@ -215,7 +217,7 @@ export function mtgjsonSetToScryfallCard(set: MTGJSONSet): Card[] {
         toughness: side.toughness,
         type_line: side.type,
         watermark: side.watermark,
-        original_text: side.originalText,
+        original_text: modernizeSymbols(side.originalText??""),
         original_type: side.originalType,
       }))
       toPush.type_line = sides.map(it => it.type).join(" // ")
@@ -236,4 +238,36 @@ function imageUris(id: string, side: "front" | "back"): ImageUris {
     png: `https://cards.scryfall.io/png/${side}/${id[0]}/${id[1]}/${id}.jpg`,
     small: `https://cards.scryfall.io/small/${side}/${id[0]}/${id[1]}/${id}.jpg`,
   }
+}
+
+function modernizeSymbols(text: string): string {
+  return text
+    .replaceAll("oc\nT", "{T}")
+    .replaceAll("o\nX", "{X}")
+    .replaceAll("o\nW", "{W}")
+    .replaceAll("o\nU", "{U}")
+    .replaceAll("o\nB", "{B}")
+    .replaceAll("o\nR", "{R}")
+    .replaceAll("o\nG", "{G}")
+    .replaceAll('{WB}', "{W/B}")
+    .replaceAll('{GU}', "{R/W}")
+    .replaceAll('{RG}', "{R/G}")
+    .replaceAll('{WU}', "{W/U}")
+    .replaceAll('{RW}', "{G/W}")
+    .replaceAll('{GW}', "{G/U}")
+    .replaceAll('{RB}', "{B/R}")
+    .replaceAll('{UB}', "{U/B}")
+    .replaceAll('{UR}', "{U/R}")
+    .replaceAll('{BG}', "{B/G}")
+    .replaceAll("o0", "{0}")
+    .replaceAll("o1", "{1}")
+    .replaceAll("o2", "{2}")
+    .replaceAll("o3", "{3}")
+    .replaceAll("o4", "{4}")
+    .replaceAll("o5", "{5}")
+    .replaceAll("o6", "{6}")
+    .replaceAll("o7", "{7}")
+    .replaceAll("o8", "{8}")
+    .replaceAll("o9", "{9}")
+    .replaceAll("o10", "{10}");
 }

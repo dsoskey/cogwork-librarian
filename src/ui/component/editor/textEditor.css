@@ -48,7 +48,7 @@ textarea.coglib-prism-theme {
     }
   }
 
-  &:focus-within {
+  &.focusable:focus-within {
     outline: 2px inset var(--active);
 
     * {

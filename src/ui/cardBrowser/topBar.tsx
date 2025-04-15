@@ -138,7 +138,6 @@ export const TopBar = ({
               )}
             </div>
           </div>}
-          {/*{mobile && vennControl}*/}
         </div>)}
       </div>
       {status === 'success' && vennControl}
