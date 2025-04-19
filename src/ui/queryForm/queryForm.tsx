@@ -37,6 +37,7 @@ export interface QueryFormProps {
   execute: (startIndex: number, selectedIndex: number) => void
   source: DataSource
   setSource: Setter<DataSource>
+  settingsButton?: React.ReactNode;
 }
 
 export function QueryForm({
@@ -44,6 +45,7 @@ export function QueryForm({
   execute,
   source,
   setSource,
+  settingsButton,
 }: QueryFormProps) {
   const { queries, setQueries } = useContext(ProjectContext);
   const { memStatus } = useContext(CogDBContext);
@@ -64,6 +66,7 @@ export function QueryForm({
           onSubmit={execute}
           canSubmit={canSubmit}
           showLineNumbers
+          settingsButton={settingsButton}
           language='scryfall-extended-multi'
         />
       </div>

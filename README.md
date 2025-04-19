@@ -17,3 +17,7 @@ npm run start-dev
 ```shell
 npm run test
 ```
+
+## useful resources
+
+- [phosphor duotone icons](https://icon-sets.iconify.design/ph/?suffixes=Duotone&query=phosphor&search-prefix=ph)

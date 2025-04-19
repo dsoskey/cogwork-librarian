@@ -68,7 +68,7 @@ export const getLineIndex = (
   return result;
 };
 
-export interface QueryInputProps {
+export interface TextEditorProps {
   setQueries: React.Dispatch<React.SetStateAction<string[]>>;
   queries: string[];
   onSubmit?: (baseIndex: number, selectedIndex: number) => void;
@@ -77,6 +77,7 @@ export interface QueryInputProps {
   language?: Language;
   disabled?: boolean;
   showLineNumbers?: boolean;
+  settingsButton?: React.ReactNode;
 }
 
 export const TextEditor = ({
@@ -88,7 +89,8 @@ export const TextEditor = ({
   language,
   disabled,
   showLineNumbers,
-}: QueryInputProps) => {
+  settingsButton,
+}: TextEditorProps) => {
   const separator = "\n";
   const value = queries.join(separator);
   const controller = useRef<HTMLTextAreaElement>(null);
@@ -205,6 +207,7 @@ export const TextEditor = ({
           title="Copy to clipboard"
           buttonText={COPY_BUTTON_ICONS}
         />
+        {settingsButton}
       </div>
 
 

@@ -1,0 +1,13 @@
+.search-option-root {
+    .form-field {
+        display: flex;
+        align-items: baseline;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: var(--spacing-200);
+        width: 175px;
+        select {
+            width: 100px;
+        }
+    }
+}

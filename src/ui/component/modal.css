@@ -8,6 +8,9 @@
   overflow-y: auto;
   scrollbar-color: var(--light-color) var(--dark-color);
 
+  h2 {
+    --svg-stroke: var(--dark-color);
+  }
 
   a {
     color: var(--dark-color);

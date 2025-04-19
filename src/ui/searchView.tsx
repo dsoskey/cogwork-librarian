@@ -12,18 +12,17 @@ import { Masthead } from './component/masthead'
 import { Footer } from './footer'
 import { parseQuerySet } from '../api/mtgql-ep/parser'
 import { CogError } from '../error'
-import { SearchOptions } from 'mtgql'
 import { cogDB as cogDBClient } from '../api/local/db'
 import { RunStrategy } from '../api/queryRunnerCommon'
-
-const options: SearchOptions = {
-  order: 'cmc',
-  dir: 'auto',
-}
+import { SearchOptionPicker, useSearchOptions } from './settingsView'
+import { GearIcon } from './icons/gear'
+import { Modal } from './component/modal'
 
 export const SearchView = () => {
-  const cogDB = useContext(CogDBContext)
-  const project = useContext(ProjectContext)
+  const cogDB = useContext(CogDBContext);
+  const project = useContext(ProjectContext);
+  const [options, setters] = useSearchOptions();
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const { queries, addCard } = project
 
   const [source, setSource] = useLocalStorage<DataSource>('source', 'local')
@@ -94,19 +93,27 @@ export const SearchView = () => {
     return () => document.removeEventListener("keydown", handleFocusShortcut)
   }, [])
 
-  return<div className='search-view-root'>
+  const settingsButton = <button
+    className='rotate-on-hover'
+    title="search settings"
+    onClick={() => setSettingsOpen(true)}>
+    <GearIcon className="rotate-target" />
+  </button>
+
+  return <div className='search-view-root'>
     <div className='query-panel'>
       <div className='row top'>
         <Masthead />
-          <button className='saved-cards-toggle' onClick={() => setShowSavedCards(prev => !prev)}>
-            {showSavedCards ? "hide": "show"} saved cards
-          </button>
+        <button className='saved-cards-toggle' onClick={() => setShowSavedCards(prev => !prev)}>
+          {showSavedCards ? "hide" : "show"} saved cards
+        </button>
       </div>
       <QueryForm
         status={queryRunner.status}
         execute={execute}
         source={source}
         setSource={setSource}
+        settingsButton={settingsButton}
       />
       <BrowserView
         lastQueries={lastQueries}
@@ -122,6 +129,16 @@ export const SearchView = () => {
       />
       <Footer />
     </div>
+    <Modal
+      open={settingsOpen}
+      onClose={() => setSettingsOpen(false)}
+      title={<h2 className="row center">
+        <span>Search settings</span>
+        <GearIcon size="32" />
+      </h2>}
+    >
+      <SearchOptionPicker options={options} {...setters} />
+    </Modal>
 
     {<div className={`saved-cards-floater ${showSavedCards ? "show" : "hide"}`}>
       {showSavedCards && <SavedCardsEditor {...project} />}
