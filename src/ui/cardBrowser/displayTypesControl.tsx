@@ -23,7 +23,7 @@ export function DisplayTypesControl({
 }: DisplayTypesControlProps) {
 
     return <label className='display-type'>
-        <span className="bold">show{" "}</span>
+        <span className="bold">display{" "}</span>
         <select value={activeCollection}
                 onChange={event => setActiveCollection(event.target.value as ActiveCollection)}>
             {Object.values(activeCollections).map(it => <option key={it} value={it}>{collectionOptions[it]}</option>)}

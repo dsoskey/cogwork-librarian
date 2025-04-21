@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react'
-import { FlagContext } from './flags'
-import { useHighlightPrism } from '../api/local/syntaxHighlighting'
+import { FlagContext } from '../flags'
+import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { Link } from 'react-router-dom'
-import gitcube from "../../docs/design/gitcube.md";
+import gitcube from "../../../docs/design/gitcube.md";
 import { Route, Routes } from 'react-router'
-import { MDDoc } from './docs/renderer'
+import { MDDoc } from '../docs/renderer'
 
 export const AppInfo = () => {
   const { setFlag } = useContext(FlagContext)

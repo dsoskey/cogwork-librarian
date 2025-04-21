@@ -6,6 +6,8 @@ import { Card } from 'mtgql'
 import { LoaderText, TRIANGLES } from '../component/loaders'
 import { CardImage } from '../cardBrowser/cardViews/cardImage'
 import "./cardLink.css"
+import { imageUris } from '../../api/mtgjson'
+
 export function useCardLoader(name: string, id: string) {
   return useLiveQuery(
     async () => cogDB.getCardByNameId(name, id),
@@ -66,6 +68,80 @@ export function CardLink({ name, id, allowedPlacements }: CardLinkProps) {
           onClick={() => setIsLockedOpen(false)}
         >
           <_CardImage name={name} card={card} />
+        </div>
+      )}
+    </>
+  );
+}
+
+interface CardLink2Props {
+  name: string
+  id: string
+  hasBack?: boolean;
+  onClick?: () => void;
+  lockable?: boolean;
+  allowedPlacements?: Placement[]
+}
+
+export function CardLink2({ lockable, onClick, name, id, hasBack, allowedPlacements }: CardLink2Props) {
+  const _lockable = lockable ?? true;
+  const [isLockedOpen, setIsLockedOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const _allowedPlacements = allowedPlacements ?? ["top", "bottom"];
+
+  const {refs, floatingStyles, context} = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    middleware: [
+      autoPlacement({ allowedPlacements: _allowedPlacements }),
+      offset({ mainAxis: 4 }),
+    ],
+  });
+
+  const hover = useHover(context);
+
+  const {getReferenceProps, getFloatingProps} = useInteractions([hover,]);
+
+  return (
+    <>
+      <span
+        className={`card-link ${isLockedOpen ? "active" : ''}`}
+        title={isLockedOpen
+          ? ""
+          : (_lockable
+            ? "click hovered text to keep image open"
+            : name)
+      }
+        ref={refs.setReference}
+        {...getReferenceProps()}
+        onClick={() => {
+          if (_lockable) {
+            setIsLockedOpen(p=>!p)
+          }
+          onClick?.()
+        }}
+      >
+        {name}
+      </span>
+      {(isLockedOpen || isOpen) && (
+        <div
+          className="popup-container"
+          ref={refs.setFloating}
+          style={floatingStyles}
+          {...getFloatingProps()}
+          onClick={() => setIsLockedOpen(false)}
+        >
+          <img
+            className="card-link-image"
+            src={imageUris(id, "front").normal}
+            alt={name}
+          />
+          {hasBack && <img
+            className="card-link-image"
+            src={imageUris(id, "back").normal}
+            alt={name}
+          />}
+
         </div>
       )}
     </>

@@ -229,7 +229,7 @@ export function mtgjsonSetToScryfallCard(set: MTGJSONSet): Card[] {
   return result;
 }
 
-function imageUris(id: string, side: "front" | "back"): ImageUris {
+export function imageUris(id: string, side: "front" | "back"): ImageUris {
   return {
     art_crop: `https://cards.scryfall.io/art_crop/${side}/${id[0]}/${id[1]}/${id}.jpg`,
     border_crop: `https://cards.scryfall.io/border_crop/${side}/${id[0]}/${id[1]}/${id}.jpg`,

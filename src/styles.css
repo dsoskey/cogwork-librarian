@@ -46,7 +46,7 @@
   --data-b: #bd7dfc;
   --data-r: #ff7b7d;
   --data-g: #32cd32;
-  --data-m: goldenrod;
+  --data-m: #ffbc1c;
   --data-c: silver;
   --on-data: #1f1f1f;
 
@@ -230,24 +230,31 @@ thead {
   background-color: var(--darkest-color);
 }
 
+.card-column-root .column-subheader.w,
 th.w {
   background-color: color-mix(in oklch, var(--data-w), #000 15%);
 }
+.card-column-root .column-subheader.u,
 th.u {
   background-color: color-mix(in oklch, var(--data-u), #000 15%);
 }
+.card-column-root .column-subheader.b,
 th.b {
   background-color: color-mix(in oklch, var(--data-b), #000 15%);
 }
+.card-column-root .column-subheader.r,
 th.r {
   background-color: color-mix(in oklch, var(--data-r), #000 15%);
 }
+.card-column-root .column-subheader.g,
 th.g {
   background-color: color-mix(in oklch, var(--data-g), #000 15%);
 }
+.card-column-root .column-subheader.multi,
 th.m {
   background-color: color-mix(in oklch, var(--data-m), #000 15%);
 }
+.card-column-root .column-subheader.colorless,
 th.c {
   background-color: color-mix(in oklch, var(--data-c), #000 15%);
 }
@@ -791,4 +798,8 @@ body:has(.query-panel) {
     rotation-point: center;
     animation: 2s infinite linear rotating;
   }
+}
+
+.card-link-image {
+  clip-path: inset(0 0 0 0 round var(--card-border-radius));
 }
