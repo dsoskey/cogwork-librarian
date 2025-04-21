@@ -170,36 +170,48 @@
         font-size: .9em;
         color: var(--on-data);
         padding: var(--spacing-100);
+        background-color: var(--bkgd-color);
+
         &:last-of-type {
             border-bottom-right-radius: var(--border-radius);
             border-bottom-left-radius: var(--border-radius);
         }
         .card-link {
+
             display: inline-block;
             width: 100%;
             text-decoration: none;
+            border-radius: var(--border-radius);
+
+            &.active,
+            &:hover {
+                color: unset;
+            }
+        }
+        &:hover {
+            background-color: color-mix(in oklch, var(--bkgd-color), #000 10%);
         }
 
         &.w {
-            background-color: var(--data-w);
+            --bkgd-color: var(--data-w);
         }
         &.u {
-            background-color: var(--data-u);
+            --bkgd-color: var(--data-u);
         }
         &.b {
-            background-color: var(--data-b);
+            --bkgd-color: var(--data-b);
         }
         &.r {
-            background-color: var(--data-r);
+            --bkgd-color: var(--data-r);
         }
         &.g {
-            background-color: var(--data-g);
+            --bkgd-color: var(--data-g);
         }
         &.multi {
-            background-color: var(--data-m);
+            --bkgd-color: var(--data-m);
         }
         &.colorless {
-            background-color: var(--data-c);
+            --bkgd-color: var(--data-c);
         }
     }
 
