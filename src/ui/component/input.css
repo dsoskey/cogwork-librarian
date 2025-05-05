@@ -4,6 +4,7 @@
     .display,
     .links {
         border-radius: var(--border-radius);
+        padding:unset;
     }
     pre[class*="language-"] {
         padding: unset;

@@ -24,6 +24,7 @@ import { COPY_TITLE } from '../cardBrowser/cardViews/searchHoverActions'
 import { PrinterIcon } from '../icons/printer'
 import { ComboListView } from './comboListView'
 import { CommandersSpellCompact } from '../icons/commandersSpellbook'
+import { DraftmancerIcon } from '../icons/draftmancer'
 
 
 export function CubeView() {
@@ -192,6 +193,13 @@ function CubeModelView() {
             />
             <RefreshButton toSubmit={[cube]} />
           </>}
+          {cube.source === "cubecobra" && <a
+            className="button-like"
+            href={`https://draftmancer.com/?cubeCobraID=${cube.canonical_id}&cubeCobraName=${encodeURI(cube.name)}`}
+            title="Start Draftmancer draft"
+            target="_blank"
+            rel="noopener noreferrer"
+          ><DraftmancerIcon/></a>}
           <button
             disabled={pathname !== `/cube/${cube.key}/list`}
             className={pathname === `/cube/${cube.key}/list` ? '' : 'gone'}

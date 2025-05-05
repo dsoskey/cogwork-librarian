@@ -84,6 +84,7 @@ button {
   background-color: var(--bkgd-color);
   color: var(--text-color);
 
+  display: inline-block;
   transition-property: color, background-color;
   transition-duration: 100ms;
   transition-timing-function: ease-out;
@@ -167,14 +168,14 @@ input[type="checkbox"].custom {
   position: relative;
   width: 1.2em;
   height: 1.2em;
-  border: 1px solid var(--light-color);
+  border: 1px solid var(--active);
   /* Adjusts the position of the checkboxes on the text baseline */
   vertical-align: -2px;
   /* Set here so that Windows' High-Contrast Mode can override */
   color: var(--active);
 }
 input[type="checkbox"].custom:hover:not(:disabled) {
-  border: 1px solid var(--active);
+  border: 1px solid var(--light-color);
 }
 input[type="checkbox"].custom::before {
   content: "✔";

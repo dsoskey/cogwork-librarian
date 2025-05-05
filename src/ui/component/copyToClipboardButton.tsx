@@ -54,7 +54,7 @@ interface CopyToClipboardButtonProps extends HTMLAttributes<HTMLButtonElement> {
   titleText?: Partial<Record<TaskStatus, string>>
   className?: string
 }
-export const CopyToClipboardButton = ({ titleText, buttonText, copyText, className, children, ...rest }: CopyToClipboardButtonProps) => {
+export const CopyToClipboardButton = ({ titleText = DEFAULT_BUTTON_TEXT, buttonText, copyText, className, children, ...rest }: CopyToClipboardButtonProps) => {
   const { status, onClick } = useCopyToClipboard(copyText);
   let content =  DEFAULT_BUTTON_TEXT[status];
   if (children) {

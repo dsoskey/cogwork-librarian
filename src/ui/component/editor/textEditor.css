@@ -1,7 +1,8 @@
 .coglib-prism-theme {
+  /*--editor-font-size: 1em;*/
   /* copies prism theme */
   font-family: var(--monospace-family);
-  font-size: 1em;
+  font-size: var(--editor-font-size, 1em);
   text-align: left;
   white-space: pre;
   word-spacing: normal;
@@ -12,8 +13,13 @@
   border: none;
 }
 textarea.coglib-prism-theme {
-  padding: var(--toolbar-height, 1em) 1em 1em var(--gutter-width, 1em);
-  margin: 0.5em 0;
+  padding-top: var(--toolbar-height, 1em);
+  padding-right: 1em;
+  padding-left: var(--gutter-width, 1em);
+  padding-bottom: var(--spacing-100);
+  margin-top: 0.5em;
+  margin-right: 0;
+  margin-left: 0;
 }
 
 .query-editor {
@@ -80,6 +86,7 @@ textarea.coglib-prism-theme {
     cursor: default;
     padding-right: 0;
     padding-left: 0;
+    padding-bottom: var(--spacing-100);
 
     .line-number {
       color: color-mix(var(--color-interpolation), var(--dark300), var(--light600) 50%);
@@ -119,6 +126,7 @@ textarea.coglib-prism-theme {
     grid-area: overlap;
     box-sizing: border-box;
     display: inline-block;
+    padding-bottom: var(--spacing-100);
     scrollbar-color: var(--active-mid-alpha) var(--darker-color);
 
     &.show {
@@ -163,6 +171,8 @@ textarea.coglib-prism-theme {
     box-sizing: border-box;
     display: inline-block;
     grid-area: overlap;
+    padding-bottom: var(--spacing-100);
+
 
     a {
       text-decoration: none;

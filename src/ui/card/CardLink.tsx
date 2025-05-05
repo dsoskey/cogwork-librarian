@@ -7,8 +7,9 @@ import { LoaderText, TRIANGLES } from '../component/loaders'
 import { CardImage } from '../cardBrowser/cardViews/cardImage'
 import "./cardLink.css"
 import { imageUris } from '../../api/mtgjson'
+import { Input, InputProps } from '../component/input'
 
-export function useCardLoader(name: string, id: string) {
+export function useCardLoader(name: string, id?: string) {
   return useLiveQuery(
     async () => cogDB.getCardByNameId(name, id),
     [name, id],
@@ -29,7 +30,7 @@ export function MDCardImage ({ name, id }) {
 
 interface CardLinkProps {
   name: string
-  id: string
+  id?: string
   allowedPlacements?: Placement[]
 }
 export function CardLink({ name, id, allowedPlacements }: CardLinkProps) {
@@ -146,4 +147,45 @@ export function CardLink2({ lockable, onClick, name, id, hasBack, allowedPlaceme
       )}
     </>
   );
+}
+
+export interface HoverableInputProps extends InputProps {
+  allowedPlacements?: Placement[]
+
+}
+
+export function HoverableInput({ allowedPlacements = ["top", "bottom"], ...props }: HoverableInputProps) {
+  const card: Card = useCardLoader(props.value, undefined);
+  const [isLockedOpen, setIsLockedOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const {refs, floatingStyles, context} = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    middleware: [
+      autoPlacement({ allowedPlacements }),
+      offset({ mainAxis: 4 }),
+    ],
+  });
+
+  const hover = useHover(context);
+
+  const {getReferenceProps, getFloatingProps} = useInteractions([hover,]);
+
+  return <>
+      <Input {...props}
+             ref={refs.setReference}
+             {...getReferenceProps()} />
+      {(isLockedOpen || isOpen) && (
+        <div
+          className="popup-container"
+          ref={refs.setFloating}
+          style={floatingStyles}
+          {...getFloatingProps()}
+          onClick={() => setIsLockedOpen(false)}
+        >
+          <_CardImage name={card.name} card={card} />
+        </div>
+      )}
+    </>;
 }

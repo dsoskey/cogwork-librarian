@@ -106,7 +106,7 @@ export function CubeSearchRow({
     }, 1500)
   }
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
       clearTimeout(timeout.current)
       runSearch(query)

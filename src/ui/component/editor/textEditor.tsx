@@ -68,6 +68,8 @@ export const getLineIndex = (
   return result;
 };
 
+export type GutterColumn = "line-numbers" | "multi-info" | "submit-button"
+
 export interface TextEditorProps {
   setQueries: React.Dispatch<React.SetStateAction<string[]>>;
   queries: string[];
@@ -76,8 +78,9 @@ export interface TextEditorProps {
   placeholder?: string | undefined;
   language?: Language;
   disabled?: boolean;
-  showLineNumbers?: boolean;
   settingsButton?: React.ReactNode;
+  gutterColumns?: GutterColumn[];
+  className?: string;
 }
 
 export const TextEditor = ({
@@ -88,8 +91,9 @@ export const TextEditor = ({
   placeholder,
   language,
   disabled,
-  showLineNumbers,
   settingsButton,
+  className = "",
+  gutterColumns = ["line-numbers", "multi-info", "submit-button"],
 }: TextEditorProps) => {
   const separator = "\n";
   const value = queries.join(separator);
@@ -179,7 +183,7 @@ export const TextEditor = ({
   }, []);
   return (
     <div
-      className={`query-editor focusable ${separateLayers ? "separated" : ""}`}
+      className={`query-editor focusable ${separateLayers ? "separated" : ""}` + className}
       onKeyDown={handleDown}
     >
       <MultiQueryActionBar
@@ -187,8 +191,7 @@ export const TextEditor = ({
         copyText={copyText}
         onSubmit={onSubmit}
         canSubmit={canSubmit}
-        showSubmit
-        showLineNumbers={showLineNumbers}
+        gutterColumns={gutterColumns}
       />
       <div className="editor-controls">
         <button

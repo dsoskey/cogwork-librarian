@@ -4,11 +4,13 @@ import { useHighlightPrism } from "../../../api/local/syntaxHighlighting";
 import { QuerySetButton } from "../querySetButton";
 import { DEFAULT_MODE_REGEXP, DEFAULT_WEIGHT_REGEXP, INCLUDE_REGEXP } from '../../../api/mtgql-ep/parser'
 
+export type GutterColumn = "line-numbers" | "multi-info" | "submit-button"
+
+
 export const VENN_REGEXP = /^@(v|venn)\((.+)\)\((.+)\)$/;
 
-export const multiQueryInfo =
-  (renderSubquery: (count: number) => string) =>
-  (queries: string[]): string[] => {
+export function multiQueryInfo(renderSubquery: (count: number) => string = rankInfo) {
+  return (queries: string[]): string[] => {
     if (queries.length === 0) {
       return [];
     }
@@ -41,35 +43,56 @@ export const multiQueryInfo =
     }
     return result;
   };
-const RENDER_QUERY_INFO = multiQueryInfo(rankInfo);
+}
+
+
+export function savedCardsQueryInfo(renderSubquery: (count: number) => string = rankInfo) {
+  return (queries: string[]): string[] => {
+    if (queries.length === 0) {
+      return [];
+    }
+
+    if (queries.length === 1) {
+      return [""];
+    }
+
+    return queries.map((line, i) => {
+      if (i === 0) {
+        return VENN_REGEXP.test(line.trim()) ? "VENN" : "BASE";
+      } else {
+        return renderSubquery(i);
+      }
+    });
+  }
+}
 
 export interface MultiQueryInfoBarProps {
   queries: string[];
+  renderQuery?: (queries: string[]) => string[]
   copyText: (mindex: number, maxdex: number) => void;
   onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
-  showLineNumbers?: boolean;
-  showSubmit?: boolean;
+  gutterColumns: GutterColumn[]
 }
 export const MultiQueryActionBar = ({
   queries,
   copyText,
-  canSubmit,
-  onSubmit,
-  showLineNumbers,
-  showSubmit,
+  renderQuery = multiQueryInfo(rankInfo),
+  ...rest
 }: MultiQueryInfoBarProps) => {
   useHighlightPrism([queries]);
-  const lineInfo = RENDER_QUERY_INFO(queries);
+  const lineInfo = renderQuery(queries);
   const numDigits = queries.length.toString().length;
 
   return (
     <pre tabIndex={-1} className="language-none labels">
       {lineInfo.map((line, index) => (
-        <div
+        <ActionLine
           key={index}
-          className={line.toLowerCase()}
-          onClick={() => {
+          line={line}
+          index={index}
+          numDigits={numDigits}
+          onClickLine={() => {
             const query = queries[index];
             const mindex = queries
               .slice(0, index)
@@ -80,11 +103,42 @@ export const MultiQueryActionBar = ({
             const maxdex = mindex + query.length + 1;
             copyText(mindex, maxdex);
           }}
-        >
-          {showLineNumbers && <code className={`multi-code line-number ${line.toLowerCase()}`}>{`${(index+1).toString().padStart(numDigits)} `}</code>}
-          <code className={`multi-code ${line.toLowerCase()}`}>{line}</code>
-          {showSubmit && (line === "BASE" || line === "VENN") && (
-            <button
+          {...rest}
+        />)
+      )}
+    </pre>
+  );
+};
+
+interface ActionLineProps {
+  line: string;
+  index: number;
+  onClickLine?: () => void;
+  gutterColumns: GutterColumn[];
+  numDigits: number;
+  onSubmit?: (baseIndex: number, selectedIndex: number) => void;
+  canSubmit?: boolean;
+}
+
+function ActionLine({ line, index, gutterColumns, onClickLine, numDigits, onSubmit, canSubmit }: ActionLineProps) {
+  const columns: React.ReactNode[] = [];
+  for (const column of gutterColumns) {
+    switch (column) {
+      case "line-numbers":
+        columns.push(<code
+          className={`multi-code line-number ${line.toLowerCase()}`}>
+          {`${(index + 1).toString().padStart(numDigits)} `}
+        </code>);
+        break;
+      case 'multi-info':
+        columns.push(<code
+          className={`multi-code ${line.toLowerCase()}`}>
+          {line}
+        </code>)
+        break;
+      case 'submit-button':
+        if (line === "BASE" || line === "VENN") {
+          columns.push(<button
               onClick={(event) => {
                 if (canSubmit && onSubmit) {
                   event.stopPropagation();
@@ -96,10 +150,17 @@ export const MultiQueryActionBar = ({
               className="run-query-button"
             >
               <QuerySetButton />
-            </button>
-          )}
-        </div>
-      ))}
-    </pre>
-  );
-};
+            </button>);
+        }
+        break;
+
+    }
+  }
+  return <div
+    key={index}
+    className={line.toLowerCase()}
+    onClick={onClickLine}
+  >
+    {...columns}
+  </div>
+}

@@ -10,7 +10,7 @@ textarea[class*="language-"] {
   color: var(--light-color, #ccc);
   background: none;
   font-family: var(--monospace-family);
-  font-size: 1em;
+  font-size: var(--editor-font-size, 1em);
   text-align: left;
   white-space: pre;
   word-spacing: normal;
