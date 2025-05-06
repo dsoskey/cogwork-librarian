@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Setter } from '../../types'
 
-interface UseConfirmDelete {
+export interface UseConfirmDelete {
   confirming: boolean
   show: () => void;
   hide: () => void;

@@ -56,7 +56,7 @@ export function newPre({ node, ...props }) {
     <MultiQueryActionBar
       queries={copyText.split("\n")}
       copyText={()=>{}}
-      showLineNumbers
+      gutterColumns={["line-numbers", "multi-info"]}
     />
     <CopyToClipboardButton copyText={copyText} className='copy-button' />
     <pre className="display" {...props} />

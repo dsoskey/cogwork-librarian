@@ -16,6 +16,7 @@ import { Modal } from '../../component/modal'
 import { isFunction } from 'lodash'
 import { getColors } from './tempColorUtil'
 import { colorKey } from '../../component/viz/types'
+import { REFOCUS_TIMEOUT } from '../../flags'
 
 export interface CubeSearchTableProps {}
 
@@ -91,7 +92,7 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
             setTimeout(() => {
                 focus(index, false, 0);
                 setFlop(p=>!p);
-            }, 50);
+            }, REFOCUS_TIMEOUT);
         },
         onBackspace(focus, index) {
             const prevEntry = queries[index - 1];
@@ -104,7 +105,7 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
             setTimeout(() => {
                 focus(index, true, prevEntry.length)
                 setFlop(p=>!p);
-            }, 50);
+            }, REFOCUS_TIMEOUT);
         },
         onDelete(_focusEntry, index) {
             setQueries(prev => {

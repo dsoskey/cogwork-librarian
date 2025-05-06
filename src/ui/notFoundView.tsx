@@ -1,6 +1,8 @@
 import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FlagContext } from './flags'
+import { Autocomplete } from './component/autocomplete'
+import { CogDBContext } from '../api/local/useCogDB'
 
 export interface NotFoundViewProps {
 
@@ -8,10 +10,20 @@ export interface NotFoundViewProps {
 
 export function NotFoundView({}: NotFoundViewProps) {
   const { proxyTest } = useContext(FlagContext).flags;
+  const { handleAutocomplete } = useContext(CogDBContext);
+
+  const [value, setValue] = useState<string>("");
 
   return <div>
       <h2>Whoa there, buddy!</h2>
       <p>looks like you found yourself in a bit of a situation. Maybe hit the back button or <Link to='/'>go to the search page</Link>?</p>
+
+    <Autocomplete
+      value={value}
+      setValue={setValue}
+      onChange={(e) => setValue(e.target.value)}
+      getCompletions={handleAutocomplete}
+    />
 
       {proxyTest && <ProxyTest />}
     </div>;

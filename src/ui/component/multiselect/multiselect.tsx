@@ -3,6 +3,7 @@ import { Setter } from '../../../types'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import _cloneDeep from 'lodash/cloneDeep'
 import "./multiselect.css"
+import { DragHandle } from '../../icons/dragHandle'
 export interface MultiselectProps extends HTMLAttributes<HTMLSelectElement> {
   labelComponent: React.ReactNode
   value: string[]
@@ -55,7 +56,7 @@ export function Multiselect({ defaultValue, optionTransform, labelComponent, val
               return <Draggable key={selectedOption} draggableId={selectedOption} index={index}>
                 {(provided, _) => (
                   <div className="row baseline slug" ref={provided.innerRef} {...provided.draggableProps}>
-                    <div className="drag-handle" {...provided.dragHandleProps} >{"\u2591"}</div>
+                    <div className="drag-handle" {...provided.dragHandleProps} ><DragHandle /></div>
                     <button onClick={onClose} title={`unselect ${displayValue}`}>X</button> {displayValue}
                   </div>
                 )}

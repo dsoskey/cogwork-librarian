@@ -34,6 +34,10 @@
   }
 }
 
+.modal-small {
+  width: 30%;
+}
+
 .info-modal .modal {
   width: 40%;
 }

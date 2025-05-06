@@ -46,7 +46,7 @@ interface BrowserViewProps {
   runStrategy: RunStrategy
   report: QueryReport
   source: DataSource
-  addCard: (card: Card) => void
+  addCard: (query: string, card: Card) => void
   addIgnoredId: (id: string) => void
   ignoredIds: string[]
   errors: CogError[]
@@ -195,7 +195,7 @@ export const BrowserView = React.memo(({
         <div className='result-container'>
           {isCardDisplay && currentPage.map((card, index) => {
             const onAdd = () => {
-              addCard(card.data)
+              addCard(lastQueries.join("\n"), card.data)
               const id = addMessage(`Added ${card.data.name} to saved cards`, false)
               setTimeout(() => {
                 dismissMessage(id)

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useEffect, useState } from 'react'
 import { cogDB, ProjectFolder } from './db'
 import { useLocalStorage } from './useLocalStorage'
 import { INTRO_EXAMPLE } from '../example'
@@ -6,8 +6,8 @@ import { Setter } from '../../types'
 import { defaultFunction, defaultPromise } from '../context'
 import { Card } from 'mtgql'
 import cloneDeep from 'lodash/cloneDeep'
-import { CardEntry, parseEntry, serializeEntry } from './types/cardEntry'
-import { Project } from './types/project'
+import { CardEntry } from './types/cardEntry'
+import { Project, SavedCardSection } from './types/project'
 
 
 export interface ProjectDao {
@@ -28,12 +28,16 @@ export interface ProjectDao {
   setCurrentLine: Setter<string>
   currentIndex: number
   setCurrentIndex: Setter<number>
-  savedCards: CardEntry[]
-  setSavedCards: Setter<CardEntry[]>
+  savedCards: SavedCardSection[]
+  setSavedCards: Setter<SavedCardSection[]>
   ignoredIds: string[]
   setIgnoredIds: Setter<string[]>
   toggleIgnoreId: (id: string) => void;
-  addCard: (card: Card) => void;
+
+  addCard: (query: string, card: Card) => void;
+  renameQuery: (queryIndex: number, newQuery: string) => void;
+  removeCard: (queryIndex: number, cardIndex: number) => void;
+  removeQuery: (queryIndex: number) => void;
 }
 
 const defaultDao: ProjectDao = {
@@ -57,6 +61,9 @@ const defaultDao: ProjectDao = {
   savedCards: [],
   setSavedCards: defaultFunction("ProjectDao.setQueries"),
   addCard: defaultFunction("ProjectDao.addCard"),
+  renameQuery: defaultFunction("ProjectDao.renameQuery"),
+  removeCard: defaultFunction("ProjectDao.removeCard"),
+  removeQuery: defaultFunction("ProjectDao.removeQuery"),
   path: ""
 }
 
@@ -70,10 +77,10 @@ export const splitPath = (path: string): [string, string] => {
 export const ProjectContext = createContext<ProjectDao>(defaultDao)
 
 function keepUpdated<S>(setter: Setter<S>, updateSetter: Setter<Date>) {
-  const inner: Setter<S> = (prev) => {
+  const inner: Setter<S> = React.useCallback((prev) => {
     setter(prev);
     updateSetter(new Date());
-  }
+  }, [setter, updateSetter]);
   return inner
 }
 export function useProjectDao(): ProjectDao {
@@ -81,15 +88,26 @@ export function useProjectDao(): ProjectDao {
   const [initialPath, setInitialPath] = useLocalStorage<string>("project.initialPath", "/my-project");
   const [currentPath, _setCurrentPath] = useLocalStorage<string>("project.currentPath", "/my-project");
   const [queries, _setQueries] = useLocalStorage<string[]>('queries', INTRO_EXAMPLE)
-  const [savedCards, _setSavedCards] = useLocalStorage<CardEntry[]>('project.savedCards', [{ name: "" }])
+  const [savedCards, _setSavedCards] = useLocalStorage<SavedCardSection[]>(
+    'project.savedCards',
+    [{ query: "*", cards: []}],
+    (sections) => {
+      // localhost migration
+      if (Array.isArray(sections) && sections.length > 0 && !("query" in sections[0])) {
+        return [{
+          query: "*",
+          cards: sections as unknown as CardEntry[],
+        }];
+      } else if (Array.isArray(sections)) {
+        return sections.map(it => ({...it, selected: false }))
+      }
+      return sections;
+    }
+  );
   const [currentIndex, setCurrentIndex] = useState<number | undefined>(
     savedCards.length ? 0 : undefined
   )
-  const [currentLine, setCurrentLine] = useState<string | undefined>(
-    savedCards.length
-      ? serializeEntry(savedCards[0])
-      : undefined
-  )
+  const [currentLine, setCurrentLine] = useState<string | undefined>(undefined);
 
   const [ignoredIds, setIgnoredIds] = useLocalStorage<string[]>('project.ignore-list', [])
   const toggleIgnoreId = useCallback(
@@ -107,18 +125,12 @@ export function useProjectDao(): ProjectDao {
     _setCurrentPath(project.path);
     _setQueries(project.queries);
     _setSavedCards(project.savedCards);
-    if (currentIndex < project.savedCards.length) {
-      setCurrentLine(serializeEntry(project.savedCards[currentIndex]))
-    } else {
-      setCurrentLine(serializeEntry(project.savedCards[0]))
-      setCurrentIndex(0)
-    }
     setIgnoredIds(project.ignoredCards);
     _setUpdatedAt(project.updatedAt);
   }, [
-    currentIndex, setInitialPath,
+    setInitialPath,
     _setCurrentPath, _setQueries, _setSavedCards,
-    setCurrentLine, setCurrentIndex, setIgnoredIds, _setUpdatedAt
+    setIgnoredIds, _setUpdatedAt
   ])
   const saveMemory = async () => {
     if (initialPath !== currentPath) {
@@ -133,8 +145,7 @@ export function useProjectDao(): ProjectDao {
         // cogDB.project.delete(initialPath);
       // })
     }
-    const savedCopy = cloneDeep(savedCards);
-    savedCopy[currentIndex] = parseEntry(currentLine);
+    const savedCopy = savedCards.map(it => ({...it,selected: false}));
     // TODO: validate that i can update primary keys
     const updated = await cogDB.project.update(currentPath, {
       path: currentPath,
@@ -147,7 +158,7 @@ export function useProjectDao(): ProjectDao {
       await cogDB.project.add({
         path: currentPath,
         queries,
-        savedCards,
+        savedCards: savedCopy,
         ignoredCards: ignoredIds,
         updatedAt,
         createdAt: updatedAt
@@ -203,7 +214,7 @@ export function useProjectDao(): ProjectDao {
     const now = new Date();
     const newProject: Project = {
       path: path,
-      savedCards: [{ name: "" }],
+      savedCards: [],
       ignoredCards: [],
       queries: [],
       createdAt: now,
@@ -298,10 +309,52 @@ export function useProjectDao(): ProjectDao {
   }
 
   const setSavedCards = keepUpdated(_setSavedCards, _setUpdatedAt)
-  const addCard = (card: Card) => {
+  const addCard = (query: string, card: Card) => {
     setSavedCards((prev) => {
       const next = cloneDeep(prev);
-      next.push({ name: card.name })
+      let sectionIndex = next.findIndex(it => it.query===query)
+      if (sectionIndex === -1) {
+        sectionIndex = prev.length;
+        next.push({ query, cards: [] });
+      }
+      const existing = next[sectionIndex].cards.findIndex(it => it.name === card.name );
+      if (existing === -1) {
+        next[sectionIndex].cards.push({ name: card.name, quantity: 1, set: card.set, cn: card.collector_number })
+      } else {
+        next[sectionIndex].cards[existing].quantity = (next[sectionIndex].cards[existing].quantity ?? 1) + 1;
+      }
+      return next;
+    })
+  }
+
+  const renameQuery = (queryIndex: number, newQuery: string) => {
+    setSavedCards(prev => {
+      if (queryIndex < 0 || queryIndex > prev.length - 1) return prev;
+      if (prev[queryIndex].query === newQuery) return prev;
+
+      const next = cloneDeep(prev);
+
+      next[queryIndex].query = newQuery;
+      return next;
+    })
+  }
+
+  const removeCard = (queryIndex: number, cardIndex: number) => {
+    setSavedCards(prev => {
+      if (queryIndex < 0 || queryIndex > prev.length - 1) return prev;
+
+      const next = cloneDeep(prev);
+      next[queryIndex].cards.splice(cardIndex, 1);
+      return next;
+    })
+  }
+
+  const removeQuery = (queryIndex: number) => {
+    setSavedCards(prev => {
+      if (queryIndex < 0 || queryIndex > prev.length - 1) return prev;
+
+      const next = cloneDeep(prev);
+      next.splice(queryIndex, 1)
       return next;
     })
   }
@@ -335,7 +388,8 @@ export function useProjectDao(): ProjectDao {
     moveProject,
     moveFolder,
     queries, setQueries: keepUpdated(_setQueries, _setUpdatedAt),
-    savedCards, setSavedCards, addCard,
+    savedCards,
+    setSavedCards, addCard, renameQuery, removeCard, removeQuery,
     path: currentPath,
     currentLine, setCurrentLine,
     currentIndex, setCurrentIndex,

@@ -93,7 +93,7 @@ export class TypedDexie extends Dexie implements DataProvider {
 
   getSet = (key: string) => this.set.get({ code: key })
 
-  getCardByNameId = async (name: string, id: string) => {
+  getCardByNameId = async (name: string, id?: string) => {
     let res = await cogDB.card.where("name").equals(name).toArray();
     if (res.length === 0)
       res = await cogDB.card.where("name").startsWith(`${name} /`).toArray();
@@ -102,7 +102,7 @@ export class TypedDexie extends Dexie implements DataProvider {
     if (res.length === 0)
       res = await cogDB.card.where("name").startsWithIgnoreCase(`${name} /`).toArray();
     if (res.length === 0) return undefined;
-    const card = res.length > 1
+    const card = res.length > 1 && id
       ? res.find(card => card.printings.find(it => it.id === id)) ?? res[0]
       : res[0];
 
@@ -243,6 +243,28 @@ export class TypedDexie extends Dexie implements DataProvider {
     this.version(17).stores({
       cardToOtag: 'oracle_id',
       cardToItag: 'id',
+    })
+
+    this.version(18).stores({
+      project: 'path, createdAt, updatedAt',
+    }).upgrade(trans => {
+      return trans.table("project").toCollection()
+        .modify(c => {
+          if (Array.isArray(c.savedCards)) {
+            c.savedCards = { all: c.savedCards }
+          }
+        })
+    })
+
+    this.version(19).stores({
+      project: 'path, createdAt, updatedAt',
+    }).upgrade(trans => {
+      return trans.table("project").toCollection()
+        .modify(c => {
+          if (!Array.isArray(c.savedCards)) {
+            c.savedCards = Object.entries(c.savedCards).map(([query, cards]) => ({ query, cards }))
+          }
+        })
     })
   }
 }

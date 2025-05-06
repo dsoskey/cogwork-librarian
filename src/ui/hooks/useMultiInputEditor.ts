@@ -21,22 +21,30 @@ interface MultiInputEditorInput {
   onEnter?: (focusEntry: FocusFunction, index: number, splitIndex: number) => void;
   onBackspace?: (focusEntry: FocusFunction, index: number) => void;
   onDelete?: (focusEntry: FocusFunction, index: number) => void;
+  onAlt?: (event: KeyboardEvent<HTMLInputElement>, index: number) => void
 }
 export function useMultiInputEditor({
   container, className, numInputs,
-  onEnter, onBackspace, onDelete,
+  onEnter, onBackspace, onDelete, onAlt
 }: MultiInputEditorInput) {
   const focusEntry = _focusEntry(container, className);
   return (index: number) => (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.altKey) {
+      onAlt?.(event, index);
+    }
     switch (event.key) {
       case 'ArrowLeft':
-        if (event.currentTarget.selectionStart === 0) {
+        event.stopPropagation();
+        if (event.currentTarget.selectionStart === 0
+          && event.currentTarget.selectionEnd === 0) {
           event.preventDefault();
           focusEntry(index, true, -1);
         }
         break;
       case 'ArrowRight':
-        if (event.currentTarget.selectionEnd >= event.currentTarget.value.length) {
+        event.stopPropagation();
+        if (event.currentTarget.selectionStart >= event.currentTarget.value.length
+          && event.currentTarget.selectionEnd >= event.currentTarget.value.length) {
           event.preventDefault();
           focusEntry(index, false, 0);
         }
@@ -76,7 +84,7 @@ export function useMultiInputEditor({
         break;
       }
       default:
-        console.log(event);
+        console.debug(event.key, event);
         break
     }
   };

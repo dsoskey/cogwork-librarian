@@ -224,6 +224,7 @@ export const TextEditor = ({
         autoCorrect='none'
         autoCapitalize='off'
         translate='no'
+        rows={queries.length || 1}
         onChange={(event) => {
           setQueries(event.target.value.split(separator));
         }}

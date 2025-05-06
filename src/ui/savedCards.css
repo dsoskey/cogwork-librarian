@@ -3,6 +3,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    gap: var(--spacing-200);
 
     h2 {
         margin-top: 0;
@@ -17,4 +18,46 @@
     .card-entry-editor:focus-visible {
         z-index: 10;
     }
+
+    .saved-card-row {
+        --editor-font-size: .8rem;
+
+        .autocomplete-root {
+            width: 100%;
+        }
+
+        .quantity {
+            min-width: .75em;
+        }
+        .query-input {
+            flex: 2;
+            text-align:right;
+        }
+    }
+}
+
+.saved-section-root {
+    display:flex;
+    flex-direction: column;
+    padding: var(--spacing-100);
+    /*background-color: lime;*/
+    gap: var(--spacing-300);
+    border: 1px solid var(--dark-color);
+
+    .drop-indicator {
+        flex: 1;
+        align-self: center;
+        margin-left: var(--spacing-200);
+    }
+    .drag-handle {
+        cursor: grab;
+        font-weight: bolder;
+    }
+    .drag-handle.active {
+        cursor: grabbing;
+    }
+}
+
+.saved-section-draggable {
+    background-color: var(--dark-color);
 }

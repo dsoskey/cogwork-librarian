@@ -65,7 +65,6 @@ export function QueryForm({
           setQueries={setQueries}
           onSubmit={execute}
           canSubmit={canSubmit}
-          showLineNumbers
           settingsButton={settingsButton}
           language='scryfall-extended-multi'
         />

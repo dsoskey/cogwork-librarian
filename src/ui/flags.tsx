@@ -7,6 +7,7 @@ import { ClientConfig, Flag } from '../../config'
 import _config from 'configuration'
 console.log(_config);
 export const CLIENT_CONFIG = _config as ClientConfig;
+export const REFOCUS_TIMEOUT = 50;
 
 interface FlagManager {
   flags: Record<Flag, boolean>

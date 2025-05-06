@@ -23,7 +23,7 @@ export const SearchView = () => {
   const project = useContext(ProjectContext);
   const [options, setters] = useSearchOptions();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const { queries, addCard } = project
+  const { path, savedCards, setSavedCards, queries, addCard } = project
 
   const [source, setSource] = useLocalStorage<DataSource>('source', 'local')
   const queryRunner = {
@@ -141,7 +141,7 @@ export const SearchView = () => {
     </Modal>
 
     {<div className={`saved-cards-floater ${showSavedCards ? "show" : "hide"}`}>
-      {showSavedCards && <SavedCardsEditor {...project} />}
+      {showSavedCards && <SavedCardsEditor path={path} savedCards={savedCards} setSavedCards={setSavedCards} />}
     </div>}
   </div>;
 }

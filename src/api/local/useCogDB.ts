@@ -10,6 +10,7 @@ import { defaultPromise } from '../context'
 import { CubeCard } from 'mtgql/build/types/cube'
 import * as Scryfall from 'scryfall-sdk'
 import { displayMessage } from '../../error'
+import { CompletionTree } from './completionTree'
 
 export const DB_LOAD_MESSAGES = [
   "loading cubes",
@@ -44,6 +45,7 @@ export interface CogDB {
   cardByOracle: (id: string) => NormedCard | undefined
   bulkCardByOracle: (oracleIds: string[]) => Promise<NormedCard[]>
   bulkCardByCubeList: (cards: CubeCard[]) => Promise<NormedCard[]>
+  handleAutocomplete: (input: string) => Promise<string[]>
   setMemory: Setter<NormedCard[]>
   loadFilter: string
   setLoadFilter: Setter<string>
@@ -68,6 +70,7 @@ const defaultDB: CogDB = {
     return undefined
   },
   bulkCardByOracle: defaultPromise("CogDB.bulkCardByOracle"),
+  handleAutocomplete: defaultPromise("CogDB.handleAutocomplete"),
   bulkCardByCubeList: defaultPromise("CogDB.bulkCardByCubeList"),
   dbReport: null,
   setMemory: () => console.error("CogDB.setMemory called without a provider!"),
@@ -108,19 +111,23 @@ export const useCogDB = (): CogDB => {
 
   const oracleToCard = useRef<{ [id: string]: NormedCard}>({})
   const nameToOracle = useRef<{ [name: string]: string }>({})
+  const completionTree = useRef<CompletionTree>(new CompletionTree())
 
   const resetIndex = () => {
     oracleToCard.current = {}
     nameToOracle.current = {}
+    completionTree.current = new CompletionTree();
   }
   const addCardToIndex = (card: NormedCard) => {
     if (!isOracleVal("extra")(card)) {
       oracleToCard.current[card.oracle_id] = card
       nameToOracle.current[card.name] = card.oracle_id
       nameToOracle.current[card.name.toLowerCase()] = card.oracle_id
+      completionTree.current.addToTree(card.name)
       if (card.name.includes(" // ")) {
-        nameToOracle.current[card.name.split(" // ")[0]] = card.oracle_id
-        nameToOracle.current[card.name.split(" // ")[0].toLowerCase()] = card.oracle_id
+        const [left, right] = card.name.split(" // ");
+        nameToOracle.current[left] = card.oracle_id
+        nameToOracle.current[left.toLowerCase()] = card.oracle_id
       }
     }
   }
@@ -414,6 +421,7 @@ export const useCogDB = (): CogDB => {
     cardByOracle,
     bulkCardByOracle,
     bulkCardByCubeList,
+    handleAutocomplete,
     setMemory,
     resetDB,
     loadManifest,
@@ -423,5 +431,9 @@ export const useCogDB = (): CogDB => {
     cardByName,
     loadFilter,
     setLoadFilter
+  }
+
+  async function handleAutocomplete(input: string) {
+    return completionTree.current.getCompletions(input);
   }
 }

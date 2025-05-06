@@ -8,6 +8,7 @@ import { CardImage } from '../cardBrowser/cardViews/cardImage'
 import "./cardLink.css"
 import { imageUris } from '../../api/mtgjson'
 import { Input, InputProps } from '../component/input'
+import { Autocomplete } from '../component/autocomplete'
 
 export function useCardLoader(name: string, id?: string) {
   return useLiveQuery(
@@ -151,7 +152,8 @@ export function CardLink2({ lockable, onClick, name, id, hasBack, allowedPlaceme
 
 export interface HoverableInputProps extends InputProps {
   allowedPlacements?: Placement[]
-
+  getCompletions: (input: string) => Promise<string[]>
+  setValue: (value: string) => void;
 }
 
 export function HoverableInput({ allowedPlacements = ["top", "bottom"], ...props }: HoverableInputProps) {
@@ -173,9 +175,11 @@ export function HoverableInput({ allowedPlacements = ["top", "bottom"], ...props
   const {getReferenceProps, getFloatingProps} = useInteractions([hover,]);
 
   return <>
-      <Input {...props}
-             ref={refs.setReference}
-             {...getReferenceProps()} />
+      <Autocomplete
+        {...props}
+        ref={refs.setReference}
+        {...getReferenceProps()}
+      />
       {(isLockedOpen || isOpen) && (
         <div
           className="popup-container"
@@ -184,7 +188,7 @@ export function HoverableInput({ allowedPlacements = ["top", "bottom"], ...props
           {...getFloatingProps()}
           onClick={() => setIsLockedOpen(false)}
         >
-          <_CardImage name={card.name} card={card} />
+          <_CardImage name={card?.name} card={card} />
         </div>
       )}
     </>;
