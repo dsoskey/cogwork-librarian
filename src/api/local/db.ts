@@ -250,21 +250,12 @@ export class TypedDexie extends Dexie implements DataProvider {
     }).upgrade(trans => {
       return trans.table("project").toCollection()
         .modify(c => {
-          if (Array.isArray(c.savedCards)) {
-            c.savedCards = { all: c.savedCards }
-          }
+          c.savedCards = [{ "*": c.savedCards }]
         })
     })
 
     this.version(19).stores({
       project: 'path, createdAt, updatedAt',
-    }).upgrade(trans => {
-      return trans.table("project").toCollection()
-        .modify(c => {
-          if (!Array.isArray(c.savedCards)) {
-            c.savedCards = Object.entries(c.savedCards).map(([query, cards]) => ({ query, cards }))
-          }
-        })
     })
   }
 }
