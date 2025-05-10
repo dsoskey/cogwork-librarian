@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useCallback } from 'react'
 import { rankInfo } from "./infoLines";
-import { useHighlightPrism } from "../../../api/local/syntaxHighlighting";
 import { QuerySetButton } from "../querySetButton";
 import { DEFAULT_MODE_REGEXP, DEFAULT_WEIGHT_REGEXP, INCLUDE_REGEXP } from '../../../api/mtgql-ep/parser'
 
@@ -74,41 +73,42 @@ export interface MultiQueryInfoBarProps {
   canSubmit?: boolean;
   gutterColumns: GutterColumn[]
 }
-export const MultiQueryActionBar = ({
+export const MultiQueryActionBar = React.memo(({
   queries,
   copyText,
   renderQuery = multiQueryInfo(rankInfo),
   ...rest
 }: MultiQueryInfoBarProps) => {
-  useHighlightPrism([queries]);
   const lineInfo = renderQuery(queries);
   const numDigits = queries.length.toString().length;
 
+  const onClickLine = useCallback((index: number) => () => {
+    const query = queries[index];
+    const mindex = queries
+      .slice(0, index)
+      .map((it) => it.length)
+      // the 1 accounts for \n
+      .reduce((prev, next) => prev + next + 1, 0);
+    // the 1 accounts for \n
+    const maxdex = mindex + query.length + 1;
+    copyText(mindex, maxdex);
+  }, [queries, copyText]);
+
   return (
-    <pre tabIndex={-1} className="language-none labels">
+    <pre tabIndex={-1} className="labels">
       {lineInfo.map((line, index) => (
         <ActionLine
           key={index}
           line={line}
           index={index}
           numDigits={numDigits}
-          onClickLine={() => {
-            const query = queries[index];
-            const mindex = queries
-              .slice(0, index)
-              .map((it) => it.length)
-              // the 1 accounts for \n
-              .reduce((prev, next) => prev + next + 1, 0);
-            // the 1 accounts for \n
-            const maxdex = mindex + query.length + 1;
-            copyText(mindex, maxdex);
-          }}
+          onClickLine={onClickLine(index)}
           {...rest}
         />)
       )}
     </pre>
   );
-};
+});
 
 interface ActionLineProps {
   line: string;

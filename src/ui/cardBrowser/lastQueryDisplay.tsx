@@ -3,6 +3,7 @@ import { MultiQueryActionBar, savedCardsQueryInfo } from '../component/editor/mu
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { ArrowInIcon, ArrowOutIcon } from '../icons/arrows'
 import { rankInfo } from '../component/editor/infoLines'
+import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 
 export interface LastQueryDisplayProps {
   lastQueries: string[]
@@ -24,7 +25,9 @@ export function LastQueryDisplay({ selectBox, lastQueries, editorControls }: Las
     }
   }
 
-  return <div className="query-editor">
+  useHighlightPrism([expanded, toDisplay]);
+
+  return <div className="text-editor-root">
     <MultiQueryActionBar
       queries={toDisplay}
       copyText={()=>{}}

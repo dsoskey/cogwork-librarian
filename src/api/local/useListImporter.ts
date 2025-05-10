@@ -4,6 +4,7 @@ import { Card, normCardList, NormedCard } from 'mtgql'
 import { Setter, TaskStatus } from '../../types'
 import * as Scry from 'scryfall-sdk'
 import { CogDB } from './useCogDB'
+import { CARD_INDEX } from './cardIndex'
 
 interface ListImporter {
   attemptImport: (rawCards: string[], restart: boolean) => Promise<NormedCard[]>
@@ -57,7 +58,7 @@ export const useListImporter = (cogDb: CogDB): ListImporter => {
       console.time("process raws")
       for (const rawCard of rawCards) {
         if (rawCard.length > 0) {
-          const maybeCard = cogDb.cardByName(rawCard.toLowerCase())
+          const maybeCard = CARD_INDEX.cardByName(rawCard.toLowerCase())
           if (maybeCard !== undefined) {
             foundCards.push(maybeCard)
             report.addComplete()

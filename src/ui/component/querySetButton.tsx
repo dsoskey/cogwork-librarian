@@ -2,7 +2,14 @@ import React, { useContext } from 'react'
 import "./querySetButton.css";
 import { CogDBContext } from '../../api/local/useCogDB'
 
-const LoaderButton = ({ vh, vw, count, total }) => {
+interface LoaderButtonProps {
+  vw: number
+  vh: number
+  count: number
+  total: number
+}
+
+const LoaderButton = React.memo(({ vh, vw, count, total }: LoaderButtonProps) => {
   const startPC = 1 / 4;
   const endPC = 3 / 4;
   const rx = (vw + vh) / 2 * .2 ;
@@ -26,12 +33,17 @@ const LoaderButton = ({ vh, vw, count, total }) => {
       width={vw/2}
     />
   </svg>
-}
+});
 
 export const QuerySetButton = () => {
   const { dbReport, memStatus } = useContext(CogDBContext);
   const { cardCount, totalCards } = dbReport;
   const viewWidth = 100;
   const viewHeight = 100;
-  return <LoaderButton vw={viewWidth} vh={viewHeight} count={cardCount} total={memStatus === "success" ? cardCount : totalCards} />
+  return <LoaderButton
+    vw={viewWidth}
+    vh={viewHeight}
+    count={cardCount}
+    total={memStatus === "success" ? cardCount : totalCards}
+  />
 }

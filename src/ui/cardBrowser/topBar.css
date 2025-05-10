@@ -73,7 +73,7 @@ pre[class*="language-"].last-query {
 }
 
 .highlight-filter-root {
-    .query-editor {
+    .text-editor-root {
         width: 100%;
     }
 }

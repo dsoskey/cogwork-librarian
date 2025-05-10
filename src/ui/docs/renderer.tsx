@@ -52,7 +52,7 @@ export const renderer = {
 
 export function newPre({ node, ...props }) {
   const copyText = node.children[0]?.children[0]?.value;
-  return <div className='query-editor'>
+  return <div className='text-editor-root'>
     <MultiQueryActionBar
       queries={copyText.split("\n")}
       copyText={()=>{}}

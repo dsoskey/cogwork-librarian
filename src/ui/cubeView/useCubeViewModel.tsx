@@ -9,6 +9,7 @@ import _groupBy from 'lodash/groupBy'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Setter } from '../../types'
 import { CardToIllustrationTag, CardToOracleTag } from '../../api/local/types/tags'
+import { CARD_INDEX } from '../../api/local/cardIndex'
 
 export interface OrderedCard extends Card, Omit<CubeCard, "name"|"cmc"|"colors"|"rarity"> {
   index: number
@@ -45,7 +46,7 @@ export interface CubeViewModel {
 
 export function useCubeViewModel(): CubeViewModel {
   const { key } = useParams()
-  const { dbStatus, bulkCardByOracle, bulkCardByCubeList } = useContext(CogDBContext)
+  const { dbStatus } = useContext(CogDBContext)
   const [loadingError, setLoadingError] = useState<React.ReactNode>(undefined)
   const [cards, setCards] = useState<OrderedCard[]>([])
   const [oracleList, oracleMap, setOracles] = useKeyValList<NormedCard>(list => _groupBy(list, 'oracle_id'))
@@ -67,7 +68,7 @@ export function useCubeViewModel(): CubeViewModel {
   const refreshCubeCards = async () => {
     try {
       if (needsMigration) {
-        const newOracles = await bulkCardByOracle(cube.oracle_ids)
+        const newOracles = await CARD_INDEX.bulkCardByOracle(cube.oracle_ids)
         setOracles(newOracles)
 
         const cards = newOracles.map(it => ({ oracle_id: it.oracle_id, print_id: it.printings[0].id }))
@@ -76,7 +77,7 @@ export function useCubeViewModel(): CubeViewModel {
           cards
         })
       } else {
-        const newOracles = await bulkCardByCubeList(cube.cards)
+        const newOracles = await CARD_INDEX.bulkCardByCubeList(cube.cards)
         setOracles(newOracles)
 
         const printToCard: { [key: string]: Card } = {}

@@ -11,8 +11,8 @@ export const InfoModal = ({ title, info, buttonContent }: InfoModalProps) => {
 
   return <span className='info-modal'>
     <button onClick={() => setOpen(true)}>{buttonContent ?? "?"}</button>
-    <Modal open={open} title={title} onClose={() => setOpen(false)}>
+    {open && <Modal open={open} title={title} onClose={() => setOpen(false)}>
       {info}
-    </Modal>
+    </Modal>}
   </span>
 }

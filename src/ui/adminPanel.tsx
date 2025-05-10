@@ -12,7 +12,7 @@ export const AdminPanel = ({ children }) => {
 
   return <div>
     <span onClick={onOpen}>{children}</span>
-    <Modal open={open} title={<h2>super secret admin panel activate!</h2>} onClose={onClose}>
+    {open && <Modal open={open} title={<h2>super secret admin panel activate!</h2>} onClose={onClose}>
       <h3>flag control</h3>
       <p className='alert'>disclamer: the feature flags on this page change the applications behavior. some of these features are unreleased, and using them could potentially break your application or database. use at your own risk!</p>
       <div className='column'>
@@ -29,6 +29,6 @@ export const AdminPanel = ({ children }) => {
 
       <h3>lexer tester</h3>
       <LexerTester />
-    </Modal>
+    </Modal>}
   </div>
 }

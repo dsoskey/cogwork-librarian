@@ -173,7 +173,6 @@ export function ColorBreakdownRow({
   children
 }: ColorBreakdownRowProps) {
   const [open, setOpen] = useState(false)
-  useHighlightPrism([breakdown.tag])
 
   const denominator = total > 0 ? total : 1
   return <tr className={loading ? 'loading' : ''}>

@@ -8,7 +8,6 @@ import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { FlagContext } from '../flags'
 import './topBar.css'
 import { SearchError } from '../component/searchError'
-import { useViewportListener } from '../viewport'
 import { LastQueryDisplay } from './lastQueryDisplay'
 
 

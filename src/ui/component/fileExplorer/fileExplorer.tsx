@@ -3,7 +3,8 @@ import "./fileExplorer.css"
 import { Setter } from '../../../types'
 import { defaultFunction } from '../../../api/context'
 import { useEditablePath } from './editablePath'
-import { useDrag, useDrop } from 'react-dnd'
+import { DndProvider, useDrag, useDrop } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 export const RESERVED_PATH = ".path"
 export enum PathType { File, Dir }
@@ -215,9 +216,9 @@ interface FileExplorerProps extends ExplorerCtx {
 export const FileExplorer = ({ dirPaths, filePaths, ...ctx }: FileExplorerProps) => {
   const tree = buildTree(dirPaths, filePaths)
 
-  return <ExplorerContext.Provider value={ctx}>
+  return <DndProvider backend={HTML5Backend}><ExplorerContext.Provider value={ctx}>
     <ul className='file-explorer'>
       {Object.keys(tree).map(key => <ExplorerBranch key={key} text={key} tree={tree[key]} />)}
     </ul>
-  </ExplorerContext.Provider>
+  </ExplorerContext.Provider></DndProvider>
 }

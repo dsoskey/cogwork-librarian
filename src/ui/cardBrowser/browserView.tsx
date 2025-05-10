@@ -64,7 +64,6 @@ export const BrowserView = React.memo(({
   errors,
   lastQueries,
 }: BrowserViewProps) => {
-  const { addMessage, dismissMessage } = useContext(ToasterContext)
   const { displayTypes } = useContext(FlagContext).flags
   const viewport = useViewportListener()
   const [activeCollection, setActiveCollection] = useState<ActiveCollection>('search')
@@ -192,43 +191,19 @@ export const BrowserView = React.memo(({
       />
 
       {showCards && <>
-        <div className='result-container'>
-          {isCardDisplay && currentPage.map((card, index) => {
-            const onAdd = () => {
-              addCard(lastQueries.join("\n"), card.data)
-              const id = addMessage(`Added ${card.data.name} to saved cards`, false)
-              setTimeout(() => {
-                dismissMessage(id)
-              }, DISMISS_TIMEOUT_MS)
-            }
-            const onIgnore = () => {
-              addIgnoredId(card.data.oracle_id)
-              const id = addMessage(`Ignored ${card.data.name} from future searches`, false)
-              setTimeout(() => {
-                dismissMessage(id)
-              }, DISMISS_TIMEOUT_MS)
-            }
-            return (
-              <CardImageView
-                className={`_${cardsPerRow}${rotateCards ? ' rotated' : ''}`}
-                onAdd={onAdd}
-                hoverContent={<SearchHoverActions card={card} onAdd={onAdd} onIgnore={onIgnore} />}
-                key={card.data.id + index}
-                card={card}
-                showRender={displayType === 'render'}
-                revealDetails={revealDetails}
-                visibleDetails={visibleDetails}
-                highlightFilter={highlightFilter}
-              />
-            )
-          })}
-          {displayType === 'viz' && <div className='viz-container'>
-            <CardVizView cards={result} />
-            <CardListView result={currentPage} />
-          </div>}
-          {displayType === 'json' && <CardJsonView result={currentPage} />}
-          {displayType === 'list' && <CardListView result={currentPage} />}
-        </div>
+        <CardResults
+          lastQueries={lastQueries}
+          isCardDisplay={isCardDisplay}
+          rotateCards={rotateCards}
+          displayType={displayType}
+          currentPage={currentPage}
+          result={result}
+          addCard={addCard}
+          addIgnoredId={addIgnoredId}
+          cardsPerRow={cardsPerRow}
+          revealDetails={revealDetails}
+          visibleDetails={visibleDetails}
+          highlightFilter={highlightFilter} />
         {viewport.mobile && <div className='bottom-page-control'>
           {pageControl}
         </div>}
@@ -236,6 +211,79 @@ export const BrowserView = React.memo(({
     </div>
   </div>
 })
+
+interface CardResultsProps {
+  lastQueries: string[];
+  isCardDisplay: boolean;
+  rotateCards: boolean;
+  displayType: DisplayType;
+  currentPage: EnrichedCard[];
+  result: EnrichedCard[];
+  addCard: (query: string, card: Card) => void
+  addIgnoredId: (id: string) => void
+  cardsPerRow: number;
+  revealDetails: boolean
+  visibleDetails: string[]
+  highlightFilter: (card: Card) => boolean
+}
+
+function CardResults({
+  lastQueries,
+  currentPage,
+  result,
+  addCard,
+  addIgnoredId,
+  rotateCards,
+  isCardDisplay,
+  cardsPerRow,
+  displayType,
+  revealDetails,
+  visibleDetails,
+  highlightFilter,
+}: CardResultsProps) {
+
+  const { addMessage, dismissMessage } = useContext(ToasterContext)
+
+
+  return <div className='result-container'>
+    {isCardDisplay && currentPage.map((card, index) => {
+      const onAdd = () => {
+        addCard(lastQueries.join("\n"), card.data)
+        const id = addMessage(`Added ${card.data.name} to saved cards`, false)
+        setTimeout(() => {
+          dismissMessage(id)
+        }, DISMISS_TIMEOUT_MS)
+      }
+      const onIgnore = () => {
+        addIgnoredId(card.data.oracle_id)
+        const id = addMessage(`Ignored ${card.data.name} from future searches`, false)
+        setTimeout(() => {
+          dismissMessage(id)
+        }, DISMISS_TIMEOUT_MS)
+      }
+      return (
+        <CardImageView
+          className={`_${cardsPerRow}${rotateCards ? ' rotated' : ''}`}
+          onAdd={onAdd}
+          hoverContent={<SearchHoverActions card={card} onAdd={onAdd} onIgnore={onIgnore} />}
+          key={card.data.id + index}
+          card={card}
+          showRender={displayType === 'render'}
+          revealDetails={revealDetails}
+          visibleDetails={visibleDetails}
+          highlightFilter={highlightFilter}
+        />
+      )
+    })}
+    {displayType === 'viz' && <div className='viz-container'>
+      <CardVizView cards={result} />
+      <CardListView result={currentPage} />
+    </div>}
+    {displayType === 'json' && <CardJsonView result={currentPage} />}
+    {displayType === 'list' && <CardListView result={currentPage} />}
+  </div>
+}
+
 
 export interface DownloadButtonProps {
   searchResult: Array<EnrichedCard>
@@ -252,7 +300,7 @@ export function DownloadButton({ searchResult }: DownloadButtonProps) {
     <span className="bold">download <input
       type="number" pattern="[0-9]*"
       placeholder="all"
-      value={isNaN(value) ? "":value}
+      value={isNaN(value) ? "" : value}
       onChange={handleChange}
       onKeyDown={event => {
         if (event.key !== "Tab" && event.key !== "Backspace" && !/\d/.test(event.key)) {

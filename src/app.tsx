@@ -1,6 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-import { DndProvider } from 'react-dnd'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { AppInfo, WhatsNext } from './ui/views/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
@@ -12,7 +10,6 @@ import { SearchView } from './ui/searchView'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
 import { HistoryView } from './ui/historyView'
 import { DocsView } from './ui/docs/docsView'
-import { FlagContext } from './ui/flags'
 import { ProjectContext, useProjectDao } from './api/local/useProjectDao'
 import { SettingsView } from './ui/settingsView'
 import { CubeView } from './ui/cubeView'
@@ -27,26 +24,36 @@ import { OtagView } from './ui/views/tag/otagView'
 import { ContextMenu, handleClickOutsideContextMenu } from './ui/component/contextMenu/contextMenu'
 import Prism from 'prismjs'
 import { hookContextMenu } from './api/local/syntaxHighlighting'
+import { useLocalStorage } from './api/local/useLocalStorage'
 
 export const App = () => {
-  const { } = useContext(FlagContext).flags;
   const [cubeContext, setCubeContext] = useState<string>("")
 
   const cogDB = useCogDB()
+  const {memory} = cogDB;
   const listImporter = useListImporter(cogDB)
   const bulkCubeImporter = useBulkCubeImporter()
 
-  const project = useProjectDao()
+  const project = useProjectDao();
+  const {
+    path,
+    savedCards, setSavedCards,
+    renameQuery, removeCard, queries, setQueries, addCard,
+    toggleIgnoreId, ignoredIds,
+  } = project
+  const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>("showSavedCards", true)
+
 
   const [messages, setMessages] = useState<ToasterMessage[]>([])
-  const addMessage = (text: string, dismissible: boolean) => {
+  const addMessage = useCallback((text: string, dismissible: boolean) => {
     const message: ToasterMessage = { id: uuidv4() ,text, dismissible }
     setMessages(prev => [...prev, message])
     return message.id
-  }
-  const dismissMessage = (messageId: string) => {
+  }, [setMessages]);
+  const dismissMessage = useCallback((messageId: string) => {
     setMessages(prev => prev.filter(it => it.id !== messageId))
-  }
+  }, [setMessages]);
+  const toasterValue = useMemo(() => ({ messages, addMessage, dismissMessage }), [messages, addMessage, dismissMessage])
   useEffect(() => {
     cogDB.resetDB()
     Prism.hooks.add("complete", hookContextMenu(setCubeContext))
@@ -57,34 +64,50 @@ export const App = () => {
       <ListImporterContext.Provider value={listImporter}>
         <BulkCubeImporterContext.Provider value={bulkCubeImporter}>
           <ProjectContext.Provider value={project}>
-            <ToasterContext.Provider value={{ messages, addMessage, dismissMessage }}>
-              <DndProvider backend={HTML5Backend}>
-                <ErrorBoundary FallbackComponent={RenderErrorFallback}>
-                  <div className='root' onClick={handleClickOutsideContextMenu}>
-                      <Routes>
-                        <Route path="/data/cube/*" element={<DefaultLayout><CubeRedirect /></DefaultLayout>} />
-                        <Route path="/cube/:key/*" element={<DefaultLayout><CubeView /></DefaultLayout>} />
-                        <Route path='/data/card' element={<DefaultLayout><CardDataView /></DefaultLayout>}/>
-                        <Route path='/data/otag/:tag' element={<DefaultLayout><OtagView /></DefaultLayout>}/>
-                        <Route path='/data/otag' element={<DefaultLayout><TagManager /></DefaultLayout>}/>
-                        <Route path='/cube' element={<DefaultLayout><CubeDataView /></DefaultLayout>}/>
-                        <Route
-                          path='/saved'
-                          element={<DefaultLayout><SavedCardsEditor {...project} /></DefaultLayout>}
+            <ToasterContext.Provider value={toasterValue}>
+              <ErrorBoundary FallbackComponent={RenderErrorFallback}>
+                <div className='root' onClick={handleClickOutsideContextMenu}>
+                  <Routes>
+                    <Route path="/data/cube/*" element={<DefaultLayout><CubeRedirect /></DefaultLayout>} />
+                    <Route path="/cube/:key/*" element={<DefaultLayout><CubeView /></DefaultLayout>} />
+                    <Route path='/data/card' element={<DefaultLayout><CardDataView /></DefaultLayout>}/>
+                    <Route path='/data/otag/:tag' element={<DefaultLayout><OtagView /></DefaultLayout>}/>
+                    <Route path='/data/otag' element={<DefaultLayout><TagManager /></DefaultLayout>}/>
+                    <Route path='/cube' element={<DefaultLayout><CubeDataView /></DefaultLayout>}/>
+                    <Route path='/about-me' element={<DefaultLayout><AppInfo /></DefaultLayout>} />
+                    <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
+                    <Route path='/user-guide/*' element={<DocsView />} />
+                    <Route path='/history' element={<DefaultLayout><HistoryView /></DefaultLayout>} />
+                    <Route path="/settings" element={<DefaultLayout><SettingsView /></DefaultLayout>} />
+                    <Route path="/" element={
+                      <div className='search-view-root'>
+                        <SearchView
+                          memory={memory}
+                          showSavedCards={showSavedCards} setShowSavedCards={setShowSavedCards}
+                          addCard={addCard}
+                          path={path}
+                          queries={queries}
+                          setQueries={setQueries}
+                          toggleIgnoreId={toggleIgnoreId}
+                          ignoredIds={ignoredIds}
                         />
-                        <Route path='/about-me' element={<DefaultLayout><AppInfo /></DefaultLayout>} />
-                        <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
-                        <Route path='/user-guide/*' element={<DocsView />} />
-                        <Route path='/history' element={<DefaultLayout><HistoryView /></DefaultLayout>} />
-                        <Route path="/settings" element={<DefaultLayout><SettingsView /></DefaultLayout>} />
-                        <Route path="/" element={<SearchView />} />
-                        <Route path="*" element={<DefaultLayout><NotFoundView /></DefaultLayout>} />
-                      </Routes>
-                    <Toaster />
-                    <ContextMenu contextKey={cubeContext} />
-                  </div>
-                </ErrorBoundary>
-              </DndProvider>
+                        <div className={`saved-cards-floater ${showSavedCards ? 'show' : 'hide'}`}>
+                          {showSavedCards && <SavedCardsEditor
+                            path={path}
+                            savedCards={savedCards}
+                            setSavedCards={setSavedCards}
+                            renameQuery={renameQuery}
+                            removeCard={removeCard}
+                          />}
+                        </div>
+                      </div>
+                    } />
+                    <Route path='*' element={<DefaultLayout><NotFoundView /></DefaultLayout>} />
+                  </Routes>
+                  <Toaster />
+                  <ContextMenu contextKey={cubeContext} />
+                </div>
+              </ErrorBoundary>
             </ToasterContext.Provider>
           </ProjectContext.Provider>
         </BulkCubeImporterContext.Provider>

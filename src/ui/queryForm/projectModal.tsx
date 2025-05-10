@@ -185,9 +185,12 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
     }
   }
 
+  if (modalState === ModalState.Closed)
+    return null;
+
   return <Modal
     className="project-modal"
-    open={modalState !== ModalState.Closed}
+    open
     title={<div className="row center">
       <h2>Manage projects</h2>
       {error && <div className='alert'>{error}</div>}

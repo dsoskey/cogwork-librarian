@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { cogDB, ProjectFolder } from './db'
 import { useLocalStorage } from './useLocalStorage'
 import { INTRO_EXAMPLE } from '../example'
@@ -24,10 +24,6 @@ export interface ProjectDao {
   queries: string[]
   setQueries: Setter<string[]>
   path: string;
-  currentLine: string;
-  setCurrentLine: Setter<string>
-  currentIndex: number
-  setCurrentIndex: Setter<number>
   savedCards: SavedCardSection[]
   setSavedCards: Setter<SavedCardSection[]>
   ignoredIds: string[]
@@ -44,10 +40,6 @@ const defaultDao: ProjectDao = {
   ignoredIds: [],
   toggleIgnoreId: defaultFunction("ProjectDao.toggleIgnoreId"),
   setIgnoredIds: defaultFunction("ProjectDao.setIgnoredIds"),
-  currentIndex: 0,
-  currentLine: '',
-  setCurrentIndex: defaultFunction("ProjectDao.setCurrentIndex"),
-  setCurrentLine: defaultFunction("ProjectDao.setCurrentLine"),
   createFolder: defaultPromise("ProjectDao.createFolder"),
   deleteFolder: defaultPromise("ProjectDao.deleteFolder"),
   newProject: defaultPromise("ProjectDao.newProject"),
@@ -104,11 +96,6 @@ export function useProjectDao(): ProjectDao {
       return sections;
     }
   );
-  const [currentIndex, setCurrentIndex] = useState<number | undefined>(
-    savedCards.length ? 0 : undefined
-  )
-  const [currentLine, setCurrentLine] = useState<string | undefined>(undefined);
-
   const [ignoredIds, setIgnoredIds] = useLocalStorage<string[]>('project.ignore-list', [])
   const toggleIgnoreId = useCallback(
     (next: string) =>
@@ -166,17 +153,9 @@ export function useProjectDao(): ProjectDao {
     }
   }
 
-  const createFolder = async (path: string) => {
-    try {
-      await cogDB.projectFolder.add({ path })
-    } catch (e) {
-      throw Error(`a folder already exists at ${path}`)
-    }
-    return { path }
-  }
 
   // todo: handle the current project being deleted.
-  const deleteFolder = async (path: string) => {
+  const deleteFolder = useCallback(async (path: string) => {
     if (initialPath.startsWith(path)) {
       throw Error(`Can't delete ${path} with active project ${initialPath}. switch to a different project to proceed`)
     }
@@ -191,9 +170,9 @@ export function useProjectDao(): ProjectDao {
     })
 
     return deleted;
-  }
+  }, [initialPath]);
 
-  const _createProject = async (project: Project) => {
+  const _createProject = useCallback(async (project: Project) => {
     await saveMemory();
     const { path } = project;
     const [folder, _] = splitPath(path);
@@ -208,9 +187,9 @@ export function useProjectDao(): ProjectDao {
     }
     loadMemory(project);
     return project;
-  }
+  }, [saveMemory, loadMemory]);
 
-  const newProject = async (path: string) => {
+  const newProject = useCallback(async (path: string) => {
     const now = new Date();
     const newProject: Project = {
       path: path,
@@ -221,8 +200,8 @@ export function useProjectDao(): ProjectDao {
       updatedAt: now,
     }
     return _createProject(newProject);
-  }
-  const importProject = async (project: Project) => {
+  }, [_createProject]);
+  const importProject = useCallback(async (project: Project) => {
     const folderParts = project.path.split("/")
     folderParts.pop();
     const toCreate: ProjectFolder[] = [];
@@ -237,9 +216,9 @@ export function useProjectDao(): ProjectDao {
     }
     await cogDB.projectFolder.bulkPut(toCreate);
     return _createProject(project);
-  }
+  }, [_createProject])
 
-  const openProject = async (path: string) => {
+  const openProject = useCallback(async (path: string) => {
     await saveMemory();
 
     const toOpen = await cogDB.project.get(path);
@@ -248,9 +227,9 @@ export function useProjectDao(): ProjectDao {
     }
     loadMemory(toOpen)
     return toOpen;
-  }
+  }, [saveMemory, loadMemory])
 
-  const moveProject = async (oldPath: string, newPath: string) => {
+  const moveProject = useCallback(async (oldPath: string, newPath: string) => {
     if (oldPath === newPath) throw Error("can't move path to itself")
     if (oldPath === initialPath) {
       await saveMemory();
@@ -267,9 +246,9 @@ export function useProjectDao(): ProjectDao {
       setInitialPath(newPath);
       _setCurrentPath(newPath);
     }
-  }
+  }, [initialPath, saveMemory, setInitialPath, _setCurrentPath]);
 
-  const moveFolder = async (oldPath: string, newPath: string) => {
+  const moveFolder = useCallback(async (oldPath: string, newPath: string) => {
     if (oldPath === newPath) throw Error("can't move path to itself")
     if (initialPath.startsWith(oldPath)) {
       await saveMemory();
@@ -297,19 +276,19 @@ export function useProjectDao(): ProjectDao {
     }
 
     return changed
-  }
+  }, [initialPath, saveMemory, setInitialPath, _setCurrentPath])
 
   // todo: handle the current project being deleted.
-  const deleteProject = async (path: string) => {
+  const deleteProject = useCallback(async (path: string) => {
     if (path === initialPath) {
       throw Error("can't delete the active project. switch to a different one first.")
     }
     await cogDB.project.delete(path);
     return new Set([path]);
-  }
+  }, [initialPath]);
 
   const setSavedCards = keepUpdated(_setSavedCards, _setUpdatedAt)
-  const addCard = (query: string, card: Card) => {
+  const addCard = useCallback((query: string, card: Card) => {
     setSavedCards((prev) => {
       const next = cloneDeep(prev);
       let sectionIndex = next.findIndex(it => it.query===query)
@@ -325,9 +304,9 @@ export function useProjectDao(): ProjectDao {
       }
       return next;
     })
-  }
+  }, [setSavedCards]);
 
-  const renameQuery = (queryIndex: number, newQuery: string) => {
+  const renameQuery = useCallback((queryIndex: number, newQuery: string) => {
     setSavedCards(prev => {
       if (queryIndex < 0 || queryIndex > prev.length - 1) return prev;
       if (prev[queryIndex].query === newQuery) return prev;
@@ -337,9 +316,9 @@ export function useProjectDao(): ProjectDao {
       next[queryIndex].query = newQuery;
       return next;
     })
-  }
+  }, [setSavedCards]);
 
-  const removeCard = (queryIndex: number, cardIndex: number) => {
+  const removeCard = useCallback((queryIndex: number, cardIndex: number) => {
     setSavedCards(prev => {
       if (queryIndex < 0 || queryIndex > prev.length - 1) return prev;
 
@@ -347,9 +326,9 @@ export function useProjectDao(): ProjectDao {
       next[queryIndex].cards.splice(cardIndex, 1);
       return next;
     })
-  }
+  }, [setSavedCards]);
 
-  const removeQuery = (queryIndex: number) => {
+  const removeQuery = useCallback((queryIndex: number) => {
     setSavedCards(prev => {
       if (queryIndex < 0 || queryIndex > prev.length - 1) return prev;
 
@@ -357,7 +336,7 @@ export function useProjectDao(): ProjectDao {
       next.splice(queryIndex, 1)
       return next;
     })
-  }
+  }, [setSavedCards]);
 
   useEffect(() => {
     (async () => {
@@ -391,8 +370,15 @@ export function useProjectDao(): ProjectDao {
     savedCards,
     setSavedCards, addCard, renameQuery, removeCard, removeQuery,
     path: currentPath,
-    currentLine, setCurrentLine,
-    currentIndex, setCurrentIndex,
     ignoredIds, toggleIgnoreId, setIgnoredIds
   }
+}
+
+async function createFolder(path: string) {
+  try {
+    await cogDB.projectFolder.add({ path })
+  } catch (e) {
+    throw Error(`a folder already exists at ${path}`)
+  }
+  return { path }
 }

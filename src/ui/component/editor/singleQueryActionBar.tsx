@@ -1,6 +1,5 @@
 import React from 'react'
 import { rankInfo } from './infoLines'
-import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
 
 export const singleQueryInfo =
   (renderSubquery: (count: number) => string = rankInfo) =>
@@ -35,8 +34,6 @@ export const SingleQueryActionBar = ({
   queries,
   copyText,
 }: SingleQueryActionBarProps) => {
-
-  useHighlightPrism([queries])
   const lineInfo = renderQueryInfo(queries)
 
   return <pre tabIndex={-1} className='language-none labels'>

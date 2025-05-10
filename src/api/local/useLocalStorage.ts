@@ -1,6 +1,6 @@
 // Shamelessly stolen from https://usehooks.com/useLocalStorage/
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export const useLocalStorage = <T>(
   key: string,
@@ -33,27 +33,14 @@ export const useLocalStorage = <T>(
     }
   })
 
-  // Return a wrapped version of useState's setter function that ...
-  // ... persists the new value to localStorage.
-  const setValue = (value: T | ((val: T) => T)) => {
-    try {
-      // Allow value to be a function so we have same API as useState
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value
-      // Save state
-      setStoredValue(valueToStore)
-      // Save to local storage
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(
-          `${key}.coglib.sosk.watch`,
-          JSON.stringify(valueToStore)
-        )
-      }
-    } catch (error) {
-      // A more advanced implementation would handle the error case
-      console.log(error)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(
+        `${key}.coglib.sosk.watch`,
+        JSON.stringify(storedValue)
+      )
     }
-  }
+  }, [storedValue])
 
-  return [storedValue, setValue] as const
+  return [storedValue, setStoredValue] as const
 }

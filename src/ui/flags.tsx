@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useMemo, useState } from 'react'
 import _cloneDeep from 'lodash/cloneDeep'
 export type { Flag } from '../../config'
 import { ClientConfig, Flag } from '../../config'
@@ -35,8 +35,10 @@ export const FlagContextProvider = ({ children }) => {
     })
   }
 
+  const value = useMemo(() => ({ flags, setFlag }), [flags, setFlag])
+
   return (
-    <FlagContext.Provider value={{ flags, setFlag }}>
+    <FlagContext.Provider value={value}>
       {children}
     </FlagContext.Provider>
   )

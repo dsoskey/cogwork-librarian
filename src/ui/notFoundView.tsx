@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FlagContext } from './flags'
 import { Autocomplete } from './component/autocomplete'
-import { CogDBContext } from '../api/local/useCogDB'
+import { CARD_INDEX } from '../api/local/cardIndex'
 
 export interface NotFoundViewProps {
 
@@ -10,7 +10,6 @@ export interface NotFoundViewProps {
 
 export function NotFoundView({}: NotFoundViewProps) {
   const { proxyTest } = useContext(FlagContext).flags;
-  const { handleAutocomplete } = useContext(CogDBContext);
 
   const [value, setValue] = useState<string>("");
 
@@ -22,7 +21,7 @@ export function NotFoundView({}: NotFoundViewProps) {
       value={value}
       setValue={setValue}
       onChange={(e) => setValue(e.target.value)}
-      getCompletions={handleAutocomplete}
+      getCompletions={CARD_INDEX.handleAutocomplete}
     />
 
       {proxyTest && <ProxyTest />}

@@ -22,7 +22,7 @@ textarea.coglib-prism-theme {
   margin-left: 0;
 }
 
-.query-editor {
+.text-editor-root {
   --toolbar-height: 24px;
   --gutter-width: 0.25em;
   /*margin-top: var(--spacing-200);*/
@@ -84,9 +84,26 @@ textarea.coglib-prism-theme {
     display: flex;
     flex-direction: column;
     cursor: default;
+    background-color: var(--darker-color);
     padding-right: 0;
     padding-left: 0;
     padding-bottom: var(--spacing-100);
+    padding-top: var(--toolbar-height, 1em);
+
+    overflow: auto;
+
+    code {
+      font-family: var(--monospace-family);
+      font-size: 1em;
+      text-align: left;
+      word-spacing: normal;
+      word-break: normal;
+      word-wrap: normal;
+      line-height: 1.5;
+      tab-size: 4;
+      hyphens: none;
+    }
+
 
     .line-number {
       color: color-mix(var(--color-interpolation), var(--dark300), var(--light600) 50%);

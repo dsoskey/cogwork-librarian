@@ -1,13 +1,8 @@
 import { QueryForm } from './queryForm/queryForm'
 import { BrowserView } from './cardBrowser/browserView'
-import React, { useContext, useEffect, useState } from 'react'
-import { ProjectContext } from '../api/local/useProjectDao'
-import { useLocalStorage } from '../api/local/useLocalStorage'
-import { DataSource } from '../types'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Setter } from '../types'
 import { useMemoryQueryRunner } from '../api/local/useQueryRunner'
-import { useScryfallQueryRunner } from '../api/scryfall/useQueryRunner'
-import { CogDBContext } from '../api/local/useCogDB'
-import { SavedCardsEditor } from './savedCards'
 import { Masthead } from './component/masthead'
 import { Footer } from './footer'
 import { parseQuerySet } from '../api/mtgql-ep/parser'
@@ -17,26 +12,35 @@ import { RunStrategy } from '../api/queryRunnerCommon'
 import { SearchOptionPicker, useSearchOptions } from './settingsView'
 import { GearIcon } from './icons/gear'
 import { Modal } from './component/modal'
+import { Card, NormedCard } from 'mtgql'
 
-export const SearchView = () => {
-  const cogDB = useContext(CogDBContext);
-  const project = useContext(ProjectContext);
+export interface SearchViewProps {
+  showSavedCards: boolean;
+  setShowSavedCards: Setter<boolean>;
+  path: string;
+  addCard: (query: string, card: Card) => void;
+  queries: string[]
+  setQueries: Setter<string[]>;
+  toggleIgnoreId: (id: string) => void;
+  ignoredIds: string[]
+  memory: NormedCard[]
+}
+export const SearchView = ({
+  showSavedCards, setShowSavedCards,
+  memory,
+  path, addCard, queries, setQueries, toggleIgnoreId, ignoredIds
+}: SearchViewProps) => {
+
   const [options, setters] = useSearchOptions();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const { path, savedCards, setSavedCards, queries, addCard } = project
 
-  const [source, setSource] = useLocalStorage<DataSource>('source', 'local')
-  const queryRunner = {
-    local: useMemoryQueryRunner({ corpus: cogDB.memory }),
-    scryfall: useScryfallQueryRunner({}),
-  }[source]
+  const { result, report, status, runStrategy, errors, generateVenn,run } = useMemoryQueryRunner({ corpus: memory });
   const [extendedParseError, setExtendedParseError] = useState<CogError[]>([])
-  const errorsToDisplay = extendedParseError.length > 0 ? extendedParseError : queryRunner.errors
+  const errorsToDisplay = extendedParseError.length > 0 ? extendedParseError : errors
   const [lastQueries, setLastQueries] = useState<string[]>([])
 
-  const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>("showSavedCards", true)
 
-  const execute = (baseIndex: number, selectedIndex: number) => {
+  const execute = useCallback((baseIndex: number, selectedIndex: number) => {
     console.debug(`submitting query at line ${baseIndex}`)
     if (baseIndex < 0 || baseIndex >= queries.length) {
       console.error("baseIndex is out of bounds")
@@ -49,43 +53,43 @@ export const SearchView = () => {
       const { strategy, getWeight, injectPrefix } = querySet;
       const executedAt = new Date();
       let promise: Promise<void>
-      if (strategy === RunStrategy.Venn && queryRunner.generateVenn !== undefined) {
+      if (strategy === RunStrategy.Venn && generateVenn !== undefined) {
         const [left, right, ...rest] = querySet.queries
-        promise = queryRunner.generateVenn(left, right, rest, options, getWeight)
+        promise = generateVenn(left, right, rest, options, getWeight)
       } else {
-        promise = queryRunner.run(querySet.queries, options, injectPrefix, getWeight)
+        promise = run(querySet.queries, options, injectPrefix, getWeight)
       }
       setLastQueries(querySet.rawQueries);
       promise.then(() =>
         cogDBClient.history.put({
           rawQueries: querySet.queries,
           baseIndex,
-          source,
+          source: 'local',
           strategy,
           executedAt,
-          projectPath: project.path,
+          projectPath: path,
         })
       ).catch(error => {
         console.error(error)
         cogDBClient.history.put({
           rawQueries: querySet.queries,
           baseIndex,
-          source,
+          source: 'local',
           strategy,
           errorText: error.toString(),
           executedAt,
-          projectPath: project.path,
+          projectPath: path,
         })
       })
     } catch (error) {
       setExtendedParseError([error])
     }
-  }
+  }, [queries, run, generateVenn, setLastQueries, path, setExtendedParseError, options]);
 
   useEffect(() => {
     const handleFocusShortcut = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "'") {
-        const element = document.querySelector(".query-editor .controller");
+        const element = document.querySelector(".text-editor-root .controller");
         element?.focus?.()
       }
     }
@@ -93,14 +97,9 @@ export const SearchView = () => {
     return () => document.removeEventListener("keydown", handleFocusShortcut)
   }, [])
 
-  const settingsButton = <button
-    className='rotate-on-hover'
-    title="search settings"
-    onClick={() => setSettingsOpen(true)}>
-    <GearIcon className="rotate-target" />
-  </button>
+  const handleSettingsClick = useCallback(() => setSettingsOpen(true), [setSettingsOpen]);
 
-  return <div className='search-view-root'>
+  return <>
     <div className='query-panel'>
       <div className='row top'>
         <Masthead />
@@ -109,27 +108,32 @@ export const SearchView = () => {
         </button>
       </div>
       <QueryForm
-        status={queryRunner.status}
+        queries={queries}
+        setQueries={setQueries}
+        status={status}
         execute={execute}
-        source={source}
-        setSource={setSource}
-        settingsButton={settingsButton}
+        settingsButton={<button
+          className='rotate-on-hover'
+          title="search settings"
+          onClick={handleSettingsClick}>
+        <GearIcon className="rotate-target" />
+      </button>}
       />
       <BrowserView
         lastQueries={lastQueries}
-        report={queryRunner.report}
-        result={queryRunner.result}
-        status={queryRunner.status}
+        report={report}
+        result={result}
+        status={status}
         errors={errorsToDisplay}
         addCard={addCard}
-        addIgnoredId={project.toggleIgnoreId}
-        ignoredIds={project.ignoredIds}
-        source={source}
-        runStrategy={queryRunner.runStrategy ?? RunStrategy.Search}
+        addIgnoredId={toggleIgnoreId}
+        ignoredIds={ignoredIds}
+        source="local"
+        runStrategy={runStrategy ?? RunStrategy.Search}
       />
       <Footer />
     </div>
-    <Modal
+    {settingsOpen && <Modal
       open={settingsOpen}
       onClose={() => setSettingsOpen(false)}
       title={<h2 className="row center">
@@ -138,10 +142,6 @@ export const SearchView = () => {
       </h2>}
     >
       <SearchOptionPicker options={options} {...setters} />
-    </Modal>
-
-    {<div className={`saved-cards-floater ${showSavedCards ? "show" : "hide"}`}>
-      {showSavedCards && <SavedCardsEditor path={path} savedCards={savedCards} setSavedCards={setSavedCards} />}
-    </div>}
-  </div>;
+    </Modal>}
+  </>;
 }

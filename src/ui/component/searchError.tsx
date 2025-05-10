@@ -16,7 +16,6 @@ export const SearchError = ({ report, source, errors }: SearchErrorProps) => {
     () => errors.map((it) => `- ${it.displayMessage}`).join('\n\n'),
     [errors]
   )
-  useHighlightPrism([errorText])
   return <div>
     {report.start && report.end && (
       <>

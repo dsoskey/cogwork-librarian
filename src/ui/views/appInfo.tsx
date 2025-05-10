@@ -10,7 +10,6 @@ export const AppInfo = () => {
   const { setFlag } = useContext(FlagContext)
   const [pin1, setPin1] = useState(false)
   const [pin2, setPin2] = useState(false)
-  useHighlightPrism([])
 
   const tryLock = () => {
     if (pin1) {
@@ -131,8 +130,6 @@ export const AppInfo = () => {
 }
 
 export function WhatsNext() {
-  useHighlightPrism([]);
-
   return <div className="prose">
     <Routes>
       <Route path="/git-cube" element={<MDDoc>{gitcube}</MDDoc>}/>

@@ -7,7 +7,7 @@ import { GithubIcon } from '../icons/github'
 import { CoinIcon } from '../icons/coins'
 import { LightbulbIcon } from '../icons/lightbulb'
 
-export function Footer() {
+export const Footer = React.memo(() => {
   return (
     <footer className='footer'>
       <div className='links'>
@@ -86,4 +86,4 @@ export function Footer() {
       </div>
     </footer>
   )
-}
+});

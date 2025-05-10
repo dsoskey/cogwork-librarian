@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Language, useHighlightPrism } from "../../../api/local/syntaxHighlighting";
 import { MultiQueryActionBar } from "./multiQueryActionBar";
 import "./textEditor.css";
@@ -82,7 +82,7 @@ export interface TextEditorProps {
   gutterColumns?: GutterColumn[];
   className?: string;
 }
-
+const DEFAULT_GUTTER_COLUMNS: GutterColumn[] = ["line-numbers", "multi-info", "submit-button"];
 export const TextEditor = ({
   queries,
   setQueries,
@@ -93,7 +93,7 @@ export const TextEditor = ({
   disabled,
   settingsButton,
   className = "",
-  gutterColumns = ["line-numbers", "multi-info", "submit-button"],
+  gutterColumns = DEFAULT_GUTTER_COLUMNS,
 }: TextEditorProps) => {
   const separator = "\n";
   const value = queries.join(separator);
@@ -150,10 +150,10 @@ export const TextEditor = ({
     linker.current!.scrollTop = event.target.scrollTop;
   };
 
-  const copyText = (mindex: number, maxdex: number) => {
+  const copyText = useCallback((mindex: number, maxdex: number) => {
     controller.current?.focus();
     controller.current?.setSelectionRange(mindex, maxdex);
-  };
+  }, []);
 
   useHighlightPrism([value, language]);
   React.useLayoutEffect(() => {
@@ -183,7 +183,7 @@ export const TextEditor = ({
   }, []);
   return (
     <div
-      className={`query-editor focusable ${separateLayers ? "separated" : ""}` + className}
+      className={`text-editor-root focusable ${separateLayers ? "separated" : ""}` + className}
       onKeyDown={handleDown}
     >
       <MultiQueryActionBar

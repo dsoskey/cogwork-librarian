@@ -98,7 +98,7 @@
 }
 
 .docs-view {
-    .query-editor {
+    .text-editor-root {
         a {
             text-decoration: underline;
         }

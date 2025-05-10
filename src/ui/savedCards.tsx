@@ -1,8 +1,8 @@
-import React, { useCallback, useContext, useMemo, useRef, useState } from 'react'
+import React, { KeyboardEvent, useCallback, useMemo, useRef, useState } from 'react'
 import './savedCards.css'
 import { COPY_BUTTON_ICONS, CopyToClipboardButton } from './component/copyToClipboardButton'
 import { CardEntry, parseEntry, serializeEntry } from '../api/local/types/cardEntry'
-import { ProjectContext, ProjectDao, splitPath } from '../api/local/useProjectDao'
+import { ProjectDao, splitPath } from '../api/local/useProjectDao'
 import { Modal } from './component/modal'
 import { HoverableInput } from './card/CardLink'
 import { LastQueryDisplay } from './cardBrowser/lastQueryDisplay'
@@ -19,17 +19,26 @@ import { DragHandle } from './icons/dragHandle'
 import { useMultiInputEditor } from './hooks/useMultiInputEditor'
 import _isEqual from 'lodash/isEqual'
 import { REFOCUS_TIMEOUT } from './flags'
-import { CogDBContext } from '../api/local/useCogDB'
+import { Setter } from '../types'
+import { SavedCardSection } from '../api/local/types/project'
 
-type PropsKeys = "path" | "savedCards" | "setSavedCards"
-export type SavedCardsEditorProps = Pick<ProjectDao, PropsKeys>
+import { CARD_INDEX } from '../api/local/cardIndex'
+
+type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery" | "removeCard"
+export interface SavedCardsEditorProps extends Pick<ProjectDao, PropsKeys> {
+}
 
 
-export const SavedCardsEditor = React.memo(({
-  path,
-  savedCards,
-  setSavedCards,
-}: SavedCardsEditorProps) => {
+export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
+  const { path,
+    savedCards, setSavedCards,
+    removeCard, renameQuery
+  } = props;
+  const [currentIndex, setCurrentIndex] = useState<number | undefined>(
+    savedCards.length ? 0 : undefined
+  )
+  const [currentLine, setCurrentLine] = useState<string | undefined>(undefined);
+
   let ref= useRef(null);
   const confirmer = useConfirmDelete();
 
@@ -106,11 +115,18 @@ export const SavedCardsEditor = React.memo(({
           cards={section.cards}
           setQuerySelected={(s) => setQuerySelected(s, sectionIndex)}
           setCardEntry={(cardEntry, index) => setCardEntry(cardEntry, sectionIndex, index)}
+          currentIndex={currentIndex}
+          currentLine={currentLine}
+          setSavedCards={setSavedCards}
+          setCurrentIndex={setCurrentIndex}
+          setCurrentLine={setCurrentLine}
+          removeCard={removeCard}
+          renameQuery={renameQuery}
         />)}
     </DndContext>
 
     <AddQueryButton setSavedCards={setSavedCards} />
-    <Modal
+    {confirmer.confirming && <Modal
       className='modal-small'
       open={confirmer.confirming}
       title={<p className='alert'>
@@ -126,9 +142,9 @@ export const SavedCardsEditor = React.memo(({
         </button>
         <button onClick={confirmer.hide}>cancel</button>
       </div>
-    </Modal>
+    </Modal>}
   </div>
-})
+});
 
 
 interface SavedSectionEditorProps {
@@ -138,14 +154,23 @@ interface SavedSectionEditorProps {
   setQuerySelected: (selected: boolean) => void;
   cards: CardEntry[];
   setCardEntry: (cardEntry: CardEntry, index: number) => void;
+  renameQuery: any
+  removeCard: any
+  setSavedCards: Setter<SavedCardSection[]>
+  currentLine: string
+  setCurrentLine: Setter<string>
+  currentIndex: number
+  setCurrentIndex: Setter<number>
 }
 
-function SavedSectionEditor({ query, queryIndex, querySelected, setQuerySelected, cards, setCardEntry }: SavedSectionEditorProps) {
-  const { renameQuery, removeCard, setSavedCards,
-    // todo: current line & index handle multiple sections
-    currentLine, setCurrentLine ,
-    currentIndex, setCurrentIndex } = useContext(ProjectContext)
-  const { handleAutocomplete } = useContext(CogDBContext);
+function SavedSectionEditor({
+  query, queryIndex,
+  querySelected, setQuerySelected,
+  cards, setCardEntry,
+  renameQuery, removeCard, setSavedCards,
+  currentLine, setCurrentLine,
+  currentIndex, setCurrentIndex,
+}: SavedSectionEditorProps) {
   const [editingQuery, setEditingQuery] = useState<boolean>(false)
   const [editValue, setEditValue] = useState<string>(query)
 
@@ -282,6 +307,8 @@ function SavedSectionEditor({ query, queryIndex, querySelected, setQuerySelected
     ? droppable.over.id !== droppable.active.id && <div className="drop-indicator">merge into </div>
     : null;
 
+  const copyText = useMemo(() => `\`\`\`\n${query}\n\`\`\`\n${cards.map(serializeEntry).join('\n')}`, [query, cards]);
+
   return <div ref={droppable.setNodeRef} style={dropstyle} className='saved-section-root'>
 
     <div className="saved-section-draggable" ref={setNodeRef} style={dragstyle} {...attributes}>
@@ -318,38 +345,25 @@ function SavedSectionEditor({ query, queryIndex, querySelected, setQuerySelected
           />
         </>}
         editorControls={<>
-          <CopyToClipboardButton copyText={query} buttonText={COPY_BUTTON_ICONS} />
+          <CopyToClipboardButton copyText={copyText} buttonText={COPY_BUTTON_ICONS} />
           <button onClick={handleEditQuery} title='edit query'><PencilIcon /></button>
           {dropIndicator}
         </>}
       />}
 
-      <div ref={refCardContainer}>{cards.map((card, cardIndex) => <div key={cardIndex} className='saved-card-row row center'>
-        <div className='quantity'>{card.quantity}</div>
-        <HoverableInput 
-          className="card-entry-editor"
-          onKeyDown={onKeyDown(cardIndex)}
-          onFocus={() => {
-            setCurrentLine(serializeEntry(card))
-            setCurrentIndex(cardIndex)
-          }}
-          onBlur={syncLine}
-          value={card.name}
-          getCompletions={handleAutocomplete}
-          onChange={(event) => {
-            const newEntry = { ...card, name: event.target.value };
-            setCurrentLine(serializeEntry(newEntry));
-            setCardEntry(newEntry, cardIndex)
-
-          }}
-          setValue={value => {
-            const newEntry = { ...card, name: value };
-            setCurrentLine(serializeEntry(newEntry));
-            setCardEntry(newEntry, cardIndex)
-          }}
-        />
-        <button onClick={() => removeCard(queryIndex, cardIndex)}>X</button>
-      </div>)}
+      <div ref={refCardContainer}>
+        {cards.map((card, cardIndex) => <SavedCardInput
+          key={cardIndex}
+          card={card}
+          cardIndex={cardIndex}
+          queryIndex={queryIndex}
+          onKeyDown={onKeyDown}
+          setCurrentLine={setCurrentLine}
+          setCurrentIndex={setCurrentIndex}
+          syncLine={syncLine}
+          setCardEntry={setCardEntry}
+          removeCard={removeCard}
+        />)}
       </div>
     </div>
   </div>
@@ -357,7 +371,7 @@ function SavedSectionEditor({ query, queryIndex, querySelected, setQuerySelected
   function handleEditQuery() {
     setEditingQuery(true)
     setTimeout(() => {
-      const element: HTMLTextAreaElement = document.querySelector(`.query-editor.editor-${queryIndex} .controller`);
+      const element: HTMLTextAreaElement = document.querySelector(`.text-editor-root.editor-${queryIndex} .controller`);
       if (element) {
         element.focus?.()
         element.selectionStart = query.length;
@@ -389,6 +403,57 @@ function SavedSectionEditor({ query, queryIndex, querySelected, setQuerySelected
       })
     }
   }
+}
+
+interface SavedCardInputProps {
+  card: CardEntry;
+  cardIndex: number;
+  queryIndex: number;
+  onKeyDown: (index: number) => (event: KeyboardEvent<HTMLInputElement>) => void;
+  setCurrentLine: Setter<string>;
+  setCurrentIndex: Setter<number>;
+  syncLine: () => void;
+  setCardEntry: (cardEntry: CardEntry, index: number) => void;
+  removeCard: (queryIndex: number, cardIndex: number) => void;
+}
+function SavedCardInput({
+  card,
+  cardIndex,
+  queryIndex,
+  onKeyDown,
+  setCurrentLine,
+  setCurrentIndex,
+  setCardEntry,
+  syncLine,
+  removeCard,
+}: SavedCardInputProps) {
+
+  return <div className='saved-card-row row center'>
+    <div className='quantity'>{card.quantity}</div>
+    <HoverableInput
+      className="card-entry-editor"
+      onKeyDown={onKeyDown(cardIndex)}
+      onFocus={() => {
+        setCurrentLine(serializeEntry(card))
+        setCurrentIndex(cardIndex)
+      }}
+      onBlur={syncLine}
+      value={card.name}
+      getCompletions={CARD_INDEX.handleAutocomplete}
+      onChange={(event) => {
+        const newEntry = { ...card, name: event.target.value };
+        setCurrentLine(serializeEntry(newEntry));
+        setCardEntry(newEntry, cardIndex)
+
+      }}
+      setValue={value => {
+        const newEntry = { ...card, name: value };
+        setCurrentLine(serializeEntry(newEntry));
+        setCardEntry(newEntry, cardIndex)
+      }}
+    />
+    <button onClick={() => removeCard(queryIndex, cardIndex)}>X</button>
+  </div>
 }
 
 function AddQueryButton({ setSavedCards }) {

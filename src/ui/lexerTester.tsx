@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useHighlightPrism } from '../api/local/syntaxHighlighting'
 import { buildLexer } from 'mtgql'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 
@@ -8,8 +7,6 @@ export const LexerTester = () => {
   const [text, setText] = useLocalStorage<string>("lexer-test-value", "")
   const [tokens, setTokens] = useState<any[]>([])
   const [error, setError] = useState<Error | undefined>()
-
-  useHighlightPrism([text]);
 
   const runLexer = () => {
     const toSubmit = text.trim()

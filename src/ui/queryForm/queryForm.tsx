@@ -35,31 +35,27 @@ const DatabaseSettings = () => {
 export interface QueryFormProps {
   status: TaskStatus
   execute: (startIndex: number, selectedIndex: number) => void
-  source: DataSource
-  setSource: Setter<DataSource>
+  queries: string[]
+  setQueries: Setter<string[]>
   settingsButton?: React.ReactNode;
 }
 
 export function QueryForm({
   status,
   execute,
-  source,
-  setSource,
   settingsButton,
+  queries,
+  setQueries,
 }: QueryFormProps) {
-  const { queries, setQueries } = useContext(ProjectContext);
   const { memStatus } = useContext(CogDBContext);
-  const { searchSource } = useContext(FlagContext).flags;
 
   // something about prism overrides the state update for this css class
 
-  const canRunQuery = source === 'scryfall' || memStatus === 'success'
-  const canSubmit = canRunQuery && status !== 'loading'
-  const iconSize = 30
+  const canSubmit = memStatus === 'success' && status !== 'loading'
   return (
     <div className='query-form'>
       <ProjectTabs />
-      <div className={source}>
+      <div className='local'>
         <TextEditor
           queries={queries}
           setQueries={setQueries}
@@ -69,56 +65,7 @@ export function QueryForm({
           language='scryfall-extended-multi'
         />
       </div>
-      {!searchSource && <CombinedStatusLoader />}
-      {searchSource &&
-        <div className='row center execute-controls'>
-          <label><span className='bold'>data source:</span></label>
-          <div className={`source-option row center ${source === 'local' ? 'selected' : ''}`}>
-            <div className='radio-button-holder'>
-              <CoglibIcon
-                size={iconSize}
-                isActive={source === 'local'}
-              />
-              <input
-                id={`source-local`}
-                type='radio'
-                value='local'
-                checked={source === 'local'}
-                onChange={() => setSource('local')}
-              />
-            </div>
-            <label htmlFor={`source-local`}>local</label>
-            <DatabaseSettings />
-            <InfoModal
-              title={<h2 className='row center'>
-                <CoglibIcon size={iconSize} />
-                <span>data source: local</span>
-              </h2>}
-              info={description['local']}
-            />
-          </div>
-          <div className={`source-option row center ${source === 'scryfall' ? 'selected' : ''}`}>
-            <div className='radio-button-holder'>
-              <ScryfallIcon
-                isActive={source === 'scryfall'}
-                size={iconSize}
-              />
-              <input
-                id={`source-scryfall`}
-                type='radio'
-                value='scryfall'
-                checked={source === 'scryfall'}
-                onChange={() => setSource('scryfall')}
-              />
-            </div>
-            <label htmlFor={`source-scryfall`}>Scryfall</label>
-            <InfoModal title={<h2 className='row center'>
-              <ScryfallIcon size={iconSize} />
-              <span>data source: Scryfall</span>
-            </h2>} info={description['scryfall']} />
-            <CombinedStatusLoader />
-          </div>
-        </div>}
+      <CombinedStatusLoader />
     </div>
   )
 }

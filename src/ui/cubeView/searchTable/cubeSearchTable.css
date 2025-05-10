@@ -28,7 +28,7 @@
         .search-row-input {
             width: 100%;
         }
-        .query-editor:has(.search-row-input) {
+        .text-editor-root:has(.search-row-input) {
             width: 100%;
         }
         .error-indicator {

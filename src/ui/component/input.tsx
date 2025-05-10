@@ -12,7 +12,7 @@ export interface InputProps extends HTMLAttributes<HTMLInputElement> {
   placeholder?: string
 }
 
-export const Input = React.forwardRef<HTMLDivElement>(({ value, onChange, language, placeholder, ...rest }: InputProps, parentRef) => {
+export const Input = React.forwardRef<HTMLDivElement, InputProps>(({ value, onChange, language, placeholder, ...rest }: InputProps, parentRef) => {
   const controller = useRef<HTMLInputElement>()
   const faker = useRef<HTMLPreElement>()
   const linker = useRef<HTMLPreElement>()
@@ -21,7 +21,7 @@ export const Input = React.forwardRef<HTMLDivElement>(({ value, onChange, langua
     faker.current.scrollLeft = event.target.scrollLeft
     linker.current.scrollLeft = event.target.scrollLeft
   }
-  useHighlightPrism([value])
+  useHighlightPrism([value]);
 
   useEffect(() => {
     controller.current?.addEventListener('scroll', onScroll)
@@ -39,7 +39,7 @@ export const Input = React.forwardRef<HTMLDivElement>(({ value, onChange, langua
   const displayValue = value.length > 0 ? value : placeholder
 
   return (
-    <div className='query-editor query-input' onKeyDown={handleDown} ref={parentRef}>
+    <div className='text-editor-root query-input' onKeyDown={handleDown} ref={parentRef}>
       <pre ref={linker}
            tabIndex={-1}
            aria-hidden

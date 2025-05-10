@@ -1,11 +1,9 @@
 import { CogDBContext, DB_INIT_MESSAGES } from '../../api/local/useCogDB'
 import { LoaderBar, LoaderText } from './loaders'
 import React, { useContext } from 'react'
-import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 
 export function MemStatusLoader() {
   const { dbStatus, memError, memStatus, dbReport } = useContext(CogDBContext)
-  useHighlightPrism([dbStatus, memStatus, memError])
 
   if (dbStatus === "loading") return null
 
@@ -31,8 +29,6 @@ export function MemStatusLoader() {
 
 export function DBStatusLoader() {
   const { dbStatus, dbError, memStatus, dbReport } = useContext(CogDBContext)
-  useHighlightPrism([dbStatus, dbError])
-
   switch (dbStatus) {
     case 'loading':
       return <>

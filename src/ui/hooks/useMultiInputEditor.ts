@@ -1,6 +1,6 @@
 import { KeyboardEvent, MutableRefObject } from 'react'
 
-function _focusEntry (container: MutableRefObject<HTMLElement>, className: string) {
+export function _focusEntry (container: MutableRefObject<HTMLElement>, className: string) {
   return (index: number, backwards?: boolean, selection?: number) => {
     const vector = backwards ? -1 : 1;
     const inputs = container.current.getElementsByClassName(className);

@@ -18,7 +18,7 @@ const DatabaseLink = ({ active }: DatabaseLinkProps) => {
   </Link>
 
 }
-export const Masthead = () => {
+export const Masthead = React.memo(() => {
   const { adminMode } = useContext(FlagContext).flags
   const { pathname } = useLocation()
   const topPath = pathname.replace("/","").split("/")[0]
@@ -74,4 +74,4 @@ export const Masthead = () => {
       </div>
     </div>
   </div>
-}
+});
