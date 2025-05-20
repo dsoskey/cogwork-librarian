@@ -257,6 +257,16 @@ export class TypedDexie extends Dexie implements DataProvider {
     this.version(19).stores({
       project: 'path, createdAt, updatedAt',
     })
+
+    this.version(20).stores({
+      history: '++id, executedAt, project, projectPath',
+    }).upgrade(trans => {
+      return trans.table("history").toCollection().modify(function(value) {
+        if (value.rawQueries.length === 0) {
+          delete this.value;
+        }
+      })
+    })
   }
 }
 export const cogDB = new TypedDexie()

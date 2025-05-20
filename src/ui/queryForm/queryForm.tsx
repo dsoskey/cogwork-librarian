@@ -38,6 +38,8 @@ export interface QueryFormProps {
   queries: string[]
   setQueries: Setter<string[]>
   settingsButton?: React.ReactNode;
+  historyButton?: React.ReactNode;
+  savedCardsToggle?: React.ReactNode;
 }
 
 export function QueryForm({
@@ -46,6 +48,8 @@ export function QueryForm({
   settingsButton,
   queries,
   setQueries,
+  historyButton,
+  savedCardsToggle,
 }: QueryFormProps) {
   const { memStatus } = useContext(CogDBContext);
 
@@ -54,14 +58,14 @@ export function QueryForm({
   const canSubmit = memStatus === 'success' && status !== 'loading'
   return (
     <div className='query-form'>
-      <ProjectTabs />
+      <ProjectTabs savedCardsToggle={savedCardsToggle} />
       <div className='local'>
         <TextEditor
           queries={queries}
           setQueries={setQueries}
           onSubmit={execute}
           canSubmit={canSubmit}
-          settingsButton={settingsButton}
+          settingsButton={<>{settingsButton}{historyButton}</>}
           language='scryfall-extended-multi'
         />
       </div>

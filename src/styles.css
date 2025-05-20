@@ -726,7 +726,10 @@ body:has(.query-panel) {
 }
 
 .saved-cards-toggle {
-  margin: var(--spacing-200);
+  position: absolute;
+  right: var(--spacing-100);
+  top: var(--spacing-100);
+  z-index: 20;
 }
 
 .saved-cards-floater {

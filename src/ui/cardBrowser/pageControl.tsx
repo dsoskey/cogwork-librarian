@@ -87,14 +87,14 @@ export interface PageInfoProps {
   ignoreCount: number
   lowerBound: number
   upperBound: number
+  noun?: string
 }
 
-export function PageInfo({ ignoreCount, searchCount, lowerBound, upperBound }: PageInfoProps) {
+export function PageInfo({ ignoreCount, searchCount, lowerBound, upperBound, noun = "card" }: PageInfoProps) {
 
   return <div>
-    {searchCount > 0 && `${lowerBound} – ${Math.min(upperBound, searchCount)} of ${searchCount} cards`}
-    {searchCount > 0 && ignoreCount > 0 && `. ignored ${ignoreCount} cards`}
-    {searchCount === 0 &&
-      '0 cards found. We\'ll have more details on that soon :)'}
+    {searchCount > 0 && `${lowerBound} – ${Math.min(upperBound, searchCount)} of ${searchCount} ${noun}s`}
+    {searchCount > 0 && ignoreCount > 0 && `. ignored ${ignoreCount} ${noun}s`}
+    {searchCount === 0 && `0 ${noun}s found.`}
   </div>
 }

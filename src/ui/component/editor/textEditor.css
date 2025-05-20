@@ -105,6 +105,11 @@ textarea.coglib-prism-theme {
     }
 
 
+    .multi-code {
+      white-space: pre;
+      color: var(--light-color);
+    }
+
     .line-number {
       color: color-mix(var(--color-interpolation), var(--dark300), var(--light600) 50%);
     }
@@ -114,9 +119,6 @@ textarea.coglib-prism-theme {
       background-color: var(--darkest-color);
     }
 
-    .multi-code {
-      white-space: pre;
-    }
   }
   .labels > div {
     padding-left: var(--spacing-200);

@@ -109,7 +109,7 @@ function reducer(state: { active: string[], selectedIndex: number }, action) {
 }
 
 
-export const ProjectTabs = () => {
+export const ProjectTabs = ({ savedCardsToggle }) => {
   const maxOpenProjects = 5;
   const project = useContext(ProjectContext)
   const { openProject, path } = project;
@@ -158,15 +158,17 @@ export const ProjectTabs = () => {
           manage projects
         </button>
         <button onClick={() => {
-          const now = new Date();
-          const text = serializeProject({ createdAt: now, updatedAt: now, ...project, ignoredCards: [] });
-          downloadText(text, title, "md")
+          const now = new Date()
+          const text = serializeProject({ createdAt: now, updatedAt: now, ...project, ignoredCards: [] })
+          downloadText(text, title, 'md')
         }}>export {title}</button>
+        {savedCardsToggle}
       </div>
       {oldIgnoreIds.length > 0 && <InfoModal
-        buttonContent="migrate ignore-list"
+        buttonContent='migrate ignore-list'
         info={<>
-         <p>Instead of a single global ignore-list, each project now has its own ignore-list. You've used the global ignore-list feature in the past. Permanently move global ignore-list to the current project?</p>
+          <p>Instead of a single global ignore-list, each project now has its own ignore-list. You've used the global
+            ignore-list feature in the past. Permanently move global ignore-list to the current project?</p>
          <button onClick={() => {
            setIgnoredIds(oldIgnoreIds)
            setOldIgnoreIds([])

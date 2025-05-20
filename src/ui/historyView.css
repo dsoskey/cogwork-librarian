@@ -25,3 +25,17 @@
     flex-direction: row;
     align-items: baseline;
 }
+
+.history-view {
+    .history-section-root:not(:last-of-type) {
+        padding-bottom: var(--spacing-100);
+        border-bottom: solid 1px var(--active);
+    }
+
+    .history-page {
+        padding-left: var(--spacing-300);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-200);
+    }
+}

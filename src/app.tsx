@@ -8,7 +8,6 @@ import { ToasterMessage, Toaster, ToasterContext } from './ui/component/toaster'
 import { v4 as uuidv4 } from 'uuid';
 import { SearchView } from './ui/searchView'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
-import { HistoryView } from './ui/historyView'
 import { DocsView } from './ui/docs/docsView'
 import { ProjectContext, useProjectDao } from './api/local/useProjectDao'
 import { SettingsView } from './ui/settingsView'
@@ -77,7 +76,6 @@ export const App = () => {
                     <Route path='/about-me' element={<DefaultLayout><AppInfo /></DefaultLayout>} />
                     <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
                     <Route path='/user-guide/*' element={<DocsView />} />
-                    <Route path='/history' element={<DefaultLayout><HistoryView /></DefaultLayout>} />
                     <Route path="/settings" element={<DefaultLayout><SettingsView /></DefaultLayout>} />
                     <Route path="/" element={
                       <div className='search-view-root'>
@@ -92,6 +90,11 @@ export const App = () => {
                           ignoredIds={ignoredIds}
                         />
                         <div className={`saved-cards-floater ${showSavedCards ? 'show' : 'hide'}`}>
+                          {showSavedCards && <button
+                            className="saved-cards-toggle"
+                            title="Hide saved cards"
+                            onClick={() => setShowSavedCards(false)}
+                          >X</button>}
                           {showSavedCards && <SavedCardsEditor
                             path={path}
                             savedCards={savedCards}

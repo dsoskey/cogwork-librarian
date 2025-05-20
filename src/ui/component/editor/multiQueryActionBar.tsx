@@ -71,12 +71,14 @@ export interface MultiQueryInfoBarProps {
   copyText: (mindex: number, maxdex: number) => void;
   onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
-  gutterColumns: GutterColumn[]
+  gutterColumns: GutterColumn[];
+  indexStart?: number;
 }
 export const MultiQueryActionBar = React.memo(({
   queries,
   copyText,
   renderQuery = multiQueryInfo(rankInfo),
+  indexStart = 0,
   ...rest
 }: MultiQueryInfoBarProps) => {
   const lineInfo = renderQuery(queries);
@@ -101,6 +103,7 @@ export const MultiQueryActionBar = React.memo(({
           key={index}
           line={line}
           index={index}
+          indexStart={indexStart}
           numDigits={numDigits}
           onClickLine={onClickLine(index)}
           {...rest}
@@ -113,6 +116,7 @@ export const MultiQueryActionBar = React.memo(({
 interface ActionLineProps {
   line: string;
   index: number;
+  indexStart: number;
   onClickLine?: () => void;
   gutterColumns: GutterColumn[];
   numDigits: number;
@@ -120,14 +124,14 @@ interface ActionLineProps {
   canSubmit?: boolean;
 }
 
-function ActionLine({ line, index, gutterColumns, onClickLine, numDigits, onSubmit, canSubmit }: ActionLineProps) {
+function ActionLine({ line, index, indexStart, gutterColumns, onClickLine, numDigits, onSubmit, canSubmit }: ActionLineProps) {
   const columns: React.ReactNode[] = [];
   for (const column of gutterColumns) {
     switch (column) {
       case "line-numbers":
         columns.push(<code
           className={`multi-code line-number ${line.toLowerCase()}`}>
-          {`${(index + 1).toString().padStart(numDigits)} `}
+          {`${(index + 1 + indexStart).toString().padStart(numDigits)} `}
         </code>);
         break;
       case 'multi-info':

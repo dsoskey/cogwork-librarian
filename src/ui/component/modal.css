@@ -8,6 +8,10 @@
   overflow-y: auto;
   scrollbar-color: var(--light-color) var(--dark-color);
 
+  &.max-height {
+    height: 80svh;
+  }
+
   h2 {
     --svg-stroke: var(--dark-color);
   }

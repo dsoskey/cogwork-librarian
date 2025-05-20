@@ -13,6 +13,8 @@ import { SearchOptionPicker, useSearchOptions } from './settingsView'
 import { GearIcon } from './icons/gear'
 import { Modal } from './component/modal'
 import { Card, NormedCard } from 'mtgql'
+import { HistoryView } from './historyView'
+import { ClockIcon } from './icons/clock'
 
 export interface SearchViewProps {
   showSavedCards: boolean;
@@ -33,6 +35,7 @@ export const SearchView = ({
 
   const [options, setters] = useSearchOptions();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const { result, report, status, runStrategy, errors, generateVenn,run } = useMemoryQueryRunner({ corpus: memory });
   const [extendedParseError, setExtendedParseError] = useState<CogError[]>([])
@@ -60,19 +63,19 @@ export const SearchView = ({
         promise = run(querySet.queries, options, injectPrefix, getWeight)
       }
       setLastQueries(querySet.rawQueries);
-      promise.then(() =>
+      promise.then(() => {
         cogDBClient.history.put({
-          rawQueries: querySet.queries,
+          rawQueries: queries,
           baseIndex,
           source: 'local',
           strategy,
           executedAt,
           projectPath: path,
         })
-      ).catch(error => {
+      }).catch(error => {
         console.error(error)
         cogDBClient.history.put({
-          rawQueries: querySet.queries,
+          rawQueries: queries,
           baseIndex,
           source: 'local',
           strategy,
@@ -103,15 +106,24 @@ export const SearchView = ({
     <div className='query-panel'>
       <div className='row top'>
         <Masthead />
-        <button className='saved-cards-toggle' onClick={() => setShowSavedCards(prev => !prev)}>
-          {showSavedCards ? "hide" : "show"} saved cards
-        </button>
       </div>
       <QueryForm
         queries={queries}
         setQueries={setQueries}
         status={status}
         execute={execute}
+        savedCardsToggle={<button
+          onClick={() => setShowSavedCards(prev => !prev)}
+        >
+          {showSavedCards ? 'hide saved cards' : 'show saved cards'}
+        </button>}
+        historyButton={<button
+          className='rotate-on-hover'
+          title='query history'
+          onClick={() => setHistoryOpen(true)}
+        >
+          <ClockIcon className='rotate-target' />
+        </button>}
         settingsButton={<button
           className='rotate-on-hover'
           title="search settings"
@@ -133,6 +145,16 @@ export const SearchView = ({
       />
       <Footer />
     </div>
+    {historyOpen && <Modal
+      className='max-height'
+      open={historyOpen}
+      onClose={() => setHistoryOpen(false)}
+      title={<h2 className="row center">
+        <ClockIcon className="rotate-target" size={36} />
+        <span>query history — {path}</span>
+    </h2>}>
+      <HistoryView path={path} />
+    </Modal>}
     {settingsOpen && <Modal
       open={settingsOpen}
       onClose={() => setSettingsOpen(false)}
