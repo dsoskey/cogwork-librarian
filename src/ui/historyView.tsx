@@ -4,7 +4,6 @@ import { cogDB, QueryHistory } from '../api/local/db'
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
 import './historyView.css'
 import { COPY_BUTTON_ICONS, CopyToClipboardButton } from './component/copyToClipboardButton'
-import { PageControl, PageInfo, usePageControl } from './cardBrowser/pageControl'
 import { LoaderText } from './component/loaders'
 import { MultiQueryActionBar, multiQueryInfo, savedCardsQueryInfo } from './component/editor/multiQueryActionBar'
 import { rankInfo } from './component/editor/infoLines'
@@ -14,10 +13,11 @@ import _groupBy from 'lodash/groupBy'
 const INDICATOR = '>>'
 
 const displayQuery = (history: QueryHistory) => {
-  const result = history.baseIndex > 0 ? [`# ${history.baseIndex} prev lines ...`] : [];
-  let currentIndex = history.baseIndex;
+  const baseIndex = history.baseIndex >= history.rawQueries.length ? 0 : history.baseIndex;
+  const result = baseIndex > 0 ? [`# ${baseIndex} prev lines ...`] : [];
+  let currentIndex = baseIndex;
   while (currentIndex < history.rawQueries.length && history.rawQueries[currentIndex].length > 0) {
-    const prefix = history.baseIndex === currentIndex ? INDICATOR : ''.padStart(INDICATOR.length);
+    const prefix = baseIndex === currentIndex ? INDICATOR : ''.padStart(INDICATOR.length);
     result.push(`${prefix} ${history.rawQueries[currentIndex]}`);
     currentIndex++;
   }
