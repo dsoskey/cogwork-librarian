@@ -2,6 +2,7 @@ build
 .idea/
 .tool-versions
 temp-res
+.DS_Store
 
 # Logs
 logs
