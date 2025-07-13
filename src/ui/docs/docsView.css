@@ -90,11 +90,15 @@
     margin: 0 var(--spacing-200);
 }
 
-.docs-view code {
-    color: var(--active-mid-alpha);
-    background-color: var(--darker-color);
-    padding: var(--spacing-100);
-    border-radius: var(--border-radius);
+.docs-view {
+    table code,
+    p code {
+        color: var(--active-mid-alpha);
+        background-color: var(--darker-color);
+        padding: var(--spacing-100);
+        border-radius: var(--border-radius);
+
+    }
 }
 
 .docs-view {

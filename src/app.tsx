@@ -5,12 +5,12 @@ import { ListImporterContext, useListImporter } from './api/local/useListImporte
 import { Navigate, Route, Routes, useLocation } from 'react-router'
 import { SavedCardsEditor } from './ui/savedCards'
 import { ToasterMessage, Toaster, ToasterContext } from './ui/component/toaster'
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 import { SearchView } from './ui/searchView'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
 import { DocsView } from './ui/docs/docsView'
 import { ProjectContext, useProjectDao } from './api/local/useProjectDao'
-import { SettingsView } from './ui/settingsView'
+import { SettingsContext, SettingsView } from './ui/settingsView'
 import { CubeView } from './ui/cubeView'
 import { CardDataView } from './ui/data/cardDataView'
 import { CubeDataView } from './ui/data/cubeDataView'
@@ -24,102 +24,107 @@ import { ContextMenu, handleClickOutsideContextMenu } from './ui/component/conte
 import Prism from 'prismjs'
 import { hookContextMenu } from './api/local/syntaxHighlighting'
 import { useLocalStorage } from './api/local/useLocalStorage'
+import { DEFAULT_GUTTER_COLUMNS, GutterColumn } from './ui/component/editor/textEditor'
 
 export const App = () => {
-  const [cubeContext, setCubeContext] = useState<string>("")
+  const [cubeContext, setCubeContext] = useState<string>('')
+  const [gutterColumns, setGutterColumns] = useLocalStorage<GutterColumn[]>('editor.info', DEFAULT_GUTTER_COLUMNS)
+  const [lineHeight, setLineHeight] = useLocalStorage<number>("editor.line-height", 1.25)
 
   const cogDB = useCogDB()
-  const {memory} = cogDB;
+  const { memory } = cogDB
   const listImporter = useListImporter(cogDB)
   const bulkCubeImporter = useBulkCubeImporter()
 
-  const project = useProjectDao();
+  const project = useProjectDao()
   const {
     path,
     savedCards, setSavedCards,
     renameQuery, removeCard, queries, setQueries, addCard,
-    toggleIgnoreId, ignoredIds,
+    toggleIgnoreId, ignoredIds
   } = project
-  const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>("showSavedCards", true)
+  const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>('showSavedCards', true)
 
 
   const [messages, setMessages] = useState<ToasterMessage[]>([])
   const addMessage = useCallback((text: string, dismissible: boolean) => {
-    const message: ToasterMessage = { id: uuidv4() ,text, dismissible }
+    const message: ToasterMessage = { id: uuidv4(), text, dismissible }
     setMessages(prev => [...prev, message])
     return message.id
-  }, [setMessages]);
+  }, [setMessages])
   const dismissMessage = useCallback((messageId: string) => {
     setMessages(prev => prev.filter(it => it.id !== messageId))
-  }, [setMessages]);
+  }, [setMessages])
   const toasterValue = useMemo(() => ({ messages, addMessage, dismissMessage }), [messages, addMessage, dismissMessage])
   useEffect(() => {
     cogDB.resetDB()
-    Prism.hooks.add("complete", hookContextMenu(setCubeContext))
+    Prism.hooks.add('complete', hookContextMenu(setCubeContext))
   }, [])
 
   return (
-    <CogDBContext.Provider value={cogDB}>
-      <ListImporterContext.Provider value={listImporter}>
-        <BulkCubeImporterContext.Provider value={bulkCubeImporter}>
-          <ProjectContext.Provider value={project}>
-            <ToasterContext.Provider value={toasterValue}>
-              <ErrorBoundary FallbackComponent={RenderErrorFallback}>
-                <div className='root' onClick={handleClickOutsideContextMenu}>
-                  <Routes>
-                    <Route path="/data/cube/*" element={<DefaultLayout><CubeRedirect /></DefaultLayout>} />
-                    <Route path="/cube/:key/*" element={<DefaultLayout><CubeView /></DefaultLayout>} />
-                    <Route path='/data/card' element={<DefaultLayout><CardDataView /></DefaultLayout>}/>
-                    <Route path='/data/otag/:tag' element={<DefaultLayout><OtagView /></DefaultLayout>}/>
-                    <Route path='/data/otag' element={<DefaultLayout><TagManager /></DefaultLayout>}/>
-                    <Route path='/cube' element={<DefaultLayout><CubeDataView /></DefaultLayout>}/>
-                    <Route path='/about-me' element={<DefaultLayout><AppInfo /></DefaultLayout>} />
-                    <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
-                    <Route path='/user-guide/*' element={<DocsView />} />
-                    <Route path="/settings" element={<DefaultLayout><SettingsView /></DefaultLayout>} />
-                    <Route path="/" element={
-                      <div className='search-view-root'>
-                        <SearchView
-                          memory={memory}
-                          showSavedCards={showSavedCards} setShowSavedCards={setShowSavedCards}
-                          addCard={addCard}
-                          path={path}
-                          queries={queries}
-                          setQueries={setQueries}
-                          toggleIgnoreId={toggleIgnoreId}
-                          ignoredIds={ignoredIds}
-                        />
-                        <div className={`saved-cards-floater ${showSavedCards ? 'show' : 'hide'}`}>
-                          {showSavedCards && <button
-                            className="saved-cards-toggle"
-                            title="Hide saved cards"
-                            onClick={() => setShowSavedCards(false)}
-                          >X</button>}
-                          {showSavedCards && <SavedCardsEditor
+    <SettingsContext.Provider value={{ gutterColumns, setGutterColumns, lineHeight: lineHeight / 100, setLineHeight }}>
+      <CogDBContext.Provider value={cogDB}>
+        <ListImporterContext.Provider value={listImporter}>
+          <BulkCubeImporterContext.Provider value={bulkCubeImporter}>
+            <ProjectContext.Provider value={project}>
+              <ToasterContext.Provider value={toasterValue}>
+                <ErrorBoundary FallbackComponent={RenderErrorFallback}>
+                  <div className='root' onClick={handleClickOutsideContextMenu}>
+                    <Routes>
+                      <Route path='/data/cube/*' element={<DefaultLayout><CubeRedirect /></DefaultLayout>} />
+                      <Route path='/cube/:key/*' element={<DefaultLayout><CubeView /></DefaultLayout>} />
+                      <Route path='/data/card' element={<DefaultLayout><CardDataView /></DefaultLayout>} />
+                      <Route path='/data/otag/:tag' element={<DefaultLayout><OtagView /></DefaultLayout>} />
+                      <Route path='/data/otag' element={<DefaultLayout><TagManager /></DefaultLayout>} />
+                      <Route path='/cube' element={<DefaultLayout><CubeDataView /></DefaultLayout>} />
+                      <Route path='/about-me' element={<DefaultLayout><AppInfo /></DefaultLayout>} />
+                      <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
+                      <Route path='/user-guide/*' element={<DocsView />} />
+                      <Route path='/settings' element={<DefaultLayout><SettingsView /></DefaultLayout>} />
+                      <Route path='/' element={
+                        <div className='search-view-root'>
+                          <SearchView
+                            memory={memory}
+                            showSavedCards={showSavedCards} setShowSavedCards={setShowSavedCards}
+                            addCard={addCard}
                             path={path}
-                            savedCards={savedCards}
-                            setSavedCards={setSavedCards}
-                            renameQuery={renameQuery}
-                            removeCard={removeCard}
-                          />}
+                            queries={queries}
+                            setQueries={setQueries}
+                            toggleIgnoreId={toggleIgnoreId}
+                            ignoredIds={ignoredIds}
+                          />
+                          <div className={`saved-cards-floater ${showSavedCards ? 'show' : 'hide'}`}>
+                            {showSavedCards && <button
+                              className='saved-cards-toggle'
+                              title='Hide saved cards'
+                              onClick={() => setShowSavedCards(false)}
+                            >X</button>}
+                            {showSavedCards && <SavedCardsEditor
+                              path={path}
+                              savedCards={savedCards}
+                              setSavedCards={setSavedCards}
+                              renameQuery={renameQuery}
+                              removeCard={removeCard}
+                            />}
+                          </div>
                         </div>
-                      </div>
-                    } />
-                    <Route path='*' element={<DefaultLayout><NotFoundView /></DefaultLayout>} />
-                  </Routes>
-                  <Toaster />
-                  <ContextMenu contextKey={cubeContext} />
-                </div>
-              </ErrorBoundary>
-            </ToasterContext.Provider>
-          </ProjectContext.Provider>
-        </BulkCubeImporterContext.Provider>
-      </ListImporterContext.Provider>
-    </CogDBContext.Provider>
+                      } />
+                      <Route path='*' element={<DefaultLayout><NotFoundView /></DefaultLayout>} />
+                    </Routes>
+                    <Toaster />
+                    <ContextMenu contextKey={cubeContext} />
+                  </div>
+                </ErrorBoundary>
+              </ToasterContext.Provider>
+            </ProjectContext.Provider>
+          </BulkCubeImporterContext.Provider>
+        </ListImporterContext.Provider>
+      </CogDBContext.Provider>
+    </SettingsContext.Provider>
   )
 }
 
 function CubeRedirect() {
-  const { pathname } = useLocation();
-  return <Navigate to={pathname.replace("/data","")} replace />
+  const { pathname } = useLocation()
+  return <Navigate to={pathname.replace('/data', '')} replace />
 }

@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { createContext, useContext } from 'react'
 import { ThemePicker } from './component/theme'
-import { FormField } from './component/formField'
+import { FormField, RangeField } from './component/formField'
 import { PREFER_VALUES, SearchOptions, SortOrder } from 'mtgql'
 import { useLocalStorage } from '../api/local/useLocalStorage'
 import { SORT_ORDERS } from 'mtgql/build/filters/order'
@@ -8,12 +8,15 @@ import { Setter } from '../types'
 
 const SORT_VALUES = Object.values(SORT_ORDERS)
 import './settingsView.css'
+import { GutterColumn } from './component/editor/textEditor'
 
 export function SettingsView() {
   const [options, setters] = useSearchOptions()
   return <>
     <h2>Search defaults</h2>
     <SearchOptionPicker options={options} {...setters} />
+    <h2>Editor</h2>
+    <EditorSettings />
     <h2>Theme</h2>
     <ThemePicker />
   </>
@@ -107,3 +110,41 @@ export function useSearchOptions(): [SearchOptions, SearchSetters] {
     setDefaultDirection
   }]
 }
+
+export interface EditorSettingsProps {
+
+}
+
+export function EditorSettings({}: EditorSettingsProps) {
+  const { lineHeight, setLineHeight } = useContext(SettingsContext)
+
+
+  const handleLineHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLineHeight(parseInt(e.target.value));
+  }
+
+    return <div>
+      <RangeField title="Line height">
+        <input
+          type="range"
+          min={100} max={200}
+          step={25}
+          value={lineHeight * 100}
+          onChange={handleLineHeightChange}
+        />
+      </RangeField>
+    </div>;
+}
+
+interface UserSettings {
+  gutterColumns: GutterColumn[]
+  setGutterColumns: Setter<GutterColumn[]>
+  lineHeight: number;
+  setLineHeight: Setter<number>;
+}
+export const SettingsContext = createContext<UserSettings>({
+  setGutterColumns: () => {},
+  gutterColumns: [],
+  lineHeight: 0,
+  setLineHeight: () => {},
+})

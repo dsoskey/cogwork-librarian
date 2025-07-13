@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { HslColorPicker } from 'react-colorful'
 import cloneDeep from 'lodash/cloneDeep'
 import { useLocalStorage } from '../../../api/local/useLocalStorage'
@@ -20,6 +20,7 @@ import { cogDB } from '../../../api/local/db'
 import { Modal } from '../modal'
 import { PRESET_THEMES } from './presets'
 import "./picker.css"
+import { SettingsContext } from '../../settingsView'
 
 function refreshTheme(theme: Theme, element: HTMLElement) {
   for (const key in theme) {
@@ -79,6 +80,8 @@ interface ThemeSampleProps {
   theme: Theme
 }
 function ThemeSample({ theme }: ThemeSampleProps) {
+  const { lineHeight  } = useContext(SettingsContext);
+
   const ref = useRef<HTMLDivElement>();
   useEffect(() => {
     if (ref.current) {
@@ -101,6 +104,7 @@ function ThemeSample({ theme }: ThemeSampleProps) {
     </div>
     <TextEditor
       disabled
+      lineHeight={lineHeight}
       language='scryfall-extended-multi'
       setQueries={() => {}}
       queries={SAVAI_SACRIFICE_EXAMPLE.queries}

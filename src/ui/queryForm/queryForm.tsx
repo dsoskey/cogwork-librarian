@@ -1,15 +1,11 @@
 import React, { useContext } from 'react'
 import { TextEditor } from '../component/editor/textEditor'
 import { DataSource, Setter, TaskStatus } from '../../types'
-import { ScryfallIcon } from '../icons/scryfallIcon'
-import { CoglibIcon } from '../icons/coglibIcon'
-import { InfoModal } from '../component/infoModal'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { MemStatusLoader, DBStatusLoader } from '../component/dbStatusLoader'
 import { Link } from 'react-router-dom'
-import { ProjectContext } from '../../api/local/useProjectDao'
 import { ProjectTabs } from './projectTabs'
-import { FlagContext } from '../flags'
+import { SettingsContext } from '../settingsView'
 
 const description: Record<DataSource, String> = {
   scryfall:
@@ -52,6 +48,7 @@ export function QueryForm({
   savedCardsToggle,
 }: QueryFormProps) {
   const { memStatus } = useContext(CogDBContext);
+  const { lineHeight } = useContext(SettingsContext);
 
   // something about prism overrides the state update for this css class
 
@@ -67,6 +64,7 @@ export function QueryForm({
           canSubmit={canSubmit}
           settingsButton={<>{settingsButton}{historyButton}</>}
           language='scryfall-extended-multi'
+          lineHeight={lineHeight}
         />
       </div>
       <CombinedStatusLoader />

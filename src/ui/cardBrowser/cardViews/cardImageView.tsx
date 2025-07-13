@@ -51,7 +51,7 @@ export const CardImageView = ({
   }
 
   const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
-    switch (event.key) {
+    switch (event.key.toLowerCase()) {
       case 'a':
         onAdd?.();
         break;

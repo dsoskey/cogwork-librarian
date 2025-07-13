@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, useCallback, useMemo, useRef, useState } from 'react'
+import React, { KeyboardEvent, useCallback, useContext, useMemo, useRef, useState } from 'react'
 import './savedCards.css'
 import { COPY_BUTTON_ICONS, CopyToClipboardButton } from './component/copyToClipboardButton'
 import { CardEntry, parseEntry, serializeEntry } from '../api/local/types/cardEntry'
@@ -23,6 +23,7 @@ import { Setter } from '../types'
 import { SavedCardSection } from '../api/local/types/project'
 
 import { CARD_INDEX } from '../api/local/cardIndex'
+import { SettingsContext } from './settingsView'
 
 type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery" | "removeCard"
 export interface SavedCardsEditorProps extends Pick<ProjectDao, PropsKeys> {
@@ -171,6 +172,7 @@ function SavedSectionEditor({
   currentLine, setCurrentLine,
   currentIndex, setCurrentIndex,
 }: SavedSectionEditorProps) {
+  const {lineHeight} = useContext(SettingsContext);
   const [editingQuery, setEditingQuery] = useState<boolean>(false)
   const [editValue, setEditValue] = useState<string>(query)
 
@@ -318,6 +320,7 @@ function SavedSectionEditor({
         gutterColumns={['multi-info']}
         language="scryfall-extended-multi"
         className={`editor-${queryIndex}`}
+        lineHeight={lineHeight}
         settingsButton={<>
           <button onClick={handleSaveQuery} title="save query"><FloppyDisk /></button>
           <button title="cancel query changes" onClick={() => {

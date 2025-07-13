@@ -1,8 +1,7 @@
 import React from "react";
-import { MultiQueryActionBar, savedCardsQueryInfo } from '../component/editor/multiQueryActionBar'
+import { goodLineQuery, MultiQueryActionBar } from '../component/editor/multiQueryActionBar'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { ArrowInIcon, ArrowOutIcon } from '../icons/arrows'
-import { rankInfo } from '../component/editor/infoLines'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 
 export interface LastQueryDisplayProps {
@@ -31,7 +30,7 @@ export function LastQueryDisplay({ selectBox, lastQueries, editorControls }: Las
     <MultiQueryActionBar
       queries={toDisplay}
       copyText={()=>{}}
-      renderQuery={savedCardsQueryInfo(rankInfo)}
+      renderQuery={goodLineQuery}
       gutterColumns={["multi-info"]}
     />
     <div className="editor-controls">

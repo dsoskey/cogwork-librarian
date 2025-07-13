@@ -20,6 +20,7 @@ export const SAVAI_SACRIFICE_EXAMPLE: QueryExample = {
     '-t:planeswalker -t:creature',
     "# subquery 8 is a fallback query",
     '*',
+    "",
     "# A fallback query is any query that overlaps with the base query.",
     "# Use a fallback query to include the entire base domain in the search results.",
     "# *, the identity filter that matches all cards, is the most concise way to do this"

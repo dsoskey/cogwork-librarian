@@ -8,7 +8,7 @@
   word-spacing: normal;
   word-break: normal;
   word-wrap: normal;
-  line-height: 1.5;
+  line-height: var(--editor-line-height, 1.5);
   overflow: auto;
   border: none;
 }
@@ -25,11 +25,11 @@ textarea.coglib-prism-theme {
 .text-editor-root {
   --toolbar-height: 24px;
   --gutter-width: 0.25em;
-  /*margin-top: var(--spacing-200);*/
-  /*margin-bottom: var(--spacing-200);*/
+  --editor-line-height: 1.25;
   height: max-content;
   display: grid;
   position: relative;
+  background-color: var(--darker-color);
   grid-template-columns: auto auto 1fr;
   grid-template-rows: 1fr;
   grid-template-areas: "labels brown overlap";
@@ -87,10 +87,21 @@ textarea.coglib-prism-theme {
     background-color: var(--darker-color);
     padding-right: 0;
     padding-left: 0;
-    padding-bottom: var(--spacing-100);
+    padding-bottom: 0;
     padding-top: var(--toolbar-height, 1em);
 
-    overflow: auto;
+    overflow: hidden;
+    height: fit-content;
+
+    & > div {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      &.query-header {
+        background-color: var(--darkest-color);
+      }
+    }
 
     code {
       font-family: var(--monospace-family);
@@ -99,24 +110,43 @@ textarea.coglib-prism-theme {
       word-spacing: normal;
       word-break: normal;
       word-wrap: normal;
-      line-height: 1.5;
+      line-height: var(--editor-line-height);
       tab-size: 4;
       hyphens: none;
     }
 
-
+    .multi-code:last-of-type {
+      margin-bottom: 0;
+    }
     .multi-code {
+      --text-color: var(--light-color);
       white-space: pre;
-      color: var(--light-color);
+      color: var(--text-color);
+      margin-top: -1px;
+      margin-bottom: -1px;
+
+      position: relative;
+
+      &.subquery-middle {
+        box-sizing: border-box;
+        border-width: 0 0 0 2px;
+        border-style: solid;
+        border-color: var(--text-color);
+      }
+      &.subquery-end {
+        box-sizing: border-box;
+        border-width: 0 0 2px 2px;
+        border-style: solid;
+        border-color: var(--text-color);
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 4px;
+        margin-bottom: -2px;
+      }
     }
 
     .line-number {
+      white-space: pre;
       color: color-mix(var(--color-interpolation), var(--dark300), var(--light600) 50%);
-    }
-
-    .venn,
-    .base {
-      background-color: var(--darkest-color);
     }
 
   }
@@ -127,9 +157,8 @@ textarea.coglib-prism-theme {
   .run-query-button {
     background-color: transparent;
     border: 0;
-    padding: 0 var(--spacing-100) 0 0;
+    padding: 0;
     margin: 0;
-    top: 0.15em;
     position: relative;
     cursor: pointer;
     min-width: unset;

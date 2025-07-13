@@ -1,41 +1,42 @@
 import React, { useCallback } from 'react'
-import { rankInfo } from "./infoLines";
+import { BOX_CHARS, rankInfo } from './infoLines'
 import { QuerySetButton } from "../querySetButton";
 import { DEFAULT_MODE_REGEXP, DEFAULT_WEIGHT_REGEXP, INCLUDE_REGEXP } from '../../../api/mtgql-ep/parser'
 
-export type GutterColumn = "line-numbers" | "multi-info" | "submit-button"
+// todo: add setting for which lineInfo you want
+export type GutterColumn = "line-numbers" | "multi-info" | "multi-hook" | "submit-button"
 
 
 export const VENN_REGEXP = /^@(v|venn)\((.+)\)\((.+)\)$/;
 
 export function multiQueryInfo(renderSubquery: (count: number) => string = rankInfo) {
-  return (queries: string[]): string[] => {
+  return (queries: string[]): LineInfo[] => {
     if (queries.length === 0) {
       return [];
     }
-    const result = [];
+    const result: LineInfo[] = [];
     let count = 0;
     let isMultiline = false;
     for (const line of queries) {
       const trimmed = line.trim();
       if (trimmed.length === 0) {
-        result.push("    ");
+        result.push({ type: 'space', text: '    ' });
         count = 0;
       } else if (trimmed.startsWith("#")) {
-        result.push(" ");
+        result.push({ type: "comment", text: ' ' });
       } else if (count === 0 && INCLUDE_REGEXP.test(trimmed)) {
-        result.push("MPRT");
+        result.push({ type: "import", text: 'MPRT' });
       } else if (count === 0 && DEFAULT_WEIGHT_REGEXP.test(trimmed)) {
-        result.push("WGHT");
+        result.push({ type: "weight", text: 'WGHT' });
       } else if (count === 0 && DEFAULT_MODE_REGEXP.test(trimmed)) {
-        result.push("MODE");
+        result.push({ type: "mode", text: 'MODE' });
       } else if (count === 0) {
-        result.push(VENN_REGEXP.test(line.trim()) ? "VENN" : "BASE");
+        result.push({ type: 'query-header', text: VENN_REGEXP.test(trimmed) ? 'VENN' : 'BASE' });
         count += 1;
       } else if (isMultiline) {
-        result.push(" ");
+        result.push({ type: 'space', text: ' ' });
       } else {
-        result.push(renderSubquery(count));
+        result.push({ type: "space", text: renderSubquery(count) });
         count += 1;
       }
       isMultiline = !trimmed.startsWith("#") && trimmed.endsWith("\\");
@@ -44,6 +45,63 @@ export function multiQueryInfo(renderSubquery: (count: number) => string = rankI
   };
 }
 
+type LineType = "space" | "comment" | "query-header" | "subquery-middle" | "subquery-end" | "import" | "weight" | "mode"
+interface LineInfo {
+  text: string
+  type: LineType
+}
+
+export function goodLineQuery(queries: string[]): LineInfo[] {
+    if (queries.length === 0) {
+      return [];
+    }
+    const result: LineInfo[] = [];
+
+    let querySetCount = 0;
+    let subqueryCount = 0;
+    let isMultiline = false;
+    let isInQuery = false;
+
+    for (let i = 0; i < queries.length; i++) {
+      const line = queries[i].trim();
+      const isEndOfQuerySet = i === queries.length - 1 || queries[i+1].trim().length === 0;
+
+      if (line.length === 0) {
+        result.push({ type: "space",  text: '    ' });
+        subqueryCount = 0;
+        isInQuery = false;
+      } else if (line.startsWith("#")) {
+        result.push({ type: isInQuery ? "subquery-middle" : "comment", text: " " });
+      } else if (subqueryCount === 0 && INCLUDE_REGEXP.test(line)) {
+        result.push({ type: "import", text: 'MPRT' });
+      } else if (subqueryCount === 0 && DEFAULT_WEIGHT_REGEXP.test(line)) {
+        result.push({ type: "weight", text: 'WGHT' });
+      } else if (subqueryCount === 0 && DEFAULT_MODE_REGEXP.test(line)) {
+        result.push({ type: "mode", text: 'MODE' });
+      } else if (subqueryCount === 0) {
+        const renderedQueryType = VENN_REGEXP.test(line) ? "V" : "B";
+        querySetCount += 1;
+        const cap = isEndOfQuerySet ?
+          BOX_CHARS.horizontal :
+          BOX_CHARS.fuckedUpT
+        const renderedQuerySetCount = querySetCount.toString().padEnd(2, BOX_CHARS.horizontal) + cap;
+        result.push({ type: "query-header", text: renderedQueryType + renderedQuerySetCount });
+        subqueryCount += 1;
+        isInQuery = true;
+      } else if (isMultiline) {
+        result.push({ type: "subquery-middle", text: BOX_CHARS.vertical });
+      } else {
+        result.push({
+          type: isEndOfQuerySet ? "subquery-end" : "subquery-middle",
+          text: subqueryCount.toString().padStart(4)
+        });
+        subqueryCount += 1;
+      }
+      isMultiline = !line.startsWith("#") && line.endsWith("\\");
+
+    }
+    return result;
+}
 
 export function savedCardsQueryInfo(renderSubquery: (count: number) => string = rankInfo) {
   return (queries: string[]): string[] => {
@@ -67,7 +125,7 @@ export function savedCardsQueryInfo(renderSubquery: (count: number) => string = 
 
 export interface MultiQueryInfoBarProps {
   queries: string[];
-  renderQuery?: (queries: string[]) => string[]
+  renderQuery?: (queries: string[]) => LineInfo[]
   copyText: (mindex: number, maxdex: number) => void;
   onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
@@ -77,7 +135,7 @@ export interface MultiQueryInfoBarProps {
 export const MultiQueryActionBar = React.memo(({
   queries,
   copyText,
-  renderQuery = multiQueryInfo(rankInfo),
+  renderQuery = goodLineQuery,
   indexStart = 0,
   ...rest
 }: MultiQueryInfoBarProps) => {
@@ -114,7 +172,7 @@ export const MultiQueryActionBar = React.memo(({
 });
 
 interface ActionLineProps {
-  line: string;
+  line: LineInfo;
   index: number;
   indexStart: number;
   onClickLine?: () => void;
@@ -125,23 +183,25 @@ interface ActionLineProps {
 }
 
 function ActionLine({ line, index, indexStart, gutterColumns, onClickLine, numDigits, onSubmit, canSubmit }: ActionLineProps) {
+  const { text, type } = line;
   const columns: React.ReactNode[] = [];
   for (const column of gutterColumns) {
     switch (column) {
       case "line-numbers":
         columns.push(<code
-          className={`multi-code line-number ${line.toLowerCase()}`}>
+          className={`line-number ${type}`}>
           {`${(index + 1 + indexStart).toString().padStart(numDigits)} `}
         </code>);
         break;
       case 'multi-info':
+      case 'multi-hook':
         columns.push(<code
-          className={`multi-code ${line.toLowerCase()}`}>
-          {line}
+          className={`multi-code ${type}`}>
+          {text}
         </code>)
         break;
       case 'submit-button':
-        if (line === "BASE" || line === "VENN") {
+        if (type === 'query-header') {
           columns.push(<button
               onClick={(event) => {
                 if (canSubmit && onSubmit) {
@@ -162,7 +222,7 @@ function ActionLine({ line, index, indexStart, gutterColumns, onClickLine, numDi
   }
   return <div
     key={index}
-    className={line.toLowerCase()}
+    className={type.toLowerCase()}
     onClick={onClickLine}
   >
     {...columns}

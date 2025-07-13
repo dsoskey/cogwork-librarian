@@ -77,12 +77,13 @@ export interface TextEditorProps {
   canSubmit?: boolean;
   placeholder?: string | undefined;
   language?: Language;
+  lineHeight?: number;
   disabled?: boolean;
   settingsButton?: React.ReactNode;
   gutterColumns?: GutterColumn[];
   className?: string;
 }
-const DEFAULT_GUTTER_COLUMNS: GutterColumn[] = ["line-numbers", "multi-info", "submit-button"];
+export const DEFAULT_GUTTER_COLUMNS: GutterColumn[] = ["line-numbers", "multi-info", "submit-button"];
 export const TextEditor = ({
   queries,
   setQueries,
@@ -92,6 +93,7 @@ export const TextEditor = ({
   language,
   disabled,
   settingsButton,
+  lineHeight = 1.25,
   className = "",
   gutterColumns = DEFAULT_GUTTER_COLUMNS,
 }: TextEditorProps) => {
@@ -171,7 +173,7 @@ export const TextEditor = ({
     faker.current!.style.height = newHeight;
     linker.current!.style.height = newHeight;
     onScroll({ target: controller.current });
-  }, [value]);
+  }, [value, lineHeight]);
 
   useEffect(() => {
     controller.current?.addEventListener("scroll", onScroll);
@@ -185,6 +187,7 @@ export const TextEditor = ({
     <div
       className={`text-editor-root focusable ${separateLayers ? "separated" : ""}` + className}
       onKeyDown={handleDown}
+      style={{ "--editor-line-height": lineHeight.toString() }}
     >
       <MultiQueryActionBar
         queries={queries}
