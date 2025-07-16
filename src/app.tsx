@@ -29,7 +29,7 @@ import { DEFAULT_GUTTER_COLUMNS, GutterColumn } from './ui/component/editor/text
 export const App = () => {
   const [cubeContext, setCubeContext] = useState<string>('')
   const [gutterColumns, setGutterColumns] = useLocalStorage<GutterColumn[]>('editor.info', DEFAULT_GUTTER_COLUMNS)
-  const [lineHeight, setLineHeight] = useLocalStorage<number>("editor.line-height", 1.25)
+  const [lineHeight, setLineHeight] = useLocalStorage<number>("editor.line-height", 125)
 
   const cogDB = useCogDB()
   const { memory } = cogDB
