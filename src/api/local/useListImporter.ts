@@ -36,11 +36,11 @@ export const useListImporter = (cogDb: CogDB): ListImporter => {
   const run = async (rawCards: string[], restart: boolean = false) => {
     return new Promise<NormedCard[]>((resolve, reject) => {
       const foundCards: NormedCard[] = []
-      const cardsToQueryAPI: string[] = []
+      const cardsToQueryAPI: { [cardName: string]: number } = {}
       const missingNames: string[] = []
       const onDone = () => {
         setResult(restart ? foundCards : (prev) => [...prev, ...foundCards])
-        setMissing(missingNames)
+        setMissing(missingNames.map(cardName => `${cardsToQueryAPI[cardName]} ${cardName}`))
         report.markTimepoint("end")
 
         if (missingNames.length > 0) {
@@ -58,21 +58,27 @@ export const useListImporter = (cogDb: CogDB): ListImporter => {
       console.time("process raws")
       for (const rawCard of rawCards) {
         if (rawCard.length > 0) {
-          const maybeCard = CARD_INDEX.cardByName(rawCard.toLowerCase())
+          const parsedRow = parseListRow(rawCard)
+          const { quantity, cardName } = parsedRow;
+          const maybeCard = CARD_INDEX.cardByName(cardName.toLowerCase())
           if (maybeCard !== undefined) {
-            foundCards.push(maybeCard)
+            for (let i = 0; i < quantity; i++) {
+              foundCards.push(maybeCard)
+            }
             report.addComplete()
+          } else if (cardsToQueryAPI[cardName] === undefined) {
+            cardsToQueryAPI[cardName] = quantity;
           } else {
-            cardsToQueryAPI.push(rawCard)
+            cardsToQueryAPI[cardName] += quantity;
           }
         }
       }
       console.timeEnd("process raws")
       console.debug(`processed local. ${foundCards.length} found. ${cardsToQueryAPI.length} to query`)
 
-      if (cardsToQueryAPI.length > 0) {
+      if (Object.keys(cardsToQueryAPI).length > 0) {
         console.debug("querying scryfall for missing cards")
-        Scry.Cards.collection(...cardsToQueryAPI.map(name => ({name})))
+        Scry.Cards.collection(...Object.keys(cardsToQueryAPI).map(name => ({name})))
           .on('data', data => {
             foundCards.push(normCardList([data as Card])[0])
             report.addComplete()
@@ -92,4 +98,18 @@ export const useListImporter = (cogDb: CogDB): ListImporter => {
   }
 
   return { attemptImport: run, abandonImport, result, missing, setMissing, status, report }
+}
+
+interface ParsedRow {
+  quantity: number;
+  cardName: string;
+}
+function parseListRow(row: string): ParsedRow {
+  const tokens = row.split(' ');
+
+  if (/^\d+x?$/.test(tokens[0])) {
+    return { quantity: parseInt(tokens[0]), cardName: tokens.slice(1).join(' ') }
+  } else {
+    return { quantity: 1, cardName: row }
+  }
 }

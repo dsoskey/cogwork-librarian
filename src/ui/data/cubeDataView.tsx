@@ -120,8 +120,8 @@ export const CubeDataView = () => {
 
     <section className='cube-import'>
     <h3 className='row baseline'>
-      <span>import from</span>
-      {CUBE_SOURCE_OPTIONS.map(sourceOption => (<label key={sourceOption}
+      <span>import from: </span>
+      {['cubecobra', 'list'].map((sourceOption: CubeSource) => (<label key={sourceOption}
         className={`input-link ${sourceOption === importType ? "active-link" : ""}`}
       >
         <input
