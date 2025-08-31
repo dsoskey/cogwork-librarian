@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useRef, useState } from 'react'
 import { CubeViewModelContext, OrderedCard } from '../useCubeViewModel'
-import { Card, normCardList, QueryRunner } from 'mtgql'
+import { Card, normCardList, QueryRunner, SearchOptions } from 'mtgql'
 import { COGDB_FILTER_PROVIDER } from '../../../api/local/db'
 import { ColorBreakdown } from '../cubeTags'
 import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
@@ -17,6 +17,7 @@ import { isFunction } from 'lodash'
 import { getColors } from './tempColorUtil'
 import { colorKey } from '../../component/viz/types'
 import { REFOCUS_TIMEOUT } from '../../flags'
+import { patchCubeQuery } from '../../../api/mtgql-ep/cubeSugar'
 
 export interface CubeSearchTableProps {}
 
@@ -66,10 +67,13 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
         close();
     }
 
-    const searchCards = useMemo(() =>
-      QueryRunner.generateSearchFunction(normCardList(cards), COGDB_FILTER_PROVIDER),
-      [cards]
-    )
+    const searchCards = useMemo(() => {
+        const search = QueryRunner.generateSearchFunction(normCardList(cards), COGDB_FILTER_PROVIDER);
+        return async (query: string, options: SearchOptions) => {
+            const patchedQuery = patchCubeQuery(cube.key, query);
+            return search(patchedQuery, options);
+        }
+    }, [cube.key, cards]);
 
 
     const totalbucket: ColorBreakdown = colorBreakdown(cards ?? [],"_total_");

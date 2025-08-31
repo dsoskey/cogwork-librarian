@@ -5,7 +5,7 @@ import Prism from 'prismjs'
 import {
   hookReactDOM,
   linkWrap,
-  mtgql,
+  mtgql, mtgqlCubePage,
   mtgqlExtended,
   mtgqlExtendedMulti
 } from './api/local/syntaxHighlighting'
@@ -26,6 +26,7 @@ Prism.languages['scryfall'] = mtgql
 Prism.languages['scryfall-extended'] = mtgqlExtended
 Prism.languages['scryfall-extended-multi'] = mtgqlExtendedMulti
 Prism.languages['mtgql'] = mtgql
+Prism.languages['mtgql-cube'] = mtgqlCubePage
 Prism.languages['mtgql-extended'] = mtgqlExtended
 Prism.languages['mtgql-extended-multi'] = mtgqlExtendedMulti
 

@@ -9,6 +9,7 @@ import { closeContextMenu, openContextMenu } from '../../ui/component/contextMen
 export type Language =
   | "regex"
   | "mtgql"
+  | 'mtgql-cube'
   | "mtgql-extended"
   | "mtgql-extended-multi"
   | "scryfall"
@@ -46,7 +47,7 @@ export const mtgql: Grammar = {
     alias: "function",
   },
   cubeString: {
-    pattern: /(\b(?:cube|cubeo)[:=])[^\s#)(]+(?=(\b|$))/i,
+    pattern: /(\b(?:cube|cubeo)[:=])[^\s#)(.]+(?=(\b|$))/i,
     lookbehind: true,
     alias: "string",
   },
@@ -72,7 +73,7 @@ export const mtgql: Grammar = {
     alias: ["keyword", "important"],
   },
   operator: {
-    pattern: new RegExp(`\\(|\\)|${operators}|(\\b(and|or)\\b)|\\+\\+|@@`, "i"),
+    pattern: new RegExp(`\\(|\\)|${operators}|(\\b(and|or)\\b)|\\+\\+|@@|\\.`, "i"),
   },
   manaCost: {
     pattern: /\{..?(\/.)?}/,
@@ -117,6 +118,13 @@ export const mtgql: Grammar = {
     pattern: new RegExp(`[^\\s#]+(?=(\\b|$))`),
   },
 };
+
+export const mtgqlCubePage = {
+  ...mtgql,
+  keyword: {
+    pattern: new RegExp(`(^|\\b)(${keywordRegex}|tag)(?=(${operators}))`, "i"),
+  },
+}
 
 // Anything built on top of mtgql goes here
 export const mtgqlExtended: Grammar = {
@@ -239,6 +247,7 @@ export const linkWrap = (env: Environment) => {
       if (env.content.includes("&lt;")) return;
       if (env.content.includes(")")) return;
       if (env.content.includes("(")) return;
+      if (env.content === '.') return;
       env.tag = "a";
       env.attributes.href = syntaxDocs[env.content];
       env.attributes.target = "_blank";

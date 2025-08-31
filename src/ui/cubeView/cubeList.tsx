@@ -8,6 +8,7 @@ import { cogDB as cogDBClient } from '../../api/local/db'
 import { SearchOptions } from 'mtgql'
 import { CubeFilter } from './cubeFilter'
 import { CardResultsLayout } from './cardResults'
+import { patchCubeQuery } from '../../api/mtgql-ep/cubeSugar'
 
 const options: SearchOptions = {
     order: 'cmc',
@@ -54,7 +55,8 @@ export function CubeList({}: CubeListProps) {
       }
     }
     const applySimpleFilter = (query: string) => {
-        execute([`cube=${cube.key} ++ (${query})`], 0);
+        const patchedQuery = patchCubeQuery(cube.key, query);
+        execute([`cube=${cube.key} ++ (${patchedQuery})`], 0);
     }
 
     return <CardResultsLayout

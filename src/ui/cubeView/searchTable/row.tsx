@@ -140,7 +140,7 @@ export function CubeSearchRow({
     isSubTotal>
     <Input
       className='search-row-input'
-      language='scryfall-extended-multi'
+      language='mtgql-cube'
       value={query}
       placeholder="*"
       onChange={handleChange}

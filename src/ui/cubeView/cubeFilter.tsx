@@ -18,7 +18,7 @@ export function CubeFilter({ applyFilter, clearFilter, canClear }: CubeFilterPro
   return <div className='cube-filter row center'>
     <label className='row center'>
       <span className='bold'>filter: </span>
-      <Input language='scryfall-extended-multi' value={filterQuery} onChange={e => setFilterQuery(e.target.value)}
+      <Input language='mtgql-cube' value={filterQuery} onChange={e => setFilterQuery(e.target.value)}
              onKeyDown={handleEnter} />
     </label>
     <button onClick={apply} disabled={filterQuery.length === 0}>Apply filter</button>

@@ -84,6 +84,7 @@ export const syntaxDocs: Record<FilterKeyword, string> = {
   tou: "/user-guide/query-syntax#combat-box",
   toughness: "/user-guide/query-syntax#combat-box",
   type: "/user-guide/query-syntax#types",
+  tag: '/user-guide/query-syntax#tags',
   unique: "/user-guide/query-syntax#printing-preference",
   usd: "/user-guide/query-syntax#prices",
   watermark: "/user-guide/query-syntax#flavor",

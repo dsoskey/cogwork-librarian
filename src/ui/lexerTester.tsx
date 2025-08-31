@@ -9,6 +9,7 @@ export const LexerTester = () => {
   const [error, setError] = useState<Error | undefined>()
 
   const runLexer = () => {
+    setError(undefined);
     const toSubmit = text.trim()
     if (toSubmit.length === 0) {
       // display error?
