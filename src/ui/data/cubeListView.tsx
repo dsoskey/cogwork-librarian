@@ -13,7 +13,7 @@ import { CubeTable } from '../component/cube/cubeDefinitionTable'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
 import { CUBE_SOURCE_TO_LABEL } from '../component/cube/sourceIcon'
 
-export const CubeDataView = () => {
+export function CubeListView() {
   const { addMessage, dismissMessage } = useContext(ToasterContext)
 
   const [cubeId, setCubeId] = useState("")
@@ -61,7 +61,7 @@ export const CubeDataView = () => {
       setCardsToImport([])
       setError("")
       setShowConfirmation(false)
-      const id = addMessage(`successfully added ${cubeId} to cube list`, false)
+      const id = addMessage(`successfully imported cube ${cubeId}`, false)
       setTimeout(() => {
         dismissMessage(id)
       }, DISMISS_TIMEOUT_MS)

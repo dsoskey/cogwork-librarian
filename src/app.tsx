@@ -13,7 +13,7 @@ import { ProjectContext, useProjectDao } from './api/local/useProjectDao'
 import { SettingsContext, SettingsView } from './ui/settingsView'
 import { CubeView } from './ui/cubeView'
 import { CardDataView } from './ui/data/cardDataView'
-import { CubeDataView } from './ui/data/cubeDataView'
+import { CubeListView } from './ui/data/cubeListView'
 import { NotFoundView } from './ui/notFoundView'
 import { ErrorBoundary } from 'react-error-boundary'
 import { RenderErrorFallback } from './ui/renderErrorFallback'
@@ -76,7 +76,7 @@ export const App = () => {
                       <Route path='/data/card' element={<DefaultLayout><CardDataView /></DefaultLayout>} />
                       <Route path='/data/otag/:tag' element={<DefaultLayout><OtagView /></DefaultLayout>} />
                       <Route path='/data/otag' element={<DefaultLayout><TagManager /></DefaultLayout>} />
-                      <Route path='/cube' element={<DefaultLayout><CubeDataView /></DefaultLayout>} />
+                      <Route path='/cube' element={<DefaultLayout><CubeListView /></DefaultLayout>} />
                       <Route path='/about-me' element={<DefaultLayout><AppInfo /></DefaultLayout>} />
                       <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
                       <Route path='/user-guide/*' element={<DocsView />} />
