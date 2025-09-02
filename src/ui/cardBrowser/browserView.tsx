@@ -26,6 +26,7 @@ import { useHighlightFilter } from './useHighlightFilter'
 import { FlagContext } from '../flags'
 import { DisplayTypesControl } from './displayTypesControl'
 import { HighlightFilterControl } from './highlightFilterControl'
+import { Link } from 'react-router-dom'
 
 const handleDownload = (text: string, ext: string) => {
   const now = new Date()
@@ -190,7 +191,11 @@ export const BrowserView = React.memo(({
         setRevealDetails={setRevealDetails}
       />
 
-      {showCards && <>
+      {result.length === 0 && status === "success" && <div className='none-cards'>
+        <div className="bold">No cards found</div>
+        <p>Check your query or head over to <Link to='./user-guide/query-syntax'>the syntax guide</Link></p>
+      </div>}
+      {showCards && result.length > 0 && <>
         <CardResults
           lastQueries={lastQueries}
           isCardDisplay={isCardDisplay}

@@ -687,6 +687,12 @@ body:has(.query-panel) {
   display: flex;
   flex-direction: column;
   flex: 1;
+
+  .none-cards {
+    background-color: var(--darker-color);
+    text-align: center;
+    padding: var(--spacing-500) var(--spacing-200);
+  }
 }
 
 @media (min-width: 769px) {

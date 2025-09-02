@@ -31,7 +31,7 @@ export function CardResultsLayout({ cards, filterControl, extraControls }: CardR
     <div className='list-control'>
       {filterControl}
       <CubeSort setOrdering={setOrdering} ordering={ordering} />
-      <div className="row">
+      <div className="row baseline">
         <label>
           <span className="bold">display as: </span>
           <select value={displayType} onChange={e => setDisplayType(e.target.value as CubeDisplayType)}>
