@@ -7,6 +7,7 @@ import { QueryReport, useReporter } from '../useReporter'
 import { useLocalStorage } from './useLocalStorage'
 import { displayMessage } from '../../error'
 import { CARD_INDEX } from './cardIndex'
+import DBWorker from './dbWorker?worker'
 
 export const DB_LOAD_MESSAGES = [
   "loading cubes",
@@ -227,8 +228,7 @@ export const useCogDB = (): CogDB => {
 
   const loadDB = useCallback(async () => {
     console.debug("starting worker")
-    // @ts-ignore
-    const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
+    const worker = new DBWorker()
     rezzy.current = []
     setMemStatus('loading')
     setMemError("")
@@ -274,7 +274,7 @@ export const useCogDB = (): CogDB => {
     }
     console.debug("starting worker")
     // @ts-ignore
-    const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
+    const worker = new DBWorker()
     if (targets.find(it => it === 'memory')) {
       rezzy.current = []
     }
@@ -291,7 +291,7 @@ export const useCogDB = (): CogDB => {
   const loadMtgJSONDB = useCallback(async (targets: ImportTarget[], filter: string) => {
     console.debug("starting worker")
     // @ts-ignore
-    const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
+    const worker = new DBWorker()
     if (targets.find(it => it === 'memory')) {
       rezzy.current = []
     }

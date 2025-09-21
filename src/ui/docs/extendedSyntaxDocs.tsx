@@ -1,10 +1,10 @@
 import React from 'react'
-import syntaxExtensions from "../../../docs/syntaxExtensions/intro.md"
-import defaultAlias from "../../../docs/syntaxExtensions/alias.md"
-import defaultWeight from "../../../docs/syntaxExtensions/weight.md"
-import mode from "../../../docs/syntaxExtensions/mode.md"
-import venn from "../../../docs/syntaxExtensions/venn.md"
-import domain from "../../../docs/syntaxExtensions/domain.md"
+import syntaxExtensions from "../../../docs/syntaxExtensions/intro.md?raw"
+import defaultAlias from "../../../docs/syntaxExtensions/alias.md?raw"
+import defaultWeight from "../../../docs/syntaxExtensions/weight.md?raw"
+import mode from "../../../docs/syntaxExtensions/mode.md?raw"
+import venn from "../../../docs/syntaxExtensions/venn.md?raw"
+import domain from "../../../docs/syntaxExtensions/domain.md?raw"
 import { MDDoc, titleificate } from './renderer'
 import { stdlib } from '../../api/mtgql-ep/aliasLibs'
 

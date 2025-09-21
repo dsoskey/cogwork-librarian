@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { MDDoc } from './renderer'
-import keyboardShortcuts from '../../../docs/keyboardShortcuts.md'
+import keyboardShortcuts from '../../../docs/keyboardShortcuts.md?raw'
 import "./docsView.css"
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { Route, Routes, useLocation } from 'react-router'

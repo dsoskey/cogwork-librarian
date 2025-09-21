@@ -1,11 +1,11 @@
 import React from 'react'
 import { BaseSubExplanation } from './baseSubExplanation'
 import { MDDoc, titleificate } from './renderer'
-import intro from '../../../docs/gettingStarted/intro.md'
-import dbBasics from '../../../docs/gettingStarted/dbBasics.md'
-import editorBasics from '../../../docs/gettingStarted/editorBasics.md'
-import searchResults from '../../../docs/gettingStarted/searchResults.md'
-import savedCards from '../../../docs/gettingStarted/savedCards.md'
+import intro from '../../../docs/gettingStarted/intro.md?raw'
+import dbBasics from '../../../docs/gettingStarted/dbBasics.md?raw'
+import editorBasics from '../../../docs/gettingStarted/editorBasics.md?raw'
+import searchResults from '../../../docs/gettingStarted/searchResults.md?raw'
+import savedCards from '../../../docs/gettingStarted/savedCards.md?raw'
 import { KNIGHTS_EXAMPLE } from '../../api/example'
 
 export const gettingStartedSectionTitles = [

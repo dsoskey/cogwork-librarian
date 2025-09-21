@@ -1,6 +1,6 @@
-import regexDoc from '../../../docs/regex.md'
-import randomExample from '../../../docs/syntaxReference/sort/random-example.md'
-import examples from '../../../docs/examples.md'
+import regexDoc from '../../../docs/regex.md?raw'
+import randomExample from '../../../docs/syntaxReference/sort/random-example.md?raw'
+import examples from '../../../docs/examples.md?raw'
 import { MDDoc, newPre, titleificate } from './renderer'
 import React from 'react'
 

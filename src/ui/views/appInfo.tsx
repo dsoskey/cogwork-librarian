@@ -1,8 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { FlagContext } from '../flags'
-import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { Link } from 'react-router-dom'
-import gitcube from "../../../docs/design/gitcube.md";
+import gitcube from "../../../docs/design/gitcube.md?raw";
 import { Route, Routes } from 'react-router'
 import { MDDoc } from '../docs/renderer'
 
@@ -32,8 +31,8 @@ export const AppInfo = () => {
   }
 
   return (
-    <>
-      <h2>what is Cogwork Librarian?</h2>
+    <div className="prose">
+      <h2>What is Cogwork Librarian?</h2>
       <p>
         <span className={pin1 ? "info-key" : "disengaged"} onClick={tryLock}>Cogwork Librarian</span>
         &nbsp;helps you brainstorm and build cubes, battle boxes, and other custom magic formats faster.
@@ -48,12 +47,12 @@ export const AppInfo = () => {
         Why should i use Cogwork Librarian? why not use Scryfall directly?
       </h2>
       <p>
-        for the average one-off search query, Scryfall is more than sufficient.
+        For the average one-off search query, Scryfall is more than sufficient.
         Cogwork Librarian offers some key advantages over Scryfall:
       </p>
       <ol>
         <li>
-          it is designed with brainstorming lists in mind.
+          It is designed with brainstorming lists in mind.
           organize multiple query sets into a single project to keep relevant queries together.
           the ignorelist and the base/sub query model let you focus only on the subset of cards
           that you care about
@@ -77,7 +76,7 @@ export const AppInfo = () => {
         </li>
         <li>
           Cogwork Librarian works with any Scryfall-compatible list of cards,
-          including custom cards! download any of Scryfall's bulk data sets
+          including custom cards! Download any of Scryfall's bulk data sets
           through Cogwork Librarian itself, or import your own json file to
           use a custom data set.
         </li>
@@ -89,11 +88,11 @@ export const AppInfo = () => {
       </ol>
 
       <h2>
-        okay all of those are great but it's not enough for me yet. what else
+        Okay all of those are great but it's not enough for me yet. what else
         will Cogwork Librarian do in the future?
       </h2>
       <p>
-        while nothing on this list is a guarantee, here are some features i'm
+        While nothing on this list is a guarantee, here are some features i'm
         looking to implement:
       </p>
       <ul>
@@ -104,9 +103,9 @@ export const AppInfo = () => {
         </li>
       </ul>
 
-      <h2>this looks cool<span className={pin2 ? "engaged" : (pin1 ? "info-key" : "")} onClick={clickPin2}>!</span> how can i contribute?</h2>
+      <h2>This looks cool<span className={pin2 ? "engaged" : (pin1 ? "info-key" : "")} onClick={clickPin2}>!</span> how can i contribute?</h2>
       <p>
-        At the moment, I need people to test Cogwork Librarian. Try it out for
+        At the moment, I need people to use Cogwork Librarian and share it with their friends. Try it out for
         your next cube project and see if it helps you level up your queries.{' '}
         <a
           href='https://github.com/dsoskey/cogwork-librarian/issues/new?assignees=&labels=bug&template=bug_report.md&title='
@@ -125,7 +124,7 @@ export const AppInfo = () => {
         </a>{' '}
         are encouraged!
       </p>
-    </>
+    </div>
   )
 }
 

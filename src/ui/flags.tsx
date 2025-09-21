@@ -1,12 +1,20 @@
 import React, { createContext, useMemo, useState } from 'react'
 import _cloneDeep from 'lodash/cloneDeep'
 export type { Flag } from '../../config'
-import { ClientConfig, Flag } from '../../config'
+import { ClientConfig, Flag, Stage } from '../../config'
 
-// @ts-ignore
-import _config from 'configuration'
-console.log(_config);
-export const CLIENT_CONFIG = _config as ClientConfig;
+export const CLIENT_CONFIG: ClientConfig = {
+  stage: Stage.Dev,
+  flags: {
+    showDebugInfo: true,
+    adminMode: true,
+    displayTypes: true,
+    edhrecOverlay: false,
+    proxyTest: true,
+    searchSource: false,
+    cubeCombos: true,
+  }
+}
 export const REFOCUS_TIMEOUT = 50;
 
 interface FlagManager {
