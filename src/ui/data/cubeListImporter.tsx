@@ -16,7 +16,8 @@ export const CubeListImporter = ({ setCards, setError, loader, children, setCard
   const listImporter = useContext(ListImporterContext)
   const project = useContext(ProjectContext)
   const useSavedCards = () => {
-    setCardsToImport(project.savedCards.map(it => it.name))
+    setCardsToImport(project.savedCards
+      .map(it => it.cards.map(it => `${it.quantity} ${it.name}`)).flat())
   }
   const importList = () => {
     listImporter.attemptImport(cardsToImport, true)

@@ -58,7 +58,7 @@ export const Footer = React.memo(() => {
           <AsSeenOn />
         </a>
       </div>
-      <div className='legalese'>
+      <div className='legalese prose'>
         <p>
           Portions of Cogwork Librarian are unofficial Fan Content permitted
           under the Wizards of the Coast Fan Content Policy. The literal and

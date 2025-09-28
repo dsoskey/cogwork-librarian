@@ -482,6 +482,7 @@ th, td {
 
 .query-form {
   margin: var(--spacing-200);
+  flex: 1;
 }
 
 .execute-controls {
@@ -681,6 +682,8 @@ body:has(.query-panel) {
   flex:1;
   height: 100svh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .results .content {
@@ -737,7 +740,16 @@ body:has(.query-panel) {
   top: var(--spacing-100);
   z-index: 20;
 }
-
+.floating-saved-cards-toggle {
+  position: absolute;
+  bottom: var(--spacing-300);
+  right: var(--spacing-300);
+  z-index: 20;
+  box-shadow: 0 0 6px 1px var(--darker-color);
+  &:hover {
+    box-shadow: 0 0 6px 1px var(--active-mid-alpha);
+  }
+}
 .saved-cards-floater {
   --show-width: 25%;
   height: 100svh;

@@ -17,8 +17,6 @@ import { HistoryView } from './historyView'
 import { ClockIcon } from './icons/clock'
 
 export interface SearchViewProps {
-  showSavedCards: boolean;
-  setShowSavedCards: Setter<boolean>;
   path: string;
   addCard: (query: string, card: Card) => void;
   queries: string[]
@@ -28,7 +26,6 @@ export interface SearchViewProps {
   memory: NormedCard[]
 }
 export const SearchView = ({
-  showSavedCards, setShowSavedCards,
   memory,
   path, addCard, queries, setQueries, toggleIgnoreId, ignoredIds
 }: SearchViewProps) => {
@@ -112,11 +109,6 @@ export const SearchView = ({
         setQueries={setQueries}
         status={status}
         execute={execute}
-        savedCardsToggle={<button
-          onClick={() => setShowSavedCards(prev => !prev)}
-        >
-          {showSavedCards ? 'hide saved cards' : 'show saved cards'}
-        </button>}
         historyButton={<button
           className='rotate-on-hover'
           title='query history'

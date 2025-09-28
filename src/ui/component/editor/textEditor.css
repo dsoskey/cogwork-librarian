@@ -152,6 +152,9 @@ textarea.coglib-prism-theme {
   }
   .labels > div {
     padding-left: var(--spacing-200);
+    &:last-child {
+      padding-bottom: var(--spacing-200);
+    }
   }
 
   .run-query-button {

@@ -11,13 +11,13 @@ interface _BaseIconProps extends React.SVGProps<SVGSVGElement> {
 export interface BaseIconProps extends Omit<_BaseIconProps, "children"> {
 }
 
-export function BaseIcon({ size = DEFAULT_SIZE, fill, className, children }: _BaseIconProps) {
+export function BaseIcon({ size = DEFAULT_SIZE, fill, className, children, transform }: _BaseIconProps) {
   return <svg
     xmlns='http://www.w3.org/2000/svg'
     className={className ? `themed-icon ${className}` : 'themed-icon'}
     width={size} height={size}
     viewBox='0 0 256 256'>
-    <g fill={fill} className='stroke'>
+    <g fill={fill} className='stroke' transform={transform}>
       {children}
     </g>
   </svg>

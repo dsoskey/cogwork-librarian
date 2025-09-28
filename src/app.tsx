@@ -25,6 +25,8 @@ import Prism from 'prismjs'
 import { hookContextMenu } from './api/local/syntaxHighlighting'
 import { useLocalStorage } from './api/local/useLocalStorage'
 import { DEFAULT_GUTTER_COLUMNS, GutterColumn } from './ui/component/editor/textEditor'
+import { SidebarOpenIcon } from './ui/icons/sidebarOpen'
+import { SidebarClosedIcon } from './ui/icons/sidebarClosed'
 
 export const App = () => {
   const [cubeContext, setCubeContext] = useState<string>('')
@@ -85,7 +87,6 @@ export const App = () => {
                         <div className='search-view-root'>
                           <SearchView
                             memory={memory}
-                            showSavedCards={showSavedCards} setShowSavedCards={setShowSavedCards}
                             addCard={addCard}
                             path={path}
                             queries={queries}
@@ -94,11 +95,6 @@ export const App = () => {
                             ignoredIds={ignoredIds}
                           />
                           <div className={`saved-cards-floater ${showSavedCards ? 'show' : 'hide'}`}>
-                            {showSavedCards && <button
-                              className='saved-cards-toggle'
-                              title='Hide saved cards'
-                              onClick={() => setShowSavedCards(false)}
-                            >X</button>}
                             {showSavedCards && <SavedCardsEditor
                               path={path}
                               savedCards={savedCards}
@@ -107,6 +103,13 @@ export const App = () => {
                               removeCard={removeCard}
                             />}
                           </div>
+                          <button
+                            className={`floating-saved-cards-toggle ${showSavedCards ? 'show' : 'hide'}`}
+                            title={`${showSavedCards ? 'Hide':'Show'} saved cards`}
+                            onClick={() => setShowSavedCards(prevState => !prevState)}
+                          >{showSavedCards
+                            ? <SidebarOpenIcon size={32} /> : <SidebarClosedIcon size={32} />}
+                          </button>
                         </div>
                       } />
                       <Route path='*' element={<DefaultLayout><NotFoundView /></DefaultLayout>} />

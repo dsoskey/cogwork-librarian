@@ -109,7 +109,7 @@ function reducer(state: { active: string[], selectedIndex: number }, action) {
 }
 
 
-export const ProjectTabs = ({ savedCardsToggle }) => {
+export const ProjectTabs = () => {
   const maxOpenProjects = 5;
   const project = useContext(ProjectContext)
   const { openProject, path } = project;
@@ -162,7 +162,6 @@ export const ProjectTabs = ({ savedCardsToggle }) => {
           const text = serializeProject({ createdAt: now, updatedAt: now, ...project, ignoredCards: [] })
           downloadText(text, title, 'md')
         }}>export {title}</button>
-        {savedCardsToggle}
       </div>
       {oldIgnoreIds.length > 0 && <InfoModal
         buttonContent='migrate ignore-list'
