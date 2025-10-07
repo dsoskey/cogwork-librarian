@@ -148,8 +148,10 @@ export const TextEditor = ({
   const onScroll = (event: any) => {
     faker.current!.scrollLeft = event.target.scrollLeft;
     faker.current!.scrollTop = event.target.scrollTop;
-    linker.current!.scrollLeft = event.target.scrollLeft;
-    linker.current!.scrollTop = event.target.scrollTop;
+    if (linker.current) {
+      linker.current.scrollLeft = event.target.scrollLeft;
+      linker.current.scrollTop = event.target.scrollTop;
+    }
   };
 
   const copyText = useCallback((mindex: number, maxdex: number) => {
@@ -157,13 +159,15 @@ export const TextEditor = ({
     controller.current?.setSelectionRange(mindex, maxdex);
   }, []);
 
-  useHighlightPrism([value, language]);
+  useHighlightPrism([value, revealLinks, language]);
   React.useLayoutEffect(() => {
     // Shamelessly stolen from https://stackoverflow.com/a/65990608
     // Reset height - important to shrink on delete
     controller.current!.style.height = "inherit";
     faker.current!.style.height = "inherit";
-    linker.current!.style.height = "inherit";
+    if (linker.current) {
+      linker.current!.style.height = "inherit";
+    }
     // Set height
     const newHeight = `${Math.max(
       controller.current?.scrollHeight ?? 0,
@@ -171,8 +175,20 @@ export const TextEditor = ({
     )}px`;
     controller.current!.style.height = newHeight;
     faker.current!.style.height = newHeight;
-    linker.current!.style.height = newHeight;
+    if (linker.current) {
+      linker.current.style.height = newHeight;
+    }
     onScroll({ target: controller.current });
+
+    if (revealLinks) {
+      linker.current?.querySelectorAll('a').forEach(qs => {
+        qs.tabIndex = 0;
+      })
+    } else {
+      linker.current?.querySelectorAll('a').forEach(qs => {
+        qs.tabIndex = -1;
+      })
+    }
   }, [value, lineHeight]);
 
   useEffect(() => {
@@ -232,16 +248,14 @@ export const TextEditor = ({
           setQueries(event.target.value.split(separator));
         }}
       />
-      <pre
+      {revealLinks && <pre
         ref={linker}
         tabIndex={-1}
-        aria-hidden // Is this an accessibility issue with the links? also consider
-        className={`language-${language ?? "none"} links ${
-          revealLinks ? "show" : "hide"
-        }`}
+        aria-hidden
+        className={`language-${language ?? "none"}-links links show`}
       >
         <code className="match-braces">{value}</code>
-      </pre>
+      </pre>}
       <pre
         ref={faker}
         tabIndex={-1}

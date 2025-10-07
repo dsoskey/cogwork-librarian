@@ -21,7 +21,18 @@ export const Input = React.forwardRef<HTMLDivElement, InputProps>(({ value, onCh
     faker.current.scrollLeft = event.target.scrollLeft
     linker.current.scrollLeft = event.target.scrollLeft
   }
-  useHighlightPrism([value]);
+  useHighlightPrism([value, revealLinks, language]);
+  React.useLayoutEffect(() => {
+    if (revealLinks) {
+      linker.current?.querySelectorAll('a').forEach(qs => {
+        qs.tabIndex = 0;
+      })
+    } else {
+      linker.current?.querySelectorAll('a').forEach(qs => {
+        qs.tabIndex = -1;
+      })
+    }
+  })
 
   useEffect(() => {
     controller.current?.addEventListener('scroll', onScroll)
@@ -33,6 +44,8 @@ export const Input = React.forwardRef<HTMLDivElement, InputProps>(({ value, onCh
       setRevealLinks(prev => !prev)
       if (revealLinks) {
         controller.current.focus()
+      } else {
+        linker.current?.focus()
       }
     }
   }
@@ -40,13 +53,6 @@ export const Input = React.forwardRef<HTMLDivElement, InputProps>(({ value, onCh
 
   return (
     <div className='text-editor-root query-input' onKeyDown={handleDown} ref={parentRef}>
-      <pre ref={linker}
-           tabIndex={-1}
-           aria-hidden
-           className={`language-${language ?? 'none'} links match-braces ${
-             revealLinks ? 'show' : 'hide'
-           }`}
-      ><code>{displayValue}</code></pre>
       <input
         {...rest}
         ref={controller}
@@ -54,11 +60,22 @@ export const Input = React.forwardRef<HTMLDivElement, InputProps>(({ value, onCh
         value={value}
         onChange={onChange}
       />
-      <pre ref={faker}
-            aria-hidden
-            tabIndex={-1}
-            className={`language-${language ?? 'none'} display match-braces`}>
-        <code>{displayValue}</code></pre>
+      {revealLinks && <pre
+        ref={linker}
+        tabIndex={-1}
+        aria-hidden
+        className={`language-${language ?? 'none'}-links links show`}
+      >
+        <code>{displayValue}</code>
+      </pre>}
+      <pre
+        ref={faker}
+        tabIndex={-1}
+        aria-hidden
+        className={`language-${language ?? 'none'} display`}
+      >
+        <code>{displayValue}</code>
+      </pre>
     </div>
   )
 })

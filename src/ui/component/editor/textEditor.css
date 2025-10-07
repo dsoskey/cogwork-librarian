@@ -179,19 +179,13 @@ textarea.coglib-prism-theme {
     display: inline-block;
     padding-bottom: var(--spacing-100);
     scrollbar-color: var(--active-mid-alpha) var(--darker-color);
-
-    &.show {
-      z-index: 4;
-      background-color: color-mix(in srgb, var(--active), transparent 80%);
-
-    }
-    &.hide {
-      z-index: 1;
-    }
+    z-index: 4;
+    background-color: color-mix(in srgb, var(--active), transparent 80%);
 
     a:focus {
-      background-color: color-mix(in srgb, var(--active), transparent 80%);
+      background-color: var(--darkest-color);
     }
+
     :not(a) {
       color: transparent;
       background: transparent;

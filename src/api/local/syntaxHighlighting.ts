@@ -189,6 +189,8 @@ export const mtgqlExtendedMulti: Grammar = {
 };
 
 export const linkWrap = (env: Environment) => {
+  if (!env.language.endsWith("-links")) return;
+
   switch (env.type) {
     case "negation":
       env.tag = "a";
