@@ -31,41 +31,40 @@ export function CardResultsLayout({ cards, filterControl, extraControls }: CardR
     <div className='list-control'>
       {filterControl}
       <CubeSort setOrdering={setOrdering} ordering={ordering} />
-      <div className="row baseline">
+      <div className='row baseline'>
         <label>
-          <span className="bold">display as: </span>
+          <span className='bold'>display as: </span>
           <select value={displayType} onChange={e => setDisplayType(e.target.value as CubeDisplayType)}>
-            <option value="grid">classic grid</option>
-            <option value="visual spoiler">visual spoiler</option>
+            <option value='grid'>classic grid</option>
+            <option value='visual spoiler'>visual spoiler</option>
           </select>
         </label>
-        {displayType === "visual spoiler" && <>
-          <label className="row center">
-            <span className="bold">show custom images:</span>
-            <input
-              className="custom"
-              type="checkbox"
-              checked={showCustomImage}
-              onChange={e => setShowCustomImage(e.target.checked)} />
-          </label>
-          {viewport.width > 1024 &&
+        <label className='row center'>
+          <span className='bold'>show custom images:</span>
+          <input
+            className='custom'
+            type='checkbox'
+            checked={showCustomImage}
+            onChange={e => setShowCustomImage(e.target.checked)} />
+        </label>
+        {displayType === 'visual spoiler' && viewport.width > 1024 &&
             <CardsPerRowControl
               setCardsPerRow={setCardsPerRow}
               cardsPerRow={cardsPerRow}
             />}
-        </>}
 
         {extraControls}
       </div>
     </div>
 
     {sorted.length > 0 && <>
-      {displayType === "grid" && <ClassicCardList
-        cards={groupCards(sorted, "color_identity", "type_line")}
-        sort2By="cmc"
+      {displayType === 'grid' && <ClassicCardList
+        cards={groupCards(sorted, 'color_identity', 'type_line')}
+        sort2By='cmc'
+        showCustomImage={showCustomImage}
         onCardNameClick={setActiveCard}
       />}
-      {displayType === "visual spoiler" && <div className='result-container'>
+      {displayType === 'visual spoiler' && <div className='result-container'>
         {sorted.map((card, i) => <CardImageView
           key={card.id + i.toString()}
           className={`_${cardsPerRow}`}
@@ -137,35 +136,36 @@ type DoubleGrouped<T> = {
   }
 }
 
+
 export interface ClassicCardListProps {
   sort2By: string
   onCardNameClick: (card: OrderedCard) => void
+  showCustomImage: boolean
   cards: DoubleGrouped<OrderedCard[]>
 }
 
-
-
-export function ClassicCardList({ sort2By, onCardNameClick, cards }: ClassicCardListProps) {
-
-
+export function ClassicCardList({ sort2By, showCustomImage, onCardNameClick, cards }: ClassicCardListProps) {
   return <div className="classic-card-list-root row">
     {Object.entries(cards).map(([groupby1, groupby2]) => <ClassicCardColumn
       key={groupby1}
       title={groupby1}
       cards={groupby2}
+      showCustomImage={showCustomImage}
       onCardNameClick={onCardNameClick}
     />)}
   </div>
 }
 
+
 export interface ClassicCardColumnProps {
   title: string
   onCardNameClick: (card: OrderedCard) => void
+  showCustomImage: boolean
   cards: { [groupby2: string]: OrderedCard[] } & { _count: number }
 
 }
 
-export function ClassicCardColumn({ title, cards, onCardNameClick }: ClassicCardColumnProps) {
+export function ClassicCardColumn({ title, cards, onCardNameClick, showCustomImage }: ClassicCardColumnProps) {
     const { _count, ...rest } = cards;
     return <div className="card-column-root">
       <div className="column-header">{title} [{_count}]</div>
@@ -184,6 +184,7 @@ export function ClassicCardColumn({ title, cards, onCardNameClick }: ClassicCard
               }}
               lockable={false}
               id={card.id}
+              imageSrc={showCustomImage ? card.alt_image_uri : undefined}
               name={DOUBLE_FACED_LAYOUTS.includes(card.layout) || card.layout === "adventure"
                 ? card.name.split(" // ")[0]
                 : card.name}

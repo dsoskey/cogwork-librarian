@@ -5,7 +5,9 @@
 .update-timestamp {
     margin-right: var(--spacing-200);
 }
-
+.active-card-title {
+    margin: unset;
+}
 .cube-view-root {
     .header {
         margin: 0 var(--spacing-300);
@@ -126,11 +128,15 @@
     font-size: 5em;
 }
 
-.active-card-root img {
-    width: 300px;
-    aspect-ratio: var(--card-aspect-ratio);
+.active-card-root {
+    &.row {
+        gap: var(--spacing-400);
+    }
+    img {
+        width: 300px;
+        aspect-ratio: var(--card-aspect-ratio);
+    }
 }
-
 .classic-card-list-root {
     margin: var(--spacing-300);
 }

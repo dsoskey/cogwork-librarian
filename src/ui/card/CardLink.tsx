@@ -79,13 +79,14 @@ export function CardLink({ name, id, allowedPlacements }: CardLinkProps) {
 interface CardLink2Props {
   name: string
   id: string
+  imageSrc?: string;
   hasBack?: boolean;
   onClick?: () => void;
   lockable?: boolean;
   allowedPlacements?: Placement[]
 }
 
-export function CardLink2({ lockable, onClick, name, id, hasBack, allowedPlacements }: CardLink2Props) {
+export function CardLink2({ lockable, onClick, imageSrc, name, id, hasBack, allowedPlacements }: CardLink2Props) {
   const _lockable = lockable ?? true;
   const [isLockedOpen, setIsLockedOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -135,7 +136,7 @@ export function CardLink2({ lockable, onClick, name, id, hasBack, allowedPlaceme
         >
           <img
             className="card-link-image"
-            src={imageUris(id, "front").normal}
+            src={imageSrc ?? imageUris(id, "front").normal}
             alt={name}
           />
           {hasBack && <img

@@ -18,6 +18,7 @@ export async function importCubeCobra(cubeId: string, now: Date): Promise<Cube> 
     }
     // conditionally add these fields,
     // they can override db card data for cube-specific analysis
+    if (it.custom_name) result.name = it.custom_name
     if (it.rarity) result.rarity = it.rarity;
     if (it.cmc) result.cmc = it.cmc;
     if (it.type_line) result.type_line = it.type_line;

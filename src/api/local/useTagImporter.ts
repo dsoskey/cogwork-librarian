@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { TaskStatus } from '../../types'
 import { QueryReport, useReporter } from '../useReporter'
 import { TagType } from 'mtgql'
+import DBWorker from './dbWorker?worker';
 
 export interface OracleTagImporter {
   oracleTagReport: QueryReport
@@ -45,7 +46,7 @@ export const useTagImporter = (): OracleTagImporter => {
   const loadTags = async (type: TagType) => {
     console.time(`loaded ${type} tags`)
     // @ts-ignore
-    const worker = new Worker(new URL("./dbWorker.ts", import.meta.url))
+    const worker = new DBWorker()
     setTaskStatus("loading")
     oracleTagReport.reset(2)
 

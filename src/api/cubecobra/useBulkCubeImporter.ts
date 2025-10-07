@@ -1,6 +1,7 @@
 import { createContext, useState } from 'react'
 import { Setter } from '../../types'
 import { Cube, CubeSource, ExternalCubeSource } from 'mtgql'
+import CubeImportWorker from './cubeImportWorker?worker';
 
 const RUNNING_STATES = [
   "querying-cubecobra",
@@ -97,7 +98,7 @@ export const useBulkCubeImporter = (): BulkCubeImporter => {
     console.debug("starting cube import worker")
     console.time(timerName)
     // @ts-ignore
-    const worker = new Worker(new URL("./cubeImportWorker.ts", import.meta.url))
+    const worker = new CubeImportWorker();
     setStatus("querying-cubecobra")
     setMissingCubes([])
     worker.onmessage = handleCubeImport
@@ -109,7 +110,7 @@ export const useBulkCubeImporter = (): BulkCubeImporter => {
 
     console.debug("starting cube import worker")
     // @ts-ignore
-    const worker = new Worker(new URL("./cubeImportWorker.ts", import.meta.url))
+    const worker = new CubeImportWorker();
     setStatus("querying-cubecobra")
     setMissingCubes([])
     worker.onmessage = handleCubeImport

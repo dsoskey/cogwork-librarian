@@ -25,17 +25,21 @@ import { PrinterIcon } from '../icons/printer'
 import { ComboListView } from './comboListView'
 import { CommandersSpellCompact } from '../icons/commandersSpellbook'
 import { DraftmancerIcon } from '../icons/draftmancer'
+import { LinkIcon } from '../icons/link'
+import { CheckIcon } from '../icons/check'
+import { ErrorIcon } from '../icons/error'
+import { COBRA_CUSTOM_ID } from '../../api/cubecobra/constants'
 
 
 export function CubeView() {
-  const showDebugInfo = useContext(FlagContext).flags.showDebugInfo;
-  const cubeViewModel = useCubeViewModel();
-  const { cube, oracleMap, activeCard, setActiveCard } = cubeViewModel;
+  const showDebugInfo = useContext(FlagContext).flags.showDebugInfo
+  const cubeViewModel = useCubeViewModel()
+  const { cube, oracleMap, activeCard, setActiveCard } = cubeViewModel
 
   const onPrintSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const normedCard = oracleMap[activeCard.oracle_id][0]
     const nextPrint = normedCard.printings.find(p => p.id === e.target.value)
-    setActiveCard({...activeCard, ...nextPrint})
+    setActiveCard({ ...activeCard, ...nextPrint })
   }
 
   const saveActiveCard = () => {
@@ -44,10 +48,10 @@ export function CubeView() {
         ...cube.cards.slice(0, activeCard.index),
         { oracle_id: activeCard.oracle_id, print_id: activeCard.id },
         ...cube.cards.slice(activeCard.index + 1)
-      ];
+      ]
       const newCube = {
         ...cube,
-        cards,
+        cards
       }
       cogDBClient.cube.put(newCube)
         .then(() => setActiveCard(undefined))
@@ -65,39 +69,48 @@ export function CubeView() {
     </div>
     <Modal
       open={activeCard !== undefined}
-      title={<div className="row center">
-        <h2>{activeCard?.name} –</h2>
-        <a href={activeCard?.scryfall_uri.replace(/\?.+$/, "")}
-           rel='noreferrer'
-           target='_blank'
-           title="view on Scryfall "
-        ><ScryfallIcon size="1.5em" /></a>
+      title={<div className='row center'>
+        <h2 className="active-card-title">{activeCard?.name} –</h2>
         {showDebugInfo && <CopyToClipboardButton
           copyText={() => JSON.stringify(activeCard, undefined, 2)}
-          buttonText={LINK_BUTTON_ICONS}
+          buttonText={{
+            unstarted: <LinkIcon size="1.5em"/>,
+            success: <CheckIcon size="1.5em"/>,
+            error: <ErrorIcon size="1.5em"/>,
+          }}
           titleText={COPY_TITLE}
         />}
+        {activeCard?.scryfall_uri &&
+          <a href={activeCard?.scryfall_uri.replace(/\?.+$/, '')}
+             rel='noreferrer'
+             target='_blank'
+             style={{ lineHeight: '0', alignSelf: 'center' }}
+          >
+            <button title='open in Scryfall'>
+              <ScryfallIcon size="1.5em" />
+            </button>
+          </a>}
       </div>}
       onClose={() => setActiveCard(undefined)}>
-      {activeCard && <div className="row active-card-root">
-          <div>
-            <CardImageView
-              card={{ data: activeCard, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
-              altImageUri={activeCard.alt_image_uri}
-              altImageBackUri={activeCard.alt_image_back_uri}
-              highlightFilter={() => false}
-            />
-            <div>
-              <select value={activeCard.id} onChange={onPrintSelect}>
-                {oracleMap[activeCard.oracle_id][0]
-                  .printings.map(printing =>
-                    <option key={printing.id} value={printing.id}>
-                      {printing.set_name} – ({printing.set} {printing.collector_number})
-                    </option>)}
-              </select>
-              <button onClick={saveActiveCard}>save</button>
-            </div>
-          </div>
+      {activeCard && <div className='row active-card-root'>
+        <div className="column">
+          <CardImageView
+            card={{ data: activeCard, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
+            altImageUri={activeCard.alt_image_uri}
+            altImageBackUri={activeCard.alt_image_back_uri}
+            highlightFilter={() => false}
+          />
+          {activeCard.id !== COBRA_CUSTOM_ID && <div className="row ">
+            <select value={activeCard.id} onChange={onPrintSelect}>
+              {oracleMap[activeCard.oracle_id][0]
+                .printings.map(printing =>
+                  <option key={printing.id} value={printing.id}>
+                    {printing.set_name} – ({printing.set} {printing.collector_number})
+                  </option>)}
+            </select>
+            <button onClick={saveActiveCard}>save</button>
+          </div>}
+        </div>
         <div>
           <div className='row baseline'>
             <h3>mana cost</h3>
@@ -151,23 +164,24 @@ export function CubeView() {
 
 function CubeModelView() {
   const { cube, cards } = useContext(CubeViewModelContext)
-  const { cubeCombos } = useContext(FlagContext).flags;
+  const { cubeCombos } = useContext(FlagContext).flags
   const { pathname } = useLocation()
 
   return <>
     <div className='header'>
-      <div className="row baseline wrap">
+      <div className='row baseline wrap'>
         <h2>{cube.name}</h2>
         <em>
           — a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube
           {cube.created_by && ` created by ${cube.created_by} `}
-          from{" "}
-          {cube.source !== "list" && <a href={cubeLink(cube)}
-             rel='noreferrer'
-             target='_blank'>
+          from{' '}
+          {cube.source !== 'list' && <a
+            href={cubeLink(cube)}
+            rel='noreferrer'
+            target='_blank'>
             {CUBE_SOURCE_TO_LABEL[cube.source]}
           </a>}
-          {cube.source === "list" && "a text list"}
+          {cube.source === 'list' && 'a text list'}
         </em>
       </div>
       <div className='cube-subroutes row center'>
@@ -181,7 +195,7 @@ function CubeModelView() {
           title="powered by Commander's Spellbook!"
           className={`row center ${pathname === `/cube/${cube.key}/combos` ? 'active-link' : ''}`}
         >
-          combos <CommandersSpellCompact height="15" />
+          combos <CommandersSpellCompact height='15' />
         </Link>}
         <div>
           {cube.source !== 'list' && <>
@@ -189,17 +203,17 @@ function CubeModelView() {
               copyText={`${window.location.protocol}//${window.location.host}/cube/${cube.key}?source=${cube.source}`}
               title={`copy share link to keyboard`}
               buttonText={LINK_BUTTON_ICONS}
-              className="square"
+              className='square'
             />
             <RefreshButton toSubmit={[cube]} />
           </>}
-          {cube.source === "cubecobra" && <a
-            className="button-like"
+          {cube.source === 'cubecobra' && <a
+            className='button-like'
             href={`https://draftmancer.com/?cubeCobraID=${cube.canonical_id}&cubeCobraName=${encodeURI(cube.name)}`}
-            title="Start Draftmancer draft"
-            target="_blank"
-            rel="noopener noreferrer"
-          ><DraftmancerIcon/></a>}
+            title='Start Draftmancer draft'
+            target='_blank'
+            rel='noopener noreferrer'
+          ><DraftmancerIcon /></a>}
           <button
             disabled={pathname !== `/cube/${cube.key}/list`}
             className={pathname === `/cube/${cube.key}/list` ? '' : 'gone'}
@@ -214,7 +228,7 @@ function CubeModelView() {
       <Route path='/list' element={<CubeList />} />
       <Route path='/table' element={<CubeSearchTable />} />
       {cubeCombos && <Route path='/combos' element={<ComboListView cards={cards} />} />}
-      <Route path="" element={<CubeOverview />}/>
+      <Route path='' element={<CubeOverview />} />
     </Routes>
   </>
 }

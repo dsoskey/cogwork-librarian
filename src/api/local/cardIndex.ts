@@ -3,6 +3,7 @@ import { isOracleVal, normCardList, NormedCard } from 'mtgql'
 import { CubeCard } from 'mtgql/build/types/cube'
 import { cogDB } from './db'
 import * as Scryfall from 'scryfall-sdk'
+import { COBRA_CUSTOM_ID, DEFAULT_CUSTOM_CARD } from '../cubecobra/constants'
 
 class CardIndex {
   oracleToCard: { [id: string]: NormedCard } = {}
@@ -68,7 +69,10 @@ class CardIndex {
   }
 
   bulkCardByCubeList = async (cubeList: CubeCard[]) => {
-    const result = cubeList.map(it => this.cardByOracle(it.oracle_id))
+    const result = cubeList
+      .map(it => it.oracle_id === COBRA_CUSTOM_ID
+        ? DEFAULT_CUSTOM_CARD
+        : this.cardByOracle(it.oracle_id))
     const missingMemoryIndices = result
       .map((card, index) => card === undefined ? index : -1)
       .filter(index => index !== -1)
