@@ -1,5 +1,6 @@
 .default-layout {
-    margin: var(--spacing-300);
+    margin: 0 var(--spacing-300);
+    flex: 1;
 
     h2 {
         margin-top: 0;

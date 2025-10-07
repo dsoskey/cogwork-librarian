@@ -1,11 +1,11 @@
 import React from 'react'
 import "./footer.css"
-import { InnertubeWidget } from '../component/innertubeWidget'
-import { AsSeenOn } from './asSeenOn'
 import { BugIcon } from '../icons/bug'
 import { GithubIcon } from '../icons/github'
 import { CoinIcon } from '../icons/coins'
 import { LightbulbIcon } from '../icons/lightbulb'
+import { AsSeenOn } from './asSeenOn'
+import { InnertubeWidget } from '../component/innertubeWidget'
 
 export const Footer = React.memo(() => {
   return (
@@ -58,32 +58,36 @@ export const Footer = React.memo(() => {
           <AsSeenOn />
         </a>
       </div>
-      <div className='legalese prose'>
-        <p>
-          Portions of Cogwork Librarian are unofficial Fan Content permitted
-          under the Wizards of the Coast Fan Content Policy. The literal and
-          graphical information presented on this site about Magic: The
-          Gathering, including card images, mana symbols, and Oracle text, is
-          copyright Wizards of the Coast, LLC, a subsidiary of Hasbro, Inc.
-          Cogwork Librarian is not produced by or endorsed by Wizards of the
-          Coast.
-        </p>
-        <p>
-          The Scryfall logo is copyright Scryfall, LLC. Cogwork Librarian is not
-          produced by or endorsed by Scryfall, LLC.
-        </p>
-        <p>
-          All other content licensed under{' '}
-          <a
-            href='https://github.com/dsoskey/cogwork-librarian/blob/main/LICENSE'
-            rel='noreferrer'
-            target='_blank'
-          >
-            GPL v3
-          </a>
-          .
-        </p>
-      </div>
+      <Legalese />
     </footer>
   )
 });
+
+function Legalese() {
+  return <div className='legalese prose'>
+    <p>
+      Portions of Cogwork Librarian are unofficial Fan Content permitted
+      under the Wizards of the Coast Fan Content Policy. The literal and
+      graphical information presented on this site about Magic: The
+      Gathering, including card images, mana symbols, and Oracle text, is
+      copyright Wizards of the Coast, LLC, a subsidiary of Hasbro, Inc.
+      Cogwork Librarian is not produced by or endorsed by Wizards of the
+      Coast.
+    </p>
+    <p>
+      The Scryfall logo is copyright Scryfall, LLC. Cogwork Librarian is not
+      produced by or endorsed by Scryfall, LLC.
+    </p>
+    <p>
+      All other content licensed under{' '}
+      <a
+        href='https://github.com/dsoskey/cogwork-librarian/blob/main/LICENSE'
+        rel='noreferrer'
+        target='_blank'
+      >
+        GPL v3
+      </a>
+      .
+    </p>
+  </div>
+}
