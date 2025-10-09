@@ -198,7 +198,7 @@ export const TextEditor = ({
       controller.current?.removeEventListener("scroll", onScroll);
       linker.current?.removeEventListener("scroll", onScroll);
     };
-  }, []);
+  }, [revealLinks]);
   return (
     <div
       className={`text-editor-root focusable ${separateLayers ? "separated" : ""}` + className}

@@ -67,6 +67,8 @@ textarea.coglib-prism-theme {
     margin-top: 0;
     margin-bottom: 0;
     overflow-y: clip;
+    overscroll-behavior: none;
+
   }
 
   .editor-controls {
