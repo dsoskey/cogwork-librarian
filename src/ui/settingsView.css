@@ -11,3 +11,11 @@
         }
     }
 }
+
+.indent-01 {
+    margin-left: 28px;
+}
+
+input.refresh-rate {
+    width: 4em;
+}

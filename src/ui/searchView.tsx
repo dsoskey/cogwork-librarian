@@ -9,7 +9,7 @@ import { parseQuerySet } from '../api/mtgql-ep/parser'
 import { CogError } from '../error'
 import { cogDB as cogDBClient } from '../api/local/db'
 import { RunStrategy } from '../api/queryRunnerCommon'
-import { SearchOptionPicker, useSearchOptions } from './settingsView'
+import { AutoSyncSettings, SearchOptionPicker, useSearchOptions } from './settingsView'
 import { GearIcon } from './icons/gear'
 import { Modal } from './component/modal'
 import { Card, NormedCard } from 'mtgql'
@@ -34,7 +34,7 @@ export const SearchView = ({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  const { result, report, status, runStrategy, errors, generateVenn,run } = useMemoryQueryRunner({ corpus: memory });
+  const { result, report, status, runStrategy, errors, generateVenn, run } = useMemoryQueryRunner({ corpus: memory });
   const [extendedParseError, setExtendedParseError] = useState<CogError[]>([])
   const errorsToDisplay = extendedParseError.length > 0 ? extendedParseError : errors
   const [lastQueries, setLastQueries] = useState<string[]>([])
@@ -155,6 +155,8 @@ export const SearchView = ({
         <GearIcon size="32" />
       </h2>}
     >
+      <AutoSyncSettings />
+
       <SearchOptionPicker options={options} {...setters} />
     </Modal>}
   </>;

@@ -13,13 +13,71 @@ import { GutterColumn } from './component/editor/textEditor'
 export function SettingsView() {
   const [options, setters] = useSearchOptions()
   return <>
-    <h2>Search defaults</h2>
+    <h2>Settings</h2>
+    <h3>Data sync</h3>
+    <AutoSyncSettings />
+    <h3>Search defaults</h3>
     <SearchOptionPicker options={options} {...setters} />
-    <h2>Editor</h2>
+    <h3>Editor</h3>
     <EditorSettings />
-    <h2>Theme</h2>
+    <h3>Theme</h3>
     <ThemePicker />
   </>
+}
+
+type RefreshUnits = 'seconds'| 'minutes' | 'hours' | 'days'
+
+export function AutoSyncSettings() {
+  const [shouldSearchMissing, setShouldSearchMissing] = useLocalStorage('auto-find-cube',true);
+  const [shouldSearchOld, setShouldSearchOld] = useLocalStorage('auto-refresh-cube',false);
+  const [refreshRate, setRefreshRate] = useLocalStorage('refresh-rate',0);
+  const [refreshUnits, setRefreshUnits] = useLocalStorage<RefreshUnits>('refresh-units','minutes');
+
+  const handleRefreshRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const eventValue =parseInt(e.target.value)
+    if (isNaN(eventValue)) return;
+    if (eventValue < 0) return;
+    setRefreshRate(parseInt(e.target.value))
+  }
+
+  return <div className="prose">
+    <label className='row center pointer'>
+      <input
+        className='custom'
+        type='checkbox'
+        checked={shouldSearchMissing}
+        onChange={e => setShouldSearchMissing(e.target.checked)}
+      />
+      <span className='bold'>Auto-search missing cubes</span>
+    </label>
+    <div className='indent-01'>
+      <div><em>While running search queries, Cogwork Librarian will search CubeCobra for cubes not found in the local database.</em></div>
+      <label className={`row center ${shouldSearchMissing ? 'pointer' : ''}`}>
+        <input
+          className='custom'
+          type='checkbox'
+          disabled={!shouldSearchMissing}
+          checked={shouldSearchOld}
+          onChange={e => setShouldSearchOld(e.target.checked)} />
+        <span className='bold'>Also refresh existing cubes after </span>
+        <input
+          className='refresh-rate'
+          type='number'
+          value={refreshRate}
+          disabled={!shouldSearchOld || !shouldSearchMissing}
+          onChange={handleRefreshRateChange} />
+        <select
+          value={refreshUnits}
+          onChange={e => setRefreshUnits(e.target.value as RefreshUnits)}
+          disabled={!shouldSearchOld || !shouldSearchMissing}
+        >
+          <option value='minutes'>{refreshRate === 1 ? 'minute' : 'minutes'}</option>
+          <option value='hours'>{refreshRate === 1 ? 'hour' : 'hours'}</option>
+          <option value='days'>{refreshRate === 1 ? 'day' : 'days'}</option>
+        </select>
+      </label>
+    </div>
+  </div>
 }
 
 export interface SearchDefaultPickerProps extends SearchSetters {

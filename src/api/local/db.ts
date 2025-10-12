@@ -15,6 +15,7 @@ import { Project } from './types/project'
 import { RunStrategy } from '../queryRunnerCommon'
 import { ThemeDefinition } from './types/theme'
 import { CardToIllustrationTag, CardToOracleTag } from './types/tags'
+import { importCubeCobra } from '../cubecobra/cubeListImport'
 
 export interface Collection {
   id: string // used for NormedCard.collectionId
@@ -79,7 +80,38 @@ export class TypedDexie extends Dexie implements DataProvider {
   projectFolder!: Table<ProjectFolder>
   theme: Table<ThemeDefinition>
 
-  getCube = (key: String) => this.cube.get(key)
+  getCube = async (key: string, canRefresh: boolean = true) => {
+    const existingCube = await this.cube.get(key);
+    const now = new Date();
+
+    if (
+      !canRefresh ||
+      localStorage.getItem("auto-find-cube.coglib.sosk.watch") === "false"
+    ) {
+      return existingCube;
+    }
+
+    if (existingCube !== undefined) {
+      const autoRefresh = localStorage.getItem('auto-refresh-cube.coglib.sosk.watch') === 'true';
+      const timeSinceRefreshMillis = now.getTime() - existingCube.last_source_update.getTime();
+      const refreshRate = getRefreshRateInMilliseconds();
+      if (autoRefresh && timeSinceRefreshMillis > refreshRate) {
+        // should refresh. pass through to try statement
+      } else {
+        return existingCube;
+      }
+    }
+
+    try {
+      const newCube = await importCubeCobra(key, now);
+      await this.cube.put(newCube);
+
+      return newCube;
+    } catch (error) {
+      console.error('failed to fetch cube, using existing cube if present', error);
+      return existingCube;
+    }
+  }
   getOtag = (key: String) => this.oracleTag.get({ label: key })
   getAtag = (key: String) => this.illustrationTag.get({ label: key })
   getBlock = (key: string) => this.block
@@ -272,3 +304,22 @@ export class TypedDexie extends Dexie implements DataProvider {
 export const cogDB = new TypedDexie()
 export const COGDB_FILTER_PROVIDER = new CachingFilterProvider(cogDB)
 
+export function getRefreshRateInMilliseconds() {
+  let refreshRate = parseInt(localStorage.getItem('refresh-rate.coglib.sosk.watch')??'0');
+  if (isNaN(refreshRate)) {
+    refreshRate = 0;
+  }
+  const refreshUnits = JSON.parse(localStorage.getItem('refresh-units.coglib.sosk.watch')??'"minutes"');
+
+  switch (refreshUnits) {
+    case 'minutes':
+      return refreshRate * 1000 * 60;
+    case 'hours':
+      return refreshRate * 1000 * 60 * 60;
+    case 'days':
+      return refreshRate * 1000 * 60 * 60 * 24;
+    case 'seconds':
+    default:
+      return refreshRate * 1000;
+  }
+}

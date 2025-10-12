@@ -173,6 +173,13 @@ input[type="checkbox"].custom {
   vertical-align: -2px;
   /* Set here so that Windows' High-Contrast Mode can override */
   color: var(--active);
+  cursor: pointer;
+
+  &:disabled {
+    color: var(--active-low-alpha);
+    border-color: var(--active-low-alpha);
+    cursor: default;
+  }
 }
 input[type="checkbox"].custom:hover:not(:disabled) {
   border: 1px solid var(--light-color);
@@ -362,6 +369,15 @@ th, td {
 .column.center,
 .row.center {
   align-items: center;
+}
+
+.column.justify-end,
+.row.justify-end {
+  justify-content: end;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .column.space-between,

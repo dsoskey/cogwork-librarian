@@ -17,6 +17,7 @@ import { FlagContextProvider } from './ui/flags'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { loadTheme } from './ui/component/theme'
 import { createRoot } from 'react-dom/client'
+import { loadDefaultPreferences } from './defaultPreferences'
 
 const router = createBrowserRouter([
   { path: "*", Component: App }
@@ -43,6 +44,7 @@ Prism.hooks.add('complete', hookReactDOM(router))
 Scry.setTimeout(50)
 
 loadTheme();
+loadDefaultPreferences();
 
 const root = createRoot(document.getElementById('app'));
 root.render(<FlagContextProvider>

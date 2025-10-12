@@ -135,7 +135,7 @@ export const BrowserView = React.memo(({
     return null
   }
 
-  const pageControl = showCards ? <div className='row center wrap'>
+  const pageControl = showCards ? <div className='row center wrap justify-end'>
     <PageInfo
       searchCount={cards.search.length}
       ignoreCount={cards.ignore.length}
@@ -176,7 +176,7 @@ export const BrowserView = React.memo(({
         displayTypesControl={displayTypesControl}
         lastQueries={lastQueries}
         pageControl={pageControl}
-        downloadButton={<DownloadButton searchResult={result} />}
+        downloadButton={<DownloadButton searchResult={activeCards} />}
         vennControl={runStrategy === RunStrategy.Venn
           ? <VennControl {...vc} cards={cards} />
           : null}

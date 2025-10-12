@@ -35,7 +35,7 @@ export const mtgql: Grammar = {
     greedy: true,
   },
   quotedCube: {
-    pattern: /(\b(?:cube|cubeo):|=)("[^"]*"|'[^']*')/,
+    pattern: /(\b(?:cube|ctag|list):|=)("[^"]*"|'[^']*')/,
     greedy: true,
     lookbehind: true,
     alias: "function",
@@ -47,7 +47,7 @@ export const mtgql: Grammar = {
     alias: "function",
   },
   cubeString: {
-    pattern: /(\b(?:cube|cubeo)[:=])[^\s#)(.]+(?=(\b|$))/i,
+    pattern: /(\b(?:cube|ctag|list)[:=])[^\s#)(.]+(?=(\b|$))/i,
     lookbehind: true,
     alias: "string",
   },

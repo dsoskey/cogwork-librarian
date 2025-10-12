@@ -17,7 +17,11 @@ export function CubeContextMenu({ cubeKey, handleLinkClick }: CubeContextMenuPro
   const { dbStatus } = useContext(CogDBContext)
   const notFound = useMemo(() => missingCubes.includes(cubeKey), [missingCubes, cubeKey, source])
 
-  const cube = useLiveQuery(() => cogDBClient.getCube(cubeKey), [cubeKey, dbStatus], null)
+  const cube = useLiveQuery(() => cubeKey.length > 0
+    ? cogDBClient.getCube(cubeKey, false)
+    : null,
+    [cubeKey, dbStatus],
+    null)
 
   return <>
     <div>
