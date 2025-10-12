@@ -12,7 +12,7 @@ export const CLIENT_CONFIG: ClientConfig = {
     edhrecOverlay: false,
     proxyTest: true,
     searchSource: false,
-    cubeCombos: true,
+    cubeCombos: false,
   }
 }
 export const REFOCUS_TIMEOUT = 50;
