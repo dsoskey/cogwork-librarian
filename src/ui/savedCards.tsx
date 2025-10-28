@@ -16,30 +16,17 @@ import { AddIcon } from './icons/add'
 import { TextEditor } from './component/editor/textEditor'
 import { FloppyDisk } from './icons/floppyDisk'
 import { DragHandle } from './icons/dragHandle'
-import { useMultiInputEditor } from './hooks/useMultiInputEditor'
-import _isEqual from 'lodash/isEqual'
-import { REFOCUS_TIMEOUT } from './flags'
-import { Setter } from '../types'
-import { SavedCardSection } from '../api/local/types/project'
-
-import { CARD_INDEX } from '../api/local/cardIndex'
 import { SettingsContext } from './settingsView'
 
-type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery" | "removeCard"
+type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery"
 export interface SavedCardsEditorProps extends Pick<ProjectDao, PropsKeys> {
 }
 
 
 export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
-  const { path,
-    savedCards, setSavedCards,
-    removeCard, renameQuery
+  const {
+    path, savedCards, setSavedCards, renameQuery
   } = props;
-  const [currentIndex, setCurrentIndex] = useState<number | undefined>(
-    savedCards.length ? 0 : undefined
-  )
-  const [currentLine, setCurrentLine] = useState<string | undefined>(undefined);
-
   let ref= useRef(null);
   const confirmer = useConfirmDelete();
 
@@ -51,10 +38,10 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
     })
   }
 
-  const setCardEntry = (entry: CardEntry, sectionIndex: number, cardIndex: number) => {
+  const setSectionsCards = (cards: string[], sectionIndex: number) => {
     setSavedCards((prev) => {
       const next = _cloneDeep(prev);
-      next[sectionIndex].cards[cardIndex] = entry;
+      next[sectionIndex].cards = cards;
       return next;
     })
   }
@@ -67,7 +54,8 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
 
   const oldSaved = localStorage.getItem("saved-cards.coglib.sosk.watch")
 
-  const copyText = useMemo(() => savedCards.map(i => i.cards.map(serializeEntry)).join('\n'), [savedCards]);
+  const copyText = useMemo(() => savedCards
+    .flatMap(i => i.cards).join('\n'), [savedCards]);
 
   return <div className='saved-cards-editor' ref={ref}>
     <div className='row center'>
@@ -93,9 +81,19 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
           const next = _cloneDeep(prev)
           const toMove = next[source];
           for (const card of toMove.cards) {
-            const existingCard = next[destination].cards.find(it => it.name === card.name);
-            if (existingCard) {
-              existingCard.quantity = (existingCard.quantity ?? undefined) + card.quantity;
+            const cardToMove = parseEntry(card);
+            const nextEntries = next[destination].cards.map(parseEntry);
+            const foundIndex = nextEntries.findIndex(it =>
+              it.name === cardToMove.name
+              && (cardToMove.quantity === undefined || (it.set ?? cardToMove.set) === cardToMove.set)
+              && (cardToMove.cn === undefined || (it.cn ?? cardToMove.cn) === cardToMove.cn)
+            );
+            if (foundIndex >= 0) {
+              const existingCard = nextEntries[foundIndex];
+              existingCard.quantity = (existingCard.quantity ?? 1) + (cardToMove.quantity ?? 1);
+              existingCard.cn = existingCard.cn ?? cardToMove.cn;
+              existingCard.set = existingCard.set ?? cardToMove.set;
+              next[destination].cards[foundIndex] = serializeEntry(existingCard);
             } else {
               next[destination].cards.push(card);
             }
@@ -114,14 +112,8 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
           queryIndex={sectionIndex}
           querySelected={section.selected ?? false}
           cards={section.cards}
+          setCards={(cards) => setSectionsCards(cards, sectionIndex)}
           setQuerySelected={(s) => setQuerySelected(s, sectionIndex)}
-          setCardEntry={(cardEntry, index) => setCardEntry(cardEntry, sectionIndex, index)}
-          currentIndex={currentIndex}
-          currentLine={currentLine}
-          setSavedCards={setSavedCards}
-          setCurrentIndex={setCurrentIndex}
-          setCurrentLine={setCurrentLine}
-          removeCard={removeCard}
           renameQuery={renameQuery}
         />)}
     </DndContext>
@@ -153,144 +145,20 @@ interface SavedSectionEditorProps {
   queryIndex: number;
   querySelected: boolean;
   setQuerySelected: (selected: boolean) => void;
-  cards: CardEntry[];
-  setCardEntry: (cardEntry: CardEntry, index: number) => void;
+  cards: string[];
+  setCards: (cards: string[]) => void;
   renameQuery: any
-  removeCard: any
-  setSavedCards: Setter<SavedCardSection[]>
-  currentLine: string
-  setCurrentLine: Setter<string>
-  currentIndex: number
-  setCurrentIndex: Setter<number>
 }
 
 function SavedSectionEditor({
   query, queryIndex,
   querySelected, setQuerySelected,
-  cards, setCardEntry,
-  renameQuery, removeCard, setSavedCards,
-  currentLine, setCurrentLine,
-  currentIndex, setCurrentIndex,
+  cards, setCards,
+  renameQuery,
 }: SavedSectionEditorProps) {
   const {lineHeight} = useContext(SettingsContext);
-  const [editingQuery, setEditingQuery] = useState<boolean>(false)
-  const [editValue, setEditValue] = useState<string>(query)
-
-  const refCardContainer = useRef<HTMLDivElement>(null);
-  const onKeyDown = useMultiInputEditor({
-    container: refCardContainer,
-    className: 'card-entry-editor',
-    numInputs: cards.length,
-    onAlt: (event, index) => {
-      switch (event.code) {
-        case "Digit1": {
-          event.preventDefault();
-          const nextEntry = {
-            ...cards[index],
-            quantity: (cards[index].quantity ?? 1) + 1
-          }
-
-          setCardEntry(nextEntry, index)
-          setCurrentLine(serializeEntry(nextEntry))
-          break;
-        }
-        case "Digit2":
-          event.preventDefault();
-
-          if ((cards[index].quantity ?? 0) <= 1) {
-            // remove card
-            const nextEntry = cards[index + 1];
-            setSavedCards(prev => {
-              const next = _cloneDeep(prev);
-              next[queryIndex].cards.splice(index, 1);
-              return next;
-            })
-            setCurrentLine(serializeEntry(nextEntry));
-          } else {
-            const nextEntry = {
-              ...cards[index],
-              quantity: cards[index].quantity - 1
-            }
-
-            setCardEntry(nextEntry, index)
-            setCurrentLine(serializeEntry(nextEntry))
-          }
-      }
-    },
-    onEnter: (focusEntry, _index, splitIndex) => {
-      const currentEntry = parseEntry(currentLine)
-
-      if (splitIndex === 0) {
-        setSavedCards(prev => {
-          const next = _cloneDeep(prev);
-          next[queryIndex].cards.splice(currentIndex, 1, { name: "" }, currentEntry)
-          return next;
-        })
-        setCurrentIndex(prev=>prev + 1);
-      } else {
-        const quantStr = currentEntry.quantity ? currentEntry.quantity.toString()+" ": "";
-        const firstHalf = `${quantStr}${currentEntry.name.substring(0, splitIndex)}`;
-        const secondHalf = currentEntry.name.substring(splitIndex);
-        setSavedCards(prev => {
-          const next = _cloneDeep(prev);
-          next[queryIndex].cards.splice(currentIndex, 1, parseEntry(firstHalf), parseEntry(secondHalf))
-          return next;
-        })
-        setCurrentLine(secondHalf);
-        setCurrentIndex(prev=>prev + 1);
-      }
-
-      setTimeout(() => {
-        focusEntry(currentIndex, false, 0)
-      }, REFOCUS_TIMEOUT);
-    },
-    onBackspace(focusEntry, index) {
-      const parsedEntry = parseEntry(currentLine);
-      setSavedCards(prev => {
-        const next = _cloneDeep(prev);
-        const nextSection = next[queryIndex]
-        nextSection.cards.splice(index, 1);
-        const nextEntry = nextSection.cards[index-1]
-        if (nextEntry.name === "") {
-
-          nextSection.cards[index-1] = parsedEntry;
-        } else {
-          nextSection.cards[index-1] = {
-            ...nextEntry,
-            name: nextEntry.name + parsedEntry.name
-          }
-        }
-        return next;
-      })
-      const prevEntry = cards[index - 1];
-      if (prevEntry.name === "") {
-        setCurrentIndex(index - 1)
-      } else {
-        const serialized = serializeEntry(prevEntry);
-        setCurrentLine(prev => `${serialized}${parseEntry(prev).name}`)
-        setCurrentIndex(index - 1)
-      }
-
-      setTimeout(() => {
-        focusEntry(index, true, prevEntry.name.length)
-      }, REFOCUS_TIMEOUT);
-    },
-    onDelete(_focusEntry, index) {
-      const nextEntry = cards[index + 1];
-      setSavedCards(prev => {
-        const next = _cloneDeep(prev);
-
-        const nextSection = next[queryIndex]
-        const nextEntry = nextSection.cards[index + 1];
-        nextSection.cards[index] = { ...next[index], name:  currentLine + nextEntry.name}
-        nextSection.cards.splice(index + 1, 1);
-        return next;
-      })
-      setCurrentLine(prev => `${prev}${nextEntry.name}`)
-
-      // No focus, we're already on the correct line
-    }
-  })
+  const [editingQuery, setEditingQuery] = useState<boolean>(false);
+  const [editValue, setEditValue] = useState<string>(query);
 
   const droppable = useDroppable({ id: queryIndex })
   const dropstyle = {
@@ -309,7 +177,7 @@ function SavedSectionEditor({
     ? droppable.over.id !== droppable.active.id && <div className="drop-indicator">merge into </div>
     : null;
 
-  const copyText = useMemo(() => `\`\`\`\n${query}\n\`\`\`\n${cards.map(serializeEntry).join('\n')}`, [query, cards]);
+  const copyText = useMemo(() => `\`\`\`\n${query}\n\`\`\`\n${cards.join('\n')}`, [query, cards]);
 
   return <div ref={droppable.setNodeRef} style={dropstyle} className='saved-section-root'>
 
@@ -354,20 +222,7 @@ function SavedSectionEditor({
         </>}
       />}
 
-      <div ref={refCardContainer}>
-        {cards.map((card, cardIndex) => <SavedCardInput
-          key={cardIndex}
-          card={card}
-          cardIndex={cardIndex}
-          queryIndex={queryIndex}
-          onKeyDown={onKeyDown}
-          setCurrentLine={setCurrentLine}
-          setCurrentIndex={setCurrentIndex}
-          syncLine={syncLine}
-          setCardEntry={setCardEntry}
-          removeCard={removeCard}
-        />)}
-      </div>
+      <TextEditor gutterColumns={[]} setQueries={setCards} queries={cards} />
     </div>
   </div>
 
@@ -394,74 +249,11 @@ function SavedSectionEditor({
     const value = (Array.isArray(s) ? s : s(editValue.split('\n'))).join('\n');
     setEditValue(value);
   }
-
-
-  function syncLine() {
-    const newEntry = parseEntry(currentLine);
-    if (cards[currentIndex] !== undefined && !_isEqual(newEntry, cards[currentIndex])) {
-      setSavedCards(prev => {
-        const next = _cloneDeep(prev)
-        next[queryIndex].cards[currentIndex] = newEntry
-        return next
-      })
-    }
-  }
-}
-
-interface SavedCardInputProps {
-  card: CardEntry;
-  cardIndex: number;
-  queryIndex: number;
-  onKeyDown: (index: number) => (event: KeyboardEvent<HTMLInputElement>) => void;
-  setCurrentLine: Setter<string>;
-  setCurrentIndex: Setter<number>;
-  syncLine: () => void;
-  setCardEntry: (cardEntry: CardEntry, index: number) => void;
-  removeCard: (queryIndex: number, cardIndex: number) => void;
-}
-function SavedCardInput({
-  card,
-  cardIndex,
-  queryIndex,
-  onKeyDown,
-  setCurrentLine,
-  setCurrentIndex,
-  setCardEntry,
-  syncLine,
-  removeCard,
-}: SavedCardInputProps) {
-
-  return <div className='saved-card-row row center'>
-    <div className='quantity'>{card.quantity}</div>
-    <HoverableInput
-      className="card-entry-editor"
-      onKeyDown={onKeyDown(cardIndex)}
-      onFocus={() => {
-        setCurrentLine(serializeEntry(card))
-        setCurrentIndex(cardIndex)
-      }}
-      onBlur={syncLine}
-      value={card.name}
-      getCompletions={CARD_INDEX.handleAutocomplete}
-      onChange={(event) => {
-        const newEntry = { ...card, name: event.target.value };
-        setCurrentLine(serializeEntry(newEntry));
-        setCardEntry(newEntry, cardIndex)
-
-      }}
-      setValue={value => {
-        const newEntry = { ...card, name: value };
-        setCurrentLine(serializeEntry(newEntry));
-        setCardEntry(newEntry, cardIndex)
-      }}
-    />
-    <button onClick={() => removeCard(queryIndex, cardIndex)}>X</button>
-  </div>
 }
 
 function AddQueryButton({ setSavedCards }) {
   const addQuery = useCallback(() => {
-    return setSavedCards(prev => [...prev, { query: "*", cards: [{ name: "" }] }])
+    return setSavedCards(prev => [...prev, { query: "*", cards: [""] }])
   }, [setSavedCards]);
 
   return <button onClick={addQuery} className="row center"><AddIcon /> Add query</button>

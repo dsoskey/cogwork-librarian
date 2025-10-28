@@ -16,6 +16,8 @@ import { RunStrategy } from '../queryRunnerCommon'
 import { ThemeDefinition } from './types/theme'
 import { CardToIllustrationTag, CardToOracleTag } from './types/tags'
 import { importCubeCobra } from '../cubecobra/cubeListImport'
+import { Printing } from 'mtgql/build/types'
+import { serializeEntry } from './types/cardEntry'
 
 export interface Collection {
   id: string // used for NormedCard.collectionId
@@ -125,20 +127,50 @@ export class TypedDexie extends Dexie implements DataProvider {
 
   getSet = (key: string) => this.set.get({ code: key })
 
+  getAllCardsByName = async (name: string) => {
+    let result = await cogDB.card.where("name").equals(name).toArray();
+    if (result.length === 0)
+      result = await cogDB.card.where("name").startsWith(`${name} /`).toArray();
+    if (result.length === 0)
+      result = await cogDB.card.where("name").equalsIgnoreCase(name).toArray();
+    if (result.length === 0)
+      result = await cogDB.card.where("name").startsWithIgnoreCase(`${name} /`).toArray();
+    return result;
+  }
+
+  getCardByName = async (name: string, setCode?: string, collectorNumber?: string) => {
+    const normedCards = await this.getAllCardsByName(name);
+    if (normedCards.length === 0) return undefined;
+
+    const matchPrinting = (printing: Printing) => {
+      if (!setCode) return true;
+
+      if (!collectorNumber) return printing.set.toLowerCase() === setCode.toLowerCase();
+
+      return printing.set.toLowerCase() === setCode.toLowerCase()
+        && printing.collector_number.toLowerCase() === collectorNumber.toLowerCase();
+    }
+
+    const card = normedCards.length > 1
+      ? normedCards.find(card => card.printings.find(matchPrinting)) ?? normedCards[0]
+      : normedCards[0];
+
+    const printing = card.printings.find(matchPrinting) ?? card.printings[0];
+
+    return { ...card, ...printing };
+  }
+
   getCardByNameId = async (name: string, id?: string) => {
-    let res = await cogDB.card.where("name").equals(name).toArray();
-    if (res.length === 0)
-      res = await cogDB.card.where("name").startsWith(`${name} /`).toArray();
-    if (res.length === 0)
-      res = await cogDB.card.where("name").equalsIgnoreCase(name).toArray();
-    if (res.length === 0)
-      res = await cogDB.card.where("name").startsWithIgnoreCase(`${name} /`).toArray();
+    const res = await this.getAllCardsByName(name);
     if (res.length === 0) return undefined;
+
     const card = res.length > 1 && id
       ? res.find(card => card.printings.find(it => it.id === id)) ?? res[0]
       : res[0];
 
-    const printing = card.printings.find(it => it.id === id) ?? card.printings[0]
+    const printing = id
+      ? card.printings.find(it => it.id === id) ?? card.printings[0]
+      : card.printings[0];
     return { ...card, ...printing }
   }
 
@@ -296,6 +328,20 @@ export class TypedDexie extends Dexie implements DataProvider {
       return trans.table("history").toCollection().modify(function(value) {
         if (value.rawQueries.length === 0) {
           delete this.value;
+        }
+      })
+    })
+
+    this.version(21).stores({
+      project: 'path, createdAt, updatedAt',
+    }).upgrade(trans => {
+      return trans.table("project").toCollection().modify(function(value) {
+        for (const section of value.savedCards) {
+          try {
+            section.cards = section.cards.map(serializeEntry)
+          } catch (e) {
+            console.warn('error while migrating', value, e)
+          }
         }
       })
     })

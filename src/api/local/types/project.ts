@@ -1,9 +1,8 @@
-import { CardEntry, parseEntry, serializeEntry } from './cardEntry'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 
 export interface SavedCardSection {
   query: string
-  cards: CardEntry[]
+  cards: string[]
   selected?: boolean
 }
 
@@ -23,7 +22,7 @@ export function serializeProject(project: Project): string {
   const path = `# ${project.path}`
   const cars = project.savedCards
     .map((section) =>
-      `${section.query}\n${section.cards.map(serializeEntry).join('\n')}`).join('\n')
+      `${section.query}\n${section.cards.join('\n')}`).join('\n')
   const cards = `${CARD_PREFIX}${cars}\n\`\`\``
   const queries = `${QUERY_PREFIX}${project.queries.join('\n')}\n\`\`\``;
   return [path, queries, cards].join("\n\n");
@@ -55,7 +54,7 @@ export function parseProject(rawProject: string, defaultPath: string, now: Date)
   const rawPath = tree.children.find(i => i.type === "heading");
   const path = rawPath ? (rawPath).children[0].value : defaultPath;
   const rawCards = tree.children.find(i => i.type === "code" && i.lang === "cards");
-  const savedCards: CardEntry[] = rawCards ? rawCards.value.split("\n").map(parseEntry) : [];
+  const savedCards: string[] = rawCards ? rawCards.value.split("\n") : [];
   const rawQueries = tree.children.find(i => i.type === "code" && i.lang === "queries");
   // @ts-ignore
   const queries = rawQueries ? rawQueries.value.split("\n") : [];

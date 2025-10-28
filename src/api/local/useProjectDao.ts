@@ -6,8 +6,8 @@ import { Setter } from '../../types'
 import { defaultFunction, defaultPromise } from '../context'
 import { Card } from 'mtgql'
 import cloneDeep from 'lodash/cloneDeep'
-import { CardEntry } from './types/cardEntry'
 import { Project, SavedCardSection } from './types/project'
+import { parseEntry, serializeEntry } from './types/cardEntry'
 
 
 export interface ProjectDao {
@@ -88,9 +88,17 @@ export function useProjectDao(): ProjectDao {
       if (Array.isArray(sections) && sections.length > 0 && !("query" in sections[0])) {
         return [{
           query: "*",
-          cards: sections as unknown as CardEntry[],
+          cards: sections as unknown as string[],
         }];
       } else if (Array.isArray(sections)) {
+        if (typeof sections[0].cards[0] === 'object') {
+          return sections.map(it => ({
+            ...it,
+            // @ts-ignore
+            cards: it.cards.map(serializeEntry),
+            selected: false,
+          }))
+        }
         return sections.map(it => ({...it, selected: false }))
       }
       return sections;
@@ -288,6 +296,7 @@ export function useProjectDao(): ProjectDao {
   }, [initialPath]);
 
   const setSavedCards = keepUpdated(_setSavedCards, _setUpdatedAt)
+
   const addCard = useCallback((query: string, card: Card) => {
     setSavedCards((prev) => {
       const next = cloneDeep(prev);
@@ -296,11 +305,14 @@ export function useProjectDao(): ProjectDao {
         sectionIndex = prev.length;
         next.push({ query, cards: [] });
       }
-      const existing = next[sectionIndex].cards.findIndex(it => it.name === card.name );
-      if (existing === -1) {
-        next[sectionIndex].cards.push({ name: card.name, quantity: 1, set: card.set, cn: card.collector_number })
+      const cardIndex = next[sectionIndex].cards.findIndex(it => it.includes(card.name));
+      if (cardIndex === -1) {
+        // todo: settings for which details get added
+        next[sectionIndex].cards.push(serializeEntry({ name: card.name, quantity: 1, set: card.set, cn: card.collector_number }))
       } else {
-        next[sectionIndex].cards[existing].quantity = (next[sectionIndex].cards[existing].quantity ?? 1) + 1;
+        const existingEntry = parseEntry(next[sectionIndex].cards[cardIndex])
+        existingEntry.quantity = (existingEntry.quantity ?? 1) + 1;
+        next[sectionIndex].cards[cardIndex] = serializeEntry(existingEntry);
       }
       return next;
     })

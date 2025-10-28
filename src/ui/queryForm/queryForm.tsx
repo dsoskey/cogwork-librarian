@@ -63,7 +63,12 @@ export function QueryForm({
           settingsButton={<>{settingsButton}{historyButton}</>}
           language='scryfall-extended-multi'
           lineHeight={lineHeight}
+          enableLinkOverlay
+          enableCopyButton
         />
+      </div>
+      <div style={{ position: "fixed" , bottom: 0, right: 0 }}>
+
       </div>
       <CombinedStatusLoader />
     </div>

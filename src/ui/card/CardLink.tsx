@@ -17,10 +17,10 @@ export function useCardLoader(name: string, id?: string) {
     null)
 }
 
-function _CardImage({ card, name }) {
+export function _CardImage({ card, name, nameFallback = true }) {
   return <span className="card-image-container">
     {card === null && <span><LoaderText text={""} timeout={100} frames={TRIANGLES} /></span>}
-    {card === undefined && name}
+    {card === undefined && nameFallback && name}
     {card && <CardImage card={card} />}
   </span>
 }
