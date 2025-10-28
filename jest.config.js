@@ -7,7 +7,6 @@ module.exports = {
   coveragePathIgnorePatterns: ["/node_modules/", ".ne$"],
   transform: {
     'tsx?$': ['@swc/jest'],
-    "^.+\\.ne$": "jest-transform-nearley",
   },
   moduleNameMapper: {
     '^configuration$': "<rootDir>/config/development",
