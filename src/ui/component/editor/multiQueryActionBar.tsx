@@ -131,10 +131,12 @@ export interface MultiQueryInfoBarProps {
   canSubmit?: boolean;
   gutterColumns: GutterColumn[];
   indexStart?: number;
+  hoverIndex?: number
 }
 export const MultiQueryActionBar = React.memo(({
   queries,
   copyText,
+  hoverIndex,
   renderQuery = goodLineQuery,
   indexStart = 0,
   ...rest
@@ -164,6 +166,7 @@ export const MultiQueryActionBar = React.memo(({
           indexStart={indexStart}
           numDigits={numDigits}
           onClickLine={onClickLine(index)}
+          highlight={hoverIndex === index}
           {...rest}
         />)
       )}
@@ -180,16 +183,17 @@ interface ActionLineProps {
   numDigits: number;
   onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
+  highlight?: boolean;
 }
 
-function ActionLine({ line, index, indexStart, gutterColumns, onClickLine, numDigits, onSubmit, canSubmit }: ActionLineProps) {
+function ActionLine({ line, index, highlight, indexStart, gutterColumns, onClickLine, numDigits, onSubmit, canSubmit }: ActionLineProps) {
   const { text, type } = line;
   const columns: React.ReactNode[] = [];
   for (const column of gutterColumns) {
     switch (column) {
       case "line-numbers":
         columns.push(<code
-          className={`line-number ${type}`}>
+          className={`line-number ${type} ${highlight ? 'highlight' : ""}`}>
           {`${(index + 1 + indexStart).toString().padStart(numDigits)} `}
         </code>);
         break;

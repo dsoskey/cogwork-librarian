@@ -149,6 +149,10 @@ textarea.coglib-prism-theme {
     .line-number {
       white-space: pre;
       color: color-mix(var(--color-interpolation), var(--dark300), var(--light600) 50%);
+
+        &.highlight {
+            color: var(--active-mid-alpha);
+        }
     }
 
   }

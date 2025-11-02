@@ -91,7 +91,7 @@ export function useProjectDao(): ProjectDao {
           cards: sections as unknown as string[],
         }];
       } else if (Array.isArray(sections)) {
-        if (typeof sections[0].cards[0] === 'object') {
+        if (sections.filter(it => it.cards.find(card => typeof card === 'object') !== undefined).length > 0) {
           return sections.map(it => ({
             ...it,
             // @ts-ignore

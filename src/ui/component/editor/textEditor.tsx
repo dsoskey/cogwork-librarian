@@ -5,6 +5,11 @@ import "./textEditor.css";
 import { RectangleIcon } from '../../icons/rectangle'
 import { RectangleCloseIcon } from '../../icons/rectangleClose'
 import { COPY_BUTTON_ICONS, CopyToClipboardButton } from '../copyToClipboardButton'
+import { useViewportListener } from '../../viewport'
+import { _CardImage } from '../../card/CardLink'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { parseEntry } from '../../../api/local/types/cardEntry'
+import { cogDB } from '../../../api/local/db'
 
 const MIN_TEXTAREA_HEIGHT = 32;
 
@@ -82,6 +87,8 @@ export interface TextEditorProps {
   settingsButton?: React.ReactNode;
   gutterColumns?: GutterColumn[];
   className?: string;
+  enableLinkOverlay?: boolean;
+  enableCopyButton?: boolean;
 }
 export const DEFAULT_GUTTER_COLUMNS: GutterColumn[] = ["line-numbers", "multi-info", "submit-button"];
 export const TextEditor = ({
@@ -92,18 +99,43 @@ export const TextEditor = ({
   placeholder,
   language,
   disabled,
-  settingsButton,
   lineHeight = 1.25,
   className = "",
   gutterColumns = DEFAULT_GUTTER_COLUMNS,
+  enableLinkOverlay = false,
+  enableCopyButton = false,
+  settingsButton,
 }: TextEditorProps) => {
   const separator = "\n";
+  const hasToolbar = enableLinkOverlay || enableCopyButton || settingsButton !== undefined;
+  const toolbarHeight = hasToolbar ? 24:0;
   const value = queries.join(separator);
   const controller = useRef<HTMLTextAreaElement>(null);
   const faker = useRef<HTMLPreElement>(null);
   const linker = useRef<HTMLPreElement>(null);
   const [revealLinks, setRevealLinks] = useState<boolean>(false);
   const [separateLayers, setSeparateLayers] = useState<boolean>(false);
+
+  const [hoverIndex, setHoverIndex] = useState<number>(-1);
+  const hoveredLine = queries[hoverIndex];
+  const viewport = useViewportListener();
+  const [mouseLast, setMouseLast] = useState({ x:0, y:0 });
+  const cursorDistance = 5;
+  const card = useLiveQuery(async () => {
+    if (hoveredLine === undefined) return undefined;
+    const { name, set, cn } = parseEntry(queries[hoverIndex]);
+    return cogDB.getCardByName(name, set, cn);
+  }, [hoveredLine]);
+
+  const handleHover = (e: React.MouseEvent<HTMLDivElement>) => {
+    const boundingBox = e.currentTarget.getBoundingClientRect();
+    const top = boundingBox.top + toolbarHeight;
+    const height = boundingBox.bottom - top;
+    const relativeMouse = e.clientY - top;
+    const index = Math.floor(queries.length * relativeMouse / height);
+    setHoverIndex(index);
+    setMouseLast({ x: e.clientX, y: e.clientY });
+  }
 
   const handleDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "ArrowDown") {
@@ -203,7 +235,12 @@ export const TextEditor = ({
     <div
       className={`text-editor-root focusable ${separateLayers ? "separated" : ""}` + className}
       onKeyDown={handleDown}
-      style={{ "--editor-line-height": lineHeight.toString() }}
+      style={{
+        "--editor-line-height": lineHeight.toString(),
+        "--toolbar-height": toolbarHeight.toString() + "px",
+      }}
+      onMouseMove={handleHover}
+      onMouseLeave={() => setHoverIndex(-1)}
     >
       <MultiQueryActionBar
         queries={queries}
@@ -211,10 +248,11 @@ export const TextEditor = ({
         onSubmit={onSubmit}
         canSubmit={canSubmit}
         gutterColumns={gutterColumns}
+        hoverIndex={hoverIndex}
       />
       <div className="editor-controls">
-        <button
-          className='overlay-toggle'
+        {enableLinkOverlay && <button
+          className="overlay-toggle"
           title={
             revealLinks
               ? 'close overlay (ctrl/cmd + \\)'
@@ -223,12 +261,12 @@ export const TextEditor = ({
           onClick={() => setRevealLinks((prev) => !prev)}
         >
           {revealLinks ? <RectangleCloseIcon /> : <RectangleIcon />}️
-        </button>
-        <CopyToClipboardButton
+        </button>}
+        {enableCopyButton && <CopyToClipboardButton
           copyText={queries.join("\n")}
           title="Copy to clipboard"
           buttonText={COPY_BUTTON_ICONS}
-        />
+        />}
         {settingsButton}
       </div>
 
@@ -264,6 +302,21 @@ export const TextEditor = ({
       >
         <code className="match-braces">{value}</code>
       </pre>
+
+      {hoveredLine && <div style={{
+        position: 'fixed',
+        zIndex: 9999,
+        pointerEvents: 'none',
+        top: mouseLast.y < viewport.height / 2
+          ? mouseLast.y + cursorDistance
+          : mouseLast.y - cursorDistance - 350,
+        left: mouseLast.x < viewport.width / 2
+          ? mouseLast.x + cursorDistance
+          : mouseLast.x - cursorDistance - 250,
+        width: 250, height: 350,
+      }}>
+        <_CardImage card={card} nameFallback={false} />
+      </div>}
     </div>
   );
 };
