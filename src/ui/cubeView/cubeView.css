@@ -27,7 +27,7 @@
         gap: var(--spacing-200);
     }
 
-    .card-view {
+    .card-grid {
         margin: unset;
     }
     @media screen {
@@ -43,7 +43,7 @@
         .result-container {
             display: none !important;
         }
-        .card-view {
+        .card-grid {
             width: 63.5mm;
         }
         .print-page {

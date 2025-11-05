@@ -17,7 +17,7 @@ import { ThemeDefinition } from './types/theme'
 import { CardToIllustrationTag, CardToOracleTag } from './types/tags'
 import { importCubeCobra } from '../cubecobra/cubeListImport'
 import { Printing } from 'mtgql/build/types'
-import { serializeEntry } from './types/cardEntry'
+import { parseEntry, serializeEntry } from './types/cardEntry'
 
 export interface Collection {
   id: string // used for NormedCard.collectionId
@@ -127,7 +127,7 @@ export class TypedDexie extends Dexie implements DataProvider {
 
   getSet = (key: string) => this.set.get({ code: key })
 
-  getAllCardsByName = async (name: string) => {
+  getAllCardsByName = async (name: string): Promise<NormedCard[]> => {
     let result = await cogDB.card.where("name").equals(name).toArray();
     if (result.length === 0)
       result = await cogDB.card.where("name").startsWith(`${name} /`).toArray();
@@ -151,13 +151,23 @@ export class TypedDexie extends Dexie implements DataProvider {
         && printing.collector_number.toLowerCase() === collectorNumber.toLowerCase();
     }
 
-    const card = normedCards.length > 1
-      ? normedCards.find(card => card.printings.find(matchPrinting)) ?? normedCards[0]
-      : normedCards[0];
+    const card = (normedCards.length > 1
+      ? (!setCode
+          ? normedCards.find(card => !card.type_line?.startsWith("Token") && !card.type_line?.startsWith("Card"))
+          : normedCards.find(card => card.printings.find(matchPrinting)))
+      : normedCards[0]) ?? normedCards[0];
 
     const printing = card.printings.find(matchPrinting) ?? card.printings[0];
 
     return { ...card, ...printing };
+  }
+
+  async bulkGetList(listText: string[]) {
+    const entries = listText.map(parseEntry)
+    return Promise.all(entries.map(async ({ quantity, name, cn, set }) => {
+      const card = await this.getCardByName(name, set, cn)
+      return { quantity, name, cn, set, card };
+    }));
   }
 
   getCardByNameId = async (name: string, id?: string) => {

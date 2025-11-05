@@ -1,0 +1,16 @@
+
+.two-panel-layout {
+    height: 92svh;
+    display: flex;
+    overflow: clip;
+    flex-direction: row;
+    .left-root {
+        flex: 1;
+        height: 100%;
+    }
+    .right-root {
+        flex: 2;
+        height: 100%;
+        background-color: var(--darker-color);
+    }
+}

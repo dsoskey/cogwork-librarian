@@ -268,7 +268,7 @@ function CardResults({
       }
       return (
         <CardImageView
-          className={`_${cardsPerRow}${rotateCards ? ' rotated' : ''}`}
+          className={`card-grid _${cardsPerRow}${rotateCards ? ' rotated' : ''}`}
           onAdd={onAdd}
           hoverContent={<SearchHoverActions card={card} onAdd={onAdd} onIgnore={onIgnore} />}
           key={card.data.id + index}

@@ -27,6 +27,7 @@ import { useLocalStorage } from './api/local/useLocalStorage'
 import { DEFAULT_GUTTER_COLUMNS, GutterColumn } from './ui/component/editor/textEditor'
 import { SidebarOpenIcon } from './ui/icons/sidebarOpen'
 import { SidebarClosedIcon } from './ui/icons/sidebarClosed'
+import { CardList } from './ui/views/cardList'
 
 export const App = () => {
   const [cubeContext, setCubeContext] = useState<string>('')
@@ -73,6 +74,7 @@ export const App = () => {
                 <ErrorBoundary FallbackComponent={RenderErrorFallback}>
                   <div className='root' onClick={handleClickOutsideContextMenu}>
                     <Routes>
+                      <Route path="/list" element={<CardList />} />
                       <Route path='/data/cube/*' element={<DefaultLayout><CubeRedirect /></DefaultLayout>} />
                       <Route path='/cube/:key/*' element={<DefaultLayout><CubeView /></DefaultLayout>} />
                       <Route path='/data/card' element={<DefaultLayout><CardDataView /></DefaultLayout>} />

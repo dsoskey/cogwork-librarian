@@ -1,0 +1,36 @@
+.card-list-root {
+    .text-editor-root {
+
+        height: 100%;
+        overflow-y: scroll
+    }
+
+    .result-container {
+        height: 100%;
+        padding: unset;
+        overflow-y: scroll;
+
+        .card-grid {
+            position: relative;
+            .quantity {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                z-index: 2;
+                background-color: var(--active);
+                text-align: center;
+                font-weight: bold;
+                padding: var(--spacing-200);
+                min-width: 1em;
+                border-radius: var(--card-border-radius);
+            }
+            .card-grid {
+                z-index: 1;
+            }
+            .card-not-found {
+                text-align: center;
+                padding-top: var(--spacing-500);
+            }
+        }
+    }
+}

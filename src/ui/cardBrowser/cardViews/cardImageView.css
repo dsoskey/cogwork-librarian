@@ -1,4 +1,4 @@
-.card-view {
+.card-view-root {
     position: relative;
     aspect-ratio: var(--card-aspect-ratio);
     border-radius: var(--card-border-radius);
@@ -54,22 +54,22 @@
 }
 
 @media (min-width: 1024px) {
-    .card-view {
+    .card-grid._4 {
         width: 24%;
     }
-    .card-view._6 {
+    .card-grid._6 {
         width: 15.8%;
     }
-    .card-view._8 {
+    .card-grid._8 {
         width: 11.7%;
     }
-    .card-view._12 {
+    .card-grid._12 {
         width: 8.3%;
     }
-    .card-view._16 {
+    .card-grid._16 {
         width: 6.5%;
     }
-    .card-view.rotated {
+    .card-grid.rotated {
         margin: -4% 3.6%;
         width: 17.8%;
         padding-top: 0.5%;
@@ -77,7 +77,7 @@
     }
 }
 @media (max-width: 1024px) and (min-width: 768px) {
-    .card-view {
+    .card-grid {
         width: 32%;
         &.rotated {
             width: 23.5%;
@@ -88,7 +88,7 @@
     }
 }
 @media (max-width: 768px) {
-    .card-view {
+    .card-grid {
         width: 49%;
         &.rotated {
             width: 35%;

@@ -67,7 +67,7 @@ export function CardResultsLayout({ cards, filterControl, extraControls }: CardR
       {displayType === 'visual spoiler' && <div className='result-container'>
         {sorted.map((card, i) => <CardImageView
           key={card.id + i.toString()}
-          className={`_${cardsPerRow}`}
+          className={`card-grid _${cardsPerRow}`}
           highlightFilter={() => false}
           card={{ data: card, matchedQueries: [`cube:${cube.key}`], weight: 1 }}
           onClick={() => setActiveCard(card)}
