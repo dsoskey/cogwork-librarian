@@ -5,11 +5,7 @@ import "./textEditor.css";
 import { RectangleIcon } from '../../icons/rectangle'
 import { RectangleCloseIcon } from '../../icons/rectangleClose'
 import { COPY_BUTTON_ICONS, CopyToClipboardButton } from '../copyToClipboardButton'
-import { useViewportListener } from '../../viewport'
-import { _CardImage } from '../../card/CardLink'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { parseEntry } from '../../../api/local/types/cardEntry'
-import { cogDB } from '../../../api/local/db'
+import { HoverCard, useHoverCard } from '../../hooks/hoverCard'
 
 const MIN_TEXTAREA_HEIGHT = 32;
 
@@ -117,24 +113,19 @@ export const TextEditor = ({
   const [separateLayers, setSeparateLayers] = useState<boolean>(false);
 
   const [hoverIndex, setHoverIndex] = useState<number>(-1);
+  const { handleHover: handleHoverCard, mouseLast } = useHoverCard();
   const hoveredLine = queries[hoverIndex];
-  const viewport = useViewportListener();
-  const [mouseLast, setMouseLast] = useState({ x:0, y:0 });
-  const cursorDistance = 5;
-  const card = useLiveQuery(async () => {
-    if (hoveredLine === undefined) return undefined;
-    const { name, set, cn } = parseEntry(queries[hoverIndex]);
-    return cogDB.getCardByName(name, set, cn);
-  }, [hoveredLine]);
 
   const handleHover = (e: React.MouseEvent<HTMLDivElement>) => {
     const boundingBox = e.currentTarget.getBoundingClientRect();
-    const top = boundingBox.top + toolbarHeight;
-    const height = boundingBox.bottom - top;
-    const relativeMouse = e.clientY - top;
-    const index = Math.floor(queries.length * relativeMouse / height);
+    const lineheight =  parseInt(window.getComputedStyle(e.target).getPropertyValue("line-height"));
+    const top = e.currentTarget.scrollTop;
+    const editorHeight = e.target.rows * lineheight;
+    const editorY = e.clientY - boundingBox.top;
+    const relativeMouse = editorY + top - toolbarHeight
+    const index = Math.floor(queries.length * relativeMouse / (editorHeight));
     setHoverIndex(index);
-    setMouseLast({ x: e.clientX, y: e.clientY });
+    handleHoverCard(e);
   }
 
   const handleDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -303,20 +294,7 @@ export const TextEditor = ({
         <code className="match-braces">{value}</code>
       </pre>
 
-      {hoveredLine && <div style={{
-        position: 'fixed',
-        zIndex: 9999,
-        pointerEvents: 'none',
-        top: mouseLast.y < viewport.height / 2
-          ? mouseLast.y + cursorDistance
-          : mouseLast.y - cursorDistance - 350,
-        left: mouseLast.x < viewport.width / 2
-          ? mouseLast.x + cursorDistance
-          : mouseLast.x - cursorDistance - 250,
-        width: 250, height: 350,
-      }}>
-        <_CardImage card={card} nameFallback={false} />
-      </div>}
+      {hoveredLine && <HoverCard cardName={hoveredLine} mouseLast={mouseLast} />}
     </div>
   );
 };
