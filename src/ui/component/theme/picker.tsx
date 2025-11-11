@@ -20,7 +20,7 @@ import { cogDB } from '../../../api/local/db'
 import { Modal } from '../modal'
 import { PRESET_THEMES } from './presets'
 import "./picker.css"
-import { SettingsContext } from '../../settingsView'
+import { SettingsContext } from '../../settingsContext'
 
 function refreshTheme(theme: Theme, element: HTMLElement) {
   for (const key in theme) {

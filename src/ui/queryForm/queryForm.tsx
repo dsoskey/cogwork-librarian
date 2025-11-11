@@ -1,11 +1,11 @@
 import React, { useContext, useRef } from 'react'
 import { TextEditor } from '../component/editor/textEditor'
-import { DataSource, Setter, TaskStatus } from '../../types'
+import { Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { MemStatusLoader, DBStatusLoader } from '../component/dbStatusLoader'
 import { Link } from 'react-router-dom'
 import { ProjectTabs } from './projectTabs'
-import { SettingsContext } from '../settingsView'
+import { SettingsContext } from '../settingsContext'
 
 const PLACEHOLDERS = [
   'cube:soskgy',
