@@ -37,77 +37,81 @@ const ProjectTab = ({ canClose, onClose, path, selected, setSelected }: ProjectT
   </div>
 }
 
-function reducer(state: { active: string[], selectedIndex: number }, action) {
-  let result;
-  switch (action.type) {
-    case "new":
-      result = {
-        active: [...state.active, action.path],
-        selectedIndex: state.active.length,
-      }
-      break;
-    case "open": {
-      const index = state.active.findIndex(it => it === action.path);
-      if (index === -1) {
+export function generateTabReducer(setter: (result: object) => void) {
+  return (state: { active: string[], selectedIndex: number }, action) => {
+    let result;
+    switch (action.type) {
+      case "new":
         result = {
           active: [...state.active, action.path],
           selectedIndex: state.active.length,
         }
-      } else {
-        result =  {
+        break;
+      case "open": {
+        const index = state.active.findIndex(it => it === action.path);
+        if (index === -1) {
+          result = {
+            active: [...state.active, action.path],
+            selectedIndex: state.active.length,
+          }
+        } else {
+          result =  {
+            ...state,
+            selectedIndex: index,
+          }
+        }
+        break;
+      }
+      case "select":
+        result = {
           ...state,
-          selectedIndex: index,
+          selectedIndex: action.index,
         }
-      }
-      break;
-    }
-    case "select":
-      result = {
-        ...state,
-        selectedIndex: action.index,
-      }
-      break;
-    case "close": {
-      const { index } = action;
-      let selectedIndex = state.selectedIndex;
-      if (index === selectedIndex) {
-        selectedIndex = index === 0 ? index : index - 1;
-      }
-      result = {
-        selectedIndex,
-        // @ts-ignore
-        active: state.active.toSpliced(index, 1),
-      }
-      break;
-    }
-    case "delete": {
-      const paths = action.paths as Set<string>;
-      const nextActive = state.active.filter((it => it === state.active[selectedIndex] || !paths.has(it)));
-      const selectedIndex = nextActive.findIndex(it => it === state.active[selectedIndex]);
-      result = {
-        selectedIndex,
-        active: nextActive,
-      }
-      break;
-    }
-    case "rename": {
-      for (const change of action.paths) {
-        const { oldPath, newPath } = change;
-        const selectedIndex = state.active.findIndex(it => it === oldPath);
-        if (selectedIndex > -1) {
-          state.active[selectedIndex] = newPath;
+        break;
+      case "close": {
+        const { index } = action;
+        let selectedIndex = state.selectedIndex;
+        if (index === selectedIndex) {
+          selectedIndex = index === 0 ? index : index - 1;
         }
+        result = {
+          selectedIndex,
+          // @ts-ignore
+          active: state.active.toSpliced(index, 1),
+        }
+        break;
       }
-      result = cloneDeep(state)
-      break;
+      case "delete": {
+        const paths = action.paths as Set<string>;
+        const nextActive = state.active.filter((it => it === state.active[state.selectedIndex] || !paths.has(it)));
+        const selectedIndex = nextActive.findIndex(it => it === state.active[state.selectedIndex]);
+        result = {
+          selectedIndex,
+          active: nextActive,
+        }
+        break;
+      }
+      case "rename": {
+        for (const change of action.paths) {
+          const { oldPath, newPath } = change;
+          const selectedIndex = state.active.findIndex(it => it === oldPath);
+          if (selectedIndex > -1) {
+            state.active[selectedIndex] = newPath;
+          }
+        }
+        result = cloneDeep(state)
+        break;
+      }
+      default:
+        throw Error(`Unknown action ${action.type}`)
     }
-    default:
-      throw Error(`Unknown action ${action.type}`)
+    setter(result);
+    return result;
   }
-  localStorage.setItem("tab-state.coglib.sosk.watch", JSON.stringify(result));
-  return result;
 }
 
+const SAVE_LOCALSTORAGE = (result: object) =>
+  localStorage.setItem('tab-state.coglib.sosk.watch', JSON.stringify(result))
 
 export const ProjectTabs = () => {
   const maxOpenProjects = 5;
@@ -117,7 +121,7 @@ export const ProjectTabs = () => {
   const [modalState, setModalState] = useState<ModalState>(ModalState.Closed)
   const [oldIgnoreIds, setOldIgnoreIds] = useLocalStorage("ignore-list", []);
   const { setIgnoredIds } = useContext(ProjectContext);
-  const [tabState, dispatchTabState] = useReducer(reducer, "tab-state.coglib.sosk.watch", (key) => {
+  const [tabState, dispatchTabState] = useReducer(generateTabReducer(SAVE_LOCALSTORAGE), "tab-state.coglib.sosk.watch", (key) => {
     const storageResult = localStorage.getItem(key);
     if (storageResult) {
       return JSON.parse(storageResult)
@@ -166,8 +170,8 @@ export const ProjectTabs = () => {
       {oldIgnoreIds.length > 0 && <InfoModal
         buttonContent='migrate ignore-list'
         info={<>
-          <p>Instead of a single global ignore-list, each project now has its own ignore-list. You've used the global
-            ignore-list feature in the past. Permanently move global ignore-list to the current project?</p>
+          <p>Instead of a single global ignore list, each project now has its own ignore list. You have used the global
+            ignore-list feature in the past. Permanently move global ignore list to the current project?</p>
          <button onClick={() => {
            setIgnoredIds(oldIgnoreIds)
            setOldIgnoreIds([])

@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react'
+import React, { useContext } from 'react'
 import { ThemePicker } from './component/theme'
 import { FormField, RangeField } from './component/formField'
 import { PREFER_VALUES, SearchOptions, SortOrder } from 'mtgql'
@@ -8,7 +8,7 @@ import { Setter } from '../types'
 
 const SORT_VALUES = Object.values(SORT_ORDERS)
 import './settingsView.css'
-import { GutterColumn } from './component/editor/textEditor'
+import { SettingsContext } from './settingsContext'
 
 export function SettingsView() {
   const [options, setters] = useSearchOptions()
@@ -169,11 +169,7 @@ export function useSearchOptions(): [SearchOptions, SearchSetters] {
   }]
 }
 
-export interface EditorSettingsProps {
-
-}
-
-export function EditorSettings({}: EditorSettingsProps) {
+export function EditorSettings() {
   const { lineHeight, setLineHeight } = useContext(SettingsContext)
 
 
@@ -193,16 +189,3 @@ export function EditorSettings({}: EditorSettingsProps) {
       </RangeField>
     </div>;
 }
-
-interface UserSettings {
-  gutterColumns: GutterColumn[]
-  setGutterColumns: Setter<GutterColumn[]>
-  lineHeight: number;
-  setLineHeight: Setter<number>;
-}
-export const SettingsContext = createContext<UserSettings>({
-  setGutterColumns: () => {},
-  gutterColumns: [],
-  lineHeight: 0,
-  setLineHeight: () => {},
-})

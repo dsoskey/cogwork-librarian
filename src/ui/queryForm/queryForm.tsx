@@ -1,32 +1,11 @@
 import React, { useContext } from 'react'
 import { TextEditor } from '../component/editor/textEditor'
-import { DataSource, Setter, TaskStatus } from '../../types'
+import { Setter, TaskStatus } from '../../types'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { MemStatusLoader, DBStatusLoader } from '../component/dbStatusLoader'
 import { Link } from 'react-router-dom'
 import { ProjectTabs } from './projectTabs'
-import { SettingsContext } from '../settingsView'
-
-const description: Record<DataSource, String> = {
-  scryfall:
-    'Fetches from Scryfall using its API. Supports full Scryfall syntax, but larger query sets will take longer to process.',
-  local:
-    'Processes queries against a local database of oracle cards, so it runs an order of magnitude faster than communicating with Scryfall',
-}
-
-const DatabaseSettings = () => {
-  const { outOfDate } = useContext(CogDBContext)
-  return (
-    <div className='row'>
-      <Link to='/data/card'>
-        <button className='db-settings' title='settings'>
-          ⚙
-        </button>
-      </Link>
-      {outOfDate && <span className='alert'>DATABASE UPDATE REQUIRED</span>}
-    </div>
-  )
-}
+import { SettingsContext } from '../settingsContext'
 
 export interface QueryFormProps {
   status: TaskStatus

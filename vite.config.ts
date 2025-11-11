@@ -3,6 +3,9 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   assetsInclude: ['**/*.md?raw'],
   server: {
-    port: 8080
+    port: 7777
   },
+  test: {
+    globals: true,
+  }
 })

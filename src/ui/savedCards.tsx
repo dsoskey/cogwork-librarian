@@ -23,7 +23,7 @@ import { Setter } from '../types'
 import { SavedCardSection } from '../api/local/types/project'
 
 import { CARD_INDEX } from '../api/local/cardIndex'
-import { SettingsContext } from './settingsView'
+import { SettingsContext } from './settingsContext'
 
 type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery" | "removeCard"
 export interface SavedCardsEditorProps extends Pick<ProjectDao, PropsKeys> {
@@ -40,7 +40,7 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
   )
   const [currentLine, setCurrentLine] = useState<string | undefined>(undefined);
 
-  let ref= useRef(null);
+  const ref = useRef(null);
   const confirmer = useConfirmDelete();
 
   const setQuerySelected = (selected: boolean, sectionIndex: number) => {
