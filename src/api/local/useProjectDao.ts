@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useEffect } from 'react'
 import { cogDB, ProjectFolder } from './db'
 import { useLocalStorage } from './useLocalStorage'
 import { INTRO_EXAMPLE } from '../example'

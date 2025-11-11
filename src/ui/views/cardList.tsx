@@ -1,6 +1,6 @@
 import { TextEditor } from '../component/editor/textEditor'
 import React, { useCallback, useContext, useRef, useState } from 'react'
-import { SettingsContext } from '../settingsView'
+import { SettingsContext } from '../settingsContext'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB } from '../../api/local/db'
