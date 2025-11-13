@@ -305,7 +305,28 @@ export function useProjectDao(): ProjectDao {
         sectionIndex = prev.length;
         next.push({ query, cards: [] });
       }
-      const cardIndex = next[sectionIndex].cards.findIndex(it => it.includes(card.name));
+      const nextCardEntries = next[sectionIndex].cards.map(parseEntry);
+
+      let cardIndex = nextCardEntries.findIndex(it =>
+        it.name.toLowerCase() === card.name.toLowerCase()
+        && it.set?.toLowerCase() === card.set.toLowerCase()
+        && it.cn?.toLowerCase() === card.collector_number.toLowerCase()
+      );
+      if (cardIndex === -1) {
+        cardIndex = nextCardEntries.findIndex((it) =>
+          it.name.toLowerCase() === card.name.toLowerCase()
+          && it.set?.toLowerCase() === card.set.toLowerCase()
+          && it.cn === undefined
+        )
+      }
+      if (cardIndex === -1) {
+        cardIndex = nextCardEntries.findIndex((it) =>
+          it.name.toLowerCase() === card.name.toLowerCase()
+          && it.set === undefined
+          && it.cn === undefined
+        )
+      }
+
       if (cardIndex === -1) {
         // todo: settings for which details get added
         next[sectionIndex].cards.push(serializeEntry({ name: card.name, quantity: 1, set: card.set, cn: card.collector_number }))
