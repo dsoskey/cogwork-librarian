@@ -19,6 +19,7 @@ import { DragHandle } from './icons/dragHandle'
 import { SettingsContext } from './settingsContext'
 import { useNavigate } from 'react-router'
 import { stringToBytes } from '../encoding'
+import { Checkbox } from './component/checkbox/checkbox'
 
 type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery"
 export interface SavedCardsEditorProps extends Pick<ProjectDao, PropsKeys> {
@@ -224,12 +225,7 @@ function SavedSectionEditor({
             title="drag and drop to merge"
             {...listeners}
           ><DragHandle /></button>
-          <input
-            className='custom'
-            type='checkbox'
-            checked={querySelected}
-            onChange={e => setQuerySelected(e.target.checked)}
-          />
+          <Checkbox checked={querySelected} onCheckedChange={setQuerySelected} />
         </>}
         editorControls={<>
           <CopyToClipboardButton copyText={copyText} buttonText={COPY_BUTTON_ICONS} />

@@ -163,44 +163,6 @@ select:hover:not(:disabled) {
   opacity: 0;
 }
 
-input[type="checkbox"].custom {
-  appearance: none;
-  position: relative;
-  width: 1.2em;
-  height: 1.2em;
-  border: 1px solid var(--active);
-  /* Adjusts the position of the checkboxes on the text baseline */
-  vertical-align: -2px;
-  /* Set here so that Windows' High-Contrast Mode can override */
-  color: var(--active);
-  cursor: pointer;
-
-  &:disabled {
-    color: var(--active-low-alpha);
-    border-color: var(--active-low-alpha);
-    cursor: default;
-  }
-}
-input[type="checkbox"].custom:hover:not(:disabled) {
-  border: 1px solid var(--light-color);
-}
-input[type="checkbox"].custom::before {
-  content: "✔";
-  position: absolute;
-  font-size: 1.6em;
-  top: -0.45em;
-  visibility: hidden;
-}
-input[type="checkbox"].custom:checked::before {
-  /* Use `visibility` instead of `display` to avoid recalculating layout */
-  visibility: visible;
-}
-input[type="checkbox"].custom:indeterminate::before {
-  content: "-";
-  font-weight: bold;
-  visibility: visible;
-}
-
 fieldset {
   margin-left: 0;
   padding-left: unset;
@@ -294,28 +256,36 @@ td.c {
 
 tbody tr:nth-child(even) {
   background-color: var(--darker-color);
+
+  td.w {
+    background-color: color-mix(in oklch, var(--data-w), #000 5%);
+  }
+
+  td.u {
+    background-color: color-mix(in oklch, var(--data-u), #000 5%);
+  }
+
+  td.b {
+    background-color: color-mix(in oklch, var(--data-b), #000 5%);
+  }
+
+  td.r {
+    background-color: color-mix(in oklch, var(--data-r), #000 5%);
+  }
+
+  td.g {
+    background-color: color-mix(in oklch, var(--data-g), #000 5%);
+  }
+
+  td.m {
+    background-color: color-mix(in oklch, var(--data-m), #000 5%);
+  }
+
+  td.c {
+    background-color: color-mix(in oklch, var(--data-c), #000 5%);
+  }
 }
-tbody tr:nth-child(even) td.w {
-  background-color: color-mix(in oklch, var(--data-w), #000 5%);
-}
-tbody tr:nth-child(even) td.u {
-  background-color: color-mix(in oklch, var(--data-u), #000 5%);
-}
-tbody tr:nth-child(even) td.b {
-  background-color: color-mix(in oklch, var(--data-b), #000 5%);
-}
-tbody tr:nth-child(even) td.r {
-  background-color: color-mix(in oklch, var(--data-r), #000 5%);
-}
-tbody tr:nth-child(even) td.g {
-  background-color: color-mix(in oklch, var(--data-g), #000 5%);
-}
-tbody tr:nth-child(even) td.m {
-  background-color: color-mix(in oklch, var(--data-m), #000 5%);
-}
-tbody tr:nth-child(even) td.c {
-  background-color: color-mix(in oklch, var(--data-c), #000 5%);
-}
+
 
 th, td {
   text-align: start;

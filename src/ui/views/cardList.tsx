@@ -1,5 +1,4 @@
-import { TextEditor } from '../component/editor/textEditor'
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { SettingsContext } from '../settingsContext'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -10,10 +9,11 @@ import { TwoPanelLayout } from '../layout/twoPanelLayout'
 import { SearchHoverActions } from '../cardBrowser/cardViews/searchHoverActions'
 import { useSearchParams } from 'react-router-dom'
 import { bytesToString } from '../../encoding'
-
-export interface CardListProps {
-
-}
+import { Checkbox } from '../component/checkbox/checkbox'
+import { LoaderText } from '../component/loaders'
+import { TextEditor } from '../component/editor/textEditor'
+import { PrinterIcon } from '../icons/printer'
+import { CardsPerRowControl } from '../component/cardsPerRowControl'
 
 const placeholder =
 `Enter one card per line.
@@ -29,6 +29,8 @@ export function CardList() {
 
   const [searchParams] = useSearchParams()
 
+  const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
+  const [showQuantity, setShowQuantity] = useLocalStorage('showQuantity', true);
   const [listText, setListText] = useLocalStorage<string[]>('list-text' , [''], (localStorageData) => {
     const encodedString = searchParams.get('s')
     if (encodedString) {
@@ -50,7 +52,7 @@ export function CardList() {
   }, [debounced]);
 
   return <TwoPanelLayout
-    className="card-list-root"
+    className='card-list-root'
     lChild={<TextEditor
       queries={listText}
       setQueries={handleListTextChange}
@@ -59,17 +61,60 @@ export function CardList() {
       gutterColumns={[]}
       placeholder={placeholder}
     />}
-    rInitialWidth={(width) => width*3/4}
-    rChild={cards && <div className="result-container">
-      {cards.map(({ quantity, card, name }, i) => name.length > 0 && !name.startsWith("#") && <div className="card-grid _4" key={i}>
-        {!card ? <div className="card-not-found">{name} not found</div> : <CardImageView
-          hoverContent={<SearchHoverActions card={{ data: card, matchedQueries: [], weight: 1 }} />}
-          key={i.toString()}
-          highlightFilter={() => false}
-          card={{ data: card, matchedQueries: [], weight: 1 }}
-        />}
-        {card && <div className="quantity">{quantity ?? 1}</div>}
-      </div>)}
-    </div>}
-    />
+    rInitialWidth={(width) => (width * 3) / 4}
+    rChild={
+      <div className='card-spoiler-root'>
+        <div className='row'>
+          <Checkbox
+            checked={showQuantity}
+            onCheckedChange={setShowQuantity}
+            label='Show quantity'
+            checkboxPosition='end'
+          />
+          <CardsPerRowControl
+            cardsPerRow={cardsPerRow}
+            setCardsPerRow={setCardsPerRow}
+          />
+          {/*<button onClick={print} title='print cube proxies'>*/}
+          {/*  <PrinterIcon />*/}
+          {/*</button>*/}
+        </div>
+
+        {cards === null && <LoaderText />}
+        {cards && (
+          <div className='result-container'>
+            {cards.map(
+              ({ quantity, card, name }, i) =>
+                name.length > 0 &&
+                !name.startsWith('#') && (
+                  <div className={`card-grid _${cardsPerRow}`} key={i}>
+                    {!card ? (
+                      <div className='card-not-found'>{name} not found</div>
+                    ) : (
+                      <CardImageView
+                        hoverContent={
+                          <SearchHoverActions
+                            card={{
+                              data: card,
+                              matchedQueries: [],
+                              weight: 1,
+                            }}
+                          />
+                        }
+                        key={i.toString()}
+                        highlightFilter={() => false}
+                        card={{ data: card, matchedQueries: [], weight: 1 }}
+                      />
+                    )}
+                    {showQuantity && card && (
+                      <div className='quantity'>{quantity ?? 1}</div>
+                    )}
+                  </div>
+                )
+            )}
+          </div>
+        )}
+      </div>
+    }
+  />
 }

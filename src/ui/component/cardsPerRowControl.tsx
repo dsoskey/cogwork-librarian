@@ -11,7 +11,7 @@ export function CardsPerRowControl({ cardsPerRow, setCardsPerRow, disabled }: Ca
 
     return <div>
         <label>
-            <span className="bold">cards per row: </span>
+            <span className="bold">Cards per row: </span>
             <select disabled={disabled} value={cardsPerRow} onChange={e => setCardsPerRow(parseInt(e.target.value))}>
                 <option value={4}>4</option>
                 <option value={6}>6</option>

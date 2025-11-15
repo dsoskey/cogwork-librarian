@@ -1,21 +1,21 @@
 .card-list-root {
     .text-editor-root {
-
         height: 100%;
         overflow-y: scroll
     }
 
-    .result-container {
+    .card-spoiler-root {
         height: 100%;
         padding: unset;
         overflow-y: scroll;
 
         .card-grid {
             position: relative;
+
             .quantity {
                 position: absolute;
-                top: 0px;
-                left: 0px;
+                top: 0;
+                left: 0;
                 z-index: 2;
                 background-color: var(--active);
                 color: var(--dark-color);
@@ -25,9 +25,11 @@
                 min-width: 1em;
                 border-radius: var(--card-border-radius);
             }
+
             .card-grid {
                 z-index: 1;
             }
+
             .card-not-found {
                 text-align: center;
                 padding-top: var(--spacing-500);

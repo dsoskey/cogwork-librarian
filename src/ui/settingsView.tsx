@@ -9,6 +9,7 @@ import { Setter } from '../types'
 const SORT_VALUES = Object.values(SORT_ORDERS)
 import './settingsView.css'
 import { SettingsContext } from './settingsContext'
+import { Checkbox } from './component/checkbox/checkbox'
 
 export function SettingsView() {
   const [options, setters] = useSearchOptions()
@@ -40,42 +41,45 @@ export function AutoSyncSettings() {
     setRefreshRate(parseInt(e.target.value))
   }
 
-  return <div className="prose">
-    <label className='row center pointer'>
-      <input
-        className='custom'
-        type='checkbox'
-        checked={shouldSearchMissing}
-        onChange={e => setShouldSearchMissing(e.target.checked)}
-      />
-      <span className='bold'>Auto-search missing cubes</span>
-    </label>
+  return <div className='prose'>
+    <Checkbox
+      checked={shouldSearchMissing}
+      onCheckedChange={setShouldSearchMissing}
+      label='Auto-search missing cubes'
+    />
     <div className='indent-01'>
-      <div><em>While running search queries, Cogwork Librarian will search CubeCobra for cubes not found in the local database.</em></div>
-      <label className={`row center ${shouldSearchMissing ? 'pointer' : ''}`}>
-        <input
-          className='custom'
-          type='checkbox'
-          disabled={!shouldSearchMissing}
-          checked={shouldSearchOld}
-          onChange={e => setShouldSearchOld(e.target.checked)} />
-        <span className='bold'>Also refresh existing cubes after </span>
-        <input
-          className='refresh-rate'
-          type='number'
-          value={refreshRate}
-          disabled={!shouldSearchOld || !shouldSearchMissing}
-          onChange={handleRefreshRateChange} />
-        <select
-          value={refreshUnits}
-          onChange={e => setRefreshUnits(e.target.value as RefreshUnits)}
-          disabled={!shouldSearchOld || !shouldSearchMissing}
-        >
-          <option value='minutes'>{refreshRate === 1 ? 'minute' : 'minutes'}</option>
-          <option value='hours'>{refreshRate === 1 ? 'hour' : 'hours'}</option>
-          <option value='days'>{refreshRate === 1 ? 'day' : 'days'}</option>
-        </select>
-      </label>
+      <div>
+        <em>
+          While running search queries, Cogwork Librarian will search
+          CubeCobra for cubes not found in the local database.
+        </em>
+      </div>
+      <Checkbox
+        checked={shouldSearchOld}
+        disabled={!shouldSearchMissing}
+        onCheckedChange={setShouldSearchOld}
+        label={
+          <>
+            <span className='bold'>Also refresh existing cubes after </span>
+            <input
+              className='refresh-rate'
+              type='number'
+              value={refreshRate}
+              disabled={!shouldSearchOld || !shouldSearchMissing}
+              onChange={handleRefreshRateChange}
+            />
+            <select
+              value={refreshUnits}
+              onChange={(e) => setRefreshUnits(e.target.value as RefreshUnits)}
+              disabled={!shouldSearchOld || !shouldSearchMissing}
+            >
+              <option value='minutes'>{refreshRate === 1 ? 'minute' : 'minutes'}</option>
+              <option value='hours'>{refreshRate === 1 ? 'hour' : 'hours'}</option>
+              <option value='days'>{refreshRate === 1 ? 'day' : 'days'}</option>
+            </select>
+          </>
+        }
+      />
     </div>
   </div>
 }

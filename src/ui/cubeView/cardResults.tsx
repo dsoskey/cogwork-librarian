@@ -9,6 +9,7 @@ import { PrintPage } from './printPage'
 import _groupBy from 'lodash/groupBy'
 import { CardLink2 } from '../card/CardLink'
 import { DOUBLE_FACED_LAYOUTS } from 'mtgql'
+import { Checkbox } from '../component/checkbox/checkbox'
 
 export interface CardResultsLayoutProps {
   cards: () => OrderedCard[]
@@ -39,14 +40,12 @@ export function CardResultsLayout({ cards, filterControl, extraControls }: CardR
             <option value='visual spoiler'>visual spoiler</option>
           </select>
         </label>
-        <label className='row center'>
-          <span className='bold'>show custom images:</span>
-          <input
-            className='custom'
-            type='checkbox'
-            checked={showCustomImage}
-            onChange={e => setShowCustomImage(e.target.checked)} />
-        </label>
+        <Checkbox
+          checked={showCustomImage}
+          onCheckedChange={setShowCustomImage}
+          label="show custom images"
+          checkboxPosition='end'
+        />
         {displayType === 'visual spoiler' && viewport.width > 1024 &&
             <CardsPerRowControl
               setCardsPerRow={setCardsPerRow}
@@ -193,7 +192,6 @@ export function ClassicCardColumn({ title, cards, onCardNameClick, showCustomIma
           </div>)}
         </div>)}
       </div>)}
-
     </div>;
 }
 
