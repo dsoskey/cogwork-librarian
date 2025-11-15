@@ -44,7 +44,7 @@ export const App = () => {
   const {
     path,
     savedCards, setSavedCards,
-    renameQuery, removeCard, queries, setQueries, addCard,
+    renameQuery, removeCard, queries, setQueries, addCards,
     toggleIgnoreId, ignoredIds
   } = project
   const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>('showSavedCards', true)
@@ -90,7 +90,7 @@ export const App = () => {
                         <div className='search-view-root'>
                           <SearchView
                             memory={memory}
-                            addCard={addCard}
+                            addCards={addCards}
                             path={path}
                             queries={queries}
                             setQueries={setQueries}
@@ -103,7 +103,6 @@ export const App = () => {
                               savedCards={savedCards}
                               setSavedCards={setSavedCards}
                               renameQuery={renameQuery}
-                              removeCard={removeCard}
                             />}
                           </div>
                           <button

@@ -6,7 +6,7 @@ import { EnrichedCard, RunStrategy } from '../../api/queryRunnerCommon'
 import { DataSource, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { PageControl, PageInfo, usePageControl } from './pageControl'
-import { useViewportListener } from '../viewport'
+import { useViewportListener } from '../hooks/useViewportListener'
 import { TopBar } from './topBar'
 import { ActiveCollection, CardDisplayInfo, DisplayType } from './types'
 import { useDebugDetails } from './useDebugDetails'
@@ -17,7 +17,6 @@ import { CardListView } from './cardViews/cardListView'
 import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { useVennControl, VennControl } from './vennControl'
 import { Card } from 'mtgql'
-import { downloadText } from '../download'
 import { SearchHoverActions } from './cardViews/searchHoverActions'
 import { CardsPerRowControl } from '../component/cardsPerRowControl'
 import { CardVizView } from './cardViews/cardVizView'
@@ -27,18 +26,9 @@ import { FlagContext } from '../flags'
 import { DisplayTypesControl } from './displayTypesControl'
 import { HighlightFilterControl } from './highlightFilterControl'
 import { Link } from 'react-router-dom'
+import { ExportWidget } from '../component/exportWidget'
 
-const handleDownload = (text: string, ext: string) => {
-  const now = new Date()
-  const fileName = `coglib-results-${now.toISOString().replace(/:/g, "-")}`
-  downloadText(text, fileName, ext)
-}
-
-const ROTATED_LAYOUTS = new Set<Layout>([
-  'split',
-  'planar',
-  "art_series",
-])
+const ROTATED_LAYOUTS = new Set<Layout>(['split', 'planar', 'art_series'])
 
 interface BrowserViewProps {
   lastQueries: string[]
@@ -47,14 +37,14 @@ interface BrowserViewProps {
   runStrategy: RunStrategy
   report: QueryReport
   source: DataSource
-  addCard: (query: string, card: Card) => void
+  addCards: (query: string, card: Card[]) => void
   addIgnoredId: (id: string) => void
   ignoredIds: string[]
   errors: CogError[]
 }
 
 export const BrowserView = React.memo(({
-  addCard,
+  addCards,
   addIgnoredId,
   ignoredIds,
   runStrategy,
@@ -176,7 +166,7 @@ export const BrowserView = React.memo(({
         displayTypesControl={displayTypesControl}
         lastQueries={lastQueries}
         pageControl={pageControl}
-        downloadButton={<DownloadButton searchResult={activeCards} />}
+        downloadButton={<ExportWidget addCards={addCards} lastQueries={lastQueries} searchResult={activeCards}  />}
         vennControl={runStrategy === RunStrategy.Venn
           ? <VennControl {...vc} cards={cards} />
           : null}
@@ -203,7 +193,7 @@ export const BrowserView = React.memo(({
           displayType={displayType}
           currentPage={currentPage}
           result={result}
-          addCard={addCard}
+          addCards={addCards}
           addIgnoredId={addIgnoredId}
           cardsPerRow={cardsPerRow}
           revealDetails={revealDetails}
@@ -224,7 +214,7 @@ interface CardResultsProps {
   displayType: DisplayType;
   currentPage: EnrichedCard[];
   result: EnrichedCard[];
-  addCard: (query: string, card: Card) => void
+  addCards: (query: string, card: Card[]) => void
   addIgnoredId: (id: string) => void
   cardsPerRow: number;
   revealDetails: boolean
@@ -236,7 +226,7 @@ function CardResults({
   lastQueries,
   currentPage,
   result,
-  addCard,
+  addCards,
   addIgnoredId,
   rotateCards,
   isCardDisplay,
@@ -253,7 +243,7 @@ function CardResults({
   return <div className='result-container'>
     {isCardDisplay && currentPage.map((card, index) => {
       const onAdd = () => {
-        addCard(lastQueries.join("\n"), card.data)
+        addCards(lastQueries.join("\n"), [card.data])
         const id = addMessage(`Added ${card.data.name} to saved cards`, false)
         setTimeout(() => {
           dismissMessage(id)
@@ -287,50 +277,4 @@ function CardResults({
     {displayType === 'json' && <CardJsonView result={currentPage} />}
     {displayType === 'list' && <CardListView result={currentPage} />}
   </div>
-}
-
-
-export interface DownloadButtonProps {
-  searchResult: Array<EnrichedCard>
-}
-
-export function DownloadButton({ searchResult }: DownloadButtonProps) {
-  const [value, setValue] = useState<number>(NaN)
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(Math.abs(parseInt(event.target.value)));
-  }
-  const sliceCount = value === 0 || isNaN(value) ? undefined : value;
-
-  return <div className="download-button">
-    <span className="bold">download <input
-      type="number" pattern="[0-9]*"
-      placeholder="all"
-      value={isNaN(value) ? "" : value}
-      onChange={handleChange}
-      onKeyDown={event => {
-        if (event.key !== "Tab" && event.key !== "Backspace" && !/\d/.test(event.key)) {
-          event.preventDefault()
-        }
-      }}
-    />:&nbsp;</span>
-    <button onClick={() => {
-      handleDownload(
-        searchResult.slice(0, sliceCount)
-          .map(printName).join("\n"), 'txt')
-    }}>
-      card names
-    </button>
-    <button onClick={() => {
-      handleDownload(JSON.stringify(
-        searchResult.slice(0, sliceCount)
-          .map(it => it.data)), 'json')
-    }}>
-      json
-    </button>
-  </div>
-}
-
-function printName(card: EnrichedCard) {
-  if (card.data.layout === "split") return card.data.name
-  return card.data.name.replace(/\/\/.*$/, "")
 }

@@ -17,6 +17,8 @@ import { TextEditor } from './component/editor/textEditor'
 import { FloppyDisk } from './icons/floppyDisk'
 import { DragHandle } from './icons/dragHandle'
 import { SettingsContext } from './settingsContext'
+import { useNavigate } from 'react-router'
+import { stringToBytes } from '../encoding'
 
 type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery"
 export interface SavedCardsEditorProps extends Pick<ProjectDao, PropsKeys> {
@@ -29,6 +31,8 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
   } = props;
   const ref = useRef(null);
   const confirmer = useConfirmDelete();
+  const navigate = useNavigate()
+  const [error, setError] = useState('')
 
   const setQuerySelected = (selected: boolean, sectionIndex: number) => {
     setSavedCards((prev) => {
@@ -57,6 +61,15 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
   const copyText = useMemo(() => savedCards
     .flatMap(i => i.cards).join('\n'), [savedCards]);
 
+  const openInListView = () => {
+    setError('')
+    try {
+      navigate(`/list?s=${stringToBytes(copyText)}`)
+    } catch (e) {
+      setError('Saved card list is too big to encode')
+    }
+  }
+
   return <div className='saved-cards-editor' ref={ref}>
     <div className='row center'>
       <h2>saved cards</h2>
@@ -65,12 +78,15 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
         buttonText={COPY_BUTTON_ICONS}
         copyText={copyText}
       />
+      <button onClick={openInListView}>open in list</button>
       {anyChecked && <button
         onClick={handleDeleteSections}
         title='delete checked queries'>
         <TrashIcon />
       </button>}
     </div>
+
+    {error && <div>{error}</div>}
 
 
     <DndContext onDragEnd={e => {

@@ -18,7 +18,7 @@ import { ClockIcon } from './icons/clock'
 
 export interface SearchViewProps {
   path: string;
-  addCard: (query: string, card: Card) => void;
+  addCards: (query: string, card: Card[]) => void;
   queries: string[]
   setQueries: Setter<string[]>;
   toggleIgnoreId: (id: string) => void;
@@ -27,7 +27,7 @@ export interface SearchViewProps {
 }
 export const SearchView = ({
   memory,
-  path, addCard, queries, setQueries, toggleIgnoreId, ignoredIds
+  path, addCards, queries, setQueries, toggleIgnoreId, ignoredIds
 }: SearchViewProps) => {
 
   const [options, setters] = useSearchOptions();
@@ -129,7 +129,7 @@ export const SearchView = ({
         result={result}
         status={status}
         errors={errorsToDisplay}
-        addCard={addCard}
+        addCards={addCards}
         addIgnoredId={toggleIgnoreId}
         ignoredIds={ignoredIds}
         source="local"

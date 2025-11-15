@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Viewport } from '../viewport'
+import { Viewport } from '../hooks/useViewportListener'
 
 const cheeseSS = (dragging: boolean): React.CSSProperties => ({
   position: 'relative',
@@ -16,17 +16,17 @@ const cheeseSS = (dragging: boolean): React.CSSProperties => ({
 })
 
 interface ResizeHandleProps {
-  onChange: (number) => void
+  onChange: (width: number) => void
   min: number
   max: number
   viewport: Viewport
 }
-export const ResizeHandle = ({
+export function ResizeHandle({
   viewport,
   onChange,
   min,
   max,
-}: ResizeHandleProps) => {
+}: ResizeHandleProps)  {
   const [dragging, setDragging] = useState<boolean>(false)
   const onMouseDown = (event) => {
     event.preventDefault()

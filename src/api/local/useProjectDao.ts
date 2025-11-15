@@ -7,7 +7,7 @@ import { defaultFunction, defaultPromise } from '../context'
 import { Card } from 'mtgql'
 import cloneDeep from 'lodash/cloneDeep'
 import { Project, SavedCardSection } from './types/project'
-import { parseEntry, serializeEntry } from './types/cardEntry'
+import { CardEntry, parseEntry, serializeEntry } from './types/cardEntry'
 
 
 export interface ProjectDao {
@@ -30,7 +30,7 @@ export interface ProjectDao {
   setIgnoredIds: Setter<string[]>
   toggleIgnoreId: (id: string) => void;
 
-  addCard: (query: string, card: Card) => void;
+  addCards: (query: string, card: Card[]) => void;
   renameQuery: (queryIndex: number, newQuery: string) => void;
   removeCard: (queryIndex: number, cardIndex: number) => void;
   removeQuery: (queryIndex: number) => void;
@@ -52,7 +52,7 @@ const defaultDao: ProjectDao = {
   setQueries: defaultFunction("ProjectDao.setQueries"),
   savedCards: [],
   setSavedCards: defaultFunction("ProjectDao.setQueries"),
-  addCard: defaultFunction("ProjectDao.addCard"),
+  addCards: defaultFunction("ProjectDao.addCards"),
   renameQuery: defaultFunction("ProjectDao.renameQuery"),
   removeCard: defaultFunction("ProjectDao.removeCard"),
   removeQuery: defaultFunction("ProjectDao.removeQuery"),
@@ -262,7 +262,7 @@ export function useProjectDao(): ProjectDao {
       await saveMemory();
     }
 
-    let changed = []
+    const changed = []
 
     await cogDB.transaction("rw", cogDB.project, cogDB.projectFolder, async() => {
       try {
@@ -297,43 +297,18 @@ export function useProjectDao(): ProjectDao {
 
   const setSavedCards = keepUpdated(_setSavedCards, _setUpdatedAt)
 
-  const addCard = useCallback((query: string, card: Card) => {
+  const addCards = useCallback((query: string, cards: Card[]) => {
     setSavedCards((prev) => {
       const next = cloneDeep(prev);
-      let sectionIndex = next.findIndex(it => it.query===query)
+      let sectionIndex = next.findIndex((it) => it.query === query)
       if (sectionIndex === -1) {
-        sectionIndex = prev.length;
-        next.push({ query, cards: [] });
+        sectionIndex = next.length
+        next.push({ query, cards: [] })
       }
-      const nextCardEntries = next[sectionIndex].cards.map(parseEntry);
+      const nextCardEntries = next[sectionIndex].cards.map(parseEntry)
 
-      let cardIndex = nextCardEntries.findIndex(it =>
-        it.name.toLowerCase() === card.name.toLowerCase()
-        && it.set?.toLowerCase() === card.set.toLowerCase()
-        && it.cn?.toLowerCase() === card.collector_number.toLowerCase()
-      );
-      if (cardIndex === -1) {
-        cardIndex = nextCardEntries.findIndex((it) =>
-          it.name.toLowerCase() === card.name.toLowerCase()
-          && it.set?.toLowerCase() === card.set.toLowerCase()
-          && it.cn === undefined
-        )
-      }
-      if (cardIndex === -1) {
-        cardIndex = nextCardEntries.findIndex((it) =>
-          it.name.toLowerCase() === card.name.toLowerCase()
-          && it.set === undefined
-          && it.cn === undefined
-        )
-      }
-
-      if (cardIndex === -1) {
-        // todo: settings for which details get added
-        next[sectionIndex].cards.push(serializeEntry({ name: card.name, quantity: 1, set: card.set, cn: card.collector_number }))
-      } else {
-        const existingEntry = parseEntry(next[sectionIndex].cards[cardIndex])
-        existingEntry.quantity = (existingEntry.quantity ?? 1) + 1;
-        next[sectionIndex].cards[cardIndex] = serializeEntry(existingEntry);
+      for (let i = 0; i < cards.length; i++) {
+        addCardToProject(next[sectionIndex].cards, nextCardEntries, cards[i])
       }
       return next;
     })
@@ -399,9 +374,10 @@ export function useProjectDao(): ProjectDao {
     deleteProject,
     moveProject,
     moveFolder,
+    addCards,
     queries, setQueries: keepUpdated(_setQueries, _setUpdatedAt),
     savedCards,
-    setSavedCards, addCard, renameQuery, removeCard, removeQuery,
+    setSavedCards, renameQuery, removeCard, removeQuery,
     path: currentPath,
     ignoredIds, toggleIgnoreId, setIgnoredIds
   }
@@ -414,4 +390,47 @@ async function createFolder(path: string) {
     throw Error(`a folder already exists at ${path}`)
   }
   return { path }
+}
+
+function addCardToProject (nextValue: string[], nextCardEntries: CardEntry[], card: Card) {
+  let cardIndex = nextCardEntries.findIndex(
+    (it) =>
+      it.name.toLowerCase() === card.name.toLowerCase() &&
+      it.set?.toLowerCase() === card.set.toLowerCase() &&
+      it.cn?.toLowerCase() === card.collector_number.toLowerCase()
+  )
+  if (cardIndex === -1) {
+    cardIndex = nextCardEntries.findIndex(
+      (it) =>
+        it.name.toLowerCase() === card.name.toLowerCase() &&
+        it.set?.toLowerCase() === card.set.toLowerCase() &&
+        it.cn === undefined
+    )
+  }
+  if (cardIndex === -1) {
+    cardIndex = nextCardEntries.findIndex(
+      (it) =>
+        it.name.toLowerCase() === card.name.toLowerCase() &&
+        it.set === undefined &&
+        it.cn === undefined
+    )
+  }
+
+  if (cardIndex === -1) {
+    // todo: settings for which details get added
+    nextValue.push(
+      serializeEntry({
+        name: card.name,
+        quantity: 1,
+        set: card.set,
+        cn: card.collector_number,
+      })
+    )
+  } else {
+    const existingEntry = parseEntry(nextValue[cardIndex])
+    existingEntry.quantity = (existingEntry.quantity ?? 1) + 1
+    nextValue[cardIndex] = serializeEntry(existingEntry)
+  }
+
+  return nextValue;
 }

@@ -1,5 +1,5 @@
 import { TextEditor } from '../component/editor/textEditor'
-import React, { useCallback, useContext, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { SettingsContext } from '../settingsContext'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -8,6 +8,8 @@ import { CardImageView } from '../cardBrowser/cardViews/cardImageView'
 import "./cardList.css";
 import { TwoPanelLayout } from '../layout/twoPanelLayout'
 import { SearchHoverActions } from '../cardBrowser/cardViews/searchHoverActions'
+import { useSearchParams } from 'react-router-dom'
+import { bytesToString } from '../../encoding'
 
 export interface CardListProps {
 
@@ -25,7 +27,15 @@ shock
 export function CardList() {
   const { lineHeight } = useContext(SettingsContext);
 
-  const [listText, setListText] = useLocalStorage<string[]>('list-text' , ['']);
+  const [searchParams] = useSearchParams()
+
+  const [listText, setListText] = useLocalStorage<string[]>('list-text' , [''], (localStorageData) => {
+    const encodedString = searchParams.get('s')
+    if (encodedString) {
+      return bytesToString(encodedString).split('\n')
+    }
+    return localStorageData
+  });
   const [debounced, setDebounced] = useState(listText)
   const timeout = useRef<number>();
   const handleListTextChange = (next: string[]) => {
@@ -41,7 +51,7 @@ export function CardList() {
 
   return <TwoPanelLayout
     className="card-list-root"
-    leftChild={<TextEditor
+    lChild={<TextEditor
       queries={listText}
       setQueries={handleListTextChange}
       lineHeight={lineHeight}
@@ -49,7 +59,8 @@ export function CardList() {
       gutterColumns={[]}
       placeholder={placeholder}
     />}
-    rightChild={cards && <div className="result-container">
+    rInitialWidth={(width) => width*3/4}
+    rChild={cards && <div className="result-container">
       {cards.map(({ quantity, card, name }, i) => name.length > 0 && !name.startsWith("#") && <div className="card-grid _4" key={i}>
         {!card ? <div className="card-not-found">{name} not found</div> : <CardImageView
           hoverContent={<SearchHoverActions card={{ data: card, matchedQueries: [], weight: 1 }} />}

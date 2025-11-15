@@ -1,6 +1,6 @@
 import { _CardImage } from '../card/CardLink'
 import React, { useState } from 'react'
-import { useViewportListener } from '../viewport'
+import { useViewportListener } from './useViewportListener'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { parseEntry } from '../../api/local/types/cardEntry'
 import { cogDB } from '../../api/local/db'
