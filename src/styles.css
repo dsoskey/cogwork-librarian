@@ -163,6 +163,10 @@ select:hover:not(:disabled) {
   opacity: 0;
 }
 
+.pad-200 {
+  padding: var(--spacing-200);
+}
+
 fieldset {
   margin-left: 0;
   padding-left: unset;
@@ -285,7 +289,6 @@ tbody tr:nth-child(even) {
     background-color: color-mix(in oklch, var(--data-c), #000 5%);
   }
 }
-
 
 th, td {
   text-align: start;

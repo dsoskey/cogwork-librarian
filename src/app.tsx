@@ -28,7 +28,7 @@ import { DEFAULT_GUTTER_COLUMNS, GutterColumn } from './ui/component/editor/text
 import { SidebarOpenIcon } from './ui/icons/sidebarOpen'
 import { SidebarClosedIcon } from './ui/icons/sidebarClosed'
 import { SettingsContext } from './ui/settingsContext'
-import { CardList } from './ui/views/cardList'
+import { CardList } from './ui/views/cardList/cardList'
 
 export const App = () => {
   const [cubeContext, setCubeContext] = useState<string>('')
@@ -44,7 +44,7 @@ export const App = () => {
   const {
     path,
     savedCards, setSavedCards,
-    renameQuery, removeCard, queries, setQueries, addCards,
+    renameQuery, queries, setQueries, addCards,
     toggleIgnoreId, ignoredIds
   } = project
   const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>('showSavedCards', true)

@@ -3,11 +3,13 @@ import * as Scry from 'scryfall-sdk'
 import { App } from './app'
 import Prism from 'prismjs'
 import {
+  arenaList,
   hookReactDOM,
   linkWrap,
-  mtgql, mtgqlCubePage,
+  mtgql,
+  mtgqlCubePage,
   mtgqlExtended,
-  mtgqlExtendedMulti
+  mtgqlExtendedMulti,
 } from './api/local/syntaxHighlighting'
 import './prism-cogwork.css'
 import './styles.css'
@@ -23,6 +25,7 @@ const router = createBrowserRouter([
   { path: "*", Component: App }
 ])
 
+Prism.languages['arena-list'] = arenaList
 Prism.languages['scryfall'] = mtgql
 Prism.languages['scryfall-links'] = mtgql
 Prism.languages['scryfall-extended'] = mtgqlExtended

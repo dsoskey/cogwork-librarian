@@ -11,18 +11,23 @@ export function useCopyToClipboard(copyText: (() => string) | string) {
     useState<TaskStatus>('unstarted')
 
   const onClick = () => {
-    const text = _isFunction(copyText) ? copyText() : copyText;
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        setStatus('success')
-        setTimeout(() => {
-          setStatus('unstarted')
-        }, 3000)
-      })
-      .catch(() => {
-        setStatus('error')
-      })
+    try {
+      const text = _isFunction(copyText) ? copyText() : copyText;
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          setStatus('success')
+          setTimeout(() => {
+            setStatus('unstarted')
+          }, 3000)
+        })
+        .catch(() => {
+          setStatus('error')
+        })
+    } catch (e) {
+      console.error(e)
+      setStatus('error')
+    }
   }
 
   return { onClick, status }

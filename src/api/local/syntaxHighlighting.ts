@@ -7,6 +7,7 @@ import { Router as RemixRouter } from '@remix-run/router'
 import { closeContextMenu, openContextMenu } from '../../ui/component/contextMenu/contextMenu'
 
 export type Language =
+  | "arena-list"
   | "regex"
   | "mtgql"
   | 'mtgql-cube'
@@ -154,6 +155,29 @@ const comment: Grammar = {
     alias: ["comment"],
   },
 };
+
+export const arenaList: Grammar = {
+  comment: {
+    pattern: /(\n|^)\s*#.*(?=\n|$)/,
+    inside: comment,
+    // greedy: true,
+  },
+  quantity: {
+    pattern: /\n\s*\d+/,
+    alias: 'constant',
+  },
+  setinfo: {
+    pattern: /\s+\([^)(]+\)( \S+)?/,
+    alias: 'keyword',
+  },
+  finish: {
+    pattern: /\*[^*]+\*/,
+    alias: 'identity'
+  },
+  cardname: {
+    pattern: /.*/,
+  }
+}
 
 export const mtgqlExtendedMulti: Grammar = {
   comment: {

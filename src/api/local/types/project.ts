@@ -1,10 +1,19 @@
 import { fromMarkdown } from 'mdast-util-from-markdown'
+import { parseEntry } from './cardEntry'
 
 export interface SavedCardSection {
   query: string
   cards: string[]
   selected?: boolean
 }
+
+export function totalCardQuantity(cards: string[]) {
+  return cards
+    .filter(card => card.length > 0 && !card.startsWith('#'))
+    .map(card => parseEntry(card).quantity??1)
+    .reduce((a,b) => a+b, 0)
+}
+
 
 export interface Project {
   path: string;

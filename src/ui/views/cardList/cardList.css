@@ -9,6 +9,14 @@
         padding: unset;
         overflow-y: scroll;
 
+        .spoiler-tools {
+            display: flex;
+            flex-direction: row;
+            gap: var(--spacing-200);
+            padding-inline-start: var(--spacing-300);
+            padding-top: var(--spacing-200);
+        }
+
         .card-grid {
             position: relative;
 

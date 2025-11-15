@@ -20,6 +20,7 @@ import { SettingsContext } from './settingsContext'
 import { useNavigate } from 'react-router'
 import { stringToBytes } from '../encoding'
 import { Checkbox } from './component/checkbox/checkbox'
+import { totalCardQuantity } from '../api/local/types/project'
 
 type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery"
 export interface SavedCardsEditorProps extends Pick<ProjectDao, PropsKeys> {
@@ -71,9 +72,14 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
     }
   }
 
+  const cardQuantity = savedCards
+    .map((section) => totalCardQuantity(section.cards))
+    .reduce((a, b) => a + b, 0)
+
   return <div className='saved-cards-editor' ref={ref}>
     <div className='row center'>
       <h2>saved cards</h2>
+      <div>({cardQuantity})</div>
       <CopyToClipboardButton
         className='copy-text'
         buttonText={COPY_BUTTON_ICONS}
@@ -195,6 +201,8 @@ function SavedSectionEditor({
     : null;
 
   const copyText = useMemo(() => `\`\`\`\n${query}\n\`\`\`\n${cards.join('\n')}`, [query, cards]);
+  const sectionQuantity = totalCardQuantity(cards)
+  const quantityElement = <div className="pad-200">{sectionQuantity} card{sectionQuantity !== 1?'s':''}</div>
 
   return <div ref={droppable.setNodeRef} style={dropstyle} className='saved-section-root'>
 
@@ -213,6 +221,7 @@ function SavedSectionEditor({
             setEditValue(query);
           }}><TrashIcon /></button>
           {dropIndicator}
+          {quantityElement}
         </>}
       />}
 
@@ -231,10 +240,11 @@ function SavedSectionEditor({
           <CopyToClipboardButton copyText={copyText} buttonText={COPY_BUTTON_ICONS} />
           <button onClick={handleEditQuery} title='edit query'><PencilIcon /></button>
           {dropIndicator}
+          {quantityElement}
         </>}
       />}
 
-      <TextEditor gutterColumns={[]} setQueries={setCards} queries={cards} />
+      <TextEditor language="arena-list" gutterColumns={[]} setQueries={setCards} queries={cards} />
     </div>
   </div>
 
