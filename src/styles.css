@@ -206,30 +206,41 @@ thead {
 }
 
 .card-column-root .column-subheader.w,
+.card-column-root .column-subheader.white,
 th.w {
   background-color: color-mix(in oklch, var(--data-w), #000 15%);
 }
+
 .card-column-root .column-subheader.u,
+.card-column-root .column-subheader.blue,
 th.u {
   background-color: color-mix(in oklch, var(--data-u), #000 15%);
 }
+
 .card-column-root .column-subheader.b,
+.card-column-root .column-subheader.black,
 th.b {
   background-color: color-mix(in oklch, var(--data-b), #000 15%);
 }
+
 .card-column-root .column-subheader.r,
+.card-column-root .column-subheader.red,
 th.r {
   background-color: color-mix(in oklch, var(--data-r), #000 15%);
 }
+
 .card-column-root .column-subheader.g,
+.card-column-root .column-subheader.green,
 th.g {
   background-color: color-mix(in oklch, var(--data-g), #000 15%);
 }
 .card-column-root .column-subheader.multi,
+.card-column-root .column-subheader.multicolored,
 th.m {
   background-color: color-mix(in oklch, var(--data-m), #000 15%);
 }
 .card-column-root .column-subheader.colorless,
+.card-column-root .column-subheader.hybrid,
 th.c {
   background-color: color-mix(in oklch, var(--data-c), #000 15%);
 }

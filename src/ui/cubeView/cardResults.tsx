@@ -9,6 +9,7 @@ import _groupBy from 'lodash/groupBy'
 import { CardLink2 } from '../card/CardLink'
 import { DOUBLE_FACED_LAYOUTS } from 'mtgql'
 import { Checkbox } from '../component/checkbox/checkbox'
+import _sortBy from 'lodash/sortBy'
 
 export interface CardResultsLayoutProps {
   cards: OrderedCard[]
@@ -56,7 +57,7 @@ export function CardResultsLayout({ cards, sortControl, filterControl, extraCont
 
     {cards.length > 0 && <>
       {displayType === 'grid' && <ClassicCardList
-        cards={groupCards(cards, 'color_identity', 'type_line')}
+        cards={groupCards(cards, 'color_category', 'type_line')}
         sort2By='cmc'
         showCustomImage={showCustomImage}
         onCardNameClick={setActiveCard}
@@ -116,8 +117,8 @@ function groupCards(cards:OrderedCard[], groupby1: keyof OrderedCard, groupby2: 
   const result:any = _groupBy(cards, cardKeyToGroupFunction[groupby1] ?? groupby1);
   for (const key in result) {
     const _cards = result[key];
-    if (key === "multi") {
-      result[key] = _groupBy(_cards, (it) => it.color_identity.join(""));
+    if (key === "multi" || key === 'Multicolor' || key === 'Hybrid') {
+      result[key] = _groupBy(_cards, (it) => (it.color_identity ?? it.colors).join(""));
     } else {
       result[key] = _groupBy(_cards, cardKeyToGroupFunction[groupby2] ?? groupby2);
     }
@@ -141,16 +142,34 @@ export interface ClassicCardListProps {
   cards: DoubleGrouped<OrderedCard[]>
 }
 
+const SORTS = {
+  color_category: {
+    white: 0,
+    blue: 1,
+    black: 2,
+    red: 3,
+    green: 4,
+    colorless: 5,
+    multicolored: 6,
+    hybrid: 7,
+  }
+}
 export function ClassicCardList({ sort2By, showCustomImage, onCardNameClick, cards }: ClassicCardListProps) {
-  return <div className="classic-card-list-root row">
-    {Object.entries(cards).map(([groupby1, groupby2]) => <ClassicCardColumn
-      key={groupby1}
-      title={groupby1}
-      cards={groupby2}
-      showCustomImage={showCustomImage}
-      onCardNameClick={onCardNameClick}
-    />)}
-  </div>
+  // todo: make this depend on group key
+  const entries = _sortBy(Object.entries(cards), ([it]) => SORTS.color_category[it.toLowerCase()] ?? 8)
+  return (
+    <div className='classic-card-list-root row'>
+      {entries.map(([groupby1, groupby2]) => (
+        <ClassicCardColumn
+          key={groupby1}
+          title={groupby1}
+          cards={groupby2}
+          showCustomImage={showCustomImage}
+          onCardNameClick={onCardNameClick}
+        />
+      ))}
+    </div>
+  )
 }
 
 
@@ -167,7 +186,7 @@ export function ClassicCardColumn({ title, cards, onCardNameClick, showCustomIma
     return <div className="card-column-root">
       <div className="column-header">{title} [{_count}]</div>
       {Object.entries(rest).map(([group2, cards]) => <div key={group2}>
-        <div className={`column-subheader ${title}`}>{group2} [{cards.length}]</div>
+        <div className={`column-subheader ${title.toLowerCase()}`}>{group2} [{cards.length}]</div>
 
         {Object.entries(_groupBy(cards, "cmc")).map(([_cmc, cards]) => <div className="column-subgroup">
 

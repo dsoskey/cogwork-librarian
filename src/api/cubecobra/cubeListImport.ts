@@ -6,6 +6,7 @@ export async function importCubeCobra(cubeId: string, now: Date): Promise<Cube> 
   const response = await fetch(`${URL_BASE}${cubeId}`)
 
   const json = await response.json();
+  console.debug('fetched cube', cubeId, json);
   const cards = json.cards.mainboard.map(it => {
     const result: Partial<CubeCard> = {
       print_id: it.details.scryfall_id,
@@ -23,7 +24,11 @@ export async function importCubeCobra(cubeId: string, now: Date): Promise<Cube> 
     if (it.cmc) result.cmc = it.cmc;
     if (it.type_line) result.type_line = it.type_line;
     if (it.colors) result.colors = it.colors;
-    if (it.color_category) result.color_category = it.color_category;
+    if (it.colorCategory) {
+      result.color_category = it.colorCategory;
+    } else {
+      result.color_category = it.details.colorcategory;
+    }
     return result
   })
 
