@@ -72,7 +72,7 @@ pre[class*="language-"].last-query {
     margin-right: var(--spacing-100);
 }
 
-.highlight-filter-root {
+.filter-root {
     .text-editor-root {
         width: 100%;
     }

@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import { CubeSort, useCubeSort } from './cubeSort'
 import { CardImageView } from '../cardBrowser/cardViews/cardImageView'
 import { CubeViewModelContext, OrderedCard } from './useCubeViewModel'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
@@ -12,27 +11,27 @@ import { DOUBLE_FACED_LAYOUTS } from 'mtgql'
 import { Checkbox } from '../component/checkbox/checkbox'
 
 export interface CardResultsLayoutProps {
-  cards: () => OrderedCard[]
+  cards: OrderedCard[]
   filterControl: React.ReactNode;
+  sortControl?: React.ReactNode;
   extraControls?: React.ReactNode;
 }
 
 type CubeDisplayType = "grid" | "visual spoiler"
 
-export function CardResultsLayout({ cards, filterControl, extraControls }: CardResultsLayoutProps) {
+export function CardResultsLayout({ cards, sortControl, filterControl, extraControls }: CardResultsLayoutProps) {
   const viewport = useViewportListener();
   const { cube, setActiveCard } = useContext(CubeViewModelContext);
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
   const [showCustomImage, setShowCustomImage] = useLocalStorage('cards-custom-image', true)
-  const { ordering, setOrdering, sorted } = useCubeSort(cards);
 
   const [displayType, setDisplayType] = useLocalStorage<CubeDisplayType>('cube-display-type', "visual spoiler")
 
   return <div className="card-list-root">
     <div className='list-control'>
-      {filterControl}
-      <CubeSort setOrdering={setOrdering} ordering={ordering} />
-      <div className='row baseline'>
+      <div className="prose">{filterControl}</div>
+      {sortControl}
+      <div className='row center'>
         <label>
           <span className='bold'>display as: </span>
           <select value={displayType} onChange={e => setDisplayType(e.target.value as CubeDisplayType)}>
@@ -51,20 +50,19 @@ export function CardResultsLayout({ cards, filterControl, extraControls }: CardR
               setCardsPerRow={setCardsPerRow}
               cardsPerRow={cardsPerRow}
             />}
-
         {extraControls}
       </div>
     </div>
 
-    {sorted.length > 0 && <>
+    {cards.length > 0 && <>
       {displayType === 'grid' && <ClassicCardList
-        cards={groupCards(sorted, 'color_identity', 'type_line')}
+        cards={groupCards(cards, 'color_identity', 'type_line')}
         sort2By='cmc'
         showCustomImage={showCustomImage}
         onCardNameClick={setActiveCard}
       />}
       {displayType === 'visual spoiler' && <div className='result-container'>
-        {sorted.map((card, i) => <CardImageView
+        {cards.map((card, i) => <CardImageView
           key={card.id + i.toString()}
           className={`card-grid _${cardsPerRow}`}
           highlightFilter={() => false}
@@ -74,7 +72,7 @@ export function CardResultsLayout({ cards, filterControl, extraControls }: CardR
           altImageBackUri={showCustomImage ? card.alt_image_back_uri : undefined}
         />)}
       </div>}
-      <PrintPage cards={sorted} />
+      <PrintPage cards={cards} />
     </>}
   </div>;
 }

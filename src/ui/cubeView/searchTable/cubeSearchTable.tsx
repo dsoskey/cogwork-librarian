@@ -18,6 +18,7 @@ import { getColors } from './tempColorUtil'
 import { colorKey } from '../../component/viz/types'
 import { REFOCUS_TIMEOUT } from '../../flags'
 import { patchCubeQuery } from '../../../api/mtgql-ep/cubeSugar'
+import { CubeSort, useCubeSort } from '../cubeSort'
 
 export interface CubeSearchTableProps {}
 
@@ -41,6 +42,8 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
         query: "",
         cards: [],
     });
+  const { ordering, setOrdering, sorted } = useCubeSort(cardsToShow.cards)
+
     const setCardsToShow = (p) => {
         _setCardsToShow(p);
         setTimeout(() => {
@@ -146,56 +149,67 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
         }
     }
 
-    return <div className="cube-search-table-root">
-        <div className="table-controls">
-            <div>
-                <InfoModal
-                  title={<h2>Cube search table</h2>}
-                  info={<p>
-                      Each row has an editable search query and the query results broken down by color category.
-                      Click a table cell to show the cards that match that cell's query.
-                      Edit the query rows like any multiline text box,
-                      using <code>Enter</code> and <code>Backspace</code> to add and remove rows.
-                      Navigate the query rows using <code>Up</code> and <code>Down</code>.
-                  </p>}
-                />
-                <PresetSelector setQueries={bulkSetQuery} cards={cards} />
-            </div>
+    return (
+      <div className='cube-search-table-root'>
+        <div className='table-controls'>
+          <div>
+            <InfoModal
+              title={<h2>Cube search table</h2>}
+              info={
+                <p>
+                  Each row has an editable search query and the query results
+                  broken down by color category. Click a table cell to show the
+                  cards that match that cell's query. Edit the query rows like
+                  any multiline text box, using <code>Enter</code> and{' '}
+                  <code>Backspace</code> to add and remove rows. Navigate the
+                  query rows using <code>Up</code> and <code>Down</code>.
+                </p>
+              }
+            />
+            <PresetSelector setQueries={bulkSetQuery} cards={cards} />
+          </div>
 
-            <label className='row baseline'>
-                <span className="form-label">cell calculation: </span>
-                <select
-                  value={cellDisplayMode}
-                  onChange={event => setCellDisplayMode(parseInt(event.target.value))}>
-                    {Object.entries(CELLS).map(([key, value]) => <option key={key} value={key}>{value}</option>)}
-                </select>
+          <label className='row baseline'>
+            <span className='form-label'>cell calculation: </span>
+            <select
+              value={cellDisplayMode}
+              onChange={(event) =>
+                setCellDisplayMode(parseInt(event.target.value))
+              }
+            >
+              {Object.entries(CELLS).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </label>
+          {cellDisplayMode === CellDisplayMode.asfan && (
+            <label className='row center'>
+              <span className='form-label'>pack size: </span>
+              <input
+                type='number'
+                value={packSize}
+                onChange={(event) => setPackSize(parseInt(event.target.value))}
+              />
             </label>
-            {cellDisplayMode === CellDisplayMode.asfan &&
-              <label className='row center'>
-                  <span className='form-label'>pack size: </span>
-                  <input
-                    type='number'
-                    value={packSize}
-                    onChange={event => setPackSize(parseInt(event.target.value))}
-                  />
-              </label>
-            }
+          )}
         </div>
-        <table className="cube-search-table">
-            <thead>
+        <table className='cube-search-table'>
+          <thead>
             <tr>
-                <th>query</th>
-                <th>total</th>
-                <th className='w'>w</th>
-                <th className='u'>u</th>
-                <th className='b'>b</th>
-                <th className='r'>r</th>
-                <th className='g'>g</th>
-                <th className='m'>m</th>
-                <th className='c'>c</th>
+              <th>query</th>
+              <th>total</th>
+              <th className='w'>w</th>
+              <th className='u'>u</th>
+              <th className='b'>b</th>
+              <th className='r'>r</th>
+              <th className='g'>g</th>
+              <th className='m'>m</th>
+              <th className='c'>c</th>
             </tr>
-            </thead>
-            <tbody ref={editorContainer}>
+          </thead>
+          <tbody ref={editorContainer}>
             <ColorBreakdownRow
               onCellClick={onCellClick}
               breakdown={totalbucket}
@@ -203,9 +217,9 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
               cellDisplayMode={cellDisplayMode}
               packSize={packSize}
             >
-                total
+              total
             </ColorBreakdownRow>
-            {queries.map(((it, i) => (
+            {queries.map((it, i) => (
               <CubeSearchRow
                 setCardsToShow={setCardsToShow}
                 flop={flop}
@@ -218,18 +232,24 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
                 cellDisplayMode={cellDisplayMode}
                 packSize={packSize}
               />
-            )))}
-            </tbody>
+            ))}
+          </tbody>
         </table>
-        {cardsToShow.cards.length > 0 && <CardResultsLayout
-          cards={() => cardsToShow.cards}
-          filterControl={<h3 ref={topOfResults}>
-              <code className='language-scryfall-extended-multi'>
+        {cardsToShow.cards.length > 0 && (
+          <CardResultsLayout
+            cards={sorted}
+            sortControl={<CubeSort setOrdering={setOrdering} ordering={ordering} />}
+            filterControl={
+              <h3 ref={topOfResults}>
+                <code className='language-scryfall-extended-multi'>
                   {cardsToShow.query}
-              </code>
-            </h3>}
-        />}
-    </div>;
+                </code>
+              </h3>
+            }
+          />
+        )}
+      </div>
+    )
 }
 
 interface PresetSelectorProps {

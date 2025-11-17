@@ -47,9 +47,9 @@ export const COPY_BUTTON_ICONS = {
 
 
 const DEFAULT_BUTTON_TEXT = {
-  unstarted: 'copy to clipboard',
-  success: 'copied successfully!',
-  error: 'there was an error copying',
+  unstarted: 'Copy to clipboard',
+  success: 'Copied successfully!',
+  error: 'There was an error copying',
 }
 
 interface CopyToClipboardButtonProps extends HTMLAttributes<HTMLButtonElement> {
@@ -58,8 +58,9 @@ interface CopyToClipboardButtonProps extends HTMLAttributes<HTMLButtonElement> {
   buttonText?: Partial<Record<TaskStatus, React.ReactNode>>
   titleText?: Partial<Record<TaskStatus, string>>
   className?: string
+  disabled?: boolean
 }
-export const CopyToClipboardButton = ({ titleText = DEFAULT_BUTTON_TEXT, buttonText, copyText, className, children, ...rest }: CopyToClipboardButtonProps) => {
+export const CopyToClipboardButton = ({ titleText = DEFAULT_BUTTON_TEXT, buttonText, copyText, className, children, disabled, ...rest }: CopyToClipboardButtonProps) => {
   const { status, onClick } = useCopyToClipboard(copyText);
   let content =  DEFAULT_BUTTON_TEXT[status];
   if (children) {
@@ -69,14 +70,14 @@ export const CopyToClipboardButton = ({ titleText = DEFAULT_BUTTON_TEXT, buttonT
   }
   let title = rest.title
   if (titleText) {
-    title = titleText[status] ?? "Copy to clipboard"
+    title = titleText[status] ?? DEFAULT_BUTTON_TEXT[status]
   }
 
   return <button
     {...rest}
     title={title}
     className={className}
-    disabled={status !== 'unstarted'}
+    disabled={status !== 'unstarted' || disabled}
     onClick={onClick}
   >
     {content}

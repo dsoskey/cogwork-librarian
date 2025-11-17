@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { cogDB as cogDBClient } from '../../api/local/db'
 import { CardImageView } from '../cardBrowser/cardViews/cardImageView'
@@ -14,7 +14,7 @@ import {
   CubeViewModelContext,
   useCubeViewModel
 } from './useCubeViewModel'
-import { Route, Routes, useLocation } from 'react-router'
+import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import { CubeOverview } from './cubeOverview'
 import { CubeList } from './cubeList'
 import { FlagContext } from '../flags'
@@ -29,6 +29,10 @@ import { LinkIcon } from '../icons/link'
 import { CheckIcon } from '../icons/check'
 import { ErrorIcon } from '../icons/error'
 import { COBRA_CUSTOM_ID } from '../../api/cubecobra/constants'
+import { FileUpArrow } from '../icons/fileUpArrow'
+import { useCubeSort } from './cubeSort'
+import { useHighlightFilter } from '../cardBrowser/useHighlightFilter'
+import { serializeEntry } from '../../api/local/types/cardEntry'
 
 
 export function CubeView() {
@@ -162,73 +166,151 @@ export function CubeView() {
   </CubeViewModelContext.Provider>
 }
 
+const EMPTY = []
 function CubeModelView() {
   const { cube, cards } = useContext(CubeViewModelContext)
   const { cubeCombos } = useContext(FlagContext).flags
   const { pathname } = useLocation()
 
-  return <>
-    <div className='header'>
-      <div className='row baseline wrap'>
-        <h2>{cube.name}</h2>
-        <em>
-          — a {cube.cards?.length ?? cube.print_ids?.length ?? cube.oracle_ids.length} card cube
-          {cube.created_by && ` created by ${cube.created_by} `}
-          from{' '}
-          {cube.source !== 'list' && <a
-            href={cubeLink(cube)}
-            rel='noreferrer'
-            target='_blank'>
-            {CUBE_SOURCE_TO_LABEL[cube.source]}
-          </a>}
-          {cube.source === 'list' && 'a text list'}
-        </em>
-      </div>
-      <div className='cube-subroutes row center'>
-        <Link to={`/cube/${cube.key}`} className={pathname === `/cube/${cube.key}` ? 'active-link' : ''}>overview</Link>
-        <Link to={`/cube/${cube.key}/list`}
-              className={pathname === `/cube/${cube.key}/list` ? 'active-link' : ''}>list</Link>
-        <Link to={`/cube/${cube.key}/table`} className={pathname === `/cube/${cube.key}/table` ? 'active-link' : ''}>search
-          table</Link>
-        {cubeCombos && <Link
-          to={`/cube/${cube.key}/combos`}
-          title="powered by Commander's Spellbook!"
-          className={`row center ${pathname === `/cube/${cube.key}/combos` ? 'active-link' : ''}`}
-        >
-          combos <CommandersSpellCompact height='15' />
-        </Link>}
-        <div>
-          {cube.source !== 'list' && <>
-            <CopyToClipboardButton
+  const [filterQuery, setFilterQuery] = useState<string>('')
+  const { highlightFilter, error } = useHighlightFilter(
+    filterQuery,
+    EMPTY,
+    true
+  )
+
+  const filtered = !error ? cards.filter(highlightFilter) : cards
+  const { ordering, setOrdering, sorted } = useCubeSort(filtered)
+
+  const navigate = useNavigate()
+  const openInListView = () => {
+    const listText = sorted.map((card) =>
+      serializeEntry({
+        name: card.name,
+        set: card.set,
+        cn: card.collector_number,
+      })
+    )
+    localStorage.setItem(
+      'list-text.coglib.sosk.watch',
+      JSON.stringify(listText)
+    )
+    navigate(`/list`)
+  }
+
+  return (
+    <>
+      <div className='header'>
+        <div className='row baseline wrap'>
+          <h2>{cube.name}</h2>
+          <em>
+            — a{' '}
+            {cube.cards?.length ??
+              cube.print_ids?.length ??
+              cube.oracle_ids.length}{' '}
+            card cube
+            {cube.created_by && ` created by ${cube.created_by} `}
+            from{' '}
+            {cube.source !== 'list' && (
+              <a href={cubeLink(cube)} rel='noreferrer' target='_blank'>
+                {CUBE_SOURCE_TO_LABEL[cube.source]}
+              </a>
+            )}
+            {cube.source === 'list' && 'a text list'}
+          </em>
+        </div>
+        <div className='cube-subroutes row center'>
+          <Link to={`/cube/${cube.key}`} className={pathname === `/cube/${cube.key}` ? 'active-link' : ''}>
+            overview
+          </Link>
+          <Link
+            to={`/cube/${cube.key}/list`}
+            className={
+              pathname === `/cube/${cube.key}/list` ? 'active-link' : ''
+            }
+          >
+            list
+          </Link>
+          <Link
+            to={`/cube/${cube.key}/table`}
+            className={
+              pathname === `/cube/${cube.key}/table` ? 'active-link' : ''
+            }
+          >
+            search table
+          </Link>
+          {cubeCombos && (
+            <Link
+              to={`/cube/${cube.key}/combos`}
+              title="powered by Commander's Spellbook!"
+              className={`row center ${
+                pathname === `/cube/${cube.key}/combos` ? 'active-link' : ''
+              }`}
+            >
+              combos <CommandersSpellCompact height='15' />
+            </Link>
+          )}
+          <div className="row center">
+            <span className='bold'>import: </span>
+            {cube.source !== 'list' && <RefreshButton toSubmit={[cube]} />}
+
+            <span className='bold'>export: </span>
+            {cube.source !== 'list' && <CopyToClipboardButton
               copyText={`${window.location.protocol}//${window.location.host}/cube/${cube.key}?source=${cube.source}`}
-              title={`copy share link to keyboard`}
+              titleText={{ unstarted: `Copy share link to keyboard` }}
               buttonText={LINK_BUTTON_ICONS}
               className='square'
-            />
-            <RefreshButton toSubmit={[cube]} />
-          </>}
-          {cube.source === 'cubecobra' && <a
-            className='button-like'
-            href={`https://draftmancer.com/?cubeCobraID=${cube.canonical_id}&cubeCobraName=${encodeURI(cube.name)}`}
-            title='Start Draftmancer draft'
-            target='_blank'
-            rel='noopener noreferrer'
-          ><DraftmancerIcon /></a>}
-          <button
-            disabled={pathname !== `/cube/${cube.key}/list`}
-            className={pathname === `/cube/${cube.key}/list` ? '' : 'gone'}
-            onClick={print}
-            title='print cube proxies'><PrinterIcon />
-          </button>
+            />}
+            <button onClick={openInListView} title='open in quick list'>
+              <FileUpArrow />
+            </button>
+            {cube.source === 'cubecobra' && (
+              <a
+                className='button-like'
+                href={`https://draftmancer.com/?cubeCobraID=${
+                  cube.canonical_id
+                }&cubeCobraName=${encodeURI(cube.name)}`}
+                title='Start Draftmancer draft'
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                <DraftmancerIcon />
+              </a>
+            )}
+            <button
+              disabled={pathname !== `/cube/${cube.key}/list`}
+              onClick={print}
+              title='print cube proxies'
+            >
+              <PrinterIcon />
+            </button>
+          </div>
+          <div>
+            <span className='bold'>last updated:</span>{' '}
+            {cube.last_updated?.toLocaleString() ?? '~'}
+          </div>
         </div>
-        <div><span className='bold'>last updated:</span> {cube.last_updated?.toLocaleString() ?? '~'}</div>
       </div>
-    </div>
-    <Routes>
-      <Route path='/list' element={<CubeList />} />
-      <Route path='/table' element={<CubeSearchTable />} />
-      {cubeCombos && <Route path='/combos' element={<ComboListView cards={cards} />} />}
-      <Route path='' element={<CubeOverview />} />
-    </Routes>
-  </>
+      <Routes>
+        <Route
+          path='/list'
+          element={
+            <CubeList
+              cards={sorted}
+              ordering={ordering}
+              setOrdering={setOrdering}
+              filter={filterQuery}
+              setFilter={setFilterQuery}
+              filterError={error}
+            />
+          }
+        />
+        <Route path='/table' element={<CubeSearchTable />} />
+        {cubeCombos && (
+          <Route path='/combos' element={<ComboListView cards={cards} />} />
+        )}
+        <Route path='' element={<CubeOverview />} />
+      </Routes>
+    </>
+  )
 }

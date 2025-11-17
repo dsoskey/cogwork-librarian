@@ -1,10 +1,9 @@
-import React, { KeyboardEvent, useCallback, useContext, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useContext, useMemo, useRef, useState } from 'react'
 import './savedCards.css'
 import { COPY_BUTTON_ICONS, CopyToClipboardButton } from './component/copyToClipboardButton'
-import { CardEntry, parseEntry, serializeEntry } from '../api/local/types/cardEntry'
+import { parseEntry, serializeEntry } from '../api/local/types/cardEntry'
 import { ProjectDao, splitPath } from '../api/local/useProjectDao'
 import { Modal } from './component/modal'
-import { HoverableInput } from './card/CardLink'
 import { LastQueryDisplay } from './cardBrowser/lastQueryDisplay'
 import { PencilIcon } from './icons/pencil'
 import { TrashIcon } from './icons/trash'
@@ -18,9 +17,9 @@ import { FloppyDisk } from './icons/floppyDisk'
 import { DragHandle } from './icons/dragHandle'
 import { SettingsContext } from './settingsContext'
 import { useNavigate } from 'react-router'
-import { stringToBytes } from '../encoding'
 import { Checkbox } from './component/checkbox/checkbox'
 import { totalCardQuantity } from '../api/local/types/project'
+import { FileUpArrow } from './icons/fileUpArrow'
 
 type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery"
 export interface SavedCardsEditorProps extends Pick<ProjectDao, PropsKeys> {
@@ -34,7 +33,6 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
   const ref = useRef(null);
   const confirmer = useConfirmDelete();
   const navigate = useNavigate()
-  const [error, setError] = useState('')
 
   const setQuerySelected = (selected: boolean, sectionIndex: number) => {
     setSavedCards((prev) => {
@@ -64,12 +62,11 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
     .flatMap(i => i.cards).join('\n'), [savedCards]);
 
   const openInListView = () => {
-    setError('')
-    try {
-      navigate(`/list?s=${stringToBytes(copyText)}`)
-    } catch (e) {
-      setError('Saved card list is too big to encode')
-    }
+    localStorage.setItem(
+      'list-text.coglib.sosk.watch',
+      JSON.stringify(copyText.split('\n'))
+    )
+    navigate(`/list`)
   }
 
   const cardQuantity = savedCards
@@ -85,16 +82,15 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
         buttonText={COPY_BUTTON_ICONS}
         copyText={copyText}
       />
-      <button onClick={openInListView}>open in list</button>
+      <button onClick={openInListView} title="open in quick list">
+        <FileUpArrow />
+      </button>
       {anyChecked && <button
         onClick={handleDeleteSections}
         title='delete checked queries'>
         <TrashIcon />
       </button>}
     </div>
-
-    {error && <div>{error}</div>}
-
 
     <DndContext onDragEnd={e => {
       if (e.over.id !== e.active.id) {

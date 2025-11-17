@@ -163,7 +163,7 @@ export const arenaList: Grammar = {
     // greedy: true,
   },
   quantity: {
-    pattern: /\n\s*\d+/,
+    pattern: /(\n|^)\s*\d+/,
     alias: 'constant',
   },
   setinfo: {

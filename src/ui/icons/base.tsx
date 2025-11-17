@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const DEFAULT_SIZE = '18';
+export const DEFAULT_SIZE = '20';
 export const DEFAULT_OPACITY = "0.5";
 
 interface _BaseIconProps extends React.SVGProps<SVGSVGElement> {

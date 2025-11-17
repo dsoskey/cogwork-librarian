@@ -148,6 +148,7 @@ select {
   background-color: var(--darker-color);
   color: var(--light-color);
   border-radius: var(--border-radius);
+  border-color: var(--light-color);
   min-width: var(--interaction-size-min);
   min-height: var(--interaction-size-min);
 }

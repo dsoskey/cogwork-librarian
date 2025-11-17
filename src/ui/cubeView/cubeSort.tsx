@@ -40,13 +40,10 @@ export const SORT_OPTIONS = [
 export const DEFAULT_ORDERING = ["color_id", 'cmc', "creatures_first", 'type_line', 'name']
 
 
-export function useCubeSort(cards: () => OrderedCard[]) {
-  const [ordering, setOrdering] = useLocalStorage<any[]>("cube-sort.coglib.sosk.watch", DEFAULT_ORDERING)
+export function useCubeSort(cards: OrderedCard[]) {
+  const [ordering, setOrdering] = useLocalStorage<string[]>("cube-sort.coglib.sosk.watch", DEFAULT_ORDERING)
   const sorted: OrderedCard[] = useMemo(() => {
-    console.time("cardmap")
-    const _cards = cards();
-    console.timeEnd("cardmap")
-    return _sortBy(_cards, ordering.map(it => orderValToKey[it] ?? it),
+    return _sortBy(cards, ordering.map(it => orderValToKey[it] ?? it),
     ) as OrderedCard[]
   }, [cards, ordering])
 

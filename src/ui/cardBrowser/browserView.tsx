@@ -24,7 +24,7 @@ import { Layout } from 'mtgql/build/generated/models/Layout'
 import { useHighlightFilter } from './useHighlightFilter'
 import { FlagContext } from '../flags'
 import { DisplayTypesControl } from './displayTypesControl'
-import { HighlightFilterControl } from './highlightFilterControl'
+import { FilterControl } from './filterControl'
 import { Link } from 'react-router-dom'
 import { ExportWidget } from '../component/exportWidget'
 
@@ -158,10 +158,11 @@ export const BrowserView = React.memo(({
   return <div className='results' ref={topOfResults}>
     <div className='content'>
       <TopBar
-        highlightFilterControl={<HighlightFilterControl
+        highlightFilterControl={<FilterControl
+          label="Highlight:"
           filterQuery={filterQuery}
           setFilterQuery={setFilterQuery}
-          highlightError={highlightError}
+          highlightError={highlightError.message}
         />}
         displayTypesControl={displayTypesControl}
         lastQueries={lastQueries}

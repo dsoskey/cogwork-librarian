@@ -10,10 +10,12 @@
 }
 .cube-view-root {
     .header {
-        margin: 0 var(--spacing-300);
+        padding: 0 var(--spacing-300);
         display: flex;
         flex-direction: column;
         gap: var(--spacing-200);
+        border-bottom: var(--gray-68) 2px solid;
+        box-shadow: 0 2px 2px 0 var(--gray-68-shadow);
     }
 
     .card-list-root {
@@ -21,7 +23,7 @@
     }
 
     .list-control {
-        margin: 0 var(--spacing-300) var(--spacing-300);
+        margin: 0 var(--spacing-400) var(--spacing-400);
         display: flex;
         flex-direction: column;
         gap: var(--spacing-200);

@@ -1,7 +1,7 @@
-
-.drag-handle:hover {
-    color: var(--dark-color);
-    background-color: var(--active-mid-alpha);
+.drag-handle {
+    width: 16px;
+    height: 16px;
+    padding: 2px;
 }
 
 .multiselect .multiselect-droppable {
@@ -9,7 +9,18 @@
 }
 
 .slug {
-    padding: var(--spacing-100);
-    border: var(--light-color) inset 2px;
+    padding: var(--spacing-100) var(--spacing-200) var(--spacing-100) var(--spacing-100);
+
+    background: var(--darker-color);
     border-radius: var(--border-radius);
+
+    button, .button-like {
+        --bkgd-color: var(--darker-color);
+    }
+
+    button:hover:not(:disabled), .button-like:hover:not(:disabled) {
+        --text-color: var(--dark-color);
+        --svg-stroke: var(--dark-color);
+        --bkgd-color: var(--active-mid-alpha);
+    }
 }

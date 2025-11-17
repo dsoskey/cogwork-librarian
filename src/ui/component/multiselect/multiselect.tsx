@@ -55,9 +55,9 @@ export function Multiselect({ defaultValue, optionTransform, labelComponent, val
               const displayValue = transform(selectedOption)
               return <Draggable key={selectedOption} draggableId={selectedOption} index={index}>
                 {(provided, _) => (
-                  <div className="row baseline slug" ref={provided.innerRef} {...provided.draggableProps}>
-                    <div className="drag-handle" {...provided.dragHandleProps} ><DragHandle /></div>
-                    <button onClick={onClose} title={`unselect ${displayValue}`}>X</button> {displayValue}
+                  <div className="row center slug" ref={provided.innerRef} {...provided.draggableProps}>
+                    <div className="drag-handle button-like" {...provided.dragHandleProps} ><DragHandle /></div>
+                    <button className="bold" onClick={onClose} title={`unselect ${displayValue}`}>X</button> {displayValue}
                   </div>
                 )}
               </Draggable>

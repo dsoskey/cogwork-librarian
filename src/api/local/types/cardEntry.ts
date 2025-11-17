@@ -16,6 +16,14 @@ export function serializeEntry(card: CardEntry) {
   return `${quant}${card.name}${set}${cn}`;
 }
 
+export function serializeMinimalEntry(card: CardEntry) {
+  const quant =
+    card.quantity !== undefined && card.quantity > 1
+      ? `${card.quantity}${card.name.length > 0 ? ' ' : ''}`
+      : ''
+  return `${quant}${card.name}`
+}
+
 
 export function parseEntry(input: string): CardEntry {
   const separator = " "

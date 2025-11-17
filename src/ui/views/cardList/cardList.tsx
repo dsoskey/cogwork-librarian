@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { SettingsContext } from '../../settingsContext'
 import { useLocalStorage } from '../../../api/local/useLocalStorage'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -8,7 +8,7 @@ import "./cardList.css";
 import { TwoPanelLayout } from '../../layout/twoPanelLayout'
 import { SearchHoverActions } from '../../cardBrowser/cardViews/searchHoverActions'
 import { useSearchParams } from 'react-router-dom'
-import { bytesToString, stringToBytes } from '../../../encoding'
+import { b64decode, b64encode } from '../../../encoding'
 import { Checkbox } from '../../component/checkbox/checkbox'
 import { LoaderText } from '../../component/loaders'
 import { TextEditor } from '../../component/editor/textEditor'
@@ -18,6 +18,11 @@ import {
   CopyToClipboardButton,
   LINK_BUTTON_ICONS,
 } from '../../component/copyToClipboardButton'
+import {
+  parseEntry,
+  serializeMinimalEntry,
+} from '../../../api/local/types/cardEntry'
+import { BoneIcon } from '../../icons/bone'
 
 const placeholder =
 `Enter one card per line.
@@ -31,14 +36,14 @@ shock
 export function CardList() {
   const { lineHeight } = useContext(SettingsContext);
 
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cards-per-row', 4)
   const [showQuantity, setShowQuantity] = useLocalStorage('showQuantity', true);
   const [listText, setListText] = useLocalStorage<string[]>('list-text' , [''], (localStorageData) => {
     const encodedString = searchParams.get('s')
     if (encodedString) {
-      return bytesToString(encodedString).split('\n')
+      return b64decode(encodedString).split('\n')
     }
     return localStorageData
   });
@@ -55,15 +60,22 @@ export function CardList() {
     return cogDB.bulkGetList(debounced);
   }, [debounced]);
 
-  const getShareLink = () => {
-    const url = `${window.location.protocol}//${
-      window.location.host
-    }/list?s=${stringToBytes(listText.join('\n'))}`
-    if (url.length > 8000) {
-      throw Error('share link is too long')
-    }
-    return url.toString()
+  const handleSimplify = () => {
+    handleListTextChange(listText.map(parseEntry).map(serializeMinimalEntry))
   }
+
+  const url = `${window.location.protocol}//${
+    window.location.host
+  }/list?s=${b64encode(listText.join('\n'))}`
+  const urlTooLong = url.length > 12000
+
+  useEffect(() => {
+    if (urlTooLong) {
+      setSearchParams({})
+    } else {
+      setSearchParams({ s: b64encode(listText.join('\n')) })
+    }
+  }, [debounced])
 
   const cardQuantity = totalCardQuantity(listText)
   return (
@@ -81,15 +93,19 @@ export function CardList() {
           settingsButton={
             <>
               <CopyToClipboardButton
-                copyText={getShareLink}
+                copyText={url}
                 buttonText={LINK_BUTTON_ICONS}
                 className='square'
+                disabled={urlTooLong}
                 titleText={{
-                  unstarted: 'copy share link to clipboard',
-                  success: 'copied successfully!',
-                  error: 'there was an error copying',
+                  unstarted: urlTooLong
+                    ? 'list too long to share'
+                    : 'copy share link to clipboard',
                 }}
               />
+              <button onClick={handleSimplify} title="simplify list (helps reduce bigger lists below url limit)">
+                <BoneIcon />
+              </button>
               <div className='pad-200'>
                 {cardQuantity} card{cardQuantity !== 1 ? 's' : ''}
               </div>

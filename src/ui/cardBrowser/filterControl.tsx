@@ -3,16 +3,17 @@ import { Input } from '../component/input'
 import { Setter } from '../../types'
 import { ErrorIcon } from '../icons/error'
 
-export interface HighlightFilterControlProps {
+export interface FilterControlProps {
   filterQuery: string
   setFilterQuery: Setter<string>
   highlightError: string
+  label?: string
 }
 
-export function HighlightFilterControl({ filterQuery, setFilterQuery, highlightError }: HighlightFilterControlProps) {
+export function FilterControl({ label = 'filter:', filterQuery, setFilterQuery, highlightError }: FilterControlProps) {
 
-  return <label className='highlight-filter-root row center'>
-    <span className='bold'>Highlight:</span>
+  return <label className='filter-root row center'>
+    <span className='bold'>{label}</span>
     <Input
       language="scryfall"
       value={filterQuery}

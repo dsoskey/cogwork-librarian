@@ -42,7 +42,7 @@ describe('parseEntry', () => {
       input: '3 Phyrexian Metamorph (PNPH) 42★ *F*',
       expected: {
         quantity: 1,
-        name: 'Phyrexian Metamorph (PNPH) 42★ *F*',
+        name: 'Phyrexian Metamorph',
         set: 'PNPH',
         cn: '42★',
         finish: '*F*',

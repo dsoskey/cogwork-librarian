@@ -23,7 +23,7 @@ textarea.coglib-prism-theme {
 }
 
 .text-editor-root {
-  --toolbar-height: 24px;
+  --toolbar-height: 28px;
   --gutter-width: 0.25em;
   --editor-line-height: 1.25;
   height: max-content;

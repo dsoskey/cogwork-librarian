@@ -40,7 +40,6 @@
     display:flex;
     flex-direction: column;
     padding: var(--spacing-100);
-    /*background-color: lime;*/
     gap: var(--spacing-300);
     border: 1px solid var(--dark-color);
 
@@ -49,10 +48,12 @@
         align-self: center;
         margin-left: var(--spacing-200);
     }
+
     .drag-handle {
         cursor: grab;
         font-weight: bolder;
     }
+
     .drag-handle.active {
         cursor: grabbing;
     }

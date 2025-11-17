@@ -1,42 +1,45 @@
-import { Card, QueryRunner } from 'mtgql'
-import { useEffect, useState } from 'react'
+import { Card, QueryRunner, SearchError } from 'mtgql'
+import { useEffect, useRef, useState } from 'react'
 import { COGDB_FILTER_PROVIDER } from '../../api/local/db'
 
 
-export function useHighlightFilter(query: string, submittedQueries: string[] = []) {
+export function useHighlightFilter(query: string, submittedQueries?: string[], defaultFilterState = false) {
   const [highlightFilter, setHighlightFilter] = useState<(card: Card) => boolean>(
-    () => () => false
+    () => () => defaultFilterState
   )
-  const [error, setError] = useState<string>("")
+  const timeout = useRef();
+  const [error, setError] = useState<SearchError | undefined>()
 
   useEffect(() => {
-    setError("");
+    setError(undefined);
     if (query.length === 0) {
-      setHighlightFilter(() => () => false);
+      setHighlightFilter(() => () => defaultFilterState)
       return;
     }
 
     let queryToRun = query;
-    if (/^@\d+$/.test(query)) {
+    if (submittedQueries && /^@\d+$/.test(query)) {
       const index = parseInt(query.replace("@", ""))
       if (index >= 0 && index < submittedQueries.length) {
         queryToRun = submittedQueries[index];
       }
     }
-    // probably needs a debounce
-    (async () => {
+    timeout.current = setTimeout(async () => {
       try {
-        const nextHighlightFilter = await QueryRunner
-          .singleCardFilter(queryToRun, COGDB_FILTER_PROVIDER)
+        timeout.current = undefined;
+        const nextHighlightFilter = await QueryRunner.singleCardFilter(
+          queryToRun,
+          COGDB_FILTER_PROVIDER
+        )
         // must use function syntax otherwise setter tries to evaluate function
         setHighlightFilter((_) => nextHighlightFilter)
       } catch (e) {
-        console.error(error);
-        setError(JSON.stringify(e));
-        setHighlightFilter((_) => () => false);
+        console.error(e as SearchError)
+        setError(e as SearchError)
+        setHighlightFilter((_) => () => defaultFilterState)
       }
-    })()
-  }, [query, submittedQueries])
+    }, 200)
+  }, [query, submittedQueries, defaultFilterState])
 
   return {
     highlightFilter,

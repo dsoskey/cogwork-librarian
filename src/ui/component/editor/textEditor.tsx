@@ -104,7 +104,7 @@ export const TextEditor = ({
 }: TextEditorProps) => {
   const separator = "\n";
   const hasToolbar = enableLinkOverlay || enableCopyButton || settingsButton !== undefined;
-  const toolbarHeight = hasToolbar ? 24:0;
+  const toolbarHeight = hasToolbar ? 28:0;
   const value = queries.join(separator);
   const controller = useRef<HTMLTextAreaElement>(null);
   const faker = useRef<HTMLPreElement>(null);
