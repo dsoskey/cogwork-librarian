@@ -162,7 +162,7 @@ export const BrowserView = React.memo(({
           label="Highlight:"
           filterQuery={filterQuery}
           setFilterQuery={setFilterQuery}
-          highlightError={highlightError.message}
+          highlightError={highlightError?.message ?? ""}
         />}
         displayTypesControl={displayTypesControl}
         lastQueries={lastQueries}
