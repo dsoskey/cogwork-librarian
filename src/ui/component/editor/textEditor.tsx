@@ -162,7 +162,7 @@ export const TextEditor = ({
         }
       }
 
-      if (event.shiftKey && event.key === "'") {
+      if (event.shiftKey && ['"', "'"].includes(event.key)) {
         setSeparateLayers((prev) => !prev);
       }
     }

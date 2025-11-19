@@ -8,7 +8,7 @@
   word-spacing: normal;
   word-break: normal;
   word-wrap: normal;
-  line-height: var(--editor-line-height, 1.5);
+  line-height: var(--editor-line-height, 1.25);
   overflow: auto;
   border: none;
 }
@@ -87,11 +87,8 @@ textarea.coglib-prism-theme {
     flex-direction: column;
     cursor: default;
     background-color: var(--darker-color);
-    padding-right: 0;
-    padding-left: 0;
-    padding-bottom: 0;
-    padding-top: var(--toolbar-height, 1em);
-
+    line-height: var(--editor-line-height, 1.25);
+    padding: var(--toolbar-height, 1em) 0 0;
     overflow: hidden;
     height: fit-content;
 
@@ -112,7 +109,7 @@ textarea.coglib-prism-theme {
       word-spacing: normal;
       word-break: normal;
       word-wrap: normal;
-      line-height: var(--editor-line-height);
+      line-height: var(--editor-line-height, 1.25);
       tab-size: 4;
       hyphens: none;
     }
@@ -170,6 +167,8 @@ textarea.coglib-prism-theme {
     margin: 0;
     position: relative;
     cursor: pointer;
+    height: 18px;
+    width: 18px;
     min-width: unset;
     min-height: unset;
     aspect-ratio: 1/1;
