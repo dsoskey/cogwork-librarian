@@ -29,6 +29,7 @@ textarea.coglib-prism-theme {
   height: max-content;
   display: grid;
   position: relative;
+  box-sizing: border-box;
   background-color: var(--darker-color);
   grid-template-columns: auto auto 1fr;
   grid-template-rows: 1fr;
@@ -222,6 +223,8 @@ textarea.coglib-prism-theme {
     display: inline-block;
     grid-area: overlap;
     padding-bottom: var(--spacing-100);
+
+    overflow: hidden;
 
 
     a {

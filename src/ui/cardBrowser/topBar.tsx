@@ -140,12 +140,12 @@ export const TopBar = ({
         </div>)}
       </div>
       {status === 'success' && vennControl}
-      <div className='result-controls'>
+      {status === 'success' && <div className='result-controls'>
         {pageControl}
         {downloadButton}
         {displayTypesControl}
         {cardsPerRowControl}
-      </div>
+      </div>}
     </div>
   )
 }

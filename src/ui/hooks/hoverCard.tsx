@@ -10,7 +10,7 @@ const MAX_CARD_HEIGHT = 350;
 
 export function useHoverCard() {
   const [mouseLast, setMouseLast] = useState({ x:0, y:0 });
-  const handleHover = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleHover = (e: React.MouseEvent) => {
     setMouseLast({ x: e.clientX, y: e.clientY });
   }
 

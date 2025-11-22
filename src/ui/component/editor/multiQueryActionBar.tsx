@@ -52,9 +52,9 @@ interface LineInfo {
 }
 
 export function goodLineQuery(queries: string[]): LineInfo[] {
-    if (queries.length === 0) {
-      return [];
-    }
+    if (queries.length === 0) return [];
+    if (typeof queries[0] === 'object') return [];
+
     const result: LineInfo[] = [];
 
     let querySetCount = 0;
@@ -130,13 +130,14 @@ export interface MultiQueryInfoBarProps {
   onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
   gutterColumns: GutterColumn[];
+  highlightedRow?: number;
+  setHighlightedRow?: (e: React.MouseEvent, newNumber: number) => void;
   indexStart?: number;
-  hoverIndex?: number
 }
 export const MultiQueryActionBar = React.memo(({
   queries,
   copyText,
-  hoverIndex,
+  highlightedRow, setHighlightedRow,
   renderQuery = goodLineQuery,
   indexStart = 0,
   ...rest
@@ -165,8 +166,11 @@ export const MultiQueryActionBar = React.memo(({
           index={index}
           indexStart={indexStart}
           numDigits={numDigits}
+          highlighted={index === highlightedRow}
+          onHover={setHighlightedRow ? (e) => {
+            setHighlightedRow(e, index)
+          } : undefined}
           onClickLine={onClickLine(index)}
-          highlight={hoverIndex === index}
           {...rest}
         />)
       )}
@@ -181,19 +185,20 @@ interface ActionLineProps {
   onClickLine?: () => void;
   gutterColumns: GutterColumn[];
   numDigits: number;
+  highlighted?: boolean;
+  onHover?: (e: React.MouseEvent) => void;
   onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
-  highlight?: boolean;
 }
 
-function ActionLine({ line, index, highlight, indexStart, gutterColumns, onClickLine, numDigits, onSubmit, canSubmit }: ActionLineProps) {
+function ActionLine({ highlighted, onHover, line, index, indexStart, gutterColumns, onClickLine, numDigits, onSubmit, canSubmit }: ActionLineProps) {
   const { text, type } = line;
   const columns: React.ReactNode[] = [];
   for (const column of gutterColumns) {
     switch (column) {
       case "line-numbers":
         columns.push(<code
-          className={`line-number ${type} ${highlight ? 'highlight' : ""}`}>
+          className={`line-number ${highlighted ? "highlight" : ""} ${type}`}>
           {`${(index + 1 + indexStart).toString().padStart(numDigits)} `}
         </code>);
         break;
@@ -225,6 +230,7 @@ function ActionLine({ line, index, highlight, indexStart, gutterColumns, onClick
     }
   }
   return <div
+    onMouseMove={onHover}
     key={index}
     className={type.toLowerCase()}
     onClick={onClickLine}

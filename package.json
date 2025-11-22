@@ -27,7 +27,6 @@
   "homepage": "https://coglib.sosk.watch",
   "devDependencies": {
     "@dep-tree/cli": "^0.19.6",
-    "@leetcode/nearley-loader": "^2.1.0",
     "@space-cow-media/spellbook-client": "^4.2.0",
     "@testing-library/react-hooks": "^7.0.2",
     "@types/lodash": "^4.14.175",
@@ -66,7 +65,7 @@
     "micromark-util-character": "^2.1.0",
     "micromark-util-chunked": "^2.0.0",
     "micromark-util-symbol": "^2.0.0",
-    "mtgql": "^3.2.7",
+    "mtgql": "3.2.8",
     "prismjs": "^1.29.0",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",

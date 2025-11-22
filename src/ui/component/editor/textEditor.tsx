@@ -115,8 +115,14 @@ export const TextEditor = ({
   const [hoverIndex, setHoverIndex] = useState<number>(-1);
   const { handleHover: handleHoverCard, mouseLast } = useHoverCard();
   const hoveredLine = queries[hoverIndex];
+  const hoverOverIndex = (e: React.MouseEvent, index: number) => {
+    setHoverIndex(index);
+    handleHoverCard(e);
+  }
 
   const handleHover = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target.rows === undefined) return;
+
     const boundingBox = e.currentTarget.getBoundingClientRect();
     const lineheight =  parseInt(window.getComputedStyle(e.target).getPropertyValue("line-height"));
     const top = e.currentTarget.scrollTop;
@@ -124,8 +130,11 @@ export const TextEditor = ({
     const editorY = e.clientY - boundingBox.top;
     const relativeMouse = editorY + top - toolbarHeight
     const index = Math.floor(queries.length * relativeMouse / (editorHeight));
-    setHoverIndex(index);
-    handleHoverCard(e);
+    hoverOverIndex(e, index);
+  }
+
+  const handleMouseLeave = () => {
+    setHoverIndex(-1)
   }
 
   const handleDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -231,7 +240,7 @@ export const TextEditor = ({
         "--toolbar-height": toolbarHeight.toString() + "px",
       }}
       onMouseMove={handleHover}
-      onMouseLeave={() => setHoverIndex(-1)}
+      onMouseLeave={handleMouseLeave}
     >
       <MultiQueryActionBar
         queries={queries}
@@ -239,7 +248,8 @@ export const TextEditor = ({
         onSubmit={onSubmit}
         canSubmit={canSubmit}
         gutterColumns={gutterColumns}
-        hoverIndex={hoverIndex}
+        highlightedRow={hoverIndex}
+        setHighlightedRow={hoverOverIndex}
       />
       <div className="editor-controls">
         {enableLinkOverlay && <button
