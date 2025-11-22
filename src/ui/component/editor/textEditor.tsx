@@ -107,7 +107,6 @@ export const TextEditor = ({
   const hasToolbar = enableLinkOverlay || enableCopyButton || settingsButton !== undefined;
   const toolbarHeight = hasToolbar ? 28:0;
   const value = queries.join(separator);
-  const rootRef = useRef<HTMLDivElement>(null);
   const controller = useRef<HTMLTextAreaElement>(null);
   const faker = useRef<HTMLPreElement>(null);
   const linker = useRef<HTMLPreElement>(null);
@@ -235,7 +234,7 @@ export const TextEditor = ({
   }
   React.useLayoutEffect(() => {
     syncLayerHeights();
-    Prism.highlightAllUnder(rootRef.current)
+    Prism.highlightAll()
   }, [value, lineHeight]);
 
   useEffect(() => {
@@ -250,7 +249,6 @@ export const TextEditor = ({
   }, [revealLinks]);
   return (
     <div
-      ref={rootRef}
       className={`text-editor-root focusable ${separateLayers ? "separated" : ""}` + className}
       onKeyDown={handleDown}
       style={{
