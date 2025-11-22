@@ -16,7 +16,6 @@ textarea.coglib-prism-theme {
   padding-top: var(--toolbar-height, 1em);
   padding-right: 1em;
   padding-left: var(--gutter-width, 1em);
-  padding-bottom: var(--spacing-100);
   margin-top: 0.5em;
   margin-right: 0;
   margin-left: 0;

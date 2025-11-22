@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB, QueryHistory } from '../api/local/db'
 import { useHighlightPrism } from '../api/local/syntaxHighlighting'
@@ -36,13 +36,14 @@ interface HistoryItemProps {
 }
 const HistoryItem = ({ history }: HistoryItemProps) => {
   const [expanded, setExpanded] = useState<boolean>(false)
+  const ref = useRef<HTMLDivElement>()
 
   const toDisplay = expanded ? displayFullQuery(history) : displayQuery(history)
-  useHighlightPrism([expanded])
+  useHighlightPrism(ref.current, [expanded])
 
   return <div>
     <div>{history.executedAt.toLocaleString()}</div>
-    <div className='text-editor-root'>
+    <div className='text-editor-root' ref={ref}>
       <MultiQueryActionBar
         queries={toDisplay}
         copyText={() => {

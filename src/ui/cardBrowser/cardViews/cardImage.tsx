@@ -20,9 +20,10 @@ interface CardImageProps {
   altImageUri?: string
   altImageBackUri?: string
   highlight?: boolean
+  showBothSides?: boolean
 }
 
-export const CardImage = ({ card, altImageUri, altImageBackUri, highlight }: CardImageProps) => {
+export const CardImage = ({ card, altImageUri, altImageBackUri, highlight, showBothSides }: CardImageProps) => {
   const { edhrecOverlay } = useContext(FlagContext).flags;
   const [transformed, setTransformed] = useState(false);
   const [flipped, setFlipped] = useState(false);
@@ -37,7 +38,7 @@ export const CardImage = ({ card, altImageUri, altImageBackUri, highlight }: Car
     setFlipped(prev => !prev)
   }
   const version = 'normal'
-  return <div className={`card-image ${card.set}`}>
+  return <div className={`card-image ${card.set} ${canTransform && showBothSides ?'sidebyside' : ""}`}>
     <img
       className={`front ${flipped ? "flipped" : ""} ${canTransform && transformed ? "transformed" : ""}`}
       width='100%'
@@ -49,7 +50,21 @@ export const CardImage = ({ card, altImageUri, altImageBackUri, highlight }: Car
         // load local backup
       }}
     />
-    {canTransform &&
+    {canTransform && showBothSides &&
+      <img
+        className={`back transformed`}
+        width='100%'
+        src={altImageBackUri ?? getBackImageURI(card, version)}
+        alt={card.name}
+        title={card.name}
+        loading={"lazy"}
+        onError={() => {
+          // load local backup
+        }}
+      />
+    }
+
+    {canTransform && !showBothSides &&
       <img
         className={`back ${canTransform && transformed ? "transformed" : ""}`}
         width='100%'
@@ -62,7 +77,7 @@ export const CardImage = ({ card, altImageUri, altImageBackUri, highlight }: Car
         }}
       />
     }
-    {canTransform && (
+    {canTransform && !showBothSides &&  (
       <button
         className='transform-button'
         data-transformed={transformed}

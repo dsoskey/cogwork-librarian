@@ -53,13 +53,14 @@ const LandingPage = () => {
 }
 export const DocsView = () => {
   const { pathname, hash } = useLocation()
+  const ref = useRef<HTMLDivElement>()
   useEffect(() => {
     const element = document.getElementById(hash ? hash.slice(1) : "page-title");
     element?.scrollIntoView({ behavior: 'smooth' });
   }, [hash]);
 
-  useHighlightPrism([pathname])
-  return <div className='docs-view'>
+  useHighlightPrism(ref.current, [pathname])
+  return <div className='docs-view' ref={ref}>
     <Masthead />
     <NavBar />
     <main className='docs-content'>

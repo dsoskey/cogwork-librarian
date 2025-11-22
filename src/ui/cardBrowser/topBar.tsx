@@ -1,10 +1,9 @@
 import { LoaderBar } from '../component/loaders'
 import { QUERIES, WEIGHT } from './constants'
-import React, { useCallback, useContext, useMemo } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { DataSource, Setter, TaskStatus } from '../../types'
 import { QueryReport } from '../../api/useReporter'
 import { CogError } from '../../error'
-import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { FlagContext } from '../flags'
 import './topBar.css'
 import { SearchError } from '../component/searchError'
@@ -49,11 +48,6 @@ export const TopBar = ({
   errors,
 }: TopBarProps) => {
   const { showDebugInfo } = useContext(FlagContext).flags
-  const errorText = useMemo(
-    () => errors.map((it) => `- ${it.displayMessage}`).join('\n\n'),
-    [errors]
-  )
-  useHighlightPrism([errorText, status])
   const toggleBase = (value: string) => () => {
     setVisibleDetails((prev) => {
       const next = new Set(prev)

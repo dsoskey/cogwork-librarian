@@ -1,9 +1,9 @@
 import React, { ChangeEventHandler, HTMLAttributes, useEffect, useRef, useState } from 'react'
 import {
   Language,
-  useHighlightPrism,
 } from '../../api/local/syntaxHighlighting'
 import "./input.css"
+import Prism from 'prismjs'
 
 export interface InputProps extends HTMLAttributes<HTMLInputElement> {
   value: string
@@ -12,16 +12,16 @@ export interface InputProps extends HTMLAttributes<HTMLInputElement> {
   placeholder?: string
 }
 
-export const Input = React.forwardRef<HTMLDivElement, InputProps>(({ value, onChange, language, placeholder, ...rest }: InputProps, parentRef) => {
+export function Input({ value, onChange, language, placeholder, ...rest }: InputProps) {
   const controller = useRef<HTMLInputElement>()
   const faker = useRef<HTMLPreElement>()
   const linker = useRef<HTMLPreElement>()
+  const ref = useRef<HTMLDivElement>()
   const [revealLinks, setRevealLinks] = useState<boolean>(false)
   const onScroll = (event) => {
     faker.current.scrollLeft = event.target.scrollLeft
     linker.current.scrollLeft = event.target.scrollLeft
   }
-  useHighlightPrism([value, revealLinks, language]);
   React.useLayoutEffect(() => {
     if (revealLinks) {
       linker.current?.querySelectorAll('a').forEach(qs => {
@@ -32,7 +32,8 @@ export const Input = React.forwardRef<HTMLDivElement, InputProps>(({ value, onCh
         qs.tabIndex = -1;
       })
     }
-  })
+    Prism.highlightAllUnder(ref.current)
+  }, [value, revealLinks, language]);
 
   useEffect(() => {
     controller.current?.addEventListener('scroll', onScroll)
@@ -52,30 +53,31 @@ export const Input = React.forwardRef<HTMLDivElement, InputProps>(({ value, onCh
   const displayValue = value.length > 0 ? value : placeholder
 
   return (
-    <div className='text-editor-root query-input' onKeyDown={handleDown} ref={parentRef}>
-      <input
-        {...rest}
-        ref={controller}
-        className={`controller coglib-prism-theme ${rest.className}`}
-        value={value}
-        onChange={onChange}
-      />
-      {revealLinks && <pre
-        ref={linker}
-        tabIndex={-1}
-        aria-hidden
-        className={`language-${language ?? 'none'}-links links show`}
-      >
+      <div className='text-editor-root query-input' onKeyDown={handleDown} ref={ref}>
+        <input
+          {...rest}
+          ref={controller}
+          className={`controller coglib-prism-theme ${rest.className}`}
+          value={value}
+          onChange={onChange}
+        />
+        {revealLinks && <pre
+          ref={linker}
+          tabIndex={-1}
+          aria-hidden
+          className={`language-${language ?? 'none'}-links links show`}
+        >
         <code>{displayValue}</code>
       </pre>}
-      <pre
-        ref={faker}
-        tabIndex={-1}
-        aria-hidden
-        className={`language-${language ?? 'none'} display`}
-      >
+        <pre
+          ref={faker}
+          tabIndex={-1}
+          aria-hidden
+          className={`language-${language ?? 'none'} display`}
+        >
         <code>{displayValue}</code>
       </pre>
-    </div>
+      </div>
+
   )
-})
+}

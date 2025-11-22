@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { ObjectValues, Setter, TaskStatus } from '../../types'
 import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
 import { ScryfallImporter, ScryfallImporterProps } from './scryfallImporter'
@@ -54,9 +54,10 @@ const TargetCheckbox = ({ importTargets, setImportTargets, target }: TargetCheck
 }
 
 const ManifestView = ({ manifest }: { manifest: Collection }) => {
-  useHighlightPrism([manifest.filter]);
+  const ref = useRef<HTMLDivElement>()
+  useHighlightPrism(ref.current, [manifest.filter]);
   return <>
-    <div>
+    <div ref={ref}>
       <span className="bold">source: </span>
       <code>{manifest.bulkUrl
         ? <a href={manifest.bulkUrl}>{manifest.name}</a>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from 'react'
 import { goodLineQuery, MultiQueryActionBar } from '../component/editor/multiQueryActionBar'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { ArrowInIcon, ArrowOutIcon } from '../icons/arrows'
@@ -12,6 +12,7 @@ export interface LastQueryDisplayProps {
 
 export function LastQueryDisplay({ selectBox, lastQueries, editorControls }: LastQueryDisplayProps) {
   const [expanded, setExpanded] = useLocalStorage("last-query-expand", true);
+  const ref = useRef<HTMLDivElement>(null);
   if (lastQueries.length === 0)
     return null;
 
@@ -24,9 +25,9 @@ export function LastQueryDisplay({ selectBox, lastQueries, editorControls }: Las
     }
   }
 
-  useHighlightPrism([expanded, toDisplay]);
+  useHighlightPrism(ref.current, [expanded, toDisplay]);
 
-  return <div className="text-editor-root">
+  return <div className="text-editor-root" ref={ref}>
     <MultiQueryActionBar
       queries={toDisplay}
       copyText={()=>{}}

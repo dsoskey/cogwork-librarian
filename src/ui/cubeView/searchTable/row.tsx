@@ -1,11 +1,9 @@
 import { ColorBreakdown } from '../cubeTags'
 import React, { HTMLProps, useEffect, useRef, useState } from 'react'
 import { Card, SearchError, SearchOptions } from 'mtgql'
-import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
 import { Modal } from '../../component/modal'
 import { OrderedCard } from '../useCubeViewModel'
 import { Input } from '../../component/input'
-import { Dictionary } from 'lodash'
 import { getColors } from './tempColorUtil'
 
 export enum CellDisplayMode {

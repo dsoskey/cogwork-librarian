@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Language, useHighlightPrism } from "../../../api/local/syntaxHighlighting";
+import { Language } from "../../../api/local/syntaxHighlighting";
 import { MultiQueryActionBar } from "./multiQueryActionBar";
 import "./textEditor.css";
 import { RectangleIcon } from '../../icons/rectangle'
 import { RectangleCloseIcon } from '../../icons/rectangleClose'
 import { COPY_BUTTON_ICONS, CopyToClipboardButton } from '../copyToClipboardButton'
 import { HoverCard, useHoverCard } from '../../hooks/hoverCard'
+import Prism from 'prismjs'
 
-const MIN_TEXTAREA_HEIGHT = 32;
+const MIN_TEXTAREA_HEIGHT = 16;
 
 export const findQueryIndex = (
   value: string,
@@ -106,6 +107,7 @@ export const TextEditor = ({
   const hasToolbar = enableLinkOverlay || enableCopyButton || settingsButton !== undefined;
   const toolbarHeight = hasToolbar ? 28:0;
   const value = queries.join(separator);
+  const rootRef = useRef<HTMLDivElement>(null);
   const controller = useRef<HTMLTextAreaElement>(null);
   const faker = useRef<HTMLPreElement>(null);
   const linker = useRef<HTMLPreElement>(null);
@@ -191,26 +193,35 @@ export const TextEditor = ({
     controller.current?.setSelectionRange(mindex, maxdex);
   }, []);
 
-  useHighlightPrism([value, revealLinks, language]);
-  React.useLayoutEffect(() => {
+  const syncLayerHeights = () => {
     // Shamelessly stolen from https://stackoverflow.com/a/65990608
     // Reset height - important to shrink on delete
+    if (!controller.current) return
     controller.current!.style.height = "inherit";
     faker.current!.style.height = "inherit";
     if (linker.current) {
       linker.current!.style.height = "inherit";
     }
     // Set height
-    const newHeight = `${Math.max(
-      controller.current?.scrollHeight ?? 0,
+
+    const { height } = controller.current!.getBoundingClientRect();
+    const scrollbarHeight = height ? height - controller.current!.clientHeight : 0;
+    const newHeight0 = Math.max(
       MIN_TEXTAREA_HEIGHT,
-    )}px`;
+      scrollbarHeight,
+      controller.current!.scrollHeight
+    ) + scrollbarHeight
+    const newHeight = `${newHeight0}px`;
+    const shouldScroll = Math.abs(newHeight0 - parseInt(controller.current!.style.height)) < 0.001;
     controller.current!.style.height = newHeight;
     faker.current!.style.height = newHeight;
     if (linker.current) {
       linker.current.style.height = newHeight;
     }
-    onScroll({ target: controller.current });
+
+    if (shouldScroll) {
+      onScroll({ target: controller.current });
+    }
 
     if (revealLinks) {
       linker.current?.querySelectorAll('a').forEach(qs => {
@@ -221,18 +232,25 @@ export const TextEditor = ({
         qs.tabIndex = -1;
       })
     }
+  }
+  React.useLayoutEffect(() => {
+    syncLayerHeights();
+    Prism.highlightAllUnder(rootRef.current)
   }, [value, lineHeight]);
 
   useEffect(() => {
     controller.current?.addEventListener("scroll", onScroll);
     linker.current?.addEventListener("scroll", onScroll);
+    window.addEventListener("resize", syncLayerHeights);
     return () => {
       controller.current?.removeEventListener("scroll", onScroll);
       linker.current?.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", syncLayerHeights);
     };
   }, [revealLinks]);
   return (
     <div
+      ref={rootRef}
       className={`text-editor-root focusable ${separateLayers ? "separated" : ""}` + className}
       onKeyDown={handleDown}
       style={{

@@ -17,11 +17,11 @@ export function useCardLoader(name: string, id?: string) {
     null)
 }
 
-export function _CardImage({ card, name, nameFallback = true }) {
+export function _CardImage({ card, name, nameFallback = true, showBothSides= false }) {
   return <span className="card-image-container">
     {card === null && <span><LoaderText text={""} timeout={100} frames={TRIANGLES} /></span>}
     {card === undefined && nameFallback && name}
-    {card && <CardImage card={card} />}
+    {card && <CardImage card={card} showBothSides={showBothSides} />}
   </span>
 }
 export function MDCardImage ({ name, id }) {

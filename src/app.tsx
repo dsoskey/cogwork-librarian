@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { AppInfo, WhatsNext } from './ui/views/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
 import { Navigate, Route, Routes, useLocation } from 'react-router'
 import { SavedCardsEditor } from './ui/savedCards'
-import { ToasterMessage, Toaster, ToasterContext } from './ui/component/toaster'
-import { v4 as uuidv4 } from 'uuid'
+import { Toaster, ToasterContext, useToaster
+} from './ui/component/toaster'
 import { SearchView } from './ui/searchView'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
 import { DocsView } from './ui/docs/docsView'
@@ -48,18 +48,8 @@ export const App = () => {
     toggleIgnoreId, ignoredIds
   } = project
   const [showSavedCards, setShowSavedCards] = useLocalStorage<boolean>('showSavedCards', true)
+  const toaster = useToaster()
 
-
-  const [messages, setMessages] = useState<ToasterMessage[]>([])
-  const addMessage = useCallback((text: string, dismissible: boolean) => {
-    const message: ToasterMessage = { id: uuidv4(), text, dismissible }
-    setMessages(prev => [...prev, message])
-    return message.id
-  }, [setMessages])
-  const dismissMessage = useCallback((messageId: string) => {
-    setMessages(prev => prev.filter(it => it.id !== messageId))
-  }, [setMessages])
-  const toasterValue = useMemo(() => ({ messages, addMessage, dismissMessage }), [messages, addMessage, dismissMessage])
   useEffect(() => {
     cogDB.resetDB()
     Prism.hooks.add('complete', hookContextMenu(setCubeContext))
@@ -71,7 +61,7 @@ export const App = () => {
         <ListImporterContext.Provider value={listImporter}>
           <BulkCubeImporterContext.Provider value={bulkCubeImporter}>
             <ProjectContext.Provider value={project}>
-              <ToasterContext.Provider value={toasterValue}>
+              <ToasterContext.Provider value={toaster}>
                 <ErrorBoundary FallbackComponent={RenderErrorFallback}>
                   <div className='root' onClick={handleClickOutsideContextMenu}>
                     <Routes>

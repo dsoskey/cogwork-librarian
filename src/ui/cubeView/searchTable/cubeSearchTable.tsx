@@ -43,7 +43,6 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
         cards: [],
     });
   const { ordering, setOrdering, sorted } = useCubeSort(cardsToShow.cards)
-
     const setCardsToShow = (p) => {
         _setCardsToShow(p);
         setTimeout(() => {
@@ -54,7 +53,6 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
             })
         }, 200)
     }
-    useHighlightPrism([cardsToShow])
 
     const [queries, setQueries] = useLocalStorage(`cube-table-queries-${cube.key}`, DEFAULT_QUERIES);
     const setQuery = (index: number, nextQuery: string) => {
@@ -148,6 +146,8 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
             });
         }
     }
+
+    useHighlightPrism(topOfResults.current, [cardsToShow])
 
     return (
       <div className='cube-search-table-root'>

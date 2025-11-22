@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 import { QueryReport } from '../../api/useReporter'
 import { DataSource } from '../../types'
 import { CogError } from '../../error'
-import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 
 export interface SearchErrorProps {
   report: QueryReport

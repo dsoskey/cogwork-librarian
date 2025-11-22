@@ -1,9 +1,10 @@
 import { downloadText } from '../download'
 import { EnrichedCard } from '../../api/queryRunnerCommon'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { useCopyToClipboard } from './copyToClipboardButton'
 import { Card } from 'mtgql'
+import { ToasterContext } from './toaster'
 
 export interface ExportWidgetProps {
   searchResult: Array<EnrichedCard>
@@ -21,6 +22,7 @@ export function ExportWidget({
   lastQueries,
   addCards,
 }: ExportWidgetProps) {
+  const { addMessage } = useContext(ToasterContext);
   const [action, setAction] = useLocalStorage<ExportAction>('export-action', 'save')
 
   const [value, setValue] = useState<number>(NaN)
@@ -63,6 +65,7 @@ export function ExportWidget({
         )
         break
     }
+    addMessage(`Added ${Math.min(sliceCount, searchResult.length)} cards to saved cards.`)
   }
 
   const handleExportJson = () => {

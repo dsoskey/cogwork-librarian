@@ -4,6 +4,7 @@ import { useViewportListener } from './useViewportListener'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { parseEntry } from '../../api/local/types/cardEntry'
 import { cogDB } from '../../api/local/db'
+import { DOUBLE_FACED_LAYOUTS } from 'mtgql'
 
 const CARD_RATIO = 2.5/3.5;
 const MAX_CARD_HEIGHT = 350;
@@ -33,6 +34,8 @@ export function HoverCard({ cursorDistance = 5, cardName, mouseLast }: HoverCard
     const { name, set, cn } = parseEntry(cardName);
     return cogDB.getCardByName(name, set, cn);
   }, [cardName]);
+  const canTransform = card ? DOUBLE_FACED_LAYOUTS.includes(card.layout): false;
+  const width = canTransform ? cardWidth * 2 : cardWidth
 
   return <div style={{
     position: 'fixed',
@@ -43,9 +46,10 @@ export function HoverCard({ cursorDistance = 5, cardName, mouseLast }: HoverCard
       : mouseLast.y - cursorDistance - cardHeight,
     left: mouseLast.x < viewport.width / 2
       ? mouseLast.x + cursorDistance
-      : mouseLast.x - cursorDistance - cardWidth,
-    width: cardWidth, height: cardHeight,
+      : mouseLast.x - cursorDistance - width,
+    width,
+    height: cardHeight,
   }}>
-    <_CardImage card={card} nameFallback={false} />
+    <_CardImage card={card} name={""} nameFallback={false} showBothSides />
   </div>
 }

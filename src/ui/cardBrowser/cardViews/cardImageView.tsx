@@ -54,6 +54,7 @@ export const CardImageView = ({
     switch (event.key.toLowerCase()) {
       case 'a':
         onAdd?.();
+        event.preventDefault();
         break;
       default:
         break;

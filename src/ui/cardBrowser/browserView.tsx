@@ -11,10 +11,9 @@ import { TopBar } from './topBar'
 import { ActiveCollection, CardDisplayInfo, DisplayType } from './types'
 import { useDebugDetails } from './useDebugDetails'
 import { CogError } from '../../error'
-import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { CardJsonView } from './cardViews/cardJsonView'
 import { CardListView } from './cardViews/cardListView'
-import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
+import { ToasterContext } from '../component/toaster'
 import { useVennControl, VennControl } from './vennControl'
 import { Card } from 'mtgql'
 import { SearchHoverActions } from './cardViews/searchHoverActions'
@@ -118,8 +117,6 @@ export const BrowserView = React.memo(({
     currentPage
       .filter(it => (ROTATED_LAYOUTS.has(it.data.layout) || it.data.type_line?.includes('Battle')) && !it.data.keywords.includes('Aftermath'))
       .length === currentPage.length, [currentPage])
-
-  useHighlightPrism([result, revealDetails, visibleDetails])
 
   if (status === 'unstarted' && errors.length === 0) {
     return null
@@ -238,24 +235,18 @@ function CardResults({
   highlightFilter,
 }: CardResultsProps) {
 
-  const { addMessage, dismissMessage } = useContext(ToasterContext)
+  const { addMessage } = useContext(ToasterContext)
 
 
-  return <div className='result-container'>
+  return <div className='result-container' >
     {isCardDisplay && currentPage.map((card, index) => {
       const onAdd = () => {
         addCards(lastQueries.join("\n"), [card.data])
-        const id = addMessage(`Added ${card.data.name} to saved cards`, false)
-        setTimeout(() => {
-          dismissMessage(id)
-        }, DISMISS_TIMEOUT_MS)
+        addMessage(`Added ${card.data.name} to saved cards.`)
       }
       const onIgnore = () => {
         addIgnoredId(card.data.oracle_id)
-        const id = addMessage(`Ignored ${card.data.name} from future searches`, false)
-        setTimeout(() => {
-          dismissMessage(id)
-        }, DISMISS_TIMEOUT_MS)
+        addMessage(`Ignored ${card.data.name} from future searches.`)
       }
       return (
         <CardImageView

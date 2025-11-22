@@ -320,8 +320,9 @@ export const hookContextMenu = (setCubeContext: (id: string) => void) => (env: E
   }
 }
 
-export const useHighlightPrism = (deps: any[]) => {
+export const useHighlightPrism = (element: HTMLElement, deps: any[]) => {
   React.useLayoutEffect(() => {
-    Prism.highlightAll();
+    if (element)
+      Prism.highlightAllUnder(element);
   }, deps);
 };
