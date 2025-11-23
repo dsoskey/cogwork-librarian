@@ -114,7 +114,7 @@ export const TextEditor = ({
   const [separateLayers, setSeparateLayers] = useState<boolean>(false);
 
   const [hoverIndex, setHoverIndex] = useState<number>(-1);
-  const { handleHover: handleHoverCard, mouseLast } = useHoverCard();
+  const { handleHover: handleHoverCard, getHoverStyle } = useHoverCard();
   const hoveredLine = queries[hoverIndex];
   const hoverOverIndex = (e: React.MouseEvent, index: number) => {
     setHoverIndex(index);
@@ -320,7 +320,7 @@ export const TextEditor = ({
         <code className="match-braces">{value}</code>
       </pre>
 
-      {hoveredLine && <HoverCard cardName={hoveredLine} mouseLast={mouseLast} />}
+      {hoveredLine && <HoverCard cardName={hoveredLine} getHoverStyle={getHoverStyle} />}
     </div>
   );
 };

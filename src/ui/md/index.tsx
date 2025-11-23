@@ -8,7 +8,7 @@ import cardlink from './cardlink'
 import centering from './centering'
 import symbol from './symbols'
 import { ManaIcon } from '../card/manaSymbol'
-import { CardLink, MDCardImage } from '../card/CardLink'
+import { CardNameLink, MDCardImage } from '../card/CardLink'
 export const REMARK_PLUGINS = [cardrow, centering, cardlink, [gfm, { singleTilde: false }], symbol, breaks]
 
 const MDSymbol = ({ value }) => {
@@ -24,7 +24,7 @@ const MDCardRow = ({ children, inParagraph }) => {
 
 export const MD_RENDERERS = {
   symbol: MDSymbol,
-  cardlink: CardLink,
+  cardlink: CardNameLink,
   cardimage: MDCardImage,
   cardrow: MDCardRow,
 }

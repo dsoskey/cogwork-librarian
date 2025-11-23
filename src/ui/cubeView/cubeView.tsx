@@ -22,7 +22,6 @@ import { ManaCost } from '../card/manaCost'
 import { CubeSearchTable } from './searchTable/cubeSearchTable'
 import { COPY_TITLE } from '../cardBrowser/cardViews/searchHoverActions'
 import { PrinterIcon } from '../icons/printer'
-import { ComboListView } from './comboListView'
 import { CommandersSpellCompact } from '../icons/commandersSpellbook'
 import { DraftmancerIcon } from '../icons/draftmancer'
 import { LinkIcon } from '../icons/link'
@@ -306,9 +305,6 @@ function CubeModelView() {
           }
         />
         <Route path='/table' element={<CubeSearchTable />} />
-        {cubeCombos && (
-          <Route path='/combos' element={<ComboListView cards={cards} />} />
-        )}
         <Route path='' element={<CubeOverview />} />
       </Routes>
     </>

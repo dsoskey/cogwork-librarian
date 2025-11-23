@@ -6,7 +6,7 @@ import { CardsPerRowControl } from '../component/cardsPerRowControl'
 import { useViewportListener } from '../hooks/useViewportListener'
 import { PrintPage } from './printPage'
 import _groupBy from 'lodash/groupBy'
-import { CardLink2 } from '../card/CardLink'
+import { CardLink } from '../card/CardLink'
 import { DOUBLE_FACED_LAYOUTS } from 'mtgql'
 import { Checkbox } from '../component/checkbox/checkbox'
 import _sortBy from 'lodash/sortBy'
@@ -194,7 +194,7 @@ export function ClassicCardColumn({ title, cards, onCardNameClick, showCustomIma
             className={`column-cell ${cardKeyToGroupFunction.color_identity(card)}`}
             key={`${card.id}_${idx}`}
           >
-            <CardLink2
+            <CardLink
               onClick={() => {
                 onCardNameClick(card)
               }}

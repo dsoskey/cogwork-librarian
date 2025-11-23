@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
-import { autoPlacement, Placement, offset, useFloating, useHover, useInteractions } from '@floating-ui/react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { cogDB } from '../../api/local/db'
-import { Card } from 'mtgql'
+import { Card, DOUBLE_FACED_LAYOUTS } from 'mtgql'
 import { LoaderText, TRIANGLES } from '../component/loaders'
 import { CardImage } from '../cardBrowser/cardViews/cardImage'
 import "./cardLink.css"
 import { imageUris } from '../../api/mtgjson'
-import { Input, InputProps } from '../component/input'
+import { InputProps } from '../component/input'
 import { Autocomplete } from '../component/autocomplete'
+import { useHoverCard } from '../hooks/hoverCard'
 
 export function useCardLoader(name: string, id?: string) {
   return useLiveQuery(
@@ -29,85 +29,49 @@ export function MDCardImage ({ name, id }) {
   return <_CardImage card={card} name={name} />
 }
 
-interface CardLinkProps {
+interface CardNameLinkProps {
   name: string
   id?: string
-  allowedPlacements?: Placement[]
 }
-export function CardLink({ name, id, allowedPlacements }: CardLinkProps) {
+export function CardNameLink({ name, id }: CardNameLinkProps) {
   const card: Card = useCardLoader(name, id);
-  const [isLockedOpen, setIsLockedOpen] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const _allowedPlacements = allowedPlacements ?? ["top", "bottom"];
 
-  const {refs, floatingStyles, context} = useFloating({
-    open: isOpen,
-    onOpenChange: setIsOpen,
-    middleware: [
-      autoPlacement({ allowedPlacements: _allowedPlacements }),
-      offset({ mainAxis: 4 }),
-    ],
-  });
-
-  const hover = useHover(context);
-
-  const {getReferenceProps, getFloatingProps} = useInteractions([hover,]);
-
-  return (
-    <>
-      <span
-        className={`card-link ${isLockedOpen ? "active" : ''}`}
-        title={isLockedOpen ? "" : "click hovered text to keep image open"}
-        ref={refs.setReference} {...getReferenceProps()} onClick={() => setIsLockedOpen(p=>!p)}>
-        {name}
-      </span>
-      {(isLockedOpen || isOpen) && (
-        <div
-          className="popup-container"
-          ref={refs.setFloating}
-          style={floatingStyles}
-          {...getFloatingProps()}
-          onClick={() => setIsLockedOpen(false)}
-        >
-          <_CardImage name={name} card={card} />
-        </div>
-      )}
-    </>
-  );
+  return <CardLink
+    name={name}
+    id={card?.id ?? id ?? ''}
+    hasBack={card ? DOUBLE_FACED_LAYOUTS.includes(card.layout) : false}
+  />;
 }
 
-interface CardLink2Props {
+interface CardLinkProps {
   name: string
   id: string
   imageSrc?: string;
   hasBack?: boolean;
   onClick?: () => void;
   lockable?: boolean;
-  allowedPlacements?: Placement[]
 }
 
-export function CardLink2({ lockable, onClick, imageSrc, name, id, hasBack, allowedPlacements }: CardLink2Props) {
+export function CardLink({ lockable, onClick, imageSrc, name, id, hasBack }: CardLinkProps) {
   const _lockable = lockable ?? true;
   const [isLockedOpen, setIsLockedOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const _allowedPlacements = allowedPlacements ?? ["top", "bottom"];
+  const handleMouseEnter = () => {
+    setIsOpen(true);
+  }
 
-  const {refs, floatingStyles, context} = useFloating({
-    open: isOpen,
-    onOpenChange: setIsOpen,
-    middleware: [
-      autoPlacement({ allowedPlacements: _allowedPlacements }),
-      offset({ mainAxis: 4 }),
-    ],
-  });
+  const handleMouseLeave = () => {
+    setIsOpen(false);
+  }
 
-  const hover = useHover(context);
-
-  const {getReferenceProps, getFloatingProps} = useInteractions([hover,]);
+  const { handleHover, getHoverStyle } = useHoverCard();
 
   return (
     <>
       <span
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onMouseMove={handleHover}
         className={`card-link ${isLockedOpen ? "active" : ''}`}
         title={isLockedOpen
           ? ""
@@ -115,8 +79,6 @@ export function CardLink2({ lockable, onClick, imageSrc, name, id, hasBack, allo
             ? "click hovered text to keep image open"
             : name)
       }
-        ref={refs.setReference}
-        {...getReferenceProps()}
         onClick={() => {
           if (_lockable) {
             setIsLockedOpen(p=>!p)
@@ -129,9 +91,7 @@ export function CardLink2({ lockable, onClick, imageSrc, name, id, hasBack, allo
       {(isLockedOpen || isOpen) && (
         <div
           className="popup-container"
-          ref={refs.setFloating}
-          style={floatingStyles}
-          {...getFloatingProps()}
+          style={getHoverStyle(hasBack ? 2 : 1)}
           onClick={() => setIsLockedOpen(false)}
         >
           <img
@@ -144,7 +104,6 @@ export function CardLink2({ lockable, onClick, imageSrc, name, id, hasBack, allo
             src={imageUris(id, "back").normal}
             alt={name}
           />}
-
         </div>
       )}
     </>
@@ -152,45 +111,47 @@ export function CardLink2({ lockable, onClick, imageSrc, name, id, hasBack, allo
 }
 
 export interface HoverableInputProps extends InputProps {
-  allowedPlacements?: Placement[]
   getCompletions: (input: string) => Promise<string[]>
   setValue: (value: string) => void;
 }
 
-export function HoverableInput({ allowedPlacements = ["top", "bottom"], ...props }: HoverableInputProps) {
-  const card: Card = useCardLoader(props.value, undefined);
-  const [isLockedOpen, setIsLockedOpen] = useState(false);
+export function HoverableInput(props: HoverableInputProps) {
+  const card: Card = useCardLoader(props.value);
+  const hasBack = card ? DOUBLE_FACED_LAYOUTS.includes(card.layout) : false;
   const [isOpen, setIsOpen] = useState(false);
+  const handleMouseEnter = () => {
+    setIsOpen(true);
+  }
 
-  const {refs, floatingStyles, context} = useFloating({
-    open: isOpen,
-    onOpenChange: setIsOpen,
-    middleware: [
-      autoPlacement({ allowedPlacements }),
-      offset({ mainAxis: 4 }),
-    ],
-  });
+  const handleMouseLeave = () => {
+    setIsOpen(false);
+  }
 
-  const hover = useHover(context);
-
-  const {getReferenceProps, getFloatingProps} = useInteractions([hover,]);
+  const { handleHover, getHoverStyle } = useHoverCard();
 
   return <>
       <Autocomplete
         {...props}
-        ref={refs.setReference}
-        {...getReferenceProps()}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onMouseMove={handleHover}
       />
-      {(isLockedOpen || isOpen) && (
+      {isOpen && card && (
         <div
           className="popup-container"
-          ref={refs.setFloating}
-          style={floatingStyles}
-          {...getFloatingProps()}
-          onClick={() => setIsLockedOpen(false)}
+          style={getHoverStyle(hasBack ? 2 : 1)}
         >
-          <_CardImage name={card?.name} card={card} />
+          <img
+            className="card-link-image"
+            src={imageUris(card.id, "front").normal}
+            alt={card?.name}
+          />
+          {hasBack && <img
+            className="card-link-image"
+            src={imageUris(card.id, "back").normal}
+            alt={card?.name}
+          />}
         </div>
       )}
-    </>;
+  </>;
 }
