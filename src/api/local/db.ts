@@ -1,5 +1,5 @@
 import Dexie, { Table } from 'dexie'
-import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
+import { BulkDataDefinition } from '../scryfall/bulkData'
 import {
   Block,
   CachingFilterProvider,

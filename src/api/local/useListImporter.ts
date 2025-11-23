@@ -1,10 +1,10 @@
 import { QueryReport, useReporter } from '../useReporter'
 import { createContext, useState } from 'react'
-import { Card, normCardList, NormedCard } from 'mtgql'
+import { normCardList, NormedCard } from 'mtgql'
 import { Setter, TaskStatus } from '../../types'
-import * as Scry from 'scryfall-sdk'
-import { CogDB } from './useCogDB'
 import { CARD_INDEX } from './cardIndex'
+import { fetchCardCollection } from '../scryfall/collection'
+import { parseEntry } from './types/cardEntry'
 
 interface ListImporter {
   attemptImport: (rawCards: string[], restart: boolean) => Promise<NormedCard[]>
@@ -27,77 +27,49 @@ const defaultListImporter: ListImporter = {
 }
 
 export const ListImporterContext = createContext(defaultListImporter)
-export const useListImporter = (cogDb: CogDB): ListImporter => {
+export function useListImporter(): ListImporter {
   const [status, setStatus] = useState<TaskStatus>('unstarted')
   const [result, setResult] = useState<NormedCard[]>([])
   const [missing, setMissing] = useState<string[]>([])
   const report = useReporter()
 
-  const run = async (rawCards: string[], restart: boolean = false) => {
-    return new Promise<NormedCard[]>((resolve, reject) => {
-      const foundCards: NormedCard[] = []
-      const cardsToQueryAPI: { [cardName: string]: number } = {}
-      const missingNames: string[] = []
-      const onDone = () => {
-        setResult(restart ? foundCards : (prev) => [...prev, ...foundCards])
-        setMissing(missingNames.map(cardName => `${cardsToQueryAPI[cardName]} ${cardName}`))
-        report.markTimepoint("end")
+  const attemptImport = async (rawCards: string[], restart: boolean = false) => {
+    setStatus('loading')
+    report.reset(rawCards.length)
 
-        if (missingNames.length > 0) {
-          setStatus("error")
-          reject()
-        } else {
-          setStatus("success")
-          resolve(restart ? foundCards : [...result, ...foundCards])
-        }
-      }
+    console.time("process raws")
+    const { foundCards, cardsToQueryAPI } = findCardsLocally(rawCards)
+    console.timeEnd("process raws")
+    console.debug(`processed local. ${foundCards.length} found. ${cardsToQueryAPI.length} to query`)
 
-      setStatus('loading')
-      report.reset(rawCards.length)
+    let missingNames: string[] = [];
+    if (Object.keys(cardsToQueryAPI).length > 0) {
+      console.debug("querying scryfall for missing cards")
 
-      console.time("process raws")
-      for (const rawCard of rawCards) {
-        if (rawCard.length > 0) {
-          const parsedRow = parseListRow(rawCard)
-          const { quantity, cardName } = parsedRow;
-          const maybeCard = CARD_INDEX.cardByName(cardName.toLowerCase())
-          if (maybeCard !== undefined) {
-            for (let i = 0; i < quantity; i++) {
-              foundCards.push(maybeCard)
-            }
-            report.addComplete()
-          } else if (cardsToQueryAPI[cardName] === undefined) {
-            cardsToQueryAPI[cardName] = quantity;
-          } else {
-            cardsToQueryAPI[cardName] += quantity;
-          }
-        }
-      }
-      console.timeEnd("process raws")
-      console.debug(`processed local. ${foundCards.length} found. ${cardsToQueryAPI.length} to query`)
+      const identifiers = Object.keys(cardsToQueryAPI).map(name => ({name}))
+      const collection = await fetchCardCollection(identifiers);
+      foundCards.push(...collection.data.map(it => normCardList([it])[0]))
+      missingNames = collection.not_found.map(it => it.name)
+    }
 
-      if (Object.keys(cardsToQueryAPI).length > 0) {
-        console.debug("querying scryfall for missing cards")
-        Scry.Cards.collection(...Object.keys(cardsToQueryAPI).map(name => ({name})))
-          .on('data', data => {
-            foundCards.push(normCardList([data as Card])[0])
-            report.addComplete()
-          })
-          .on("not_found", data => {
-            missingNames.push(data.name)
-          })
-          .on("done", onDone)
-      } else {
-        onDone()
-      }
-    })
+    setResult(restart ? foundCards : (prev) => [...prev, ...foundCards])
+    setMissing(missingNames.map(cardName => `${cardsToQueryAPI[cardName]} ${cardName}`))
+    report.markTimepoint("end")
+
+    if (missingNames.length > 0) {
+      setStatus("error")
+      throw Error('List import failed to find all cards.')
+    }
+
+    setStatus("success")
+    return restart ? foundCards : [...result, ...foundCards]
   }
 
   const abandonImport = () => {
     setStatus("success")
   }
 
-  return { attemptImport: run, abandonImport, result, missing, setMissing, status, report }
+  return { attemptImport, abandonImport, result, missing, setMissing, status, report }
 }
 
 interface ParsedRow {
@@ -112,4 +84,29 @@ function parseListRow(row: string): ParsedRow {
   } else {
     return { quantity: 1, cardName: row }
   }
+}
+
+// consider moving this into CardIndex or CogDB
+function findCardsLocally(rawCards: string[]) {
+  const foundCards: NormedCard[] = []
+  const cardsToQueryAPI: { [cardName: string]: number } = {}
+
+  for (const rawCard of rawCards) {
+    if (rawCard.trim().length === 0) continue;
+
+    const parsedRow = parseEntry(rawCard)
+    const { quantity, name } = parsedRow;
+    const maybeCard = CARD_INDEX.cardByName(name.toLowerCase())
+    if (maybeCard !== undefined) {
+      for (let i = 0; i < quantity; i++) {
+        foundCards.push(maybeCard)
+      }
+    } else if (cardsToQueryAPI[name] === undefined) {
+      cardsToQueryAPI[name] = quantity;
+    } else {
+      cardsToQueryAPI[name] += quantity;
+    }
+  }
+
+  return { foundCards, cardsToQueryAPI }
 }

@@ -49,12 +49,12 @@
     "stylelint-config-standard": "^23.0.0",
     "typescript": "^4.9.5",
     "vite": "^7.1.5",
+    "vite-bundle-visualizer": "^1.2.1",
     "vitest": "^4.0.8"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@floating-ui/react": "^0.26.16",
-    "axios": "^1.6.0",
     "chart.js": "^4.4.3",
     "date-fns": "^2.30.0",
     "dexie": "^3.2.2",
@@ -81,7 +81,6 @@
     "remark": "^15.0.1",
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^3.0.1",
-    "scryfall-sdk": "^4.2.0",
     "unist-util-visit": "^5.0.0",
     "uuid": "^9.0.0"
   }

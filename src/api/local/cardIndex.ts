@@ -2,8 +2,8 @@ import { CompletionTree } from './completionTree'
 import { isOracleVal, normCardList, NormedCard } from 'mtgql'
 import { CubeCard } from 'mtgql/build/types/cube'
 import { cogDB } from './db'
-import * as Scryfall from 'scryfall-sdk'
 import { COBRA_CUSTOM_ID, DEFAULT_CUSTOM_CARD } from '../cubecobra/constants'
+import { fetchCardCollection } from '../scryfall/collection'
 
 class CardIndex {
   oracleToCard: { [id: string]: NormedCard } = {}
@@ -91,17 +91,18 @@ class CardIndex {
     if (missingDBIndexes.length === 0) return result
 
     const toCheckScryfall = missingDBIndexes
-      .map(index => Scryfall.CardIdentifier.byId(cubeList[missingMemoryIndices[index]].print_id))
-    const scryfallCards = await Scryfall.Cards.collection(...toCheckScryfall).waitForAll()
+      .map(index => ({ id: cubeList[missingMemoryIndices[index]].print_id }));
+    const scryfallCards = await fetchCardCollection(toCheckScryfall);
     if (scryfallCards.not_found.length) return Promise.reject(scryfallCards.not_found)
 
     for (let i = 0; i < missingDBIndexes.length; i++) {
       const index = missingMemoryIndices[missingDBIndexes[i]]
-      // @ts-ignore
       result[index] = normCardList([scryfallCards[i]])[0]
     }
     return result
   }
+
+
 
   handleAutocomplete = async (input: string) => {
     return this.completionTree.getCompletions(input)

@@ -1,6 +1,5 @@
 import { cogDB, COGDB_FILTER_PROVIDER, Manifest, MANIFEST_ID, toManifest } from './db'
 import { downloadCards } from './populate'
-import * as Scry from 'scryfall-sdk'
 import { downloadIllustrationTags, downloadOracleTags } from '../scryfall/tagger'
 import {
   normCardList,
@@ -9,7 +8,7 @@ import {
   MQLParser,
   FilterNode, identityNode, CachingFilterProvider, Card
 } from 'mtgql'
-import { BulkDataType } from 'scryfall-sdk/out/api/BulkData'
+import { BulkDataType, fetchBulkDataDefinition } from '../scryfall/bulkData'
 import { downloadSets } from '../scryfall/set'
 import { ImportTarget } from './useCogDB'
 import { invertItags, invertOtags } from './types/tags'
@@ -110,7 +109,7 @@ async function initOfficialDB(type: BulkDataType | "mtgjson", targets: ImportTar
 
     cards = await downloadMTGJSONDB();
   } else {
-    const bulkDataDefinition = await Scry.BulkData.definitionByType(type)
+    const bulkDataDefinition = await fetchBulkDataDefinition(type)
     manifest = toManifest(bulkDataDefinition, filter)
 
     postMessage({ type: 'manifest', data: { manifest, shouldSetManifest: targets.find(it => it === 'memory') }})

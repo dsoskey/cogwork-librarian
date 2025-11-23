@@ -8,7 +8,7 @@ import { SearchOptions } from 'mtgql'
 import { TaskStatus } from '../types'
 import { useReporter } from './useReporter'
 import { MutableRefObject, useRef, useState } from 'react'
-import { sortBy } from 'lodash'
+import sortBy from 'lodash/sortBy'
 import { CogError } from '../error'
 
 type QueryStore<T> = MutableRefObject<{ [query: string]: Array<T> }>

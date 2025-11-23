@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as Scry from 'scryfall-sdk'
 import { App } from './app'
 import Prism from 'prismjs'
 import {
@@ -43,8 +42,6 @@ Prism.languages['mtgql-extended-multi-links'] = mtgqlExtendedMulti
 
 Prism.hooks.add('wrap', linkWrap)
 Prism.hooks.add('complete', hookReactDOM(router))
-
-Scry.setTimeout(50)
 
 loadTheme();
 loadDefaultPreferences();
