@@ -97,7 +97,7 @@ class CardIndex {
 
     for (let i = 0; i < missingDBIndexes.length; i++) {
       const index = missingMemoryIndices[missingDBIndexes[i]]
-      result[index] = normCardList([scryfallCards[i]])[0]
+      result[index] = normCardList([scryfallCards.data[i]])[0]
     }
     return result
   }

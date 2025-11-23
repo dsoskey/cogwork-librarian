@@ -27,6 +27,7 @@ const defaultListImporter: ListImporter = {
 }
 
 export const ListImporterContext = createContext(defaultListImporter)
+
 export function useListImporter(): ListImporter {
   const [status, setStatus] = useState<TaskStatus>('unstarted')
   const [result, setResult] = useState<NormedCard[]>([])
@@ -40,7 +41,7 @@ export function useListImporter(): ListImporter {
     console.time("process raws")
     const { foundCards, cardsToQueryAPI } = findCardsLocally(rawCards)
     console.timeEnd("process raws")
-    console.debug(`processed local. ${foundCards.length} found. ${cardsToQueryAPI.length} to query`)
+    console.debug(`processed local. ${foundCards.length} found. ${cardsToQueryAPI} to query`)
 
     let missingNames: string[] = [];
     if (Object.keys(cardsToQueryAPI).length > 0) {

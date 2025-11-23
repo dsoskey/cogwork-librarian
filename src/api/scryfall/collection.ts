@@ -44,8 +44,12 @@ export async function fetchCardCollection(identifiers: CardIdentifier[]): Promis
       result.not_found.push(...requestPage);
     } else {
       const { not_found, data } = responsePage.value;
-      result.not_found.push(...not_found);
-      result.data.push(...data);
+      if (not_found) {
+        result.not_found.push(...not_found);
+      }
+      if (data) {
+        result.data.push(...data);
+      }
     }
   }
 
@@ -58,6 +62,9 @@ async function getCollectionPage(identifiers: CardIdentifier[]): Promise<Collect
 
   const response = await fetch(`${SCRYFALL_BASE_URI}/cards/collection`, {
     method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
     body: JSON.stringify({
       identifiers,
     })
