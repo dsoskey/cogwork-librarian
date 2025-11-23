@@ -13,7 +13,7 @@ import { CellDisplayMode, CELLS, ColorBreakdownRow, CubeSearchRow, ShownQuery } 
 import { DEFAULT_QUERIES, TABLE_PRESETS } from './presets'
 import { Setter } from '../../../types'
 import { Modal } from '../../component/modal'
-import { isFunction } from 'lodash'
+import _isFunction from 'lodash/isFunction'
 import { getColors } from './tempColorUtil'
 import { colorKey } from '../../component/viz/types'
 import { REFOCUS_TIMEOUT } from '../../flags'
@@ -263,7 +263,7 @@ function PresetSelector({ setQueries, cards }: PresetSelectorProps) {
     const handleClick = () => {
         if (selected === -1) return;
 
-        const preset: string[] = isFunction(TABLE_PRESETS[selected].preset)
+        const preset: string[] = _isFunction(TABLE_PRESETS[selected].preset)
             // @ts-ignore
             ? TABLE_PRESETS[selected].preset(cards)
             : TABLE_PRESETS[selected].preset;

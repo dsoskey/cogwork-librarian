@@ -51,7 +51,7 @@ const LandingPage = () => {
     </div>
   </div>
 }
-export const DocsView = () => {
+export default function DocsView() {
   const { pathname, hash } = useLocation()
   const ref = useRef<HTMLDivElement>()
   useEffect(() => {

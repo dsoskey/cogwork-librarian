@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { lazy, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { CardImageView } from './cardViews/cardImageView'
 import { PAGE_SIZE } from './constants'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
@@ -18,7 +18,6 @@ import { useVennControl, VennControl } from './vennControl'
 import { Card } from 'mtgql'
 import { SearchHoverActions } from './cardViews/searchHoverActions'
 import { CardsPerRowControl } from '../component/cardsPerRowControl'
-import { CardVizView } from './cardViews/cardVizView'
 import { Layout } from 'mtgql/build/generated/models/Layout'
 import { useHighlightFilter } from './useHighlightFilter'
 import { FlagContext } from '../flags'
@@ -26,6 +25,9 @@ import { DisplayTypesControl } from './displayTypesControl'
 import { FilterControl } from './filterControl'
 import { Link } from 'react-router-dom'
 import { ExportWidget } from '../component/exportWidget'
+import { DefaultSuspense } from '../layout/defaultSuspense'
+
+const CardVizView = lazy(() => import('./cardViews/cardVizView'))
 
 const ROTATED_LAYOUTS = new Set<Layout>(['split', 'planar', 'art_series'])
 
@@ -263,7 +265,7 @@ function CardResults({
       )
     })}
     {displayType === 'viz' && <div className='viz-container'>
-      <CardVizView cards={result} />
+      <DefaultSuspense><CardVizView cards={result} /></DefaultSuspense>
       <CardListView result={currentPage} />
     </div>}
     {displayType === 'json' && <CardJsonView result={currentPage} />}

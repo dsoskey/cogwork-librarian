@@ -31,7 +31,7 @@ export const vizTypeLookup: Record<VizType, VizTypeRep> = {
 
 }
 
-export function CardVizView({ cards }: CardVizViewProps) {
+export default function CardVizView({ cards }: CardVizViewProps) {
   const [vizType, setVizType] = useLocalStorage<VizType>("vizType", VizType.plot);
   const [xFunc, setXFunc] = useLocalStorage<PlotFunction>("xFunc", PlotFunction.year);
   const [xGroup, setXGroup]= useLocalStorage<GroupFunction>("xGroup", GroupFunction.none);

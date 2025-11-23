@@ -1,10 +1,8 @@
 import { humanFileSize } from '../humanFileSize'
 import { toManifest } from '../../api/local/db'
 import React, { useContext, useEffect, useState } from 'react'
-import { BulkDataDefinition } from 'scryfall-sdk/out/api/BulkData'
-import * as Scry from 'scryfall-sdk'
-import { CogDBContext, DB_INIT_MESSAGES, ImportTarget } from '../../api/local/useCogDB'
-import { LoaderBar } from '../component/loaders'
+import { BulkDataDefinition, fetchBulkDataDefinitions } from '../../api/scryfall/bulkData'
+import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { Input } from '../component/input'
 import { FormField } from '../component/formField'
@@ -25,7 +23,7 @@ export const ScryfallImporter = ({ importTargets }: ScryfallImporterProps) => {
   const [filter, setFilter] = useLocalStorage<string>("db-import-filter-1", "-is:extra ++");
 
   useEffect(() => {
-    Scry.BulkData.definitions().then((definitions) => {
+    fetchBulkDataDefinitions().then((definitions) => {
       setBulkDataDefinitions(definitions.filter((it) => it.type !== 'rulings'))
       setTargetDefinition(definitions.find(it => it.type === 'default_cards'))
     })

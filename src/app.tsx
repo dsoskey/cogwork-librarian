@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { lazy, useEffect, useState } from 'react'
 import { CogDBContext, useCogDB } from './api/local/useCogDB'
 import { AppInfo, WhatsNext } from './ui/views/appInfo'
 import { ListImporterContext, useListImporter } from './api/local/useListImporter'
@@ -8,12 +8,10 @@ import { Toaster, ToasterContext, useToaster
 } from './ui/component/toaster'
 import { SearchView } from './ui/searchView'
 import { BulkCubeImporterContext, useBulkCubeImporter } from './api/cubecobra/useBulkCubeImporter'
-import { DocsView } from './ui/docs/docsView'
 import { ProjectContext, useProjectDao } from './api/local/useProjectDao'
 import { SettingsView } from './ui/settingsView'
 import { CubeView } from './ui/cubeView'
 import { CardDataView } from './ui/data/cardDataView'
-import { CubeListView } from './ui/data/cubeListView'
 import { NotFoundView } from './ui/notFoundView'
 import { ErrorBoundary } from 'react-error-boundary'
 import { RenderErrorFallback } from './ui/renderErrorFallback'
@@ -29,6 +27,10 @@ import { SidebarOpenIcon } from './ui/icons/sidebarOpen'
 import { SidebarClosedIcon } from './ui/icons/sidebarClosed'
 import { SettingsContext } from './ui/settingsContext'
 import { CardList } from './ui/views/cardList/cardList'
+import { DefaultSuspense } from './ui/layout/defaultSuspense'
+
+const DocsView = lazy(() => import('./ui/docs/docsView'))
+const CubeListView = lazy(() => import('./ui/data/cubeListView'))
 
 export const App = () => {
   const [cubeContext, setCubeContext] = useState<string>('')
@@ -37,7 +39,7 @@ export const App = () => {
 
   const cogDB = useCogDB()
   const { memory } = cogDB
-  const listImporter = useListImporter(cogDB)
+  const listImporter = useListImporter()
   const bulkCubeImporter = useBulkCubeImporter()
 
   const project = useProjectDao()
@@ -74,7 +76,7 @@ export const App = () => {
                       <Route path='/cube' element={<DefaultLayout><CubeListView /></DefaultLayout>} />
                       <Route path='/about-me' element={<DefaultLayout><AppInfo /></DefaultLayout>} />
                       <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
-                      <Route path='/user-guide/*' element={<DocsView />} />
+                      <Route path='/user-guide/*' element={<DefaultSuspense><DocsView /></DefaultSuspense>} />
                       <Route path='/settings' element={<DefaultLayout><SettingsView /></DefaultLayout>} />
                       <Route path='/' element={
                         <div className='search-view-root'>

@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react'
 import { cogDB } from '../../api/local/db'
-import { NormedCard, CubeSource, CUBE_SOURCE_OPTIONS } from 'mtgql'
+import { NormedCard, CubeSource } from 'mtgql'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BulkCubeSiteImporter } from './bulkCubeSiteImporter'
-import { isFunction, sortBy } from 'lodash'
+import _isFunction from 'lodash/isFunction'
+import _sortBy from 'lodash/sortBy'
 import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { LoaderBar } from '../component/loaders'
@@ -13,7 +14,7 @@ import { CubeTable } from '../component/cube/cubeDefinitionTable'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
 import { CUBE_SOURCE_TO_LABEL } from '../component/cube/sourceIcon'
 
-export function CubeListView() {
+export default function CubeListView() {
   const { addMessage, dismissMessage } = useContext(ToasterContext)
 
   const [cubeId, setCubeId] = useState("")
@@ -28,7 +29,7 @@ export function CubeListView() {
   const listImporter = useContext(ListImporterContext)
 
   const existingCubes = useLiveQuery(
-    async () => sortBy(await cogDB.cube.toArray(), [(it) => it.key.toLowerCase()]),
+    async () => _sortBy(await cogDB.cube.toArray(), [(it) => it.key.toLowerCase()]),
     [status, isRunning],
   )
 
@@ -61,7 +62,7 @@ export function CubeListView() {
       setCardsToImport([])
       setError("")
       setShowConfirmation(false)
-      const id = addMessage(`successfully imported cube ${cubeId}`, false)
+      const id = addMessage(`successfully imported cube ${cubeId}`)
       setTimeout(() => {
         dismissMessage(id)
       }, DISMISS_TIMEOUT_MS)
@@ -87,7 +88,7 @@ export function CubeListView() {
 
   const setCards: Setter<NormedCard[]> = (cards) => {
     setFoundCards(cards)
-    const _cards = isFunction(cards) ? cards(foundCards) : cards
+    const _cards = _isFunction(cards) ? cards(foundCards) : cards
     saveCubeToDB(_cards)
   }
 
