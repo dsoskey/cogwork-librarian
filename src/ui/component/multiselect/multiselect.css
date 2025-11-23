@@ -5,22 +5,34 @@
 }
 
 .multiselect .multiselect-droppable {
+    display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
 }
 
-.slug {
-    padding: var(--spacing-100) var(--spacing-200) var(--spacing-100) var(--spacing-100);
-
-    background: var(--darker-color);
+.chip-container {
+    margin-left: var(--spacing-200);
+    margin-right: var(--spacing-200);
+    display: flex;
+    flex-direction: row;
     border-radius: var(--border-radius);
 
-    button, .button-like {
-        --bkgd-color: var(--darker-color);
-    }
+    .slug {
+        padding: var(--spacing-100) var(--spacing-200) var(--spacing-100) var(--spacing-100);
 
-    button:hover:not(:disabled), .button-like:hover:not(:disabled) {
-        --text-color: var(--dark-color);
-        --svg-stroke: var(--dark-color);
-        --bkgd-color: var(--active-mid-alpha);
+        background: var(--darker-color);
+        border-radius: var(--border-radius);
+
+
+
+        button, .button-like {
+            --bkgd-color: var(--darker-color);
+        }
+
+        button:hover:not(:disabled), .button-like:hover:not(:disabled) {
+            --text-color: var(--dark-color);
+            --svg-stroke: var(--dark-color);
+            --bkgd-color: var(--active-mid-alpha);
+        }
     }
 }

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { BulkCubeImporterContext } from '../../../api/cubecobra/useBulkCubeImporter'
-import { groupBy } from 'lodash'
+import groupBy from 'lodash/groupBy'
 import { Cube } from 'mtgql'
 import { RefreshIcon } from '../../icons/refresh'
 
