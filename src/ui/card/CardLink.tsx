@@ -6,8 +6,7 @@ import { LoaderText, TRIANGLES } from '../component/loaders'
 import { CardImage } from '../cardBrowser/cardViews/cardImage'
 import "./cardLink.css"
 import { imageUris } from '../../api/mtgjson'
-import { InputProps } from '../component/input'
-import { Autocomplete } from '../component/autocomplete'
+import { Autocomplete, AutocompleteProps } from '../component/autocomplete'
 import { useHoverCard } from '../hooks/hoverCard'
 
 export function useCardLoader(name: string, id?: string) {
@@ -110,8 +109,7 @@ export function CardLink({ lockable, onClick, imageSrc, name, id, hasBack }: Car
   );
 }
 
-export interface HoverableInputProps extends InputProps {
-  getCompletions: (input: string) => Promise<string[]>
+export interface HoverableInputProps extends AutocompleteProps {
   setValue: (value: string) => void;
 }
 

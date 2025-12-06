@@ -1,0 +1,8 @@
+.card-detail-view {
+    display: flex;
+    flex-direction: column;
+
+    .card-image {
+        align-self: center;
+    }
+}

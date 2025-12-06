@@ -22,7 +22,6 @@ import { ManaCost } from '../card/manaCost'
 import { CubeSearchTable } from './searchTable/cubeSearchTable'
 import { COPY_TITLE } from '../cardBrowser/cardViews/searchHoverActions'
 import { PrinterIcon } from '../icons/printer'
-import { CommandersSpellCompact } from '../icons/commandersSpellbook'
 import { DraftmancerIcon } from '../icons/draftmancer'
 import { LinkIcon } from '../icons/link'
 import { CheckIcon } from '../icons/check'
@@ -168,7 +167,6 @@ export function CubeView() {
 const EMPTY = []
 function CubeModelView() {
   const { cube, cards } = useContext(CubeViewModelContext)
-  const { cubeCombos } = useContext(FlagContext).flags
   const { pathname } = useLocation()
 
   const [filterQuery, setFilterQuery] = useState<string>('')
@@ -238,17 +236,6 @@ function CubeModelView() {
           >
             search table
           </Link>
-          {cubeCombos && (
-            <Link
-              to={`/cube/${cube.key}/combos`}
-              title="powered by Commander's Spellbook!"
-              className={`row center ${
-                pathname === `/cube/${cube.key}/combos` ? 'active-link' : ''
-              }`}
-            >
-              combos <CommandersSpellCompact height='15' />
-            </Link>
-          )}
           <div className="row center">
             <span className='bold'>import: </span>
             {cube.source !== 'list' && <RefreshButton toSubmit={[cube]} />}

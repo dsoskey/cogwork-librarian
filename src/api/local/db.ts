@@ -2,7 +2,7 @@ import Dexie, { Table } from 'dexie'
 import { BulkDataDefinition } from '../scryfall/bulkData'
 import {
   Block,
-  CachingFilterProvider,
+  CachingFilterProvider, Card,
   CardSet,
   Cube,
   DataProvider,
@@ -138,7 +138,7 @@ export class TypedDexie extends Dexie implements DataProvider {
     return result;
   }
 
-  getCardByName = async (name: string, setCode?: string, collectorNumber?: string) => {
+  getCardByName = async (name: string, setCode?: string, collectorNumber?: string): Promise<Card> => {
     const normedCards = await this.getAllCardsByName(name);
     if (normedCards.length === 0) return undefined;
 

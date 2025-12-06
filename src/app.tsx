@@ -28,6 +28,7 @@ import { SidebarClosedIcon } from './ui/icons/sidebarClosed'
 import { SettingsContext } from './ui/settingsContext'
 import { CardList } from './ui/views/cardList/cardList'
 import { DefaultSuspense } from './ui/layout/defaultSuspense'
+import { GraphSearchView } from './ui/views/graphSearch/graphSearchView'
 
 const DocsView = lazy(() => import('./ui/docs/docsView'))
 const CubeListView = lazy(() => import('./ui/data/cubeListView'))
@@ -78,6 +79,7 @@ export const App = () => {
                       <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
                       <Route path='/user-guide/*' element={<DefaultSuspense><DocsView /></DefaultSuspense>} />
                       <Route path='/settings' element={<DefaultLayout><SettingsView /></DefaultLayout>} />
+                      <Route path='/graph-search' element={<DefaultLayout><GraphSearchView memory={memory} /></DefaultLayout>} />
                       <Route path='/' element={
                         <div className='search-view-root'>
                           <SearchView

@@ -1,0 +1,55 @@
+.graph-search-root {
+    width: 100%;
+    height: 99.5svh;
+    position: relative;
+
+    .controls-root {
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--spacing-200);
+        z-index: 10;
+        top: 8px;
+        left: 8px;
+
+        .autocomplete-root {
+            width: 350px;
+        }
+    }
+
+    .graph-view-root {
+        width: 75vw;
+        height: 100%;
+    }
+
+    .detail-view-root {
+        width: 24vw;
+        background-color: hsl(25, 32%, 27%);
+        padding: 4px;
+        border-radius: 4px;
+        max-width: 300px;
+
+        position: absolute;
+        z-index: 10;
+        max-height: 96svh;
+        top: 12px;
+        right: 12px;
+        overflow: auto;
+
+        ul {
+            /*margin: 0;*/
+            padding: 0 0 0 var(--spacing-200);
+        }
+        li.related {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            :first-child {
+                flex: 1;
+            }
+        }
+    }
+
+}

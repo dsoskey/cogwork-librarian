@@ -53,6 +53,8 @@ export const Masthead = React.memo(() => {
 
         <Link to='/' className={pathname === "/" ? "active-link" : ""}>search</Link>
 
+        <Link to='/graph-search' className={pathname === "/graph-search" ? "active-link" : ""}>graph</Link>
+
         <Link to='/list' className={pathname === "/list" ? "active-link" : ""}>list</Link>
 
         <DatabaseLink active={pathname === '/data/card'} />
