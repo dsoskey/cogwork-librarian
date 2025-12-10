@@ -74,6 +74,7 @@ export type GutterColumn = "line-numbers" | "multi-info" | "submit-button"
 
 export interface TextEditorProps {
   setQueries: React.Dispatch<React.SetStateAction<string[]>>;
+  // todo: queries should be value: string
   queries: string[];
   onSubmit?: (baseIndex: number, selectedIndex: number) => void;
   canSubmit?: boolean;
@@ -132,6 +133,10 @@ export const TextEditor = ({
     const relativeMouse = editorY + top - toolbarHeight
     const index = Math.floor(queries.length * relativeMouse / (editorHeight));
     hoverOverIndex(e, index);
+  }
+
+  const handleRootClick = () => {
+    controller.current?.focus();
   }
 
   const handleMouseLeave = () => {
@@ -255,10 +260,11 @@ export const TextEditor = ({
         "--editor-line-height": lineHeight.toString(),
         "--toolbar-height": toolbarHeight.toString() + "px",
       }}
+      onClick={handleRootClick}
       onMouseMove={handleHover}
       onMouseLeave={handleMouseLeave}
     >
-      <MultiQueryActionBar
+      {gutterColumns.length > 0 && <MultiQueryActionBar
         queries={queries}
         copyText={copyText}
         onSubmit={onSubmit}
@@ -266,7 +272,7 @@ export const TextEditor = ({
         gutterColumns={gutterColumns}
         highlightedRow={hoverIndex}
         setHighlightedRow={hoverOverIndex}
-      />
+      />}
       <div className="editor-controls">
         {enableLinkOverlay && <button
           className="overlay-toggle"

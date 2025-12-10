@@ -128,11 +128,7 @@ export class TypedDexie extends Dexie implements DataProvider {
   getSet = (key: string) => this.set.get({ code: key })
 
   getAllCardsByName = async (name: string): Promise<NormedCard[]> => {
-    let result = await cogDB.card.where("name").equals(name).toArray();
-    if (result.length === 0)
-      result = await cogDB.card.where("name").startsWith(`${name} /`).toArray();
-    if (result.length === 0)
-      result = await cogDB.card.where("name").equalsIgnoreCase(name).toArray();
+    let result = await cogDB.card.where("name").equalsIgnoreCase(name).toArray();
     if (result.length === 0)
       result = await cogDB.card.where("name").startsWithIgnoreCase(`${name} /`).toArray();
     return result;

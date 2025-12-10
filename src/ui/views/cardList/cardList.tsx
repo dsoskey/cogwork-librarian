@@ -23,15 +23,8 @@ import {
   serializeMinimalEntry,
 } from '../../../api/local/types/cardEntry'
 import { BoneIcon } from '../../icons/bone'
+import { ARENA_FORMAT_PLACEHOLDER } from '../../../strings'
 
-const placeholder =
-`Enter one card per line.
-Valid formats include:
-shock
-2 grim lavamancer
-4 lightning bolt (m11)
-20 mountain (usg) 345
-`
 
 export function CardList() {
   const { lineHeight } = useContext(SettingsContext);
@@ -88,7 +81,7 @@ export function CardList() {
           lineHeight={lineHeight}
           enableCopyButton
           gutterColumns={[]}
-          placeholder={placeholder}
+          placeholder={ARENA_FORMAT_PLACEHOLDER}
           language='arena-list'
           settingsButton={
             <>

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { cogDB } from '../../api/local/db'
-import { NormedCard, CubeSource } from 'mtgql'
+import { CubeSource, Card } from 'mtgql'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BulkCubeSiteImporter } from './bulkCubeSiteImporter'
 import _isFunction from 'lodash/isFunction'
@@ -9,7 +9,6 @@ import { DISMISS_TIMEOUT_MS, ToasterContext } from '../component/toaster'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { LoaderBar } from '../component/loaders'
 import { CubeListImporter } from './cubeListImporter'
-import { Setter } from '../../types'
 import { CubeTable } from '../component/cube/cubeDefinitionTable'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
 import { CUBE_SOURCE_TO_LABEL } from '../component/cube/sourceIcon'
@@ -21,7 +20,7 @@ export default function CubeListView() {
   const [cardsToImport, setCardsToImport] = useState<string[]>([])
 
   const [error, setError] = useState("")
-  const [foundCards, setFoundCards] = useState<NormedCard[]>([])
+  const [foundCards, setFoundCards] = useState<Card[]>([])
 
   const { setSource, status, isRunning } = useContext(BulkCubeImporterContext)
   const [importType, setImportType] = useState<CubeSource | undefined>(undefined)
@@ -35,7 +34,7 @@ export default function CubeListView() {
 
   const [showConfirmation, setShowConfirmation] = useState(false)
 
-  const saveCubeToDB = async (cards: NormedCard[]) => {
+  const saveCubeToDB = async (cards: Card[]) => {
     listImporter.abandonImport()
     const key = cubeId.trim()
     if (key.length === 0) {
@@ -47,7 +46,7 @@ export default function CubeListView() {
     } else {
       const now = new Date();
       await cogDB.cube.put({ key,
-        cards: cards.map(it => ({ print_id: it.printings[0].id, oracle_id: it.oracle_id })),
+        cards: cards.map(it => ({ print_id: it.id, oracle_id: it.oracle_id })),
         oracle_ids:[],
         print_ids:[],
         name: key,
@@ -86,11 +85,16 @@ export default function CubeListView() {
     setShowConfirmation(false)
   }
 
-  const setCards: Setter<NormedCard[]> = (cards) => {
-    setFoundCards(cards)
-    const _cards = _isFunction(cards) ? cards(foundCards) : cards
-    saveCubeToDB(_cards)
+  const importList = () => {
+    listImporter.attemptImport(cardsToImport, true)
+      .then((cards) => {
+        setFoundCards(cards)
+        const _cards = _isFunction(cards) ? cards(foundCards) : cards
+        saveCubeToDB(_cards)
+      })
+      .catch((error) => setError(error.toString()))
   }
+
 
   const retrySearch = () => {
     listImporter.attemptImport(listImporter.missing, false)
@@ -142,9 +146,8 @@ export default function CubeListView() {
     {importType && importType === "list" && <CubeListImporter
       cardsToImport={cardsToImport}
       setCardsToImport={setCardsToImport}
-      setCards={setCards}
-      setError={setError}
       loader={loader}
+      importList={importList}
     >
       {CubeIdInput}
     </CubeListImporter>}

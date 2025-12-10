@@ -4,8 +4,10 @@ import { CogDBContext, ImportTarget } from '../../api/local/useCogDB'
 import { Setter, TaskStatus } from '../../types'
 import { Manifest, MANIFEST_ID } from '../../api/local/db'
 import { LoaderBar } from '../component/loaders'
-import { NormedCard } from 'mtgql'
+import { Card, normCardList } from 'mtgql'
 import { ProjectContext } from '../../api/local/useProjectDao'
+import { ARENA_FORMAT_PLACEHOLDER } from '../../strings'
+import { TextEditor } from '../component/editor/textEditor'
 
 export interface CardListImporterProps {
   importTargets: ImportTarget[]
@@ -25,20 +27,21 @@ export const CardListImporter = ({
   const [cardsToImport, setCardsToImport] = useState<string[]>([])
   const proposedManifest = useRef<Manifest>(manifest)
 
-  const finish = async (res: NormedCard[]) => {
+  const finish = async (res: Card[]) => {
+    const normed = normCardList(res);
     if (importTargets.find(it => it === "memory")) {
       setManifest(proposedManifest.current)
-      setMemory(res)
+      setMemory(normed)
     }
     if (importTargets.find(it => it === "db")) {
-      await saveToDB(proposedManifest.current, res)
+      await saveToDB(proposedManifest.current, normed)
     }
     setCardsToImport([])
     setDbImportStatus("success")
   }
 
   const useSavedCards = () => {
-    setCardsToImport(project.savedCards.map(it => it.name))
+    setCardsToImport(project.savedCards.flatMap(it => it.cards))
   }
 
   const doTry = (target: string[], restart: boolean) => {
@@ -98,19 +101,18 @@ export const CardListImporter = ({
         <span className="bold">data set name:</span>
         <input value={listTitle} onChange={event => setListTitle(event.target.value)} />
       </label>
-      <textarea
-        className='cards-to-import coglib-prism-theme'
-        value={cardsToImport.join('\n')}
-        placeholder='enter one exact card name per line'
-        spellCheck={false}
-        rows={9}
-        onChange={(event) => {
-          setCardsToImport(event.target.value.split('\n'))
-        }}
+      <TextEditor
+        className="cards-to-import"
+        queries={cardsToImport}
+        language='arena-list'
+        placeholder={ARENA_FORMAT_PLACEHOLDER}
+        gutterColumns={[]}
+        setQueries={setCardsToImport}
       />
-      <div><button onClick={useSavedCards}>use saved cards</button>
-        <button onClick={importList}>import list</button></div>
-
+      <div>
+        <button onClick={useSavedCards}>use saved cards</button>
+        <button onClick={importList}>import list</button>
+      </div>
     </>}
   </div>
 }

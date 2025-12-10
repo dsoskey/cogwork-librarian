@@ -1,43 +1,35 @@
 import React, { useContext } from 'react'
 import { Setter } from '../../types'
-import { NormedCard } from 'mtgql'
 import { ListImporterContext } from '../../api/local/useListImporter'
 import { ProjectContext } from '../../api/local/useProjectDao'
+import { ARENA_FORMAT_PLACEHOLDER } from '../../strings'
+import { TextEditor } from '../component/editor/textEditor'
 
 export interface CubeListImporterProps {
   cardsToImport: string[]
   setCardsToImport: Setter<string[]>
-  setCards: Setter<NormedCard[]>
-  setError: Setter<string>
   loader: React.ReactNode
   children: React.ReactNode
+  importList: () => void;
 }
-export const CubeListImporter = ({ setCards, setError, loader, children, setCardsToImport, cardsToImport }: CubeListImporterProps) => {
+export const CubeListImporter = ({ importList, loader, children, setCardsToImport, cardsToImport }: CubeListImporterProps) => {
   const listImporter = useContext(ListImporterContext)
   const project = useContext(ProjectContext)
   const useSavedCards = () => {
-    setCardsToImport(project.savedCards
-      .map(it => it.cards.map(it => `${it.quantity} ${it.name}`)).flat())
-  }
-  const importList = () => {
-    listImporter.attemptImport(cardsToImport, true)
-      .then(setCards)
-      .catch((error) => setError(error))
+    setCardsToImport(project.savedCards.map(it => it.cards).flat())
   }
 
   return <div className='list-import'>
     {children}
     {listImporter.status !== "error" && <>
-      <textarea
-        className='cards-to-import coglib-prism-theme'
-        value={cardsToImport.join('\n')}
-        placeholder='enter one exact card name per line'
-        spellCheck={false}
-        rows={9}
+      <TextEditor
+        className='cards-to-import'
+        language="arena-list"
+        queries={cardsToImport}
+        gutterColumns={[]}
+        placeholder={ARENA_FORMAT_PLACEHOLDER}
         disabled={listImporter.status === 'loading'}
-        onChange={(event) => {
-          setCardsToImport(event.target.value.split('\n'))
-        }}
+        setQueries={setCardsToImport}
       />
       <div className='row'>
         <span>

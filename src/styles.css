@@ -655,16 +655,12 @@ th, td {
 .list-import, .file-import {
   display: flex;
   flex-direction: column;
-}
+  gap: var(--spacing-300);
 
-.cards-to-import {
-  background: var(--darker-color);
-  color: #ccc;
-  resize: none;
-}
-
-.cards-to-import::placeholder {
-  color: var(--active-mid-alpha);
+  .text-editor-root {
+    max-width: 50%;
+    min-height: calc(var(--editor-line-height) * 9em);
+  }
 }
 
 .results {
