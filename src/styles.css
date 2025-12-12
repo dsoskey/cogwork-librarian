@@ -241,6 +241,7 @@ th.m {
 }
 .card-column-root .column-subheader.colorless,
 .card-column-root .column-subheader.hybrid,
+.card-column-root .column-subheader.lands,
 th.c {
   background-color: color-mix(in oklch, var(--data-c), #000 15%);
 }
@@ -819,6 +820,12 @@ body:has(.query-panel) {
   }
 }
 
-.card-link-image {
-  clip-path: inset(0 0 0 0 round var(--card-border-radius));
+.rotating {
+
+  rotation-point: center;
+  animation: 2s infinite linear rotating;
+  &.d1s {
+    animation: 1.25s infinite linear rotating;
+
+}
 }

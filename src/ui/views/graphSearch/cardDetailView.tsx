@@ -1,26 +1,26 @@
-import React, {useMemo} from "react";
+import React, { useContext, useMemo } from 'react'
 import {
     type CardNode,
-    type GraphLink,
-    type GraphNode,
     relatedNodeIds,
     type SearchNode
 } from "./types";
 import {RelatedSearchList} from "./relatedSearchList";
 import {RelatedCardList} from "./relatedCardList";
 import "./cardDetailView.css";
-import { imageUris } from '../../../api/mtgjson'
+import { GraphControllerContext } from './useGraphController'
+import { _CardImage } from '../../card/CardLink'
+import { ScryfallIcon } from '../../icons/scryfallIcon'
+import { TrashIcon } from '../../icons/trash'
+import { DEFAULT_ICON_SIZE } from '../../icons/base'
+import { scryfallCardLink } from '../../../api/scryfall/constants'
 
 export interface CardDetailViewProps {
     cardNode: CardNode;
-    nodes: React.RefObject<GraphNode[]>;
-    links: React.RefObject<GraphLink[]>
-    setSelectedNode: (node: GraphNode) => void;
-    toggleLink: (source: string, target: string) => void;
 }
 
-export function CardDetailView({ cardNode, nodes, links, setSelectedNode, toggleLink }: CardDetailViewProps) {
+export function CardDetailView({ cardNode }: CardDetailViewProps) {
     const { card, id } = cardNode;
+    const { nodes, links, removeNode, setSelectedNode, toggleLink } = useContext(GraphControllerContext);
 
     const { relatedCards, relatedSearches } = useMemo(() => {
         const relatedSearches: SearchNode[] = [];
@@ -42,22 +42,25 @@ export function CardDetailView({ cardNode, nodes, links, setSelectedNode, toggle
         return { relatedSearches, relatedCards };
     }, [cardNode]);
 
+    const handleDeleteClick = () => removeNode(cardNode.id);
 
     return <section className="card-detail-view">
-        <div className="row center">
+        <div className='detail-view-header row center'>
             <h2>{card.name}</h2>
-            <a
-                href={`https://scryfall.com/card/${card.set}/${card.collector_number}`}
-                target="_blank" rel="noopener noreferrer" >
-                sf
+
+            <a href={scryfallCardLink(card)}
+               rel='noreferrer'
+               target='_blank'
+               style={{ lineHeight: '0', alignSelf: 'center' }}
+            >
+                <button title='open in Scryfall'>
+                    <ScryfallIcon size={DEFAULT_ICON_SIZE} />
+                </button>
             </a>
+
+            <button onClick={handleDeleteClick}><TrashIcon /></button>
         </div>
-        <img
-            className="card-image"
-            height={350}
-            src={imageUris(card.id, 'front').normal}
-            alt={card.name}
-        />
+        <_CardImage card={card} name={card.name} nameFallback={false} />
 
         {relatedCards.length > 0 && <RelatedCardList
           relatedCards={relatedCards}

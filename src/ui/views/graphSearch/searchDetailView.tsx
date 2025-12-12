@@ -1,41 +1,42 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useContext, useEffect, useMemo } from 'react'
 import {
     type CardNode, cardToCardNode,
-    type GraphLink,
-    type GraphNode,
     relatedNodeIds,
     type SearchNode
 } from './types'
 import {RelatedCardList} from "./relatedCardList";
 import {RelatedSearchList} from "./relatedSearchList";
 import { EnrichedCard } from '../../../api/queryRunnerCommon'
-import { CardLink } from './cardLink'
+import { CardLink } from '../../card/cardLink'
 import { PageControl, PageInfo, usePageControl } from '../../cardBrowser/pageControl'
 import { useLocalStorage } from '../../../api/local/useLocalStorage'
 import { PAGE_SIZE } from '../../cardBrowser/constants'
+import { GraphControllerContext } from './useGraphController'
+import { CogDBContext } from '../../../api/local/useCogDB'
+import { GraphUserSettingsContext } from './userSettings'
+import { TrashIcon } from '../../icons/trash'
 
 export interface SearchDetailViewProps {
     searchNode: SearchNode;
-    links: React.RefObject<GraphLink[]>;
-    nodes: React.RefObject<GraphNode[]>;
-    setSelectedNode: (node: GraphNode) => void;
-    toggleLink: (source: string, target: string) => void;
     searchResults: EnrichedCard[];
     runSearch: (query: string) => Promise<void>;
-    addNodes: (nodes: GraphNode[]) => void;
 }
 
-export function SearchDetailView({ addNodes, searchNode, links, nodes, setSelectedNode, toggleLink, searchResults, runSearch }: SearchDetailViewProps) {
+export function SearchDetailView({ searchNode, searchResults, runSearch }: SearchDetailViewProps) {
     const { id } = searchNode;
+    const { memStatus } = useContext(CogDBContext);
+    const {
+        links, nodes,
+        setSelectedNode, toggleLink, addNodes, removeNode,
+    } = useContext(GraphControllerContext);
+    const handleDeleteClick = () => removeNode(id);
+
+    const { uniqueCardNodes } = useContext(GraphUserSettingsContext)
 
     const [pageSize] = useLocalStorage('page-size', PAGE_SIZE)
     const { pageNumber, setPageNumber, lowerBound, upperBound } = usePageControl(pageSize, 0)
-    const currentPage = useMemo(
-      () => searchResults.slice(lowerBound, upperBound),
-      [searchResults, lowerBound, upperBound]
-    )
 
-    const { relatedCards, relatedSearches } = useMemo(() => {
+    const { relatedCardSet, relatedCards, relatedSearches } = useMemo(() => {
         const relatedSearches: SearchNode[] = [];
         const relatedCards: CardNode[] = [];
 
@@ -51,24 +52,37 @@ export function SearchDetailView({ addNodes, searchNode, links, nodes, setSelect
                 }
             }
         }
+        const relatedCardSet = new Set(relatedCards.map(it => it.card.name));
 
-        return { relatedSearches, relatedCards };
+        return { relatedSearches, relatedCards, relatedCardSet };
     }, [searchNode]);
+
+    const filteredResults = useMemo(() => searchResults
+      .filter(it => !relatedCardSet.has(it.data.name)), [searchResults, relatedCardSet])
+    const currentPage = useMemo(
+      () => {
+          return filteredResults
+            .slice(lowerBound, upperBound)
+      },
+      [filteredResults, lowerBound, upperBound]);
 
     useEffect(() => {
         runSearch(id);
-    }, [id]);
+    }, [id, memStatus]);
     useEffect(() => {
         setPageNumber(0)
     }, [searchResults]);
 
     const onAddAllClick = () => {
         addNodes(searchResults.map(((it, index) =>
-          cardToCardNode(it.data,  true ? 0 : index + nodes.current.length))));
+          cardToCardNode(it.data, uniqueCardNodes ? 0 : index + nodes.current.length))));
     }
 
-    return <section>
-        <h2><code>{id}</code></h2>
+    return <section className="search-detail-view">
+        <div className="detail-view-header row center">
+            <h2><code>{id}</code></h2>
+            <button onClick={handleDeleteClick}><TrashIcon /></button>
+        </div>
 
         {relatedSearches.length > 0 && <RelatedSearchList
           relatedSearches={relatedSearches}
@@ -81,14 +95,14 @@ export function SearchDetailView({ addNodes, searchNode, links, nodes, setSelect
           setSelectedNode={setSelectedNode}
         />}
 
-        {searchResults.length > 0 && <>
+        {filteredResults.length > 0 && <>
             <div className="row center">
-                <h3>search results</h3>
+                <h3>other cards in search</h3>
                 <button onClick={onAddAllClick}>add all</button>
             </div>
             <div className='row center wrap'>
                 <PageInfo
-                  searchCount={searchResults.length}
+                  searchCount={filteredResults.length}
                   ignoreCount={0}
                   lowerBound={lowerBound + 1}
                   upperBound={upperBound}
@@ -98,15 +112,17 @@ export function SearchDetailView({ addNodes, searchNode, links, nodes, setSelect
                   setPageNumber={setPageNumber}
                   pageSize={pageSize}
                   upperBound={upperBound}
-                  count={searchResults.length}
+                  count={filteredResults.length}
                 />
             </div>
             <ul>
-                {currentPage.map(({ data }) => <li className='related' key={data.id}>
+                {currentPage.map(({ data }, index) => <li className='related' key={data.id}>
                     <CardLink
                       name={data.name}
                       id={data.id}
-
+                      onClick={() => addNodes([
+                        cardToCardNode(data, uniqueCardNodes ? 0 : index + nodes.current.length)
+                      ])}
                     />
                 </li>)}
             </ul>

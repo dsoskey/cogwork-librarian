@@ -10,6 +10,7 @@ export interface InputProps extends HTMLAttributes<HTMLInputElement> {
   onChange: ChangeEventHandler<HTMLInputElement>
   language?: Language
   placeholder?: string
+  disabled?: boolean
 }
 
 export function Input({ value, onChange, language, placeholder, ...rest }: InputProps) {

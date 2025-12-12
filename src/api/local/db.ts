@@ -158,6 +158,14 @@ export class TypedDexie extends Dexie implements DataProvider {
     return { ...card, ...printing };
   }
 
+  // to also try: bulk get
+  getCardByIds = async (oracle_id: string, print_id: string): Promise<Card> => {
+    const normedCard = await cogDB.card.get(oracle_id);
+    const printing = normedCard.printings.find(it => it.id === print_id) ?? normedCard.printings[0];
+
+    return { ...normedCard, ...printing };
+  }
+
   async bulkGetList(listText: string[]) {
     const entries = listText.map(parseEntry)
     return Promise.all(entries.map(async ({ quantity, name, cn, set }) => {

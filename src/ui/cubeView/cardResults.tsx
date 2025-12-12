@@ -117,8 +117,8 @@ function groupCards(cards:OrderedCard[], groupby1: keyof OrderedCard, groupby2: 
   const result:any = _groupBy(cards, cardKeyToGroupFunction[groupby1] ?? groupby1);
   for (const key in result) {
     const _cards = result[key];
-    if (key === "multi" || key === 'Multicolor' || key === 'Hybrid') {
-      result[key] = _groupBy(_cards, (it) => (it.color_identity ?? it.colors).join(""));
+    if (key === "multi" || key === 'Multicolored' || key === 'Multicolor' || key === 'Hybrid') {
+      result[key] = _groupBy(_cards, (it) => (it.colors.length > 0 ? it.colors : (it.color_identity ?? it.colors)).toSorted().join(''));
     } else {
       result[key] = _groupBy(_cards, cardKeyToGroupFunction[groupby2] ?? groupby2);
     }
@@ -150,8 +150,8 @@ const SORTS = {
     red: 3,
     green: 4,
     colorless: 5,
-    multicolored: 6,
-    hybrid: 7,
+    hybrid: 6,
+    multicolored: 7,
   }
 }
 export function ClassicCardList({ sort2By, showCustomImage, onCardNameClick, cards }: ClassicCardListProps) {

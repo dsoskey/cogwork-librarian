@@ -11,6 +11,10 @@
     }
 }
 
+img.card-image {
+    clip-path: inset(0 0 0 0 round var(--card-border-radius));
+}
+
 .card-image img {
     clip-path: inset(0 0 0 0 round var(--card-border-radius));
     box-shadow: var(--spacing-200) var(--gray-68);
@@ -41,6 +45,7 @@
     border-radius: 7% / 5.5%;
 }
 
+img.card-image.lea,
 .card-image.lea img {
     clip-path: inset(0 0 0 0 round 7% / 5.5%);
 }

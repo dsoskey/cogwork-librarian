@@ -1,8 +1,11 @@
+.search-detail-view,
 .card-detail-view {
     display: flex;
     flex-direction: column;
 
-    .card-image {
+    .card-image-container {
+        width: 75%;
+        min-width: 250px;
         align-self: center;
     }
 }

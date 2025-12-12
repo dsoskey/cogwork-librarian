@@ -6,6 +6,7 @@ import { LINK_BUTTON_ICONS, CopyToClipboardButton } from '../../component/copyTo
 import { BlockIcon } from '../../icons/block'
 import { AddIcon } from '../../icons/add'
 import { DEFAULT_ICON_SIZE } from '../../icons/base'
+import { scryfallCardLink } from '../../../api/scryfall/constants'
 
 export const COPY_TITLE = {
   unstarted: 'copy json',
@@ -21,7 +22,7 @@ export interface SearchHoverActionsProps {
 export function SearchHoverActions({ card, onAdd, onIgnore }: SearchHoverActionsProps) {
   return <div className='hover-actions'>
     <a
-      href={card.data.scryfall_uri.replace(/\?.+$/, '')}
+      href={scryfallCardLink(card.data)}
       target='_blank'
       rel='noopener'
     >

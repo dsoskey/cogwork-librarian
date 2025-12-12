@@ -31,6 +31,7 @@ import { FileUpArrow } from '../icons/fileUpArrow'
 import { useCubeSort } from './cubeSort'
 import { useHighlightFilter } from '../cardBrowser/useHighlightFilter'
 import { serializeEntry } from '../../api/local/types/cardEntry'
+import { scryfallCardLink } from '../../api/scryfall/constants'
 
 
 export function CubeView() {
@@ -82,8 +83,8 @@ export function CubeView() {
           }}
           titleText={COPY_TITLE}
         />}
-        {activeCard?.scryfall_uri &&
-          <a href={activeCard?.scryfall_uri.replace(/\?.+$/, '')}
+        {activeCard &&
+          <a href={scryfallCardLink(activeCard)}
              rel='noreferrer'
              target='_blank'
              style={{ lineHeight: '0', alignSelf: 'center' }}

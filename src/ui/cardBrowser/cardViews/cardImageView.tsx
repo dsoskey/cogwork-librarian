@@ -6,6 +6,7 @@ import "./cardImageView.css"
 import { CardImage } from './cardImage'
 import { CardCustomRender } from '../../card/cardCustomRender'
 import { Card } from 'mtgql'
+import { scryfallCardLink } from '../../../api/scryfall/constants'
 
 export interface CardImageViewProps {
   className?: string
@@ -61,8 +62,6 @@ export const CardImageView = ({
     }
   }
 
-  const href = card.data.scryfall_uri.replace(/\?.*$/, '')
-
   const highlightCard = useMemo(() => highlightFilter(card.data), [highlightFilter, card]);
 
   return (
@@ -73,7 +72,7 @@ export const CardImageView = ({
       onMouseLeave={handleHoverOff}
       onAuxClick={e => {
         if (e.button === 1) {
-          window.open(href, "_blank");
+          window.open(scryfallCardLink(card.data), "_blank");
         }
       }}
     >

@@ -3,11 +3,12 @@ import {
     DEFAULT_LINK_VALUE, DEFAULT_NO_MATCH_ID,
     type GraphLink,
     type GraphNode, relatedNodeIds,
-    type SearchNode
-} from "./types";
-import React, { useEffect, useRef, useState } from 'react'
+    type SearchNode, serializeGraph
+} from './types'
+import React, { createContext, useEffect, useRef, useState } from 'react'
 import * as d3 from "d3";
 import {useHoverCard} from "../../hooks/useHoverCard";
+import { Setter } from '../../../types'
 
 export const graphTheme = {
     node: {
@@ -24,7 +25,7 @@ export const graphTheme = {
     },
     link: {
         strokeActive: '#dad',
-        stroke: '#333',
+        stroke: 'var(--darkest-color)',
     },
     opacity: {
         high: 1,
@@ -72,15 +73,42 @@ const strokeColor = d3.scaleOrdinal(
 interface GraphControllerInput {
     initialLinks: GraphLink[]
     initialNodes: GraphNode[]
+    maxNodes?: number;
     simulationAlpha?: number
 }
 
+export interface GraphController {
+    addNode: (graphNode: GraphNode) => void;
+    addNodes: (graphNodes: GraphNode[]) => void;
+    removeNode: (nodeId: string) => void;
+    toggleLink: (sourceId: string, targetId: string) => void;
+    setGraphState: (nextState: { links: GraphLink[], nodes: GraphNode[] }) => void;
+    selectedNode: GraphNode | undefined;
+    setSelectedNode: Setter<GraphNode | undefined>;
+    removeSelection: () => void;
+    links: React.RefObject<GraphLink[]>;
+    linkRef: React.RefObject<LinkSelection>;
+    linkRender: (selection: LinkSelection) => LinkSelection;
+    nodes: React.RefObject<GraphNode[]>;
+    nodeRef: React.RefObject<NodeSelection>;
+    nodeRender: (selection: NodeSelection) => NodeSelection;
+    simulationRef: React.RefObject<d3.Simulation<any, any>>;
+    hoverId: string;
+    hoverName: string;
+    hoverType: string;
+    hoverStyle: React.CSSProperties;
+    graphError: string;
+    setGraphError: Setter<string>;
+}
 
+export const GraphControllerContext = createContext<GraphController>({} as any)
 
 export function useGraphController({
     initialLinks, initialNodes,
     simulationAlpha = .1,
-}: GraphControllerInput) {
+    maxNodes = 2500,
+}: GraphControllerInput): GraphController {
+    const [graphError, setGraphError] = useState('')
     const links = useRef<GraphLink[]>(initialLinks);
     const nodes = useRef<GraphNode[]>(initialNodes);
     const simulationRef = useRef<d3.Simulation<any, any>>();
@@ -100,6 +128,11 @@ export function useGraphController({
             .restart()
 
         setSelectedNode(prev => prev ? {...prev} : undefined)
+        try {
+            localStorage.setItem('graph-search.state', serializeGraph({ nodes: nodes.current, links: links.current }))
+        } catch (e) {
+            setGraphError('Could not save graph. If you refresh you will lose graph data.')
+        }
     }
 
     const [selectedNode, setSelectedNode] = useState<GraphNode | undefined>();
@@ -171,6 +204,11 @@ export function useGraphController({
     }
 
     const addNode = (graphNode: GraphNode) => {
+        setGraphError('');
+        if (nodes.current.length >= maxNodes) {
+            setGraphError(`Could not add ${graphNode.id}, node limit reached`);
+            return;
+        }
         if (nodes.current.find(node => node.id === graphNode.id)) return;
 
         switch (graphNode.type) {
@@ -184,11 +222,18 @@ export function useGraphController({
             }
         }
         handleGraphUpdate();
+        setSelectedNode(graphNode);
     }
 
     const addNodes = (graphNodes: GraphNode[]) => {
-        for (const graphNode of graphNodes) {
-            if (nodes.current.find(node => node.id === graphNode.id)) return;
+        setGraphError('');
+        for (let i = 0; i < graphNodes.length; i++){
+            const graphNode = graphNodes[i]
+            if (nodes.current.length >= maxNodes) {
+                setGraphError(`Could not add ${graphNode.id}, node limit reached. Skipping ${graphNodes.length - i} nodes.`);
+                break;
+            }
+            if (nodes.current.find(node => node.id === graphNode.id)) continue;
 
             switch (graphNode.type) {
                 case "card": {
@@ -319,6 +364,7 @@ export function useGraphController({
         nodes, nodeRef, nodeRender,
         simulationRef,
         hoverId, hoverName, hoverType, hoverStyle,
+        graphError, setGraphError
     }
 
 

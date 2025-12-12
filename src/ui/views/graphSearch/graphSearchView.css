@@ -5,10 +5,6 @@
 
     .controls-root {
         position: absolute;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: var(--spacing-200);
         z-index: 10;
         top: 8px;
         left: 8px;
@@ -20,25 +16,43 @@
 
     .graph-view-root {
         width: 75vw;
-        height: 100%;
+        max-height: 90svh;
+
+        .loading-indicator {
+            fill: var(--active-mid-alpha);
+        }
     }
 
     .detail-view-root {
-        width: 24vw;
-        background-color: hsl(25, 32%, 27%);
-        padding: 4px;
+        min-width: 300px;
+        width: 25vw;
+        margin: 4px;
         border-radius: 4px;
-        max-width: 300px;
 
-        position: absolute;
-        z-index: 10;
-        max-height: 96svh;
-        top: 12px;
-        right: 12px;
+        max-height: 90svh;
+
         overflow: auto;
 
+        scrollbar-color: var(--light-color) var(--darkest-color) ;
+        section {
+            background-color: var(--darkest-color);
+            padding: 4px;
+        }
+
+        .detail-view-header {
+            position: sticky;
+            top: 0;
+            background-color: var(--darkest-color);
+            padding: 4px;
+        }
+
+        h2 {
+            margin: 0;
+            flex: 1;
+        }
+
         ul {
-            /*margin: 0;*/
+            margin: 0;
             padding: 0 0 0 var(--spacing-200);
         }
         li.related {

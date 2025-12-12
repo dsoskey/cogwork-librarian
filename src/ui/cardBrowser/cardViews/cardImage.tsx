@@ -54,6 +54,7 @@ export const CardImage = ({ card, altImageUri, altImageBackUri, highlight, showB
       <img
         className={`back transformed`}
         width='100%'
+        height="100%"
         src={altImageBackUri ?? getBackImageURI(card, version)}
         alt={card.name}
         title={card.name}
