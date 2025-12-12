@@ -12,6 +12,7 @@ import { FormField } from '../component/formField'
 import { useHighlightPrism } from '../../api/local/syntaxHighlighting'
 import { DBStatusLoader, MemStatusLoader } from '../component/dbStatusLoader'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
+import { Alert } from '../component/alert/alert'
 
 const IMPORT_SOURCE = {
   scryfall: 'scryfall',
@@ -108,18 +109,18 @@ export const CardDataView = () => {
       </div>
 
       {outOfDate && (
-        <div className='alert'>
+        <Alert>
           Cogwork Librarian's syntax has updated since you last synced
           your database, so new queries may not function. to fix the
           issue, re-import your data file the same way you did last time
           and save to local database. if you've never imported a data set,
           choose "Default Cards" from import from scryfall below.
-        </div>
+        </Alert>
       )}
       {dbStatus !== 'loading' && memStatus !== 'loading' && dbDirty && (
-        <div className='alert'>
+        <Alert>
           in-memory data set hasn't been saved to database yet
-        </div>
+        </Alert>
       )}
       <FormField
         title="in-memory filter"

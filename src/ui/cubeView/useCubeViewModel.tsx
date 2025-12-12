@@ -10,6 +10,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Setter } from '../../types'
 import { CardToIllustrationTag, CardToOracleTag } from '../../api/local/types/tags'
 import { CARD_INDEX } from '../../api/local/cardIndex'
+import { Alert } from '../component/alert/alert'
 
 export interface OrderedCard extends Card, Omit<CubeCard, "name"|"cmc"|"colors"|"rarity"> {
   index: number
@@ -23,13 +24,13 @@ function LoadingError({ cardCount, refreshCubeCards }) {
     await refreshCubeCards()
   }
 
-  return <div className='alert'>
+  return <Alert>
     Your local database is missing {cardCount} cards.{' '}
     <Link to='/data/card'>Go to data</Link> to refresh your database then load this page again or
     {' '}
     <button disabled={memStatus === 'loading' || dbStatus === 'loading'} onClick={onClick}>load default database
     </button>
-  </div>
+  </Alert>
 }
 
 export interface CubeViewModel {
@@ -121,9 +122,7 @@ export function useCubeViewModel(): CubeViewModel {
           refreshCubeCards={refreshCubeCards}
         />)
       } else {
-        setLoadingError(<div className='alert'>
-          {e.message}
-        </div>)
+        setLoadingError(<Alert>{e.message}</Alert>)
       }
     }
   }

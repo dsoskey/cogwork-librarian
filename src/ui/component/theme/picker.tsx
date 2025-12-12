@@ -21,6 +21,7 @@ import { Modal } from '../modal'
 import { PRESET_THEMES } from './presets'
 import "./picker.css"
 import { SettingsContext } from '../../settingsContext'
+import { Alert } from '../alert/alert'
 
 function refreshTheme(theme: Theme, element: HTMLElement) {
   for (const key in theme) {
@@ -241,7 +242,7 @@ export function ThemePicker() {
                     {dbWorking ? "deleting" : "delete"}
                   </button>
                 </div>
-                {errorMessage.length>0 && <div className='alert'>{errorMessage}</div>}
+                {errorMessage.length>0 && <Alert>{errorMessage}</Alert>}
               </div>
             </Modal>
           </>}
@@ -316,7 +317,7 @@ export function ThemePicker() {
               })
               .catch(e => setErrorMessage(e.message))
           }}>save theme</button>
-          {errorMessage.length>0 && <div className='alert'>{errorMessage}</div>}
+          {errorMessage.length>0 && <Alert>{errorMessage}</Alert>}
         </>}
       </div>}
     </div>

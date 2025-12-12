@@ -3,6 +3,7 @@ import { ProjectContext } from '../../api/local/useProjectDao'
 import { parseEntry } from '../../api/local/types/cardEntry'
 import { Modal } from '../component/modal'
 import { CopyToClipboardButton } from '../component/copyToClipboardButton'
+import { Alert } from '../component/alert/alert'
 
 export interface SavedCardsMigratorProps {
   oldSaved: string
@@ -23,10 +24,10 @@ export function SavedCardsMigrator({ oldSaved }: SavedCardsMigratorProps) {
     setMigrateOpen(false)
   }
   return <div>
-    <p className='alert'>
+    <Alert>
       saved cards are now associated with projects.
       you have a saved card list that predates projects.
-    </p>
+    </Alert>
     <button onClick={() => setMigrateOpen(true)}>migrate saved cards</button>
     <Modal open={migrateOpen} title={<h3>migrate saved cards</h3>} onClose={() => setMigrateOpen(false)}>
       <div className='column'>

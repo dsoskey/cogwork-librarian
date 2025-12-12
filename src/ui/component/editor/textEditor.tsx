@@ -5,7 +5,8 @@ import "./textEditor.css";
 import { RectangleIcon } from '../../icons/rectangle'
 import { RectangleCloseIcon } from '../../icons/rectangleClose'
 import { COPY_BUTTON_ICONS, CopyToClipboardButton } from '../copyToClipboardButton'
-import { HoverCard, useHoverCard } from '../../hooks/hoverCard'
+import { HoverCard } from '../hoverCard'
+import { useHoverCard } from '../../hooks/useHoverCard';
 import Prism from 'prismjs'
 
 const MIN_TEXTAREA_HEIGHT = 16;
@@ -115,7 +116,7 @@ export const TextEditor = ({
   const [separateLayers, setSeparateLayers] = useState<boolean>(false);
 
   const [hoverIndex, setHoverIndex] = useState<number>(-1);
-  const { handleHover: handleHoverCard, getHoverStyle } = useHoverCard();
+  const { handleHover: handleHoverCard, hoverStyle } = useHoverCard();
   const hoveredLine = queries[hoverIndex];
   const hoverOverIndex = (e: React.MouseEvent, index: number) => {
     setHoverIndex(index);
@@ -326,7 +327,7 @@ export const TextEditor = ({
         <code className="match-braces">{value}</code>
       </pre>
 
-      {hoveredLine && <HoverCard cardName={hoveredLine} getHoverStyle={getHoverStyle} />}
+      {hoveredLine && <HoverCard cardName={hoveredLine} hoverStyle={hoverStyle} />}
     </div>
   );
 };

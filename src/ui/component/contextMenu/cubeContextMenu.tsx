@@ -6,6 +6,7 @@ import { cogDB as cogDBClient } from '../../../api/local/db'
 import { Link } from 'react-router-dom'
 import { LoaderText, TRIANGLES } from '../loaders'
 import cubecobraImage from '../../icons/cubecobra-favicon.ico'
+import { Alert } from '../alert/alert'
 
 export interface CubeContextMenuProps {
   cubeKey: string
@@ -51,6 +52,6 @@ export function CubeContextMenu({ cubeKey, handleLinkClick }: CubeContextMenuPro
       &nbsp;
       <img src={cubecobraImage} height='18px' />
     </button>}
-    {notFound && <div className='alert'>{cubeKey} not found in cubecobra</div>}
+    {notFound && <Alert>{cubeKey} not found in cubecobra</Alert>}
   </>
 }

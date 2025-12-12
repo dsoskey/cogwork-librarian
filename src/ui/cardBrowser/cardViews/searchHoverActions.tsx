@@ -5,7 +5,7 @@ import { EnrichedCard } from '../../../api/queryRunnerCommon'
 import { LINK_BUTTON_ICONS, CopyToClipboardButton } from '../../component/copyToClipboardButton'
 import { BlockIcon } from '../../icons/block'
 import { AddIcon } from '../../icons/add'
-import { DEFAULT_SIZE } from '../../icons/base'
+import { DEFAULT_ICON_SIZE } from '../../icons/base'
 
 export const COPY_TITLE = {
   unstarted: 'copy json',
@@ -26,7 +26,7 @@ export function SearchHoverActions({ card, onAdd, onIgnore }: SearchHoverActions
       rel='noopener'
     >
       <button title='open in Scryfall'>
-        <ScryfallIcon size={DEFAULT_SIZE} />
+        <ScryfallIcon size={DEFAULT_ICON_SIZE} />
       </button>
     </a>
     <CopyToClipboardButton

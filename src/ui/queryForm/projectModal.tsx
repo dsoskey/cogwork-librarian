@@ -9,6 +9,7 @@ import { parseProject, Project, serializeProject } from '../../api/local/types/p
 import { downloadText } from '../download'
 import { Modal } from '../component/modal'
 import { FormField } from '../component/formField'
+import { Alert } from '../component/alert/alert'
 
 const ProjectExplorer = (props: ExplorerCtx) => {
   const projects = useLiveQuery(() => cogDB.project.toArray())
@@ -193,7 +194,7 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
     open
     title={<div className="row center">
       <h2>Manage projects</h2>
-      {error && <div className='alert'>{error}</div>}
+      {error && <Alert>{error}</Alert>}
     </div>}
     onClose={() => {
       confirmer.hide()
@@ -244,7 +245,7 @@ export const ProjectModal = ({ modalState, setModalState, dispatchTabState }: Pr
         {selectedPath.type === PathType.Dir && ' and all projects and folders inside it'}
         {'. Type and press delete below to confirm.'}
       </p>
-      {confirmer.error.length > 0 && <p className='alert'>{confirmer.error}</p>}
+      {confirmer.error.length > 0 && <Alert>{confirmer.error}</Alert>}
       <div className='row'>
         <input
           placeholder='delete'

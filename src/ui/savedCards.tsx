@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router'
 import { Checkbox } from './component/checkbox/checkbox'
 import { totalCardQuantity } from '../api/local/types/project'
 import { FileUpArrow } from './icons/fileUpArrow'
+import { Alert } from './component/alert/alert'
 
 type PropsKeys = "path" | "savedCards" | "setSavedCards" | "renameQuery"
 export interface SavedCardsEditorProps extends Pick<ProjectDao, PropsKeys> {
@@ -141,9 +142,9 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
     {confirmer.confirming && <Modal
       className='modal-small'
       open={confirmer.confirming}
-      title={<p className='alert'>
+      title={<Alert>
         You are about to delete the saved cards for {splitPath(path)[1]}. Continue?
-      </p>}
+      </Alert>}
       onClose={confirmer.hide}>
 
       <div className='row'>

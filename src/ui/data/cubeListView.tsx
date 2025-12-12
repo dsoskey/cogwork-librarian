@@ -12,6 +12,7 @@ import { CubeListImporter } from './cubeListImporter'
 import { CubeTable } from '../component/cube/cubeDefinitionTable'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
 import { CUBE_SOURCE_TO_LABEL } from '../component/cube/sourceIcon'
+import { Alert } from '../component/alert/alert'
 
 export default function CubeListView() {
   const { addMessage, dismissMessage } = useContext(ToasterContext)
@@ -105,7 +106,7 @@ export default function CubeListView() {
   const CubeIdInput = <label>
     <span className="bold">new cube id:{" "}</span>
     <input placeholder='soskgy' value={cubeId} onChange={onCubeIdChange}/>
-    {error && <div className='alert'>{error}</div>}
+    {error && <Alert>{error}</Alert>}
   </label>
 
   const loader = listImporter.status === "loading" ? (

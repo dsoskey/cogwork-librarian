@@ -1,5 +1,5 @@
 import React from "react";
-import {CardLink} from "./cardLink";
+import { CardLink } from "../../card/CardLink";
 import type {CardNode, GraphNode} from "./types";
 
 export interface RelatedCardListProps {
@@ -17,6 +17,7 @@ export function RelatedCardList({ relatedCards, setSelectedNode, toggleLink }: R
                 <CardLink
                     name={rc.card.name}
                     id={rc.card.id}
+                    set={rc.card.set}
                     onClick={() => setSelectedNode(rc)}
                 />
                 {toggleLink && <button onClick={() => toggleLink(rc.id)}>X</button>}

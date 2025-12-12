@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { BulkCubeImporterContext } from '../../api/cubecobra/useBulkCubeImporter'
 import { LoaderText } from '../component/loaders'
+import { Alert } from '../component/alert/alert'
 
 const REPORT_URL_BASE = "https://github.com/dsoskey/cogwork-librarian/issues/new?assignees=&labels=bug&projects=&title=failed+cubecobra+import&body=during+bulk+import+these+cards+were+not+found%0A```%0A"
 
@@ -25,16 +26,14 @@ export const BulkImportMessage = () => {
   const { missingCards, missingCubes, status } = useContext(BulkCubeImporterContext)
   return <div className='row'>
     {CUBE_IMPORT_MESSAGES[status]?.length > 0 && <div><LoaderText text={CUBE_IMPORT_MESSAGES[status]} /></div>}
-    {missingCubes.length > 0 && <span className='alert'>
-        couldn't find cubes: {missingCubes.join(", ")}
-      </span>}
-    {status === "scryfall-cards-missing" && missingCards.count > 0 && <span className='alert'>
+    {missingCubes.length > 0 && <Alert>couldn't find cubes: {missingCubes.join(", ")}</Alert>}
+    {status === "scryfall-cards-missing" && missingCards.count > 0 && <Alert>
         could not find {missingCards.count} cards. this should never happen, so please{" "}
       <a href={`${REPORT_URL_BASE}${encodeObject(missingCards.cubeToCard)}${NL}\`\`\``}
          target="_blank"
          rel="noreferrer"
       >report this bug</a>
-      </span>}
+      </Alert>}
   </div>
 }
 export const BulkCubeSiteImporter = () => {

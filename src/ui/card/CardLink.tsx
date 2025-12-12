@@ -6,8 +6,7 @@ import { LoaderText, TRIANGLES } from '../component/loaders'
 import { CardImage } from '../cardBrowser/cardViews/cardImage'
 import "./cardLink.css"
 import { imageUris } from '../../api/mtgjson'
-import { Autocomplete, AutocompleteProps } from '../component/autocomplete'
-import { useHoverCard } from '../hooks/hoverCard'
+import { useHoverCard } from '../hooks/useHoverCard'
 
 export function useCardLoader(name: string, id?: string) {
   return useLiveQuery(
@@ -45,14 +44,14 @@ export function CardNameLink({ name, id }: CardNameLinkProps) {
 interface CardLinkProps {
   name: string
   id: string
+  set?: string
   imageSrc?: string;
   hasBack?: boolean;
   onClick?: () => void;
   lockable?: boolean;
 }
 
-export function CardLink({ lockable, onClick, imageSrc, name, id, hasBack }: CardLinkProps) {
-  const _lockable = lockable ?? true;
+export function CardLink({ set, lockable = false, onClick, imageSrc, name, id, hasBack }: CardLinkProps) {
   const [isLockedOpen, setIsLockedOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const handleMouseEnter = () => {
@@ -63,7 +62,7 @@ export function CardLink({ lockable, onClick, imageSrc, name, id, hasBack }: Car
     setIsOpen(false);
   }
 
-  const { handleHover, getHoverStyle } = useHoverCard();
+  const { handleHover, hoverStyle } = useHoverCard();
 
   return (
     <>
@@ -71,15 +70,15 @@ export function CardLink({ lockable, onClick, imageSrc, name, id, hasBack }: Car
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onMouseMove={handleHover}
-        className={`card-link ${isLockedOpen ? "active" : ''}`}
+        className={`card-link ${onClick ? 'clickable' : ''} ${isLockedOpen ? "active" : ''}`}
         title={isLockedOpen
           ? ""
-          : (_lockable
+          : (lockable
             ? "click hovered text to keep image open"
             : name)
       }
         onClick={() => {
-          if (_lockable) {
+          if (lockable) {
             setIsLockedOpen(p=>!p)
           }
           onClick?.()
@@ -90,16 +89,18 @@ export function CardLink({ lockable, onClick, imageSrc, name, id, hasBack }: Car
       {(isLockedOpen || isOpen) && (
         <div
           className="popup-container"
-          style={getHoverStyle(hasBack ? 2 : 1)}
+          style={hoverStyle}
           onClick={() => setIsLockedOpen(false)}
         >
           <img
-            className="card-link-image"
+            width={250}
+            className={`card-image ${set??''}`}
             src={imageSrc ?? imageUris(id, "front").normal}
             alt={name}
           />
           {hasBack && <img
-            className="card-link-image"
+            width={250}
+            className={`card-image ${set??''}`}
             src={imageUris(id, "back").normal}
             alt={name}
           />}
@@ -107,49 +108,4 @@ export function CardLink({ lockable, onClick, imageSrc, name, id, hasBack }: Car
       )}
     </>
   );
-}
-
-export interface HoverableInputProps extends AutocompleteProps {
-  setValue: (value: string) => void;
-}
-
-export function HoverableInput(props: HoverableInputProps) {
-  const card: Card = useCardLoader(props.value);
-  const hasBack = card ? DOUBLE_FACED_LAYOUTS.includes(card.layout) : false;
-  const [isOpen, setIsOpen] = useState(false);
-  const handleMouseEnter = () => {
-    setIsOpen(true);
-  }
-
-  const handleMouseLeave = () => {
-    setIsOpen(false);
-  }
-
-  const { handleHover, getHoverStyle } = useHoverCard();
-
-  return <>
-      <Autocomplete
-        {...props}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onMouseMove={handleHover}
-      />
-      {isOpen && card && (
-        <div
-          className="popup-container"
-          style={getHoverStyle(hasBack ? 2 : 1)}
-        >
-          <img
-            className="card-link-image"
-            src={imageUris(card.id, "front").normal}
-            alt={card?.name}
-          />
-          {hasBack && <img
-            className="card-link-image"
-            src={imageUris(card.id, "back").normal}
-            alt={card?.name}
-          />}
-        </div>
-      )}
-  </>;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { DEFAULT_OPACITY, DEFAULT_SIZE } from './base'
+import { DEFAULT_OPACITY, DEFAULT_ICON_SIZE } from './base'
 
 export interface DraftmancerIconProps {
 
@@ -8,7 +8,7 @@ export interface DraftmancerIconProps {
 export function DraftmancerIcon({}: DraftmancerIconProps) {
   const strokeWidth = 8
   return <svg
-    width={DEFAULT_SIZE} height={DEFAULT_SIZE}
+    width={DEFAULT_ICON_SIZE} height={DEFAULT_ICON_SIZE}
     viewBox="0 0 145.52084 145.52083"
     version="1.1"
     id="svg5"

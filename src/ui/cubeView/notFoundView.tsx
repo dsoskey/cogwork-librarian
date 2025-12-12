@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom'
 import { LoaderText } from '../component/loaders'
 import cubeArtisanIcon from '../icons/cubeartisan-favicon.ico'
 import cubeCobraIcon from '../icons/cubecobra-favicon.ico'
+import { Alert } from '../component/alert/alert'
 
 export function CubeNotFoundView() {
   const { key } = useParams()
@@ -40,7 +41,7 @@ export function CubeNotFoundView() {
         <img src={cubeCobraIcon} height="18px" />
       </button>
     </div>
-    {notFound && <div className='alert'>{cubekey} not found in {source}</div>}
+    {notFound && <Alert>{cubekey} not found in {source}</Alert>}
     {isRunning && <LoaderText text={`Fetching ${cubekey} from ${source}`} />}
   </div>
 }
