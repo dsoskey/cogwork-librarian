@@ -152,7 +152,6 @@ export function GraphSearchView({ memory }: GraphSearchViewProps) {
           </div>
         </div>
 
-        {/*todo: consider cenralized hover card rendering.*/}
         {hoverId && hoverType === 'card' &&
           <HoverCard cardName={hoverName} id={hoverId} hoverStyle={hoverStyle} />
         }

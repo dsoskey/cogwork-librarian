@@ -12,7 +12,7 @@ export function RelatedSearchList({ relatedSearches, setSelectedNode, toggleLink
         <h3>related searches ({relatedSearches.length})</h3>
         <ul>
             {relatedSearches.map(rs => <li className="related" key={rs.id}>
-                <span onClick={() => setSelectedNode(rs)}>{rs.id}</span>
+                <pre><code className="language-mtgql" onClick={() => setSelectedNode(rs)}>{rs.id}</code></pre>
                 {toggleLink && <button onClick={() => toggleLink(rs.id)}>X</button>}
             </li>)}
         </ul>

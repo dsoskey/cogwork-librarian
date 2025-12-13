@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext, useMemo, useRef } from 'react'
 import {
     type CardNode,
     relatedNodeIds,
@@ -19,6 +19,8 @@ export interface CardDetailViewProps {
 }
 
 export function CardDetailView({ cardNode }: CardDetailViewProps) {
+    const headerRef = useRef<HTMLElement>();
+
     const { card, id } = cardNode;
     const { nodes, links, removeNode, setSelectedNode, toggleLink } = useContext(GraphControllerContext);
 
@@ -45,6 +47,7 @@ export function CardDetailView({ cardNode }: CardDetailViewProps) {
     const handleDeleteClick = () => removeNode(cardNode.id);
 
     return <section className="card-detail-view">
+        <div ref={headerRef}></div>
         <div className='detail-view-header row center'>
             <h2>{card.name}</h2>
 
@@ -63,6 +66,7 @@ export function CardDetailView({ cardNode }: CardDetailViewProps) {
         <_CardImage card={card} name={card.name} nameFallback={false} />
 
         {relatedCards.length > 0 && <RelatedCardList
+          headerRef={headerRef}
           relatedCards={relatedCards}
           setSelectedNode={setSelectedNode}
           toggleLink={(t) => toggleLink(id, t)}

@@ -42,8 +42,14 @@
         .detail-view-header {
             position: sticky;
             top: 0;
+            z-index: 10;
             background-color: var(--darkest-color);
+            align-items: start;
             padding: 4px;
+
+            button {
+                margin-top: 4px;
+            }
         }
 
         h2 {
@@ -51,11 +57,21 @@
             flex: 1;
         }
 
+        .related-header {
+            position: sticky;
+            z-index: 10;
+            top: 2em;
+            background-color: var(--darkest-color);
+        }
+
         ul {
-            margin: 0;
+            margin: var(--spacing-200) 0 0;
             padding: 0 0 0 var(--spacing-200);
         }
         li.related {
+            pre {
+                cursor: pointer;
+            }
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -63,6 +79,7 @@
             :first-child {
                 flex: 1;
             }
+            height: var(--interaction-size-min);
         }
     }
 

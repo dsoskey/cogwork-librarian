@@ -870,7 +870,6 @@ body:has(.query-panel) {
 }
 
 .rotating {
-
   rotation-point: center;
   animation: 2s infinite linear rotating;
   &.d1s {
