@@ -79,7 +79,7 @@ export const App = () => {
                       <Route path='/whats-next/*' element={<DefaultLayout><WhatsNext /></DefaultLayout>} />
                       <Route path='/user-guide/*' element={<DefaultSuspense><DocsView /></DefaultSuspense>} />
                       <Route path='/settings' element={<DefaultLayout><SettingsView /></DefaultLayout>} />
-                      <Route path='/graph-search' element={<DefaultLayout><GraphSearchView memory={memory} /></DefaultLayout>} />
+                      <Route path='/graph-search' element={<DefaultLayout showFooter={false}><GraphSearchView memory={memory} /></DefaultLayout>} />
                       <Route path='/' element={
                         <div className='search-view-root'>
                           <SearchView

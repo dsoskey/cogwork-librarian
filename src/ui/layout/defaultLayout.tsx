@@ -5,17 +5,17 @@ import "./defaultLayout.css"
 import { DefaultSuspense } from './defaultSuspense'
 
 export interface DefaultLayoutProps extends React.PropsWithChildren<{}> {
-
+    showFooter?: boolean;
 }
 
-export function DefaultLayout({ children }: DefaultLayoutProps) {
+export function DefaultLayout({ children, showFooter = true }: DefaultLayoutProps) {
 
     return <>
         <Masthead />
         <div className="default-layout">
             <DefaultSuspense>{children}</DefaultSuspense>
         </div>
-        <Footer />
+        {showFooter && <Footer />}
     </>;
 }
 
