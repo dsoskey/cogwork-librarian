@@ -69,7 +69,7 @@ export interface GraphState {
     links: GraphLink[];
 }
 
-export function serializeGraph({ nodes, links }: GraphState): string {
+export function serializeGraph({ nodes, links }: GraphState, pretty: boolean = false): string {
     const _nodes: GraphNode[] = []
     for (const node of nodes) {
         const copy: GraphNode = {
@@ -93,6 +93,9 @@ export function serializeGraph({ nodes, links }: GraphState): string {
         target: link.target.id ?? link.target,
         value: link.value,
     }));
+    if (pretty) {
+        return JSON.stringify({ nodes: _nodes, links: _links }, undefined, 2);
+    }
     return JSON.stringify({ nodes: _nodes, links: _links });
 }
 

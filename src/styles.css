@@ -411,7 +411,7 @@ th, td {
     position: relative;
 
     .error-indicator {
-      --svg-stroke: var(--red);
+      --svg-stroke: var(--light-red);
       background-color: whitesmoke;
       cursor: help;
     }
@@ -441,7 +441,7 @@ th, td {
       }
 
       &.error .foreground {
-        fill: var(--red);
+        fill: var(--light-red);
       }
     }
   }
@@ -615,6 +615,17 @@ th, td {
   font-weight: bold;
   width: fit-content;
   border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  gap: var(--spacing-200);
+
+  pre {
+    margin: unset;
+  }
+  .children-container {
+    flex: 1;
+  }
 }
 
 .alert * {
@@ -671,7 +682,7 @@ th, td {
   }
 }
 
-.db-import .file {
+.file-input-root {
   width: 100%;
   height: 100%;
   display: grid;
@@ -679,27 +690,28 @@ th, td {
   grid-template-rows: 1fr;
   grid-template-areas: 'overlap';
   border: var(--active-mid-alpha) 2px inset;
-}
-.db-import .file input {
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  display: inline-block;
-  grid-area: overlap;
-  cursor: pointer;
-}
-.db-import .file label {
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  display: inline-block;
-  grid-area: overlap;
-  background: var(--active);
-  color: var(--dark-color);
-  text-align: center;
-  align-items: center;
-  justify-content: center;
+
+  input {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: inline-block;
+    grid-area: overlap;
+    cursor: pointer;
+  }
+  label {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: inline-block;
+    grid-area: overlap;
+    background: var(--active);
+    color: var(--dark-color);
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .list-import, .file-import {

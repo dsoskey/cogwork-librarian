@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { GraphControllerContext, useGraphController } from './useGraphController'
 import { NodeDetailView } from './nodeDetailView'
 import { GraphView } from './graphView'
-import { CardNode, cardToCardNode, deserializeGraph, SearchNode } from './types'
-import { NormedCard, QueryRunner } from 'mtgql'
+import { CardNode, cardToCardNode, deserializeGraph, SearchNode, serializeGraph } from './types'
+import { NormedCard, QueryRunner, SearchError } from 'mtgql'
 import { cogDB, COGDB_FILTER_PROVIDER } from '../../../api/local/db'
 import { CARD_INDEX } from '../../../api/local/cardIndex'
 import './graphSearchView.css'
@@ -14,13 +14,14 @@ import { GraphImportModal } from './importModal'
 import { HoverCard } from '../../component/hoverCard'
 import { Alert } from '../../component/alert/alert'
 import { TaskStatus } from '../../../types'
+import { displayMessage } from '../../../error'
+import { downloadText } from '../../download'
 
 export interface GraphSearchViewProps {
   memory: NormedCard[];
 }
 
 export function GraphSearchView({ memory }: GraphSearchViewProps) {
-  // todo: loading and error states
   const { result, run } = useMemoryQueryRunner({ corpus: memory });
   const [graphStatus, setGraphStatus] = useState<TaskStatus>('loading');
   const [settings] = useState<GraphUserSettings>(DEFAULT_GRAPH_USER_SETTINGS);
@@ -31,11 +32,17 @@ export function GraphSearchView({ memory }: GraphSearchViewProps) {
 
   const graphController = useGraphController({ initialLinks: [], initialNodes: [] })
   const {
-    selectedNode, nodes,
+    selectedNode, nodes, links,
     graphError, setGraphError,
     hoverId, hoverName, hoverType, hoverStyle
   } = graphController;
-
+  const handleExportClick = () => {
+    downloadText(
+      serializeGraph({ nodes: nodes.current, links: links.current }, true),
+      `coglib-graph-${Date.now()}`,
+      'json',
+    )
+  }
   const autoCompleteRef = useRef<HTMLInputElement>();
   const [nextSearchText, setNextSearchText] = useState("");
   const handleNextSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +52,7 @@ export function GraphSearchView({ memory }: GraphSearchViewProps) {
     switch (event.key) {
       case 'Enter':
         if (nextSearchText.trim() === "") return;
+        setGraphError('')
 
         try {
           const card = await cogDB.getCardByName(nextSearchText.trim());
@@ -66,8 +74,12 @@ export function GraphSearchView({ memory }: GraphSearchViewProps) {
             }
             graphController.addNode(searchNode);
             setNextSearchText('');
+            autoCompleteRef.current?.focus();
           } catch (e) {
             console.error(e);
+            const error = e as SearchError;
+            setGraphError(displayMessage(error, 0))
+            autoCompleteRef.current?.blur();
           }
         }
     }
@@ -131,13 +143,12 @@ export function GraphSearchView({ memory }: GraphSearchViewProps) {
               onKeyDown={handleSearchKeydown}
             />
 
-            {/* todo: */}
-            <button onClick={() => setActiveModal("import")}>Import</button>
-            {/*<button>Export</button>*/}
+            <button disabled={graphStatus === 'loading'} onClick={() => setActiveModal("import")}>Import</button>
+            <button disabled={graphStatus === 'loading'} onClick={handleExportClick}>Export</button>
             {/*<button>Settings</button>*/}
           </div>
 
-          {graphError && <Alert dismiss={() => setGraphError('')} >{graphError}</Alert> }
+          {graphError && <Alert dismiss={() => setGraphError('')} ><pre><code>{graphError}</code></pre></Alert> }
         </div>
 
         <div className='row'>

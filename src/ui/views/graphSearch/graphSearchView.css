@@ -83,3 +83,22 @@
     }
 
 }
+
+
+.graph-import-modal {
+    .input-link {
+        color: var(--dark-color);
+        font-size: x-large;
+        font-weight: bold;
+    }
+
+    .import-form {
+
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-300);
+    }
+    .text-editor-root {
+        min-height: calc(var(--editor-line-height) * 5em);
+    }
+}

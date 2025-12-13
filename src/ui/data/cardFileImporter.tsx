@@ -118,7 +118,7 @@ export const CardFileImporter = ({
     {dbImportStatus !== "loading" && dbImportStatus !== "error" &&
       <>
         <p>valid formats are a json list of Scryfall cards or a text list of exact card names</p>
-        <div className='file'>
+        <div className='file-input-root'>
           <label htmlFor='file-import'>
             <div>
               <p>click to browse files</p>
