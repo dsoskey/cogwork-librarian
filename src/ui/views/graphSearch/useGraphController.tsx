@@ -131,6 +131,7 @@ export function useGraphController({
         try {
             localStorage.setItem('graph-search.state', serializeGraph({ nodes: nodes.current, links: links.current }))
         } catch (e) {
+            console.error(e);
             setGraphError('Could not save graph. If you refresh you will lose graph data.')
         }
     }

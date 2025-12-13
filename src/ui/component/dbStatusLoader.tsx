@@ -15,7 +15,7 @@ export function MemStatusLoader() {
       return <div className="column">
         <span><LoaderText text='preparing the library' /></span>
         {dbReport.totalCards > 0 && <LoaderBar
-          width='500px'
+          width={500}
           count={dbReport.cardCount}
           total={dbReport.totalCards}
           label='cards loaded'
@@ -34,9 +34,9 @@ export function DBStatusLoader() {
       return <>
         <span><LoaderText text={DB_INIT_MESSAGES[dbReport.complete]} /></span>
         <div className='column'>
-          <LoaderBar width="500px" count={dbReport.complete} total={dbReport.totalQueries} />
+          <LoaderBar width={500} count={dbReport.complete} total={dbReport.totalQueries} />
           {memStatus === "loading" && dbReport.totalCards > 0 && <LoaderBar
-            width="500px"
+            width={500}
             label='cards loaded'
             count={dbReport.cardCount}
             total={dbReport.totalCards}

@@ -2,8 +2,6 @@ import { Alias, ParsedQuerySet, ParserError, QueryEnvironment, QueryMode, QueryW
 import { columnShower } from '../../error'
 import { stdlib } from './aliasLibs'
 import { injectPrefix, RunStrategy, weightAlgorithms } from '../queryRunnerCommon'
-import cloneDeep from 'lodash/cloneDeep'
-
 const ALIAS_REGEXP = /^@(a|alias):/
 export const VENN_REGEXP = /^@(v|venn)/
 const DEFAULT_DOMAIN_REGEXP = /^@(dd|defaultDomain)\((.+)\)$/
@@ -47,7 +45,7 @@ export function alias(_line: string): Alias {
 }
 
 function resolveAliases(aliases: { [name: string]: Alias }): { [name: string]: Alias } {
-  const copy = cloneDeep(aliases);
+  const copy = structuredClone(aliases);
 
   for (const key in copy) {
     const value = aliases[key];
