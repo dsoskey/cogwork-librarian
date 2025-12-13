@@ -1,5 +1,4 @@
 import React, { createContext, useMemo, useState } from 'react'
-import _cloneDeep from 'lodash/cloneDeep'
 export type { Flag } from '../../config'
 import { ClientConfig, Flag, Stage } from '../../config'
 
@@ -29,7 +28,7 @@ export const FlagContext = createContext<FlagManager>({
 
 export const FlagContextProvider = ({ children }) => {
   const [flags, setFlags] = useState<Record<Flag, boolean>>(() => {
-    const result = _cloneDeep(CLIENT_CONFIG.flags)
+    const result = structuredClone(CLIENT_CONFIG.flags)
     if (localStorage.getItem("admin.coglib.sosk.watch") === "~") {
       result.adminMode = true
     }
@@ -38,8 +37,9 @@ export const FlagContextProvider = ({ children }) => {
 
   const setFlag = (flag: Flag, value: boolean) => {
     setFlags(prev => {
-      prev[flag] = value
-      return _cloneDeep(prev)
+      const next= structuredClone(prev)
+      next[flag] = value
+      return next
     })
   }
 

@@ -5,7 +5,6 @@ import { INTRO_EXAMPLE } from '../example'
 import { Setter } from '../../types'
 import { defaultFunction, defaultPromise } from '../context'
 import { Card } from 'mtgql'
-import cloneDeep from 'lodash/cloneDeep'
 import { Project, SavedCardSection } from './types/project'
 import { CardEntry, parseEntry, serializeEntry } from './types/cardEntry'
 
@@ -299,7 +298,7 @@ export function useProjectDao(): ProjectDao {
 
   const addCards = useCallback((query: string, cards: Card[]) => {
     setSavedCards((prev) => {
-      const next = cloneDeep(prev);
+      const next = structuredClone(prev);
       let sectionIndex = next.findIndex((it) => it.query === query)
       if (sectionIndex === -1) {
         sectionIndex = next.length
@@ -319,7 +318,7 @@ export function useProjectDao(): ProjectDao {
       if (queryIndex < 0 || queryIndex > prev.length - 1) return prev;
       if (prev[queryIndex].query === newQuery) return prev;
 
-      const next = cloneDeep(prev);
+      const next = structuredClone(prev);
 
       next[queryIndex].query = newQuery;
       return next;
@@ -330,7 +329,7 @@ export function useProjectDao(): ProjectDao {
     setSavedCards(prev => {
       if (queryIndex < 0 || queryIndex > prev.length - 1) return prev;
 
-      const next = cloneDeep(prev);
+      const next = structuredClone(prev);
       next[queryIndex].cards.splice(cardIndex, 1);
       return next;
     })
@@ -340,7 +339,7 @@ export function useProjectDao(): ProjectDao {
     setSavedCards(prev => {
       if (queryIndex < 0 || queryIndex > prev.length - 1) return prev;
 
-      const next = cloneDeep(prev);
+      const next = structuredClone(prev);
       next.splice(queryIndex, 1)
       return next;
     })

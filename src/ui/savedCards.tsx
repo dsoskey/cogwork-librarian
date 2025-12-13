@@ -9,7 +9,6 @@ import { PencilIcon } from './icons/pencil'
 import { TrashIcon } from './icons/trash'
 import { useConfirmDelete } from './queryForm/useConfirmDelete'
 import { SavedCardsMigrator } from './savedCards/savedCardsMigrator'
-import _cloneDeep from 'lodash/cloneDeep'
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core'
 import { AddIcon } from './icons/add'
 import { TextEditor } from './component/editor/textEditor'
@@ -37,7 +36,7 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
 
   const setQuerySelected = (selected: boolean, sectionIndex: number) => {
     setSavedCards((prev) => {
-      const next = _cloneDeep(prev);
+      const next = structuredClone(prev);
       next[sectionIndex].selected = selected;
       return next;
     })
@@ -45,7 +44,7 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
 
   const setSectionsCards = (cards: string[], sectionIndex: number) => {
     setSavedCards((prev) => {
-      const next = _cloneDeep(prev);
+      const next = structuredClone(prev);
       next[sectionIndex].cards = cards;
       return next;
     })
@@ -98,7 +97,7 @@ export const SavedCardsEditor = React.memo((props: SavedCardsEditorProps) => {
         const source = e.active.id as number;
         const destination = e.over.id as number;
         setSavedCards(prev => {
-          const next = _cloneDeep(prev)
+          const next = structuredClone(prev)
           const toMove = next[source];
           for (const card of toMove.cards) {
             const cardToMove = parseEntry(card);

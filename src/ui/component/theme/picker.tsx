@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { HslColorPicker } from 'react-colorful'
-import cloneDeep from 'lodash/cloneDeep'
 import { useLocalStorage } from '../../../api/local/useLocalStorage'
 import { RangeField } from '../formField'
 import { TextEditor } from '../editor/textEditor'
@@ -132,7 +131,7 @@ export function ThemePicker() {
   });
   const setSeed = (key: keyof ThemeSeed) => (newVal: HSL | number | string) => {
     _setSeed(prev => {
-      const next = cloneDeep(prev);
+      const next = structuredClone(prev);
       // @ts-ignore
       next[key] = newVal
       refreshRootTheme(seedToTheme(next))

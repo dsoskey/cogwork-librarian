@@ -4,7 +4,6 @@ import { Card, normCardList, QueryRunner, SearchOptions } from 'mtgql'
 import { COGDB_FILTER_PROVIDER } from '../../../api/local/db'
 import { ColorBreakdown } from '../cubeTags'
 import { useHighlightPrism } from '../../../api/local/syntaxHighlighting'
-import _cloneDeep from 'lodash/cloneDeep'
 import { useMultiInputEditor } from '../../hooks/useMultiInputEditor'
 import { useLocalStorage } from '../../../api/local/useLocalStorage'
 import { CardResultsLayout } from '../cardResults'
@@ -57,7 +56,7 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
     const [queries, setQueries] = useLocalStorage(`cube-table-queries-${cube.key}`, DEFAULT_QUERIES);
     const setQuery = (index: number, nextQuery: string) => {
         setQueries((prev) => {
-            const next = _cloneDeep(prev);
+            const next = structuredClone(prev);
             next[index] = nextQuery;
             return next;
         })
@@ -89,7 +88,7 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
             const firstHalf = queries[index].substring(0, splitIndex);
             const secondHalf = queries[index].substring(splitIndex);
             setQueries(prev => {
-                const next = _cloneDeep(prev);
+                const next = structuredClone(prev);
                 next.splice(index, 1, firstHalf, secondHalf)
                 return next;
             })
@@ -102,7 +101,7 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
         onBackspace(focus, index) {
             const prevEntry = queries[index - 1];
             setQueries(prev => {
-                const next = _cloneDeep(prev);
+                const next = structuredClone(prev);
                 next.splice(index, 1);
                 next[index-1] = next[index-1] + queries[index]
                 return next;
@@ -114,7 +113,7 @@ export function CubeSearchTable({}: CubeSearchTableProps) {
         },
         onDelete(_focusEntry, index) {
             setQueries(prev => {
-                const next = _cloneDeep(prev);
+                const next = structuredClone(prev);
                 const nextQuery = prev[index + 1];
                 next[index] = queries[index] + nextQuery
                 next.splice(index + 1, 1);

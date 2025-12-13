@@ -1,6 +1,5 @@
 import type {SimulationNodeDatum} from "d3-force";
 import { Card, QueryRunner } from 'mtgql'
-import _cloneDeep from 'lodash/cloneDeep'
 import { cogDB, COGDB_FILTER_PROVIDER } from '../../../api/local/db'
 
 export interface GraphNode extends SimulationNodeDatum {
@@ -71,29 +70,29 @@ export interface GraphState {
 }
 
 export function serializeGraph({ nodes, links }: GraphState): string {
-    const _nodes = _cloneDeep(nodes);
-    for (const node of _nodes) {
-        delete node.fx;
-        delete node.fy;
-        delete node.x;
-        delete node.y;
-        delete node.vx;
-        delete node.vy;
-        if (node.type === 'card') {
-            delete (node as CardNode).card
+    const _nodes: GraphNode[] = []
+    for (const node of nodes) {
+        const copy: GraphNode = {
+            group: node.group,
+            id: node.id,
+            size: node.size,
+            type: node.type
+
+        };
+        if (node.type === 'search') {
+            (copy as SearchNode).totalSize = (node as SearchNode).totalSize;
         } else {
-            delete (node as SearchNode).filterFunc
+            (copy as CardNode).print_id = (node as CardNode).print_id;
+            (copy as CardNode).oracle_id = (node as CardNode).oracle_id;
         }
+        _nodes.push(copy)
+
     }
-    const _links = _cloneDeep(links);
-    for (const link of _links) {
-        if (link.source.id) link.source = link.source.id;
-        if (link.target.id) link.target = link.target.id;
-        delete link.x1;
-        delete link.y1;
-        delete link.x2;
-        delete link.y2;
-    }
+    const _links: GraphLink[] = links.map(link => ({
+        source: link.source.id ?? link.source,
+        target: link.target.id ?? link.target,
+        value: link.value,
+    }));
     return JSON.stringify({ nodes: _nodes, links: _links });
 }
 

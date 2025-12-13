@@ -6,7 +6,6 @@ import { FlagContext } from '../flags'
 import { useLocation } from 'react-router'
 import { CogDBContext } from '../../api/local/useCogDB'
 import { Dropdown } from './dropdown'
-import _cloneDeep from 'lodash/cloneDeep'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 
 interface DatabaseLinkProps { active: boolean }
@@ -27,7 +26,7 @@ export const Masthead = React.memo(() => {
     if (pathname.startsWith("/data/cube/")) {
       const cubeId = pathname.split("/").pop();
       setLastVisitedCubes(prev=> {
-        const next = _cloneDeep(prev);
+        const next = structuredClone(prev);
         const prevIndex = next.findIndex(it => it === cubeId);
         if (prevIndex === -1) {
           if (next.length > 4) {

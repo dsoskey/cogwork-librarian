@@ -1,7 +1,6 @@
 import React, { HTMLAttributes } from 'react'
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core'
 import { Setter } from '../../../types'
-import _cloneDeep from 'lodash/cloneDeep'
 import './multiselect.css'
 import { DragHandle } from '../../icons/dragHandle'
 
@@ -47,7 +46,7 @@ export function Multiselect({
         const source = e.active.id as number
         const target = e.over.id as number
         setValue(prev => {
-          const next = _cloneDeep(prev)
+          const next = structuredClone(prev)
           const toMove = next[source]
           next.splice(source, 1)
           next.splice(target, 0, toMove)

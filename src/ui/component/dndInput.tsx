@@ -1,4 +1,3 @@
-import cloneDeep from 'lodash/cloneDeep'
 import React from 'react'
 
 export interface QueryInputProps {
@@ -19,7 +18,7 @@ export const DnDInput = ({ setQueries, queries }: QueryInputProps) => {
             value={query}
             onChange={(event) =>
               setQueries((prev) => {
-                const newQ = cloneDeep(prev)
+                const newQ = structuredClone(prev)
                 newQ[index] = event.target.value
                 return newQ
               })
@@ -28,7 +27,7 @@ export const DnDInput = ({ setQueries, queries }: QueryInputProps) => {
           <button
             onClick={() => {
               setQueries((prev) => {
-                const newQ = cloneDeep(prev)
+                const newQ = structuredClone(prev)
                 newQ.splice(index, 1)
                 return newQ
               })
@@ -41,7 +40,7 @@ export const DnDInput = ({ setQueries, queries }: QueryInputProps) => {
       <button
         onClick={() => {
           setQueries((prev) => {
-            const newQ = cloneDeep(prev)
+            const newQ = structuredClone(prev)
             newQ.push('')
             return newQ
           })

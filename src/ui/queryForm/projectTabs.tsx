@@ -4,7 +4,6 @@ import './projectTabs.css'
 import { downloadText } from '../download'
 import { serializeProject } from '../../api/local/types/project'
 import { ModalState, ProjectModal } from './projectModal'
-import cloneDeep from 'lodash/cloneDeep'
 import { useLocalStorage } from '../../api/local/useLocalStorage'
 import { InfoModal } from '../component/infoModal'
 
@@ -99,7 +98,7 @@ export function generateTabReducer(setter: (result: object) => void) {
             state.active[selectedIndex] = newPath;
           }
         }
-        result = cloneDeep(state)
+        result = structuredClone(state)
         break;
       }
       default:
