@@ -1,6 +1,7 @@
 import type {SimulationNodeDatum} from "d3-force";
 import { Card, QueryRunner } from 'mtgql'
 import { cogDB, COGDB_FILTER_PROVIDER } from '../../../api/local/db'
+import { cardKeyToGroupFunction } from '../../cubeView/cardResults'
 
 export interface GraphNode extends SimulationNodeDatum {
     id: string;
@@ -33,7 +34,7 @@ export interface CardNode extends GraphNode {
 export function cardToCardNode(card: Card, index: number): CardNode {
     return {
         id: `${card.name}__${index}`,
-        group: colorGroup(card.colors??[]),
+        group: cardKeyToGroupFunction.color_identity(card),
         type: 'card',
         size: 0,
         oracle_id: card.oracle_id,

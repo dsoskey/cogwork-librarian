@@ -48,7 +48,7 @@ const FILL_COLORS = [
 
 
 const fillColor = d3.scaleOrdinal(
-    ['s', 'w', 'u', 'b', 'r', 'g', 'm', 'c'],
+    ['s', 'w', 'u', 'b', 'r', 'g', 'multi', 'colorless'],
     FILL_COLORS
 );
 
@@ -65,7 +65,7 @@ const STROKE_COLORS = [
 
 
 const strokeColor = d3.scaleOrdinal(
-    ['s', 'w', 'u', 'b', 'r', 'g', 'm', 'c'],
+    ['s', 'w', 'u', 'b', 'r', 'g', 'multi', 'colorless'],
     STROKE_COLORS
 );
 

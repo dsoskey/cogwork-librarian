@@ -7,7 +7,7 @@ import { useViewportListener } from '../hooks/useViewportListener'
 import { PrintPage } from './printPage'
 import _groupBy from 'lodash/groupBy'
 import { CardLink } from '../card/CardLink'
-import { DOUBLE_FACED_LAYOUTS } from 'mtgql'
+import { Card, DOUBLE_FACED_LAYOUTS } from 'mtgql'
 import { Checkbox } from '../component/checkbox/checkbox'
 import _sortBy from 'lodash/sortBy'
 
@@ -86,8 +86,8 @@ const SUPERTYPES = new Set([
   "Tribal"
 ])
 
-const cardKeyToGroupFunction = {
-  color_identity: (card: OrderedCard) => {
+export const cardKeyToGroupFunction = {
+  color_identity: (card: Card) => {
     if (card.color_identity.length > 1) {
       return "multi";
     }
@@ -97,7 +97,7 @@ const cardKeyToGroupFunction = {
 
     return card.color_identity.join("").toLowerCase()
   },
-  type_line: (card: OrderedCard) => {
+  type_line: (card: Card) => {
     if (!card.type_line) return ""
 
 

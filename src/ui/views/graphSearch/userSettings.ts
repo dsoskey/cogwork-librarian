@@ -14,15 +14,15 @@ export interface GraphUserSettings {
 }
 
 export const DEFAULT_GRAPH_USER_SETTINGS: GraphUserSettings = {
-  uniqueCardNodes: true,
-  showCardNamesOnGraph: false,
-  cardNodeContent: 'color-category',
+  uniqueCardNodes: true, // implemented
+  showCardNamesOnGraph: false, // v2
+  cardNodeContent: 'color-category', // default
 
-  groupUnconnectedCards: false,
-  showSearchTextOnGraph: false,
+  groupUnconnectedCards: false, // default
+  showSearchTextOnGraph: false, // v2
 
-  scaleSearchNodeSize: true,
-  searchNodeScalingFactor: 'connected-count',
+  scaleSearchNodeSize: true, // default
+  searchNodeScalingFactor: 'connected-count', // default
 }
 
 export const GraphUserSettingsContext = createContext<GraphUserSettings>(DEFAULT_GRAPH_USER_SETTINGS)
