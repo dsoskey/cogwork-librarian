@@ -99,10 +99,11 @@ export interface GraphController {
     hoverStyle: React.CSSProperties;
     graphError: string;
     setGraphError: Setter<string>;
+    initGraph: (svg: d3.Selection<SVGSVGElement, any, any, any>) => void;
 }
 
 export const GraphControllerContext = createContext<GraphController>({} as any)
-
+const USE_ZOOM = true;
 export function useGraphController({
     initialLinks, initialNodes,
     simulationAlpha = .1,
@@ -114,7 +115,7 @@ export function useGraphController({
     const simulationRef = useRef<d3.Simulation<any, any>>();
     const linkRef = useRef<LinkSelection>();
     const nodeRef = useRef<NodeSelection>();
-
+    const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, any>>()
     const handleGraphUpdate = () => {
         nodeRef.current = nodeRender(nodeRef.current.data(nodes.current));
         linkRef.current = linkRender(linkRef.current.data(links.current));
@@ -262,7 +263,7 @@ export function useGraphController({
         )
         nodes.current.splice(indexToRemove, 1);
         for (const node of nodes.current) {
-            if (nodesToUpdate.has(node.id) && node.type === 'search') {
+            if (nodesToUpdate.has(node.id) && node.type === 'search' && node.size > 1) {
                 node.size--;
             }
         }
@@ -363,11 +364,44 @@ export function useGraphController({
         selectedNode, setSelectedNode: setSelectedNode, removeSelection,
         links, linkRef, linkRender,
         nodes, nodeRef, nodeRender,
-        simulationRef,
+        simulationRef, initGraph,
         hoverId, hoverName, hoverType, hoverStyle,
         graphError, setGraphError
     }
 
+    function initGraph(svg: d3.Selection<SVGSVGElement, any, any, any>) {
+        const _links = links.current;
+        const _nodes = nodes.current;
+
+        simulationRef.current = d3.forceSimulation(_nodes)
+          .force("link", d3.forceLink(_links)
+            .id(d => d.id)
+          )
+          .force("charge", d3.forceManyBody())
+          .force("x", d3.forceX())
+          .force("y", d3.forceY())
+          .on('tick', ticked);
+
+        if (USE_ZOOM) {
+            zoomRef.current = d3.zoom()
+              .scaleExtent([0.75, 4])
+              // todo: restrict panning area
+              // .translateExtent([[], []])
+              .on("zoom", zoomed);
+            svg.call(zoomRef.current).call(zoomRef.current.transform, d3.zoomIdentity);
+        }
+
+        linkRef.current = linkRender(svg.append("g")
+          .attr('class', 'link')
+          .attr("stroke-opacity", 0.6)
+          .selectAll()
+          .data(_links));
+
+        nodeRef.current = nodeRender(svg.append("g")
+          .attr("stroke-width", 1.5)
+          .selectAll()
+          .data(_nodes));
+    }
 
     function nodeRender(selection: NodeSelection) {
         let result = selection
@@ -386,6 +420,13 @@ export function useGraphController({
 
         // add toggleable title here
 
+        if (USE_ZOOM) {
+            if (result.node()) {
+                const transform = d3.zoomTransform(result.node());
+                result.attr("transform", transform.toString());
+            }
+        }
+
         result.call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
@@ -394,11 +435,20 @@ export function useGraphController({
     }
 
     function linkRender(selection: LinkSelection) {
-        return selection
-            .join("line")
-            .attr('stroke', graphTheme.link.stroke)
-            .attr('stroke-opacity', graphTheme.opacity.mid)
-            .attr("stroke-width", d => Math.sqrt(d.value))
+        const result = selection
+          .join("line")
+          .attr('stroke', graphTheme.link.stroke)
+          .attr('stroke-opacity', graphTheme.opacity.mid)
+          .attr("stroke-width", d => Math.sqrt(d.value));
+
+        if (USE_ZOOM) {
+            if (result.node()) {
+                const transform = d3.zoomTransform(result.node());
+                result.attr("transform", transform.toString());
+            }
+        }
+
+        return result;
     }
 
     function onNodeClick(event: React.MouseEvent, nodeClicked: GraphNode) {
@@ -432,6 +482,24 @@ export function useGraphController({
         setHoverType('');
     }
 
+    function ticked() {
+        if (!linkRef.current || !nodeRef.current) return;
+        linkRef.current
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        nodeRef.current
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+    }
+
+    function zoomed({ transform }) {
+        nodeRef.current?.attr("transform", transform);
+        linkRef.current?.attr("transform", transform);
+    }
+
     // drag events
     function dragstarted(event) {
         if (!event.active) {
@@ -445,8 +513,9 @@ export function useGraphController({
 
     // Update the subject (dragged node) position during drag.
     function dragged(event) {
-        event.subject.fx = event.x;
-        event.subject.fy = event.y;
+        const transform = d3.zoomTransform(this)
+        event.subject.fx += event.dx / transform.k;
+        event.subject.fy += event.dy / transform.k;
     }
 
     // Restore the target alpha so the simulation cools after dragging ends.

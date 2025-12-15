@@ -11,11 +11,11 @@ import { Autocomplete } from '../../component/autocomplete'
 import { useMemoryQueryRunner } from '../../../api/local/useQueryRunner'
 import { DEFAULT_GRAPH_USER_SETTINGS, GraphUserSettings, GraphUserSettingsContext } from './userSettings'
 import { GraphImportModal } from './importModal'
-import { HoverCard } from '../../component/hoverCard'
 import { Alert } from '../../component/alert/alert'
 import { TaskStatus } from '../../../types'
 import { displayMessage } from '../../../error'
 import { downloadText } from '../../download'
+import { imageUris } from '../../../api/mtgjson'
 
 export interface GraphSearchViewProps {
   memory: NormedCard[];
@@ -164,8 +164,13 @@ export function GraphSearchView({ memory }: GraphSearchViewProps) {
         </div>
 
         {hoverId && hoverType === 'card' &&
-          <HoverCard cardName={hoverName} id={hoverId} hoverStyle={hoverStyle} />
-        }
+          <img
+            className="card-image"
+            src={imageUris(hoverId, "front").normal}
+            width={250}
+            style={hoverStyle}
+            alt={hoverName}
+          />}
         {hoverId && hoverType === 'search' && <div style={{
           ...hoverStyle,
           padding: 'var(--spacing-200)',

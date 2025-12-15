@@ -54,7 +54,6 @@ export function CardDetailView({ cardNode }: CardDetailViewProps) {
             <a href={scryfallCardLink(card)}
                rel='noreferrer'
                target='_blank'
-               style={{ lineHeight: '0', alignSelf: 'center' }}
             >
                 <button title='open in Scryfall'>
                     <ScryfallIcon size={DEFAULT_ICON_SIZE} />
