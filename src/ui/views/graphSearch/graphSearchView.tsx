@@ -110,7 +110,7 @@ export function GraphSearchView({ memory }: GraphSearchViewProps) {
 
   useEffect(() => {
     (async () => {
-      setGraphStatus('loading');
+      setGraphStatus('loading')
       const localState = localStorage.getItem('graph-search.state')
       if (localState) {
         try {
@@ -121,7 +121,8 @@ export function GraphSearchView({ memory }: GraphSearchViewProps) {
           setGraphStatus('error');
           setGraphError(e.toString());
         }
-
+      } else {
+        setGraphStatus('success');
       }
 
     })()
